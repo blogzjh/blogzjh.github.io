@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>ZJH&#39;blog</title>
+  <title>MarkDown常用语法 | ZJH&#39;blog</title>
   <meta name="keywords" content="">
-  <meta name="description" content="ZJH&#39;blog">
+  <meta name="description" content="MarkDown常用语法 | ZJH&#39;blog">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="description" content="针对字符的RLE压缩1. 针对纯字符的压缩 2. 不考虑两位数及以上的循环 例如：用1*2#5*3#表示：11555两个1三个5，即 数*重复次数#  至于为什么只考虑一位数：多位数可以用包装类Integer表示，并且实际压缩中不会单纯压缩字符，一般都是整个对象一起压缩，所以没必要两位相连的数与后面判断  public static StringBuffer RLE(char...chars)&amp;#">
 <meta property="og:type" content="article">
@@ -58,7 +58,7 @@
 
 
 <body>
-<aside class="nav mobile">
+<aside class="nav">
     <div class="nav-left">
         <a href="/zjh/"
    class="avatar_target">
@@ -259,12 +259,51 @@
         </div>
     </div>
 </aside>
-<div id="post" class="index">
+<div id="post">
     <div class="pjax">
-        <article class="index">
-            <div class="toc-ref">
+        <article id="post-MarkDown常用语法" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BC%95%E5%AF%BC"><span class="toc-text">引导</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%A5%E5%8D%9A%E5%AE%A2%E4%B8%8B%E7%9A%84%E5%BF%AB%E6%8D%B7%E9%94%AE"><span class="toc-text">该博客下的快捷键</span></a></li></ol></li></ol>
+        <h1 class="article-title">MarkDown常用语法</h1>
+    
+    <div class="article-meta">
+        
+        
+        
+        <span class="book">
+            <i class="iconfont icon-category"></i>
+            
+            
+            <a  data-rel="工具">工具</a>
+            
+        </span>
+        
+        
+    </div>
+    <div class="article-meta">
+        
+            发布时间 : <time class="date" title='最后更新: 2021-12-25 01:31:46'>2021-12-24 23:33</time>
+        
+    </div>
+    <div class="article-meta">
+        
+        
+        <span id="busuanzi_container_page_pv">
+            阅读 :<span id="busuanzi_value_page_pv">
+                <span class="count-comment">
+                    <span class="spinner">
+                      <div class="cube1"></div>
+                      <div class="cube2"></div>
+                    </span>
+                </span>
+            </span>
+        </span>
+        
+        
+    </div>
+    
+    <div class="toc-ref">
+    
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%88%86%E7%BA%A7%E6%A0%87%E9%A2%98"><span class="toc-text">分级标题</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%87%E9%A2%982%E7%A4%BA%E4%BE%8B"><span class="toc-text">标题2示例</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AD%97%E4%BD%93"><span class="toc-text">字体</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%8D%A2%E8%A1%8C%E7%AC%A6"><span class="toc-text">换行符</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%BD%AC%E4%B9%89%E5%AD%97%E7%AC%A6"><span class="toc-text">转义字符</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BC%95%E7%94%A8%E5%9D%97"><span class="toc-text">引用块</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BC%95%E7%94%A8"><span class="toc-text">引用</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%88%86%E5%89%B2%E7%BA%BF"><span class="toc-text">分割线</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9B%BE%E7%89%87"><span class="toc-text">图片</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%B6%85%E9%93%BE%E6%8E%A5"><span class="toc-text">超链接</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%A1%A8%E6%A0%BC"><span class="toc-text">表格</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%88%97%E8%A1%A8"><span class="toc-text">列表</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%97%A0%E5%BA%8F%E5%88%97%E8%A1%A8%E7%94%A8"><span class="toc-text">无序列表用-+*</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%89%E5%BA%8F%E5%88%97%E8%A1%A8%E7%94%A81-2-3"><span class="toc-text">有序列表用1. 2. 3.</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E5%9D%97"><span class="toc-text">代码块</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%95%E8%A1%8C%E4%BB%A3%E7%A0%81-xxxx"><span class="toc-text">单行代码&#96;xxxx&#96;</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%9A%E8%A1%8C%E4%BB%A3%E7%A0%81-39-%E2%80%98%E2%80%99xxx-xxx%E2%80%99%E2%80%99%E2%80%99"><span class="toc-text">多行代码&#39;‘’xxx xxx’’’</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%B5%81%E7%A8%8B%E5%9B%BE"><span class="toc-text">流程图</span></a></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -277,45 +316,111 @@
     }
 </style>
 </div>
-            <h1 id="引导"><a href="#引导" class="headerlink" title="引导"></a>引导</h1><h2 id="该博客下的快捷键"><a href="#该博客下的快捷键" class="headerlink" title="该博客下的快捷键"></a>该博客下的快捷键</h2><blockquote>
-<p>s/S     全屏/取消全屏</p>
-</blockquote>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <hr>
+<h1 id="分级标题"><a href="#分级标题" class="headerlink" title="分级标题"></a>分级标题</h1><p>一共支持6级标题，例如二级标题用“## 标题2”</p>
+<h2 id="标题2示例"><a href="#标题2示例" class="headerlink" title="标题2示例"></a>标题2示例</h2><h1 id="字体"><a href="#字体" class="headerlink" title="字体"></a>字体</h1><p><strong>加粗</strong>：左右各2*</p>
+<p><em>斜体</em>：左右各1*</p>
+<p><em><strong>加粗斜体</strong></em>：左右各3*</p>
+<p><del>删除横杠</del>：左右各2~</p>
+<h1 id="换行符"><a href="#换行符" class="headerlink" title="换行符"></a>换行符</h1><p>&lt;br/&gt;<br>中间加上这个br<br/>就能换行了</p>
+<h1 id="转义字符"><a href="#转义字符" class="headerlink" title="转义字符"></a>转义字符</h1><p>\xxxx就能让命令原样显示</p>
+<h1 id="引用块"><a href="#引用块" class="headerlink" title="引用块"></a>引用块</h1><pre><code>按tab   
+引用块和引用冲突，不可分层
+</code></pre>
+<h1 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h1><p>可以嵌套使用,原理同标题，&gt;表示第一层，&gt;&gt;表示内2层，&gt;后接空格</p>
 <blockquote>
-<p>w/W     打开/关闭文章目录</p>
-</blockquote>
+<p>第一层</p>
 <blockquote>
-<p>i/I     获取搜索框焦点</p>
-</blockquote>
+<p>第二层</p>
 <blockquote>
-<p>j/J     向下滑动</p>
+<p>第三层内容</p>
 </blockquote>
+</blockquote>
+</blockquote>
+<h1 id="分割线"><a href="#分割线" class="headerlink" title="分割线"></a>分割线</h1><hr>
+<p>3个或3个以上的<em>或者-，*<em>效果相同</em></em></p>
+<hr>
+<h1 id="图片"><a href="#图片" class="headerlink" title="图片"></a>图片</h1><p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/ea1eb11db63f" title="图床">图床的应用</a></p>
 <blockquote>
-<p>k/K     向上滑动</p>
+<p><br/>格式<br/><br>![图片alt](图片地址 ‘’图片title’’)</p>
 </blockquote>
-<blockquote>
-<p>gg/GG     到最顶端</p>
+<p>图片alt就是显示在图片下面的文字，相当于对图片内容的解释。<br>图片title是图片的标题，当鼠标移到图片上时显示的内容。title可加可不加</p>
+<h1 id="超链接"><a href="#超链接" class="headerlink" title="超链接"></a>超链接</h1><blockquote>
+<p><a href="%E8%B6%85%E9%93%BE%E6%8E%A5%E5%9C%B0%E5%9D%80" title="超链接title">超链接名</a><br>title可加可不加</p>
 </blockquote>
-<blockquote>
-<p>shift+G/g     到最下端</p>
-</blockquote>
-<blockquote>
-<p>ESC     1.如果输入框有内容，清除内容2.如果输入框无内容，失去焦点</p>
-</blockquote>
-<blockquote>
-<p>下     向下选择文章</p>
-</blockquote>
-<blockquote>
-<p>上     向上选择文章</p>
-</blockquote>
-<blockquote>
-<p>回车     打开当前选中的文章，若没有，则默认打开第一个</p>
-</blockquote>
-<p>到目前为止已经写了<code class="article_number"></code>篇文章， 共<code class="site_word_count"></code>字。</p>
-<p>本站访问人数：<code class="site_uv"></code>人次 ， 访问量：<code class="site_pv"></code>次</p>
+<h1 id="表格"><a href="#表格" class="headerlink" title="表格"></a>表格</h1><p>表头|表头|表头</p>
+<p>—|:–:|—:</p>
+<p>内容|内容|内容</p>
+<p>内容|内容|内容</p>
+<table>
+<thead>
+<tr>
+<th>表头</th>
+<th align="center">表头</th>
+<th align="right">表头</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>内容</td>
+<td align="center">内容</td>
+<td align="right">内容</td>
+</tr>
+<tr>
+<td>内容</td>
+<td align="center">内容</td>
+<td align="right">内容</td>
+</tr>
+</tbody></table>
+<p>第二行分割表头和内容。<br><strong>- 有一个就行，为了对齐，多加了几个</strong></p>
+<p>文字默认居左<br/><br>-两边加：表示文字居中<br/><br>-右边加：表示文字居右<br/><br>注：原生的语法两边都要用 | 包起来。此处省略</p>
+<p>第二行分割表头和内容。<br/><br>- 有一个就行，为了对齐，多加了几个<br/><br>文字默认居左<br/><br>-两边加：表示文字居中<br/><br>-右边加：表示文字居右<br/><br>注：原生的语法两边都要用 | 包起来。此处省略</p>
+<h1 id="列表"><a href="#列表" class="headerlink" title="列表"></a>列表</h1><h2 id="无序列表用"><a href="#无序列表用" class="headerlink" title="无序列表用-+*"></a>无序列表用-+*</h2><p>- 举例1<br/>+ 举例2<br/>* 举例3<br/></p>
+<ul>
+<li>举例1</li>
+</ul>
+<ul>
+<li>举例2</li>
+</ul>
+<ul>
+<li>举例3<h2 id="有序列表用1-2-3"><a href="#有序列表用1-2-3" class="headerlink" title="有序列表用1. 2. 3."></a>有序列表用1. 2. 3.</h2></li>
+</ul>
+<ol>
+<li>举例1</li>
+<li>举例2</li>
+</ol>
+<h1 id="代码块"><a href="#代码块" class="headerlink" title="代码块"></a>代码块</h1><p>反引号`是~号的半角模式</p>
+<h2 id="单行代码-xxxx"><a href="#单行代码-xxxx" class="headerlink" title="单行代码`xxxx`"></a>单行代码`xxxx`</h2><p><code>System.out.println(&quot;Hello&quot;);</code><br><code>System.out.println(&quot;World&quot;);</code></p>
+<h2 id="多行代码-39-‘’xxx-xxx’’’"><a href="#多行代码-39-‘’xxx-xxx’’’" class="headerlink" title="多行代码&#39;‘’xxx xxx’’’"></a>多行代码&#39;‘’xxx xxx’’’</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">while(iterators.hasNextLine)&#123;</span><br><span class="line">    iterators.next();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-        </article>
-        
-        
+<h1 id="流程图"><a href="#流程图" class="headerlink" title="流程图"></a>流程图</h1><pre><code class="flow">st=&gt;start: 开始
+op=&gt;operation: My Operation
+cond=&gt;condition: Yes or No?
+e=&gt;end
+st-&gt;op-&gt;cond
+cond(yes)-&gt;e
+cond(no)-&gt;op
+&amp;```
+</code></pre>
+
+      
+       <hr><span style="font-style: italic;color: gray;"> 投其所好，乐此不疲 </span>
+    </div>
+</article>
+
+
+
+
+
+
+
+    
+
+
+
+
     </div>
     <div class="copyright">
         <p class="footer-entry">
@@ -324,11 +429,11 @@
 <p class="footer-entry">Built with <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/yelog/hexo-theme-3-hexo" target="_blank">3-hexo</a> theme</p>
 
     </div>
-</div>
-<div class="full-toc">
-    <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
+    <div class="full-toc">
+        <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
 <a class="" id="rocket" ></a>
 
+    </div>
 </div>
 
 </body>
