@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>ZJH&#39;blog</title>
+  <title>Java四种next用法 | ZJH&#39;blog</title>
   <meta name="keywords" content="">
-  <meta name="description" content="ZJH&#39;blog">
+  <meta name="description" content="Java四种next用法 | ZJH&#39;blog">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="description" content="我们发现这个回形数矩阵的逻辑是：→↓←↑四个为一个循环，故考虑框架为：一个外层for里面嵌套4个内层for 每个内层for的起点终点都随着外层的变化而变化 说实话这种问题只可意会不可言传，光看源码没什么用，你得逼着自己去思考，哪怕是一个下午，一天才做出来也比你直接看源码好啊使劲想想现实逻辑怎么转化为for循环逻辑，一般看到那个→↓←↑就会感觉这四个地位等价，就尝试着把这四个for放到一个外层大fo">
 <meta property="og:type" content="article">
@@ -58,7 +58,7 @@
 
 
 <body>
-<aside class="nav mobile">
+<aside class="nav">
     <div class="nav-left">
         <a href="/zjh/"
    class="avatar_target">
@@ -289,12 +289,51 @@
         </div>
     </div>
 </aside>
-<div id="post" class="index">
+<div id="post">
     <div class="pjax">
-        <article class="index">
-            <div class="toc-ref">
+        <article id="post-Java四种next用法" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BC%95%E5%AF%BC"><span class="toc-text">引导</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%A5%E5%8D%9A%E5%AE%A2%E4%B8%8B%E7%9A%84%E5%BF%AB%E6%8D%B7%E9%94%AE"><span class="toc-text">该博客下的快捷键</span></a></li></ol></li></ol>
+        <h1 class="article-title">Java四种next用法</h1>
+    
+    <div class="article-meta">
+        
+        
+        
+        <span class="book">
+            <i class="iconfont icon-category"></i>
+            
+            
+            <a  data-rel="语言">语言</a>
+            
+        </span>
+        
+        
+    </div>
+    <div class="article-meta">
+        
+            发布时间 : <time class="date" title='最后更新: 2021-12-25 02:06:14'>2021-12-25 01:59</time>
+        
+    </div>
+    <div class="article-meta">
+        
+        
+        <span id="busuanzi_container_page_pv">
+            阅读 :<span id="busuanzi_value_page_pv">
+                <span class="count-comment">
+                    <span class="spinner">
+                      <div class="cube1"></div>
+                      <div class="cube2"></div>
+                    </span>
+                </span>
+            </span>
+        </span>
+        
+        
+    </div>
+    
+    <div class="toc-ref">
+    
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#hasNext%E5%92%8ChasNextLine%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-text">hasNext和hasNextLine的区别</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#hasNext-%E5%92%8C-next%E7%BB%84%E5%90%88"><span class="toc-text">hasNext 和 next组合</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#hasNext-%E5%92%8C-NextLine%E7%BB%84%E5%90%88"><span class="toc-text">hasNext 和 NextLine组合</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#hasNextLine-%E5%92%8C-nextLine%E7%BB%84%E5%90%88"><span class="toc-text">hasNextLine 和 nextLine组合</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-text">总结</span></a></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -307,45 +346,110 @@
     }
 </style>
 </div>
-            <h1 id="引导"><a href="#引导" class="headerlink" title="引导"></a>引导</h1><h2 id="该博客下的快捷键"><a href="#该博客下的快捷键" class="headerlink" title="该博客下的快捷键"></a>该博客下的快捷键</h2><blockquote>
-<p>s/S     全屏/取消全屏</p>
-</blockquote>
-<blockquote>
-<p>w/W     打开/关闭文章目录</p>
-</blockquote>
-<blockquote>
-<p>i/I     获取搜索框焦点</p>
-</blockquote>
-<blockquote>
-<p>j/J     向下滑动</p>
-</blockquote>
-<blockquote>
-<p>k/K     向上滑动</p>
-</blockquote>
-<blockquote>
-<p>gg/GG     到最顶端</p>
-</blockquote>
-<blockquote>
-<p>shift+G/g     到最下端</p>
-</blockquote>
-<blockquote>
-<p>ESC     1.如果输入框有内容，清除内容2.如果输入框无内容，失去焦点</p>
-</blockquote>
-<blockquote>
-<p>下     向下选择文章</p>
-</blockquote>
-<blockquote>
-<p>上     向上选择文章</p>
-</blockquote>
-<blockquote>
-<p>回车     打开当前选中的文章，若没有，则默认打开第一个</p>
-</blockquote>
-<p>到目前为止已经写了<code class="article_number"></code>篇文章， 共<code class="site_word_count"></code>字。</p>
-<p>本站访问人数：<code class="site_uv"></code>人次 ， 访问量：<code class="site_pv"></code>次</p>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在查阅了大量网上相关资料都没有一个完整的解释，并且我查的几篇高赞回答都是错误的时候，我决定用一整天的时间来精细写下这篇文章，希望对你有帮助。</p>
+<pre><code>大多数人对hasNext的印象停留在“判断是否有下一个值”上，而该方法还是一个阻塞式的方法
+</code></pre>
+<h1 id="hasNext和hasNextLine的区别"><a href="#hasNext和hasNextLine的区别" class="headerlink" title="hasNext和hasNextLine的区别"></a>hasNext和hasNextLine的区别</h1><p>二者都是用于判断“有无键盘输入”的，有则返回true，没有则阻塞！一定记住是阻塞而不是返回false，很多人都说是返回false，但你查源码会发现是不会返回false的，他会让你一直阻塞在判断阶段，二者只是在细节上有不同</p>
+<pre><code>hasNext()方法会判断接下来是否有非空字符.如果有,则返回true，没有则阻塞。例如一直敲回车相当于一直判断为空字符，但是不会返回false，而是一直阻塞在判断阶段，直到你输入了非空字符
+hasNextLine() 方法会根据行匹配模式去判断接下来是否有一行(包括空行),如果有,则返回true。这个没什么特别的，只要是你敲了回车那都是true并且不会阻塞
+</code></pre>
+<p>例如像这种if语句是永远不可能执行到内部方法体的</p>
+<pre><code>if(scan.hasNext()==false)&#123;
+    System.out.println(&quot;hasNext和hasNextLine不会返回false&quot;);
+&#125;
+</code></pre>
+<p> 再举一个例子加深理解：</p>
+<pre><code>Scanner scan = new Scanner(System.in);
+System.out.println(scan.hasNextLine());
+System.out.println(scan.hasNext());
+</code></pre>
+<p> 运行该代码，一直不停敲回车键，第一次回车会直接输出true，而后面一直敲都会阻塞在hasNext语句上，运行如下图</p>
+<p><img src="https://img-blog.csdnimg.cn/20211001130739982.png"></p>
+<p>首先，在看用法和解释之前，有以下几个点必须时刻牢记</p>
+<pre><code>    next方法不能录入空格，在特定情况下会把空格当作回车，nextLine方法可以识录入空格
+    hasNext和hasNextLine的返回值都是boolean类型，但只有可能返回true，不可能返回false，并且都默认以回车键为结束（hasNext可以设置为任意符号为结束键，不在本文研究范围之内）
+    hasNext、next不能直接识别裸回车，而hasNextLine和nextLine都可以直接识别裸回车。换句话讲：对于不输入符号而直接裸敲一个回车的操作，只有后两个能识别
+    hasNext、hasNextLine在返回一个boolean类型结果true的同时，会在堆空间中开辟一块专门用于存放刚刚输入的字符串，用于下次next或者nextLine：即下次next或者nextLine不需要再从键盘输入，相当于系统自动把刚刚输入的字符串再原封不动的输入了一遍。同时这个存储寿命＝调用对象的寿命
+    对于hasNext来说，每次敲击回车都相当于在堆空间中开辟一行，敲几次回车就会直接给后续next、nextLine方法赋值几次
+    hasNext是线程阻塞的，对于hasNext来说，如果一直不输入字符，反而一直敲回车的话，整个线程会卡在这个输入的地方，直到有字符输入
+</code></pre>
+<p>在知道 hasNext的方法用于判断和存储，next的方法用于输入之后，来做如下预备工作</p>
+<pre><code>因为hasNext、hasNextLine与next、nextLine有2X2种组合方式，所以我们用4段代码做4次实验就可以大体上了解他们的特性
 
-        </article>
-        
-        
+以下4段代码希望看客们能亲自复制粘贴了试一试，以便更深理解
+</code></pre>
+<h2 id="hasNext-和-next组合"><a href="#hasNext-和-next组合" class="headerlink" title="hasNext 和 next组合"></a>hasNext 和 next组合</h2><pre><code>Scanner scan = new Scanner(System.in);
+System.out.println(&quot;请输入字符串，并多混入空格回车尝试不同结果&quot;);
+if(scan.hasNext() ) &#123;
+    System.out.println(&quot;第一次&quot;+scan.next());
+    System.out.println(&quot;第二次&quot;+scan.next());
+    System.out.println(&quot;第三次&quot;+scan.next());
+&#125;
+</code></pre>
+<p>尝试输入：空格aaa空格bbb空格ccc回车<br><img src="https://img-blog.csdnimg.cn/20211001131608748.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_18,color_FFFFFF,t_70,g_se,x_16"><br>解释：<br><img src="https://img-blog.csdnimg.cn/20211001125303907.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_15,color_FFFFFF,t_70,g_se,x_16"></p>
+<h2 id="hasNext-和-NextLine组合"><a href="#hasNext-和-NextLine组合" class="headerlink" title="hasNext 和 NextLine组合"></a>hasNext 和 NextLine组合</h2><pre><code>Scanner scan = new Scanner(System.in);
+System.out.println(&quot;请输入字符串，并多混入空格回车尝试不同结果&quot;);
+if(scan.hasNext() ) &#123;
+    System.out.println(&quot;第一次&quot;+scan.nextLine());
+    System.out.println(&quot;第二次&quot;+scan.nextLine());
+    System.out.println(&quot;第三次&quot;+scan.nextLine());
+&#125;
+</code></pre>
+<p>解释：光标仍然闪烁，证明堆空间中的  aaa bbb ccc只赋值给了第一个，这也验证了nextLine可以录入空格。此时线程正在等待用户输入第二个nextLine<br>hasNextLine 和 next组合</p>
+<pre><code>Scanner scan = new Scanner(System.in);
+System.out.println(&quot;请输入字符串，并多混入空格回车尝试不同结果&quot;);
+if(scan.hasNextLine() ) &#123;
+    System.out.println(&quot;第一次&quot;+scan.next());
+    System.out.println(&quot;第二次&quot;+scan.next());
+    System.out.println(&quot;第三次&quot;+scan.next());
+&#125;
+</code></pre>
+<h2 id="hasNextLine-和-nextLine组合"><a href="#hasNextLine-和-nextLine组合" class="headerlink" title="hasNextLine 和 nextLine组合"></a>hasNextLine 和 nextLine组合</h2><pre><code>Scanner scan = new Scanner(System.in);
+System.out.println(&quot;请输入字符串，并多混入空格回车尝试不同结果&quot;);
+if(scan.hasNextLine() ) &#123;
+    System.out.println(&quot;第一次&quot;+scan.nextLine());
+    System.out.println(&quot;第二次&quot;+scan.nextLine());
+    System.out.println(&quot;第三次&quot;+scan.nextLine());
+&#125;
+</code></pre>
+<p>发现规律了吗<br><img src="https://img-blog.csdnimg.cn/20211001132037981.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_18,color_FFFFFF,t_70,g_se,x_16"></p>
+<p><strong>如果直接连续敲回车，那么hasNextLine会判断为true，同时进入if语句执行，并且输入了三个空行也会输出三个空行</strong></p>
+<p>验证hasNext、hasNextLine对输入代码的存储寿命</p>
+<p>hasNextLine在if语句内，我们将验证语句next放在if语句之外，输入aaa bbb ccc ddd测试</p>
+<pre><code>Scanner scan = new Scanner(System.in);
+System.out.println(&quot;请输入字符串，并多混入空格回车尝试不同结果&quot;);
+if(scan.hasNextLine() ) &#123;
+    System.out.println(&quot;第一次&quot;+scan.next());
+    System.out.println(&quot;第二次&quot;+scan.next());
+    System.out.println(&quot;第三次&quot;+scan.next());
+&#125;
+        System.out.println(&quot;验证存储寿命是否＝scan对象寿命&quot;+scan.next());
+</code></pre>
+<p> <img src="https://img-blog.csdnimg.cn/20211001132824820.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_17,color_FFFFFF,t_70,g_se,x_16"></p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>hasNext、hasNextLine不可能返回false，只有true和阻塞两种结果</p>
+<p>hasNext、hasNextLine会判断有无输入，并且hasNext一直敲回车而不输入字符会导致线程阻塞</p>
+<p>hasNext、hasNextLine也有存储功能，从“开始输入”到“判断结束”的过程中的所有输入都将储存，直到之后遇到需要键盘输入的next、nextLine，这些存储的字符串和空格会自动填写给后面的next、nextLine。而空格再next和nextLine上有不同的表现</p>
+<p>查看API还有很多同类型的不同方法，按照这个思路可以一通百通<br><img src="https://img-blog.csdnimg.cn/2021100113530823.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16"><br><img src="https://img-blog.csdnimg.cn/20211001135328579.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16"></p>
+
+      
+       <hr><span style="font-style: italic;color: gray;"> 投其所好，乐此不疲 </span>
+    </div>
+</article>
+
+
+
+
+
+
+
+    
+
+
+
+
     </div>
     <div class="copyright">
         <p class="footer-entry">
@@ -354,11 +458,11 @@
 <p class="footer-entry">Built with <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/yelog/hexo-theme-3-hexo" target="_blank">3-hexo</a> theme</p>
 
     </div>
-</div>
-<div class="full-toc">
-    <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
+    <div class="full-toc">
+        <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
 <a class="" id="rocket" ></a>
 
+    </div>
 </div>
 
 </body>

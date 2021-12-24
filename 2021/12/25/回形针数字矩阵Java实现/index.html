@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>ZJH&#39;blog</title>
+  <title>回形针数字矩阵Java实现 | ZJH&#39;blog</title>
   <meta name="keywords" content="">
-  <meta name="description" content="ZJH&#39;blog">
+  <meta name="description" content="回形针数字矩阵Java实现 | ZJH&#39;blog">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="description" content="我们发现这个回形数矩阵的逻辑是：→↓←↑四个为一个循环，故考虑框架为：一个外层for里面嵌套4个内层for 每个内层for的起点终点都随着外层的变化而变化 说实话这种问题只可意会不可言传，光看源码没什么用，你得逼着自己去思考，哪怕是一个下午，一天才做出来也比你直接看源码好啊使劲想想现实逻辑怎么转化为for循环逻辑，一般看到那个→↓←↑就会感觉这四个地位等价，就尝试着把这四个for放到一个外层大fo">
 <meta property="og:type" content="article">
@@ -58,7 +58,7 @@
 
 
 <body>
-<aside class="nav mobile">
+<aside class="nav">
     <div class="nav-left">
         <a href="/zjh/"
    class="avatar_target">
@@ -289,12 +289,51 @@
         </div>
     </div>
 </aside>
-<div id="post" class="index">
+<div id="post">
     <div class="pjax">
-        <article class="index">
-            <div class="toc-ref">
+        <article id="post-回形针数字矩阵Java实现" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BC%95%E5%AF%BC"><span class="toc-text">引导</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%A5%E5%8D%9A%E5%AE%A2%E4%B8%8B%E7%9A%84%E5%BF%AB%E6%8D%B7%E9%94%AE"><span class="toc-text">该博客下的快捷键</span></a></li></ol></li></ol>
+        <h1 class="article-title">回形针数字矩阵Java实现</h1>
+    
+    <div class="article-meta">
+        
+        
+        
+        <span class="book">
+            <i class="iconfont icon-category"></i>
+            
+            
+            <a  data-rel="数据结构算法">数据结构算法</a>
+            
+        </span>
+        
+        
+    </div>
+    <div class="article-meta">
+        
+            发布时间 : <time class="date" title='最后更新: 2021-12-25 02:08:07'>2021-12-25 02:07</time>
+        
+    </div>
+    <div class="article-meta">
+        
+        
+        <span id="busuanzi_container_page_pv">
+            阅读 :<span id="busuanzi_value_page_pv">
+                <span class="count-comment">
+                    <span class="spinner">
+                      <div class="cube1"></div>
+                      <div class="cube2"></div>
+                    </span>
+                </span>
+            </span>
+        </span>
+        
+        
+    </div>
+    
+    <div class="toc-ref">
+    
+        
     
 <style>
     .left-col .switch-btn,
@@ -307,45 +346,70 @@
     }
 </style>
 </div>
-            <h1 id="引导"><a href="#引导" class="headerlink" title="引导"></a>引导</h1><h2 id="该博客下的快捷键"><a href="#该博客下的快捷键" class="headerlink" title="该博客下的快捷键"></a>该博客下的快捷键</h2><blockquote>
-<p>s/S     全屏/取消全屏</p>
-</blockquote>
-<blockquote>
-<p>w/W     打开/关闭文章目录</p>
-</blockquote>
-<blockquote>
-<p>i/I     获取搜索框焦点</p>
-</blockquote>
-<blockquote>
-<p>j/J     向下滑动</p>
-</blockquote>
-<blockquote>
-<p>k/K     向上滑动</p>
-</blockquote>
-<blockquote>
-<p>gg/GG     到最顶端</p>
-</blockquote>
-<blockquote>
-<p>shift+G/g     到最下端</p>
-</blockquote>
-<blockquote>
-<p>ESC     1.如果输入框有内容，清除内容2.如果输入框无内容，失去焦点</p>
-</blockquote>
-<blockquote>
-<p>下     向下选择文章</p>
-</blockquote>
-<blockquote>
-<p>上     向上选择文章</p>
-</blockquote>
-<blockquote>
-<p>回车     打开当前选中的文章，若没有，则默认打开第一个</p>
-</blockquote>
-<p>到目前为止已经写了<code class="article_number"></code>篇文章， 共<code class="site_word_count"></code>字。</p>
-<p>本站访问人数：<code class="site_uv"></code>人次 ， 访问量：<code class="site_pv"></code>次</p>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="https://img-blog.csdnimg.cn/20210726004539592.png"><br>我们发现这个回形数矩阵的逻辑是：→↓←↑四个为一个循环，故考虑框架为：一个外层for里面嵌套4个内层for</p>
+<p>每个内层for的起点终点都随着外层的变化而变化</p>
+<p>说实话这种问题只可意会不可言传，光看源码没什么用，你得逼着自己去思考，哪怕是一个下午，一天才做出来也比你直接看源码好啊<del>使劲想想现实逻辑怎么转化为for循环逻辑，一般看到那个→↓←↑就会感觉这四个地位等价，就尝试着把这四个for放到一个外层大for里面，一点一点试出来</del></p>
+<pre><code>import java.util.Scanner;
+public class Test1 &#123;
+    public static void main(String[] args) &#123;
+        Scanner scan = new Scanner(System.in);
+        System.out.println(&quot;输入一个数，返回回形数矩阵&quot;);
+        int i = scan.nextInt();
+        // 键盘输入一个数
+        int[][] arr = new int[i][i];
+        int m = 1;//用于赋值
+        /*思考循环数的逻辑顺序，→↓←↑四个为一个循环，故考虑框架为一个外层for里面套4个内层for*/
+        /*每一个循环的→↓←↑内层for循环，其起点和终点都不断改变，所以起点终点必须表现出来这个联系，绝不能为常数*/
+        for (int j = 0; j &lt; i; j++) &#123;
+ 
+            for (int k = j; k &lt; i - j; k++) &#123;//k=j和k&lt;i-j都在不断的改变
+                        arr[j][k] = m;
+                m++;
+            &#125; 
+            for (int l = j + 1; l &lt; i - j; l++) &#123;
+                arr[l][i - j - 1] = m;
+                m++;
+            &#125;
+            for (int p = i - j - 2; p &gt; j - 1; p--) &#123;
+                arr[i - j - 1][p] = m;
+                m++;
+            &#125;
+            for (int q = i - j - 2; q &gt; j; q--) &#123;
+                arr[q][j] = m;
+                m++;
+            &#125;
+        &#125;
+        // 输出矩阵
+        for (int a = 0; a &lt; arr.length; a++) &#123;
+            for (int b = 0; b &lt; arr[a].length; b++) &#123;
+                System.out.print(arr[a][b] + &quot;\t&quot;);
+ 
+            &#125;
+            System.out.println();
+        &#125;
+    &#125;
+&#125;
+</code></pre>
 
-        </article>
-        
-        
+      
+       <hr><span style="font-style: italic;color: gray;"> 投其所好，乐此不疲 </span>
+    </div>
+</article>
+
+
+
+
+
+
+
+    
+
+
+
+
     </div>
     <div class="copyright">
         <p class="footer-entry">
@@ -354,11 +418,11 @@
 <p class="footer-entry">Built with <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/yelog/hexo-theme-3-hexo" target="_blank">3-hexo</a> theme</p>
 
     </div>
-</div>
-<div class="full-toc">
-    <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
+    <div class="full-toc">
+        <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
 <a class="" id="rocket" ></a>
 
+    </div>
 </div>
 
 </body>
