@@ -6,24 +6,30 @@
   <meta name="keywords" content="">
   <meta name="description" content="RLE算法的Java实现 | ZJH&#39;blog">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="摘自：  IDEA常用命令 ,侵删 1. 自动代码常用的有fori&#x2F;sout&#x2F;psvm+Tab即可生成循环、System.out、main方法等boilerplate样板代码 。例如要输入for(User user : users)只需输入user.for+Tab。 再比如，要输入Date birthday &#x3D; user.getBirthday();只需输入user.getBirthday().v">
+<meta name="description" content="决策树决策树是什么 一个根节点，若干个内部节点和叶节点 非参数学习算法 天然的分类器  决策树的目标解决分类和回归问题 原理根据信息熵(entropy) or 基尼系数(gini)的大小决定下一个节点怎么分枝，最后生成决策树，而随机森林就是多个决策树的组合 信息熵entropy超链接：Yjango:什么是信息熵？ 熵在信息论中代表随机变量的不确定性的度量 熵越小，数据不确定性越低熵越大，数据不确定">
 <meta property="og:type" content="article">
-<meta property="og:title" content="IDEA常用快捷键">
-<meta property="og:url" content="https://zjhblog.gitee.io/2021/12/25/IDEA%E5%B8%B8%E7%94%A8%E5%BF%AB%E6%8D%B7%E9%94%AE/index.html">
+<meta property="og:title" content="决策树&#x2F;随机森林——用户流失预测的案例">
+<meta property="og:url" content="https://zjhblog.gitee.io/2022/01/01/%E5%86%B3%E7%AD%96%E6%A0%91-%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E7%94%A8%E6%88%B7%E6%B5%81%E5%A4%B1%E9%A2%84%E6%B5%8B%E7%9A%84%E6%A1%88%E4%BE%8B/index.html">
 <meta property="og:site_name" content="ZJH&#39;blog">
-<meta property="og:description" content="摘自：  IDEA常用命令 ,侵删 1. 自动代码常用的有fori&#x2F;sout&#x2F;psvm+Tab即可生成循环、System.out、main方法等boilerplate样板代码 。例如要输入for(User user : users)只需输入user.for+Tab。 再比如，要输入Date birthday &#x3D; user.getBirthday();只需输入user.getBirthday().v">
+<meta property="og:description" content="决策树决策树是什么 一个根节点，若干个内部节点和叶节点 非参数学习算法 天然的分类器  决策树的目标解决分类和回归问题 原理根据信息熵(entropy) or 基尼系数(gini)的大小决定下一个节点怎么分枝，最后生成决策树，而随机森林就是多个决策树的组合 信息熵entropy超链接：Yjango:什么是信息熵？ 熵在信息论中代表随机变量的不确定性的度量 熵越小，数据不确定性越低熵越大，数据不确定">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2021-12-25T13:55:46.000Z">
-<meta property="article:modified_time" content="2021-12-25T14:36:07.624Z">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/6a2b7fea48b04223b402fb145f80d793.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/30820d3df1b24efb98664f1347d2109d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_19,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/16e8639fe87447e1b9f205219401708c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/bac26eaf8ba04751a8308ddf86301246.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f0a64f28f5004c82bc2914efde97415c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="article:published_time" content="2021-12-31T16:41:40.000Z">
+<meta property="article:modified_time" content="2022-01-02T06:53:20.033Z">
 <meta property="article:author" content="ZJH">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/6a2b7fea48b04223b402fb145f80d793.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16">
 
 
 <link rel="icon" href="/img/QQ图片20211224224200.jpg">
 
 <link href="/zjh/css/style.css?v=1.1.0" rel="stylesheet">
 
-<link href="/zjh/css/hl_theme/atom-dark.css?v=1.1.0" rel="stylesheet">
+<link href="/zjh/css/hl_theme/darcula.css?v=1.1.0" rel="stylesheet">
 
 <link href="//cdn.jsdelivr.net/npm/animate.css@4.1.0/animate.min.css" rel="stylesheet">
 
@@ -126,7 +132,7 @@
     <li>
         <div class="all active" data-rel="全部文章">全部文章
             
-                <small>(5)</small>
+                <small>(6)</small>
             
         </div>
     </li>
@@ -173,6 +179,20 @@
             
         
     
+        
+            
+                <li>
+                    <div data-rel="机器学习">
+                        
+                        机器学习
+                        <small>(1)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
 </ul>
 <div class="left-bottom">
     <div class="menus">
@@ -186,8 +206,8 @@
         
     </div>
 </div>
-<input type="hidden" id="yelog_site_posts_number" value="5">
-<input type="hidden" id="yelog_site_word_count" value="6.7k">
+<input type="hidden" id="yelog_site_posts_number" value="6">
+<input type="hidden" id="yelog_site_word_count" value="9.3k">
 <div style="display: none">
     <span id="busuanzi_value_site_uv"></span>
     <span id="busuanzi_value_site_pv"></span>
@@ -253,6 +273,14 @@
            data-author="" >
             <span class="post-title" title="MarkDown常用语法">MarkDown常用语法</span>
             <span class="post-date" title="2021-12-24 23:33:22">2021/12/24</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/zjh/2022/01/01/%E5%86%B3%E7%AD%96%E6%A0%91-%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E7%94%A8%E6%88%B7%E6%B5%81%E5%A4%B1%E9%A2%84%E6%B5%8B%E7%9A%84%E6%A1%88%E4%BE%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="决策树/随机森林——用户流失预测的案例">决策树/随机森林——用户流失预测的案例</span>
+            <span class="post-date" title="2022-01-01 00:41:40">2022/01/01</span>
         </a>
         
         <a  class="全部文章 数据结构算法 "
@@ -535,6 +563,46 @@
 
 
     
+        <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="//cdn.jsdelivr.net/npm/mathjax@2.7.8/unpacked/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+<input type="hidden" id="MathJax-js"
+        value="//cdn.jsdelivr.net/npm/mathjax@2.7.8/unpacked/MathJax.js?config=TeX-MML-AM_CHTML">
+</input>
+    
 
 
 
@@ -571,6 +639,20 @@
 
         /*高亮代码块行号*/
         
+        $('pre code').each(function(){
+            var lines = $(this).text().trim().split('\n').length, widther='';
+            if (lines>99) {
+                widther = 'widther'
+            }
+            var $numbering = $('<ul/>').addClass('pre-numbering ' + widther).attr("unselectable","on");
+            $(this).addClass('has-numbering ' + widther)
+                    .parent()
+                    .append($numbering);
+            for(var i=1;i<=lines;i++){
+                $numbering.append($('<li/>').text(i));
+            }
+        });
+        
 
         /*访问数量*/
         
@@ -590,6 +672,38 @@
 </script>
 
 <!--加入行号的高亮代码块样式-->
+
+<style>
+    pre{
+        position: relative;
+        margin-bottom: 24px;
+        border-radius: 10px;
+        border: 1px solid #e2dede;
+        background: #FFF;
+        overflow: hidden;
+    }
+    code.has-numbering{
+        margin-left: 30px;
+    }
+    code.has-numbering.widther{
+        margin-left: 35px;
+    }
+    .pre-numbering{
+        margin: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 20px;
+        padding: 0.5em 3px 0.7em 5px;
+        border-right: 1px solid #C3CCD0;
+        text-align: right;
+        color: #AAA;
+        background-color: ;
+    }
+    .pre-numbering.widther {
+        width: 35px;
+    }
+</style>
 
 <!--自定义样式设置-->
 <style>
@@ -669,6 +783,16 @@
     /*文章列表背景图*/
     
 
+    
+    #post .pjax article :not(pre) > code {
+        color: #24292e;
+        font-family: SFMono-Regular,Consolas,Liberation Mono,Menlo,Courier,monospace;
+        background-color: rgba(27,31,35,.05);
+        border-radius: 3px;
+        font-size: 85%;
+        margin: 0;
+        padding: .2em .4em;
+    }
     
 </style>
 
