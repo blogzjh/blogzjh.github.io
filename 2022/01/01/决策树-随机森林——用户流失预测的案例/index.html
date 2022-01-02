@@ -19,7 +19,7 @@
 <meta property="og:image" content="https://img-blog.csdnimg.cn/bac26eaf8ba04751a8308ddf86301246.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16">
 <meta property="og:image" content="https://img-blog.csdnimg.cn/f0a64f28f5004c82bc2914efde97415c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16">
 <meta property="article:published_time" content="2021-12-31T16:41:40.000Z">
-<meta property="article:modified_time" content="2022-01-02T06:53:20.033Z">
+<meta property="article:modified_time" content="2022-01-02T07:03:17.094Z">
 <meta property="article:author" content="ZJH">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://img-blog.csdnimg.cn/6a2b7fea48b04223b402fb145f80d793.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16">
@@ -345,7 +345,7 @@
     </div>
     <div class="article-meta">
         
-            发布时间 : <time class="date" title='最后更新: 2022-01-02 14:53:20'>2022-01-01 00:41</time>
+            发布时间 : <time class="date" title='最后更新: 2022-01-02 15:03:17'>2022-01-01 00:41</time>
         
     </div>
     <div class="article-meta">
@@ -452,8 +452,9 @@ print(&#39;Broadband: &#39;, Counter(df[&#39;broadband&#39;]))
 </code></pre>
 <p><img src="https://img-blog.csdnimg.cn/6a2b7fea48b04223b402fb145f80d793.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16" alt="前5行信息and随机查看样本数据"></p>
 <p><img src="https://img-blog.csdnimg.cn/30820d3df1b24efb98664f1347d2109d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_19,color_FFFFFF,t_70,g_se,x_16" alt="info输出信息"></p>
-<h3 id="3，划分训练集-测试集"><a href="#3，划分训练集-测试集" class="headerlink" title="3，划分训练集 测试集"></a>3，划分训练集 测试集</h3><p>由于步骤2中info()发现数据集的第一列是用户ID，最后一列是判断标准Broadband，故这两列都不用做数据分析<br>    python<br>    y = df[‘broadband’] # y就是标签(结果)</p>
-<pre><code>X = df.iloc[:, 1:-1] # 客户 id 没有用，故丢弃 cust_id；标签y也要去掉，故1：-1
+<h3 id="3，划分训练集-测试集"><a href="#3，划分训练集-测试集" class="headerlink" title="3，划分训练集 测试集"></a>3，划分训练集 测试集</h3><p>由于步骤2中info()发现数据集的第一列是用户ID，最后一列是判断标准Broadband，故这两列都不用做数据分析</p>
+<pre><code>y = df[&#39;broadband&#39;] # y就是标签(结果)
+X = df.iloc[:, 1:-1] # 客户 id 没有用，故丢弃 cust_id；标签y也要去掉，故1：-1
 #左边冒号左右端为空，表示所有行数据全部都取到X中
 
 from sklearn.model_selection import train_test_split
