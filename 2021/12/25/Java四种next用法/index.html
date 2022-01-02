@@ -6,12 +6,12 @@
   <meta name="keywords" content="">
   <meta name="description" content="Java四种next用法 | ZJH&#39;blog">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="决策树决策树是什么 一个根节点，若干个内部节点和叶节点 非参数学习算法 天然的分类器  决策树的目标解决分类和回归问题 原理根据信息熵(entropy) or 基尼系数(gini)的大小决定下一个节点怎么分枝，最后生成决策树，而随机森林就是多个决策树的组合 信息熵entropy超链接：Yjango:什么是信息熵？ 熵在信息论中代表随机变量的不确定性的度量 熵越小，数据不确定性越低熵越大，数据不确定">
+<meta name="description" content="决策树决策树是什么 一个根节点，若干个内部节点和叶节点 非参数学习算法 天然的分类器  决策树的目标解决分类和回归问题 决策树的优点  决策树易于理解和实现，人们在在学习过程中不需要使用者了解很多的背景知识，这同时是它的能够直接体现数据的特点，只要通过解释后都有能力去理解决策树所表达的意义。 对于决策树，数据的准备往往是简单或者是不必要的，而且能够同时处理数据型和常规型属性，在相对短的时间内能够对">
 <meta property="og:type" content="article">
 <meta property="og:title" content="决策树&#x2F;随机森林——用户流失预测的案例">
 <meta property="og:url" content="https://zjhblog.gitee.io/2022/01/01/%E5%86%B3%E7%AD%96%E6%A0%91-%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E7%94%A8%E6%88%B7%E6%B5%81%E5%A4%B1%E9%A2%84%E6%B5%8B%E7%9A%84%E6%A1%88%E4%BE%8B/index.html">
 <meta property="og:site_name" content="ZJH&#39;blog">
-<meta property="og:description" content="决策树决策树是什么 一个根节点，若干个内部节点和叶节点 非参数学习算法 天然的分类器  决策树的目标解决分类和回归问题 原理根据信息熵(entropy) or 基尼系数(gini)的大小决定下一个节点怎么分枝，最后生成决策树，而随机森林就是多个决策树的组合 信息熵entropy超链接：Yjango:什么是信息熵？ 熵在信息论中代表随机变量的不确定性的度量 熵越小，数据不确定性越低熵越大，数据不确定">
+<meta property="og:description" content="决策树决策树是什么 一个根节点，若干个内部节点和叶节点 非参数学习算法 天然的分类器  决策树的目标解决分类和回归问题 决策树的优点  决策树易于理解和实现，人们在在学习过程中不需要使用者了解很多的背景知识，这同时是它的能够直接体现数据的特点，只要通过解释后都有能力去理解决策树所表达的意义。 对于决策树，数据的准备往往是简单或者是不必要的，而且能够同时处理数据型和常规型属性，在相对短的时间内能够对">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://img-blog.csdnimg.cn/6a2b7fea48b04223b402fb145f80d793.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16">
 <meta property="og:image" content="https://img-blog.csdnimg.cn/30820d3df1b24efb98664f1347d2109d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_19,color_FFFFFF,t_70,g_se,x_16">
@@ -19,7 +19,7 @@
 <meta property="og:image" content="https://img-blog.csdnimg.cn/bac26eaf8ba04751a8308ddf86301246.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16">
 <meta property="og:image" content="https://img-blog.csdnimg.cn/f0a64f28f5004c82bc2914efde97415c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16">
 <meta property="article:published_time" content="2021-12-31T16:41:40.000Z">
-<meta property="article:modified_time" content="2022-01-02T07:03:17.094Z">
+<meta property="article:modified_time" content="2022-01-02T08:46:42.321Z">
 <meta property="article:author" content="ZJH">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://img-blog.csdnimg.cn/6a2b7fea48b04223b402fb145f80d793.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16">
@@ -207,7 +207,7 @@
     </div>
 </div>
 <input type="hidden" id="yelog_site_posts_number" value="6">
-<input type="hidden" id="yelog_site_word_count" value="9.3k">
+<input type="hidden" id="yelog_site_word_count" value="10.7k">
 <div style="display: none">
     <span id="busuanzi_value_site_uv"></span>
     <span id="busuanzi_value_site_pv"></span>
