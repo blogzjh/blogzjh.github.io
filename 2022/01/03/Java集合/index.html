@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>回形针数字矩阵Java实现 | ZJH&#39;blog</title>
+  <title>Java集合 | ZJH&#39;blog</title>
   <meta name="keywords" content="">
-  <meta name="description" content="回形针数字矩阵Java实现 | ZJH&#39;blog">
+  <meta name="description" content="Java集合 | ZJH&#39;blog">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="description" content="解决思路定义问题——&gt;数据收集——&gt;数据清洗——&gt;分析——&gt;建模——&gt;验证——&gt;优化 该问题下前两步已经完成，本文从数据清洗开始 数据集的特征解读   英 中 分析    PassengeID 乘客ID 乘客ID不影响Survive与否，但可标识身份   Pclass 船舱等级 高等船舱靠近甲板，更容易Survive   Name 姓名 标记   Sex 性别">
 <meta property="og:type" content="article">
@@ -357,9 +357,9 @@
 </aside>
 <div id="post">
     <div class="pjax">
-        <article id="post-回形针数字矩阵Java实现" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-Java集合" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">回形针数字矩阵Java实现</h1>
+        <h1 class="article-title">Java集合</h1>
     
     <div class="article-meta">
         
@@ -369,7 +369,7 @@
             <i class="iconfont icon-category"></i>
             
             
-            <a  data-rel="数据结构算法">数据结构算法</a>
+            <a  data-rel="Java">Java</a>
             
         </span>
         
@@ -377,12 +377,12 @@
     </div>
     <div class="article-meta">
         
-            发布时间 : <time class="date" title='最后更新: 2021-12-25 02:08:07'>2021-12-25 02:07</time>
+            发布时间 : <time class="date" title='最后更新: 2022-01-03 15:18:21'>2022-01-03 10:02</time>
         
     </div>
     <div class="article-meta">
         
-        <span>字数:452</span>
+        <span>字数:1.6k</span>
         
         
         <span id="busuanzi_container_page_pv">
@@ -401,7 +401,7 @@
     
     <div class="toc-ref">
     
-        
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6"><span class="toc-text">集合框架</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E5%92%8C%E7%BA%BF%E7%A8%8B%E4%B8%8D%E5%AE%89%E5%85%A8%E7%9A%84%E9%9B%86%E5%90%88"><span class="toc-text">线程安全和线程不安全的集合</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Collection%E6%A0%B9%E6%8E%A5%E5%8F%A3%EF%BC%9A%E5%8D%95%E5%88%97%E9%9B%86%E5%90%88"><span class="toc-text">Collection根接口：单列集合</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#List%E5%AD%90%E6%8E%A5%E5%8F%A3%EF%BC%9A%E6%9C%89%E5%BA%8F%E5%8F%AF%E9%87%8D%E5%A4%8D"><span class="toc-text">List子接口：有序可重复</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#ArrayList%E5%AE%9E%E7%8E%B0%E7%B1%BB%EF%BC%9A"><span class="toc-text">ArrayList实现类：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ArrayList%E5%BA%95%E5%B1%82%E5%88%86%E6%9E%90"><span class="toc-text">ArrayList底层分析</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LinkedList%E5%AE%9E%E7%8E%B0%E7%B1%BB%EF%BC%9A"><span class="toc-text">LinkedList实现类：</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Set%E5%AD%90%E6%8E%A5%E5%8F%A3%EF%BC%9A%E6%97%A0%E5%BA%8F%E4%B8%8D%E5%8F%AF%E9%87%8D%E5%A4%8D"><span class="toc-text">Set子接口：无序不可重复</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#HashSet%E5%AE%9E%E7%8E%B0%E7%B1%BB"><span class="toc-text">HashSet实现类</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#LinkedHashSet%E5%AE%9E%E7%8E%B0%E7%B1%BB"><span class="toc-text">LinkedHashSet实现类</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#TreeSet%E5%AE%9E%E7%8E%B0%E7%B1%BB%EF%BC%88%E7%94%A8%E7%9A%84%E5%B0%91%EF%BC%89"><span class="toc-text">TreeSet实现类（用的少）</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Map%E6%A0%B9%E6%8E%A5%E5%8F%A3"><span class="toc-text">Map根接口</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#HashMap"><span class="toc-text">HashMap</span></a></li></ol></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -417,50 +417,87 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p><img src="https://img-blog.csdnimg.cn/20210726004539592.png"><br>我们发现这个回形数矩阵的逻辑是：→↓←↑四个为一个循环，故考虑框架为：一个外层for里面嵌套4个内层for</p>
-<p>每个内层for的起点终点都随着外层的变化而变化</p>
-<p>说实话这种问题只可意会不可言传，光看源码没什么用，你得逼着自己去思考，哪怕是一个下午，一天才做出来也比你直接看源码好啊<del>使劲想想现实逻辑怎么转化为for循环逻辑，一般看到那个→↓←↑就会感觉这四个地位等价，就尝试着把这四个for放到一个外层大for里面，一点一点试出来</del></p>
-<pre><code>import java.util.Scanner;
-public class Test1 &#123;
-    public static void main(String[] args) &#123;
-        Scanner scan = new Scanner(System.in);
-        System.out.println(&quot;输入一个数，返回回形数矩阵&quot;);
-        int i = scan.nextInt();
-        // 键盘输入一个数
-        int[][] arr = new int[i][i];
-        int m = 1;//用于赋值
-        /*思考循环数的逻辑顺序，→↓←↑四个为一个循环，故考虑框架为一个外层for里面套4个内层for*/
-        /*每一个循环的→↓←↑内层for循环，其起点和终点都不断改变，所以起点终点必须表现出来这个联系，绝不能为常数*/
-        for (int j = 0; j &lt; i; j++) &#123;
- 
-            for (int k = j; k &lt; i - j; k++) &#123;//k=j和k&lt;i-j都在不断的改变
-                        arr[j][k] = m;
-                m++;
-            &#125; 
-            for (int l = j + 1; l &lt; i - j; l++) &#123;
-                arr[l][i - j - 1] = m;
-                m++;
-            &#125;
-            for (int p = i - j - 2; p &gt; j - 1; p--) &#123;
-                arr[i - j - 1][p] = m;
-                m++;
-            &#125;
-            for (int q = i - j - 2; q &gt; j; q--) &#123;
-                arr[q][j] = m;
-                m++;
-            &#125;
-        &#125;
-        // 输出矩阵
-        for (int a = 0; a &lt; arr.length; a++) &#123;
-            for (int b = 0; b &lt; arr[a].length; b++) &#123;
-                System.out.print(arr[a][b] + &quot;\t&quot;);
- 
-            &#125;
-            System.out.println();
-        &#125;
-    &#125;
-&#125;
-</code></pre>
+        <h1 id="集合框架"><a href="#集合框架" class="headerlink" title="集合框架"></a>集合框架</h1><blockquote>
+<ul>
+<li>集合框架被设计成要满足以下几个目标。<br></li>
+<li>该框架必须是高性能的。基本集合（动态数组，链表，树，哈希表）的实现也必须是高效的。<br></li>
+<li>该框架允许不同类型的集合，以类似的方式工作，具有高度的互操作性。</li>
+<li>对一个集合的扩展和适应必须是简单的。</li>
+</ul>
+</blockquote>
+<p>为此，整个集合框架就围绕一组标准接口而设计。你可以直接使用这些接口的标准实现，诸如： LinkedList, HashSet, 和 TreeSet 等,<strong>除此之外你也可以通过这些接口实现自己的集合。</strong></p>
+<p><img src="https://img-blog.csdnimg.cn/202109060840461.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16"><br><img src="https://img-blog.csdnimg.cn/20210906085157676.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16"><br><img src="https://img-blog.csdnimg.cn/20210906085253299.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16"><br><img src="https://www.runoob.com/wp-content/uploads/2014/01/2243690-9cd9c896e0d512ed.gif"></p>
+<p><strong>一般名为xxxxList  xxxxSet   xxxxMap的类都是集合，集合的子类非常多，本文介绍以下的集中常用集合类</strong><br>常用的有 ArrayList、LinkedList、HashSet、LinkedHashSet、HashMap、LinkedHashMap 等等。</p>
+<blockquote>
+<p>集合框架是一个用来代表和操纵集合的统一架构。所有的集合框架都包含如下内容：</p>
+</blockquote>
+<blockquote>
+<p><strong>接口</strong>：是代表集合的抽象数据类型。例如 Collection、List、Set、Map 等。之所以定义多个接口，是为了以不同的方式操作集合对象</p>
+</blockquote>
+<blockquote>
+<p><strong>实现（类）</strong>：是集合接口的具体实现。从本质上讲，它们是可重复使用的数据结构，例如：ArrayList、LinkedList、HashSet、HashMap。</p>
+</blockquote>
+<blockquote>
+<p><strong>算法</strong>：是实现集合接口的对象里的方法执行的一些有用的计算，例如：搜索和排序。这些算法被称为多态，那是因为相同的方法可以在相似的接口上有着不同的实现。**(Collections类提供了排序，遍历等多种算法实现)**<br>Java 集合框架提供了一套性能优良，使用方便的接口和类，<strong>java集合框架位于java.util包中， 所以当使用集合框架的时候需要进行导包。</strong></p>
+</blockquote>
+<h1 id="线程安全和线程不安全的集合"><a href="#线程安全和线程不安全的集合" class="headerlink" title="线程安全和线程不安全的集合"></a>线程安全和线程不安全的集合</h1><p>Vector、HashTable、Properties是线程安全的；</p>
+<p>ArrayList、LinkedList、HashSet、TreeSet、HashMap、TreeMap等都是线程不安全的。</p>
+<h1 id="Collection根接口：单列集合"><a href="#Collection根接口：单列集合" class="headerlink" title="Collection根接口：单列集合"></a>Collection根接口：单列集合</h1><p>Collection下定义了很多方法：<strong>add  addAll  clear  contains  containsAll  equals  hashCode  isEmpty  iterator  parallelStream  remove  removeAll  removeIf  retainAll  size  spliterator  stream  toArray</strong>等</p>
+<h2 id="List子接口：有序可重复"><a href="#List子接口：有序可重复" class="headerlink" title="List子接口：有序可重复"></a>List子接口：有序可重复</h2><p>有序：List的有序源于它的元素有地址值<br>List接口下的ArrayList，LinkedList都线程不安全，多线程访问时需显式同步。</p>
+<h3 id="ArrayList实现类："><a href="#ArrayList实现类：" class="headerlink" title="ArrayList实现类："></a>ArrayList实现类：</h3><p>List接口的主要实现类<br>底层是Object[] elementData(<strong>动态可修改的数组，封装好的数组，存储地址连续</strong>)</p>
+<ul>
+<li>增删操作低效(底层是数组)</li>
+<li>查找、修改效率高(有索引)</li>
+<li>执行效率高，但线程不安全。多线程访问时需显式同步。</li>
+</ul>
+<h4 id="ArrayList底层分析"><a href="#ArrayList底层分析" class="headerlink" title="ArrayList底层分析"></a>ArrayList底层分析</h4><ul>
+<li><strong>参数int capacity:</strong> 空参默认底层创建长度为10的数组，<br>JDK7之前是“饿汉”，JDK8之后是“懒汉”————JDK8后延迟底层数组创建，<em>new时底层不创建数组，当且仅当add元素后创建底层数组</em>，节约了内存</li>
+<li><strong>扩容:</strong> 当前底层数组长度不够用时，扩容为原来的<strong>1.5倍</strong></li>
+<li>开发中尽量带参构造，防止内存浪费</li>
+</ul>
+<h3 id="LinkedList实现类："><a href="#LinkedList实现类：" class="headerlink" title="LinkedList实现类："></a>LinkedList实现类：</h3><p>底层是<strong>双向链表</strong></p>
+<ul>
+<li>增删效率高(改变链表的next和prev地址即可，涉及的操作元素很少)</li>
+<li>查找、修改效率低(没有索引)</li>
+<li>执行效率高，但线程不安全。多线程访问时需显式同步。<blockquote>
+<p>LinkedList 继承了 AbstractSequentialList 类。<br><br>LinkedList 实现了 Queue 接口，可作为队列使用。<br><br>LinkedList 实现了 List 接口，可进行列表的相关操作。<br><br>LinkedList 实现了 Deque 接口，可作为队列使用。<br><br>LinkedList 实现了 Cloneable 接口，可实现克隆。<br><br>LinkedList 实现了 java.io.Serializable 接口，即可支持序列化，能通过序列化去传输。</p>
+</blockquote>
+</li>
+</ul>
+<h2 id="Set子接口：无序不可重复"><a href="#Set子接口：无序不可重复" class="headerlink" title="Set子接口：无序不可重复"></a>Set子接口：无序不可重复</h2><p>因为无序，所以不能重复，类似于高中所学的“集合”<br><br>开发中Set接口用的不太多，一般用List和Map更多</p>
+<ul>
+<li>Set没有额外定义方法，所有方法和Collection根接口定义的相同</li>
+<li><strong>无序性</strong>：不是随机，而是add时由数据的哈希值决定存储位置，对外“相对无序”<br></li>
+<li><strong>不可重复性</strong>：add时先调用hashcode方法算哈希值，不相等则直接add；若有相同的哈希值，则进行equals方法比对细节，若还相等，则add方法返回false，添加失败</li>
+</ul>
+<h3 id="HashSet实现类"><a href="#HashSet实现类" class="headerlink" title="HashSet实现类"></a>HashSet实现类</h3><p>底层是<strong>哈希表</strong>(元素为链表的数组)</p>
+<ul>
+<li>效率高，但线程不安全。多线程访问时需显式同步。</li>
+<li>可以存储一个null值并分配空间</li>
+<li>遍历无序，每次遍历输出的顺序都可能不同</li>
+</ul>
+<h4 id="LinkedHashSet实现类"><a href="#LinkedHashSet实现类" class="headerlink" title="LinkedHashSet实现类"></a>LinkedHashSet实现类</h4><ul>
+<li>LinkedHashSet是HashSet的一个子类<br>底层是<strong>哈希表+链表</strong>(链表可以保证元素的顺序透明)</li>
+<li>遍历时会<strong>按照添加进来的顺序进行遍历</strong><blockquote>
+<p>LinkedHashSet集合同样是根据元素的hashCode值来决定元素的存储位置，但是它同时使用链表维护元素的次序。这样使得元素看起 来像是以插入顺序保存的，也就是说，当遍历该集合时候，LinkedHashSet将会以元素的添加顺序访问集合的元素。</p>
+</blockquote>
+</li>
+<li><em>LinkedHashSet在迭代访问（遍历）Set中的全部元素时，性能比HashSet好，但是插入时性能稍微逊色于HashSet。</em>*<br><br><br>在开发中由需求决定具体使用哪个</li>
+</ul>
+<blockquote>
+<ul>
+<li>补充：去除List中重复元素的方法：把List对象扔给LinkedHashSet的构造器形参</li>
+</ul>
+</blockquote>
+<h3 id="TreeSet实现类（用的少）"><a href="#TreeSet实现类（用的少）" class="headerlink" title="TreeSet实现类（用的少）"></a>TreeSet实现类（用的少）</h3><p>SortedSet接口的唯一实现类，<strong>自排序</strong>的集合<br><br>底层是<strong>红黑树</strong>(自平衡的二叉树)</p>
+<ul>
+<li><strong>自排序</strong>：存储元素的类必须实现Comparable接口或Comparator接口<br><br>  并且为了保证可以排序，<strong>后续add的所有元素必须跟第一个add的元素类型相同</strong>，否则报错ClassCastException</li>
+<li><strong>包装类的自排序</strong>：由于包装类都实现了Comparable自然排序，所以包装类元素可以直接扔进TreeSet</li>
+<li>自定义类需先实现排序接口才能扔进TreeSet</li>
+</ul>
+<h1 id="Map根接口"><a href="#Map根接口" class="headerlink" title="Map根接口"></a>Map根接口</h1><p>双列数据，存储键值对，类似高中函数y=f(x)<br>key:无序、不可重复——&gt;Set储存<br>value:无序、可重复——&gt;Collection储存</p>
+<h2 id="HashMap"><a href="#HashMap" class="headerlink" title="HashMap"></a>HashMap</h2><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/78079598">链接：HashMap底层原理</a></p>
+<p>散列表</p>
 
       
        <hr><span style="font-style: italic;color: gray;"> 投其所好，乐此不疲 </span>

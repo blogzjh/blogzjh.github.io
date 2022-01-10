@@ -6,23 +6,31 @@
   <meta name="keywords" content="">
   <meta name="description" content="Java四种next用法 | ZJH&#39;blog">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="决策树决策树是什么 一个根节点，若干个内部节点和叶节点 非参数学习算法 天然的分类器  决策树的目标解决分类和回归问题 决策树的优点  决策树易于理解和实现，人们在在学习过程中不需要使用者了解很多的背景知识，这同时是它的能够直接体现数据的特点，只要通过解释后都有能力去理解决策树所表达的意义。 对于决策树，数据的准备往往是简单或者是不必要的，而且能够同时处理数据型和常规型属性，在相对短的时间内能够对">
+<meta name="description" content="解决思路定义问题——&gt;数据收集——&gt;数据清洗——&gt;分析——&gt;建模——&gt;验证——&gt;优化 该问题下前两步已经完成，本文从数据清洗开始 数据集的特征解读   英 中 分析    PassengeID 乘客ID 乘客ID不影响Survive与否，但可标识身份   Pclass 船舱等级 高等船舱靠近甲板，更容易Survive   Name 姓名 标记   Sex 性别">
 <meta property="og:type" content="article">
-<meta property="og:title" content="决策树&#x2F;随机森林——用户流失预测的案例">
-<meta property="og:url" content="https://zjhblog.gitee.io/2022/01/01/%E5%86%B3%E7%AD%96%E6%A0%91-%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E7%94%A8%E6%88%B7%E6%B5%81%E5%A4%B1%E9%A2%84%E6%B5%8B%E7%9A%84%E6%A1%88%E4%BE%8B/index.html">
+<meta property="og:title" content="随机森林——泰坦尼克号获救预测">
+<meta property="og:url" content="https://zjhblog.gitee.io/2022/01/11/%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E6%B3%B0%E5%9D%A6%E5%B0%BC%E5%85%8B%E5%8F%B7%E8%8E%B7%E6%95%91%E9%A2%84%E6%B5%8B/index.html">
 <meta property="og:site_name" content="ZJH&#39;blog">
-<meta property="og:description" content="决策树决策树是什么 一个根节点，若干个内部节点和叶节点 非参数学习算法 天然的分类器  决策树的目标解决分类和回归问题 决策树的优点  决策树易于理解和实现，人们在在学习过程中不需要使用者了解很多的背景知识，这同时是它的能够直接体现数据的特点，只要通过解释后都有能力去理解决策树所表达的意义。 对于决策树，数据的准备往往是简单或者是不必要的，而且能够同时处理数据型和常规型属性，在相对短的时间内能够对">
+<meta property="og:description" content="解决思路定义问题——&gt;数据收集——&gt;数据清洗——&gt;分析——&gt;建模——&gt;验证——&gt;优化 该问题下前两步已经完成，本文从数据清洗开始 数据集的特征解读   英 中 分析    PassengeID 乘客ID 乘客ID不影响Survive与否，但可标识身份   Pclass 船舱等级 高等船舱靠近甲板，更容易Survive   Name 姓名 标记   Sex 性别">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/6a2b7fea48b04223b402fb145f80d793.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/30820d3df1b24efb98664f1347d2109d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_19,color_FFFFFF,t_70,g_se,x_16">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/16e8639fe87447e1b9f205219401708c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/bac26eaf8ba04751a8308ddf86301246.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/f0a64f28f5004c82bc2914efde97415c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16">
-<meta property="article:published_time" content="2021-12-31T16:41:40.000Z">
-<meta property="article:modified_time" content="2022-01-02T08:46:42.321Z">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/5cef01f2bb72055365b892b39b01cdfb.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/aadde03b94c0c0ced9033806d8fa540f.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/6608f6f8d8f17032998fd2e2801c213b.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/6a4e973ba6174e63a9514db8712abbc3.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2629dc2066e64987b95896a87db5dd6c.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7fb4dcd3150d4be886223a0af1715d6d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_19,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e20dfbee4e5b4bb7992cfb15aaeae6ac.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/cda97a956c634886b678242a3a315ec8.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f70f693e524f4c75bfdb6ccfe37883b4.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7b7e4e2ba989488b8e4d553f025731fc.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/1583b73b3f2845c2b203ded785146e72.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/04fabbe4baed47c68ad12214800bf1d0.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_19,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/348435ac3b974dfd827f256ee10998f0.png">
+<meta property="article:published_time" content="2022-01-10T19:06:10.000Z">
+<meta property="article:modified_time" content="2022-01-10T19:06:46.305Z">
 <meta property="article:author" content="ZJH">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://img-blog.csdnimg.cn/6a2b7fea48b04223b402fb145f80d793.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/img_convert/5cef01f2bb72055365b892b39b01cdfb.png">
 
 
 <link rel="icon" href="/img/QQ图片20211224224200.jpg">
@@ -132,24 +140,10 @@
     <li>
         <div class="all active" data-rel="全部文章">全部文章
             
-                <small>(6)</small>
+                <small>(9)</small>
             
         </div>
     </li>
-    
-        
-            
-                <li>
-                    <div data-rel="语言">
-                        
-                        语言
-                        <small>(1)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
     
         
             
@@ -185,7 +179,21 @@
                     <div data-rel="机器学习">
                         
                         机器学习
-                        <small>(1)</small>
+                        <small>(2)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="Java">
+                        
+                        Java
+                        <small>(3)</small>
                         
                     </div>
                     
@@ -206,8 +214,8 @@
         
     </div>
 </div>
-<input type="hidden" id="yelog_site_posts_number" value="6">
-<input type="hidden" id="yelog_site_word_count" value="10.7k">
+<input type="hidden" id="yelog_site_posts_number" value="9">
+<input type="hidden" id="yelog_site_word_count" value="18.4k">
 <div style="display: none">
     <span id="busuanzi_value_site_uv"></span>
     <span id="busuanzi_value_site_pv"></span>
@@ -276,6 +284,30 @@
         </a>
         
         <a  class="全部文章 机器学习 "
+           href="/zjh/2022/01/11/%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E6%B3%B0%E5%9D%A6%E5%B0%BC%E5%85%8B%E5%8F%B7%E8%8E%B7%E6%95%91%E9%A2%84%E6%B5%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="随机森林——泰坦尼克号获救预测">随机森林——泰坦尼克号获救预测</span>
+            <span class="post-date" title="2022-01-11 03:06:10">2022/01/11</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/01/03/Java%E9%9B%86%E5%90%88/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Java集合">Java集合</span>
+            <span class="post-date" title="2022-01-03 10:02:27">2022/01/03</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/01/02/Java%E6%B3%9B%E5%9E%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Java泛型">Java泛型</span>
+            <span class="post-date" title="2022-01-02 19:51:37">2022/01/02</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
            href="/zjh/2022/01/01/%E5%86%B3%E7%AD%96%E6%A0%91-%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E7%94%A8%E6%88%B7%E6%B5%81%E5%A4%B1%E9%A2%84%E6%B5%8B%E7%9A%84%E6%A1%88%E4%BE%8B/"
            data-tag=""
            data-author="" >
@@ -291,7 +323,7 @@
             <span class="post-date" title="2021-12-25 02:07:12">2021/12/25</span>
         </a>
         
-        <a  class="全部文章 语言 "
+        <a  class="全部文章 Java "
            href="/zjh/2021/12/25/Java%E5%9B%9B%E7%A7%8Dnext%E7%94%A8%E6%B3%95/"
            data-tag=""
            data-author="" >
@@ -337,7 +369,7 @@
             <i class="iconfont icon-category"></i>
             
             
-            <a  data-rel="语言">语言</a>
+            <a  data-rel="Java">Java</a>
             
         </span>
         
@@ -345,7 +377,7 @@
     </div>
     <div class="article-meta">
         
-            发布时间 : <time class="date" title='最后更新: 2021-12-25 23:18:28'>2021-12-25 01:59</time>
+            发布时间 : <time class="date" title='最后更新: 2022-01-02 20:03:17'>2021-12-25 01:59</time>
         
     </div>
     <div class="article-meta">

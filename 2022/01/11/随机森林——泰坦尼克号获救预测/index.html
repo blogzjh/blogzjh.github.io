@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>随机森林——泰坦尼克号获救预测 | ZJH&#39;blog</title>
+  <meta name="keywords" content="">
+  <meta name="description" content="随机森林——泰坦尼克号获救预测 | ZJH&#39;blog">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="description" content="解决思路定义问题——&gt;数据收集——&gt;数据清洗——&gt;分析——&gt;建模——&gt;验证——&gt;优化 该问题下前两步已经完成，本文从数据清洗开始 数据集的特征解读   英 中 分析    PassengeID 乘客ID 乘客ID不影响Survive与否，但可标识身份   Pclass 船舱等级 高等船舱靠近甲板，更容易Survive   Name 姓名 标记   Sex 性别">
+<meta property="og:type" content="article">
+<meta property="og:title" content="随机森林——泰坦尼克号获救预测">
+<meta property="og:url" content="https://zjhblog.gitee.io/2022/01/11/%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E6%B3%B0%E5%9D%A6%E5%B0%BC%E5%85%8B%E5%8F%B7%E8%8E%B7%E6%95%91%E9%A2%84%E6%B5%8B/index.html">
+<meta property="og:site_name" content="ZJH&#39;blog">
+<meta property="og:description" content="解决思路定义问题——&gt;数据收集——&gt;数据清洗——&gt;分析——&gt;建模——&gt;验证——&gt;优化 该问题下前两步已经完成，本文从数据清洗开始 数据集的特征解读   英 中 分析    PassengeID 乘客ID 乘客ID不影响Survive与否，但可标识身份   Pclass 船舱等级 高等船舱靠近甲板，更容易Survive   Name 姓名 标记   Sex 性别">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/5cef01f2bb72055365b892b39b01cdfb.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/aadde03b94c0c0ced9033806d8fa540f.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/6608f6f8d8f17032998fd2e2801c213b.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/6a4e973ba6174e63a9514db8712abbc3.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2629dc2066e64987b95896a87db5dd6c.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7fb4dcd3150d4be886223a0af1715d6d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_19,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e20dfbee4e5b4bb7992cfb15aaeae6ac.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/cda97a956c634886b678242a3a315ec8.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f70f693e524f4c75bfdb6ccfe37883b4.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7b7e4e2ba989488b8e4d553f025731fc.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/1583b73b3f2845c2b203ded785146e72.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/04fabbe4baed47c68ad12214800bf1d0.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_19,color_FFFFFF,t_70,g_se,x_16">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/348435ac3b974dfd827f256ee10998f0.png">
+<meta property="article:published_time" content="2022-01-10T19:06:10.000Z">
+<meta property="article:modified_time" content="2022-01-10T19:06:46.305Z">
+<meta property="article:author" content="ZJH">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/img_convert/5cef01f2bb72055365b892b39b01cdfb.png">
+
+
+<link rel="icon" href="/img/QQ图片20211224224200.jpg">
+
+<link href="/zjh/css/style.css?v=1.1.0" rel="stylesheet">
+
+<link href="/zjh/css/hl_theme/darcula.css?v=1.1.0" rel="stylesheet">
+
+<link href="//cdn.jsdelivr.net/npm/animate.css@4.1.0/animate.min.css" rel="stylesheet">
+
+<script src="//cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+<script src="/zjh/js/titleTip.js?v=1.1.0" ></script>
+
+<script src="//cdn.jsdelivr.net/npm/highlightjs@9.16.2/highlight.pack.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+<script src="//cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js"></script>
+
+
+
+<script src="//cdn.jsdelivr.net/npm/jquery.cookie@1.4.1/jquery.cookie.min.js" ></script>
+
+<script src="/zjh/js/iconfont.js?v=1.1.0" ></script>
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<div style="display: none">
+  <input class="theme_disqus_on" value="false">
+  <input class="theme_preload_comment" value="">
+  <input class="theme_blog_path" value="/zjh">
+  <input id="theme_shortcut" value="true" />
+  <input id="theme_highlight_on" value="true" />
+  <input id="theme_code_copy" value="true" />
+</div>
+
+
+
+<body>
+<aside class="nav">
+    <div class="nav-left">
+        <a href="/zjh/"
+   class="avatar_target">
+    <img class="avatar"
+         src="/zjh/img/QQ图片20211224224200.jpg"/>
+</a>
+<div class="author">
+    <span>ZJH</span>
+</div>
+
+<div class="icon">
+    
+        
+            <a title="github"
+               href="https://github.com/BetterZJH"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-github"></use>
+                    </svg>
+                
+            </a>
+        
+    
+        
+            <a title="csdn"
+               href="https://blog.csdn.net/m0_56079407"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-csdn"></use>
+                    </svg>
+                
+            </a>
+        
+    
+        
+            <a title="email"
+               href="mailto:847829122@qq.com"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-email"></use>
+                    </svg>
+                
+            </a>
+        
+    
+        
+            <a title="qq"
+               href="http://wpa.qq.com/msgrd?v=3&uin=847829122&site=qq&menu=yes"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-qq"></use>
+                    </svg>
+                
+            </a>
+        
+    
+</div>
+
+
+
+
+<ul>
+    <li>
+        <div class="all active" data-rel="全部文章">全部文章
+            
+                <small>(9)</small>
+            
+        </div>
+    </li>
+    
+        
+            
+                <li>
+                    <div data-rel="工具">
+                        
+                        工具
+                        <small>(2)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="数据结构算法">
+                        
+                        数据结构算法
+                        <small>(2)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="机器学习">
+                        
+                        机器学习
+                        <small>(2)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="Java">
+                        
+                        Java
+                        <small>(3)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+</ul>
+<div class="left-bottom">
+    <div class="menus">
+        
+            
+            
+            
+    </div>
+    <div>
+        
+        
+    </div>
+</div>
+<input type="hidden" id="yelog_site_posts_number" value="9">
+<input type="hidden" id="yelog_site_word_count" value="18.4k">
+<div style="display: none">
+    <span id="busuanzi_value_site_uv"></span>
+    <span id="busuanzi_value_site_pv"></span>
+</div>
+
+    </div>
+    <div class="nav-right">
+        <div class="friends-area">
+    <div class="friends-title">
+        友情链接
+        <i class="iconfont icon-left"></i>
+    </div>
+    <div class="friends-content">
+        <ul>
+            
+            <li><a target="_blank" href="http://yelog.org/">叶落阁</a></li>
+            
+        </ul>
+    </div>
+</div>
+        <div class="title-list">
+    <div class="right-top">
+        <div id="default-panel">
+            <i class="iconfont icon-search" data-title="搜索 快捷键 i"></i>
+            <div class="right-title">全部文章</div>
+            <i class="iconfont icon-file-tree" data-title="切换到大纲视图 快捷键 w"></i>
+        </div>
+        <div id="search-panel">
+            <i class="iconfont icon-left" data-title="返回"></i>
+            <input id="local-search-input" autocomplete="off"/>
+            <label class="border-line" for="input"></label>
+            <i class="iconfont icon-case-sensitive" data-title="大小写敏感"></i>
+            <i class="iconfont icon-tag" data-title="标签"></i>
+        </div>
+        <div id="outline-panel" style="display: none">
+            <div class="right-title">大纲</div>
+            <i class="iconfont icon-list" data-title="切换到文章列表"></i>
+        </div>
+    </div>
+
+    <div class="tags-list">
+    <input id="tag-search" />
+    <div class="tag-wrapper">
+        
+    </div>
+
+</div>
+
+    
+    <nav id="title-list-nav">
+        
+        <a id="top" class="全部文章 工具 "
+           href="/zjh/2021/12/25/IDEA%E5%B8%B8%E7%94%A8%E5%BF%AB%E6%8D%B7%E9%94%AE/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="IDEA常用快捷键">IDEA常用快捷键</span>
+            <span class="post-date" title="2021-12-25 21:55:46">2021/12/25</span>
+        </a>
+        
+        <a id="top" class="全部文章 工具 "
+           href="/zjh/2021/12/24/MarkDown%E5%B8%B8%E7%94%A8%E8%AF%AD%E6%B3%95/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="MarkDown常用语法">MarkDown常用语法</span>
+            <span class="post-date" title="2021-12-24 23:33:22">2021/12/24</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/zjh/2022/01/11/%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E6%B3%B0%E5%9D%A6%E5%B0%BC%E5%85%8B%E5%8F%B7%E8%8E%B7%E6%95%91%E9%A2%84%E6%B5%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="随机森林——泰坦尼克号获救预测">随机森林——泰坦尼克号获救预测</span>
+            <span class="post-date" title="2022-01-11 03:06:10">2022/01/11</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/01/03/Java%E9%9B%86%E5%90%88/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Java集合">Java集合</span>
+            <span class="post-date" title="2022-01-03 10:02:27">2022/01/03</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/01/02/Java%E6%B3%9B%E5%9E%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Java泛型">Java泛型</span>
+            <span class="post-date" title="2022-01-02 19:51:37">2022/01/02</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/zjh/2022/01/01/%E5%86%B3%E7%AD%96%E6%A0%91-%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E7%94%A8%E6%88%B7%E6%B5%81%E5%A4%B1%E9%A2%84%E6%B5%8B%E7%9A%84%E6%A1%88%E4%BE%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="决策树/随机森林——用户流失预测的案例">决策树/随机森林——用户流失预测的案例</span>
+            <span class="post-date" title="2022-01-01 00:41:40">2022/01/01</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2021/12/25/%E5%9B%9E%E5%BD%A2%E9%92%88%E6%95%B0%E5%AD%97%E7%9F%A9%E9%98%B5Java%E5%AE%9E%E7%8E%B0/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="回形针数字矩阵Java实现">回形针数字矩阵Java实现</span>
+            <span class="post-date" title="2021-12-25 02:07:12">2021/12/25</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2021/12/25/Java%E5%9B%9B%E7%A7%8Dnext%E7%94%A8%E6%B3%95/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Java四种next用法">Java四种next用法</span>
+            <span class="post-date" title="2021-12-25 01:59:30">2021/12/25</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2021/12/25/RLE%E7%AE%97%E6%B3%95%E7%9A%84Java%E5%AE%9E%E7%8E%B0/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="RLE算法的Java实现">RLE算法的Java实现</span>
+            <span class="post-date" title="2021-12-25 01:35:20">2021/12/25</span>
+        </a>
+        
+        <div id="no-item-tips">
+
+        </div>
+    </nav>
+    <div id="outline-list">
+    </div>
+</div>
+
+    </div>
+    <div class="hide-list">
+        <div class="semicircle" data-title="切换全屏 快捷键 s">
+            <div class="brackets first"><</div>
+            <div class="brackets">&gt;</div>
+        </div>
+    </div>
+</aside>
+<div id="post">
+    <div class="pjax">
+        <article id="post-随机森林——泰坦尼克号获救预测" class="article article-type-post" itemscope itemprop="blogPost">
+    
+        <h1 class="article-title">随机森林——泰坦尼克号获救预测</h1>
+    
+    <div class="article-meta">
+        
+        
+        
+        <span class="book">
+            <i class="iconfont icon-category"></i>
+            
+            
+            <a  data-rel="机器学习">机器学习</a>
+            
+        </span>
+        
+        
+    </div>
+    <div class="article-meta">
+        
+            发布时间 : <time class="date" title='最后更新: 2022-01-11 03:06:46'>2022-01-11 03:06</time>
+        
+    </div>
+    <div class="article-meta">
+        
+        <span>字数:3k</span>
+        
+        
+        <span id="busuanzi_container_page_pv">
+            阅读 :<span id="busuanzi_value_page_pv">
+                <span class="count-comment">
+                    <span class="spinner">
+                      <div class="cube1"></div>
+                      <div class="cube2"></div>
+                    </span>
+                </span>
+            </span>
+        </span>
+        
+        
+    </div>
+    
+    <div class="toc-ref">
+    
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%A7%A3%E5%86%B3%E6%80%9D%E8%B7%AF"><span class="toc-text">解决思路</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E9%9B%86%E7%9A%84%E7%89%B9%E5%BE%81%E8%A7%A3%E8%AF%BB"><span class="toc-text">数据集的特征解读</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BA%93%E5%92%8C%E6%95%B0%E6%8D%AE%E5%AF%BC%E5%85%A5%EF%BC%8C%E7%AE%80%E5%8D%95%E5%88%86%E6%9E%90"><span class="toc-text">库和数据导入，简单分析</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%8C%E6%95%B4%E6%98%BE%E7%A4%BA%E6%95%B0%E6%8D%AE%E9%9B%86%E7%BB%9F%E8%AE%A1%E4%BF%A1%E6%81%AF%EF%BC%88%E5%AE%8C%E6%95%B4%E6%8F%8F%E8%BF%B0%EF%BC%89set-option"><span class="toc-text">完整显示数据集统计信息（完整描述）set_option</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E6%B8%85%E6%B4%97"><span class="toc-text">数据清洗</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C"><span class="toc-text">准备工作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8Bsurvived%E7%9A%84%E7%BB%9F%E8%AE%A1%E7%9B%B4%E6%96%B9%E5%9B%BE"><span class="toc-text">查看survived的统计直方图</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A1%A5%E5%85%A8%E7%BC%BA%E5%A4%B1%E5%80%BCfillna"><span class="toc-text">补全缺失值fillna</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%A9%E7%94%A8for%E5%BE%AA%E7%8E%AF%E5%AF%B9%E6%A0%B7%E6%9C%AC%E9%9B%86%E4%B8%80%E9%94%AE%E7%BA%A0%E6%AD%A3"><span class="toc-text">利用for循环对样本集一键纠正</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%A0%E9%99%A4%E6%97%A0%E7%94%A8%E5%AD%97%E6%AE%B5-%E7%89%B9%E5%BE%81-drop"><span class="toc-text">删除无用字段(特征)drop</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BA%A0%E6%AD%A3%E5%BC%82%E5%B8%B8%E5%80%BC"><span class="toc-text">纠正异常值</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%A9%E7%94%A8for%E5%BE%AA%E7%8E%AF%E7%9A%84%E6%A0%B7%E6%9C%AC%E9%9B%86%E4%B8%80%E9%94%AE%E7%BA%A0%E6%AD%A3"><span class="toc-text">利用for循环的样本集一键纠正</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9E%84%E5%BB%BA%E6%96%B0%E7%89%B9%E5%BE%81"><span class="toc-text">构建新特征</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%8C%E8%A1%8C%E8%A7%84%E6%A8%A1"><span class="toc-text">同行规模</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%98%AF%E5%90%A6%E5%8D%95%E8%BA%AB"><span class="toc-text">是否单身</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A5%A8%E4%BB%B7%E5%88%86%E6%AE%B5%EF%BC%9Acut"><span class="toc-text">票价分段：cut</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B9%B4%E9%BE%84%E5%88%86%E6%AE%B5%EF%BC%9Aqcut"><span class="toc-text">年龄分段：qcut</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BA%AB%E4%BB%BD%E5%88%86%E7%B1%BB%EF%BC%9A%E5%90%88%E5%B0%91%E4%B8%BA1"><span class="toc-text">身份分类：合少为1</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%B0%E7%89%B9%E5%BE%81%E5%88%86%E6%9E%90%EF%BC%9A%E8%AF%84%E4%BC%B0%E6%96%B0%E7%89%B9%E5%BE%81%E5%88%92%E5%88%86%E7%9A%84%E5%A5%BD%E5%9D%8F"><span class="toc-text">新特征分析：评估新特征划分的好坏</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A0%BC%E5%BC%8F%E6%9B%BF%E6%8D%A2-%E6%9E%84%E5%BB%BA%E6%96%B0%E5%AD%97%E6%AE%B5%EF%BC%8C"><span class="toc-text">格式替换,构建新字段，</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BB%BA%E6%A8%A1"><span class="toc-text">建模</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%87%E7%AD%BE%E3%80%81%E7%89%B9%E5%BE%81%E9%80%89%E6%8B%A9"><span class="toc-text">标签、特征选择</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%87%E7%AD%BE%E9%80%89%E6%8B%A9"><span class="toc-text">标签选择</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%89%B9%E5%BE%81%E9%80%89%E6%8B%A9"><span class="toc-text">特征选择</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%9A%E8%BF%87Pandas%E4%B8%AD%E7%9A%84get-dummies-%E8%BF%9B%E8%A1%8C%E7%BC%96%E7%A0%81"><span class="toc-text">通过Pandas中的get_dummies() 进行编码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8A%8Atrain%E9%9B%86%E6%8B%86%E5%88%86%E4%B8%BA%E8%AE%AD%E7%BB%83%E9%9B%86%E5%92%8C%E6%B5%8B%E8%AF%95"><span class="toc-text">把train集拆分为训练集和测试</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BD%91%E6%A0%BC%E6%90%9C%E7%B4%A2%EF%BC%9A%E5%AF%BB%E6%89%BE%E6%9C%80%E4%BC%98"><span class="toc-text">网格搜索：寻找最优</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%87%86%E5%A4%87"><span class="toc-text">准备</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%90%9C%E7%B4%A2"><span class="toc-text">搜索</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BD%91%E6%A0%BC%E6%90%9C%E7%B4%A2%E8%B0%83%E5%8F%82"><span class="toc-text">网格搜索调参</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%94%A8%E6%9C%80%E4%BC%98%E5%8F%82%E6%95%B0%E8%AE%AD%E7%BB%83%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97"><span class="toc-text">用最优参数训练随机森林</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B9%E6%8D%AE%E7%89%B9%E5%BE%81%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7%E6%8E%92%E5%BA%8F"><span class="toc-text">根据特征的重要性排序</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9C%A8test%E4%B8%8A%E9%A2%84%E6%B5%8B%EF%BC%9A%E6%98%AFsplit%E5%88%86%E5%89%B2%E5%87%BA%E6%9D%A5%E7%9A%84test"><span class="toc-text">在test上预测：是split分割出来的test</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%AA%8C%E8%AF%81%EF%BC%9A%E4%B8%8D%E6%98%AFsplit%E5%88%86%E5%89%B2%E5%87%BA%E6%9D%A5%E7%9A%84test%EF%BC%8C%E8%80%8C%E6%98%AFtest-csv"><span class="toc-text">验证：不是split分割出来的test，而是test.csv</span></a></li></ol></li></ol>
+    
+<style>
+    .left-col .switch-btn,
+    .left-col .switch-area {
+        display: none;
+    }
+    .toc-level-3 i,
+    .toc-level-3 ol {
+        display: none !important;
+    }
+</style>
+</div>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="解决思路"><a href="#解决思路" class="headerlink" title="解决思路"></a>解决思路</h1><p>定义问题——&gt;数据收集——&gt;数据清洗——&gt;分析——&gt;建模——&gt;验证——&gt;优化</p>
+<p>该问题下前两步已经完成，本文从数据清洗开始</p>
+<h1 id="数据集的特征解读"><a href="#数据集的特征解读" class="headerlink" title="数据集的特征解读"></a>数据集的特征解读</h1><table>
+<thead>
+<tr>
+<th align="center">英</th>
+<th align="center">中</th>
+<th align="center">分析</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">PassengeID</td>
+<td align="center">乘客ID</td>
+<td align="center">乘客ID不影响Survive与否，但可标识身份</td>
+</tr>
+<tr>
+<td align="center">Pclass</td>
+<td align="center">船舱等级</td>
+<td align="center">高等船舱靠近甲板，更容易Survive</td>
+</tr>
+<tr>
+<td align="center">Name</td>
+<td align="center">姓名</td>
+<td align="center">标记</td>
+</tr>
+<tr>
+<td align="center">Sex</td>
+<td align="center">性别</td>
+<td align="center">男女生理差别，对Survive有影响</td>
+</tr>
+<tr>
+<td align="center">Age</td>
+<td align="center">年龄</td>
+<td align="center">同上</td>
+</tr>
+<tr>
+<td align="center">SibSp</td>
+<td align="center">兄弟配偶数</td>
+<td align="center">有无同行兄弟or配偶，同行会影响决策</td>
+</tr>
+<tr>
+<td align="center">Parch</td>
+<td align="center">父母孩子数</td>
+<td align="center">有无同行父母or孩子，从而影响Survive</td>
+</tr>
+<tr>
+<td align="center">Ticket</td>
+<td align="center">船票信息</td>
+<td align="center">/</td>
+</tr>
+<tr>
+<td align="center">Fare</td>
+<td align="center">票价</td>
+<td align="center">票价跟Pclass也是正相关</td>
+</tr>
+<tr>
+<td align="center">Cabin</td>
+<td align="center">船舱信息</td>
+<td align="center">/</td>
+</tr>
+<tr>
+<td align="center">Embarked</td>
+<td align="center">港口</td>
+<td align="center">/</td>
+</tr>
+<tr>
+<td align="center">Survived</td>
+<td align="center">存活与否</td>
+<td align="center">/</td>
+</tr>
+</tbody></table>
+<p>以上信息中</p>
+<ul>
+<li>有些特征对分析没什么意义，建模时可以不扔进算法</li>
+<li>有些特征之间互相有关联，可以多特征线性合并</li>
+<li>部分数据需要清洗</li>
+<li>Train集中的Survived变量要放入模型训练</li>
+<li>Test集中的Survived变量作为验证标准</li>
+</ul>
+<h1 id="库和数据导入，简单分析"><a href="#库和数据导入，简单分析" class="headerlink" title="库和数据导入，简单分析"></a>库和数据导入，简单分析</h1><pre><code>import pandas as pd
+import numpy as np
+import time
+import sklearn
+
+from sklearn import ensemble#集成学习，包括了随机森林，SVM等集成学习算法
+from sklearn import feature_selection#特征值选择，分类回归都需要的特征值如F和P
+from sklearn import model_selection#模型选择，包括了交叉验证，网格搜索等
+from sklearn import metrics#包括了多个计算模型评估的算法
+from sklearn.preprocessing import LabelEncoder#将Label标准化，如：字符串——&gt;数字，以便代入模型
+##绘图
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import seaborn as sns#一个封装好的matplotlib，底层是matplotlib，使用更方便
+
+#mpl.style_use(&quot;ggplot&quot;)#设置matplotlib的绘图风格，可有可无
+
+data_train = pd.read_csv(&quot;train.csv&quot;)
+data_test  = pd.read_csv(&quot;test.csv&quot;)
+#显示数据集信息
+print(data_train.info())
+print(data_test.head(10))
+</code></pre>
+<h2 id="完整显示数据集统计信息（完整描述）set-option"><a href="#完整显示数据集统计信息（完整描述）set-option" class="headerlink" title="完整显示数据集统计信息（完整描述）set_option"></a>完整显示数据集统计信息（完整描述）set_option</h2><pre><code>pd.set_option(&#39;display.max_columns&#39;,11)
+#train集中有11列属性，设置最大列数为11
+print(data_train.describe())
+</code></pre>
+<ul>
+<li>同样的，pd.set_option(‘display.max_columns’,10)也可以让原本显示不全的head()显示全</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/5cef01f2bb72055365b892b39b01cdfb.png" alt="info和head输出结果"></p>
+<pre><code>count:有效值个数（非空值）
+unique:特征值的种类数
+top：出现最多的特征
+freq: top出现的次数
+mean：均值
+std : 标准差
+min ：最小值
+25%：四分之一位
+50%：中位数
+75%：四分之三位
+max：最大值
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/aadde03b94c0c0ced9033806d8fa540f.png" alt="describe输出结果"></p>
+<ul>
+<li><strong>一共有891行数据，但Age、Cabin属性明显缺失，此案例下的缺失值暂时用中位数代替</strong></li>
+</ul>
+<h1 id="数据清洗"><a href="#数据清洗" class="headerlink" title="数据清洗"></a>数据清洗</h1><p>数据清洗是数据分析中耗时最长最麻烦的阶段</p>
+<h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><pre><code>#列名小写,方便后续
+data_test.columns = data_test.columns.str.lower()
+data_train.columns = data_train.columns.str.lower()
+data_train.info()#查看属性小写后的info
+
+#合并Train和Test以便统一数据清洗
+data_sum = [data_train , data_test]
+#但由于这个sum是一个list，会缺少很多原本train和test能用的属性or方法，如columns
+#注意：此处的合并不是直接合并数据集，而是创建一个list，实现一键操作
+#一定是先分别lower再合并成sum
+</code></pre>
+<p>   <strong>要想调用方法，需要使用for循环</strong></p>
+<h3 id="查看survived的统计直方图"><a href="#查看survived的统计直方图" class="headerlink" title="查看survived的统计直方图"></a>查看survived的统计直方图</h3><pre><code>#查看属性统计量seaborn下的countplot，绘制图像
+sns.countplot(x = data_train[&#39;survived&#39;] )
+#sns.coutplot(x = &quot;survived&quot; , data = data_train)
+#两种表达方式
+plt.show()#olt.show()是生成图的操作，必不可少
+</code></pre>
+<h2 id="补全缺失值fillna"><a href="#补全缺失值fillna" class="headerlink" title="补全缺失值fillna"></a>补全缺失值fillna</h2><pre><code>#分别查看train和test集中为null值的汇总
+print(data_train.isnull().sum())
+print(&#39;\n&#39;)
+print(data_test.isnull().sum())
+</code></pre>
+<ul>
+<li><strong>age embarked的缺失值占比比较少，可以替换值</strong></li>
+<li><strong>cabin的缺失值占比很高，建模时直接把cabin属性全扔掉</strong></li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/6608f6f8d8f17032998fd2e2801c213b.png" alt="左：null汇总  右：contplot直方图"></p>
+<h3 id="利用for循环对样本集一键纠正"><a href="#利用for循环对样本集一键纠正" class="headerlink" title="利用for循环对样本集一键纠正"></a>利用for循环对样本集一键纠正</h3><pre><code>for dataset in data_sum:
+    dataset[&#39;age&#39;].fillna(dataset[&#39;age&#39;].median() , inplace=True)
+    dataset[&#39;fare&#39;].fillna(dataset[&#39;fare&#39;].median() , inplace=True)
+    ###因为age、fare都是数字类型，因此可以调用median中位数
+    ###而像属性值位字符串的特征则不能调用median
+    dataset[&#39;embarked&#39;].fillna(dataset[&#39;embarked&#39;].mode()[0] , inplace=True)
+    #mode返回的是 众数，因为即便是字符串，也可以调用
+</code></pre>
+<ul>
+<li><p>注意：mode和median的用法场景区别</p>
+</li>
+<li><p>注意fillna的使用格式</p>
+</li>
+<li><p>inplace=True表示更改原数据集，而不是返回一个新的数据集</p>
+</li>
+<li><p>mode是pandas下的一个方法，返回按索引号排序的众数，<strong>mode()[索引号]的索引号很重要，如果省略则不填充</strong></p>
+<h2 id="删除无用字段-特征-drop"><a href="#删除无用字段-特征-drop" class="headerlink" title="删除无用字段(特征)drop"></a>删除无用字段(特征)drop</h2><p>  drop_columns = [‘cabin’,’passengerid’,’ticket’]#创建一个list<br>  #分析认为：cabin缺失值太多，需要删除<br>  #passengerid无关survive，删除<br>  #ticket都是编号，删除</p>
+<p>  data_train.drop(drop_columns,axis=1,inplace=True)<br>  data_test.drop(drop_columns,axis=1,inplace=True)<br>  #drop参数的意义(行or列 , axis=0删行 axis=1删列 ， inplace=True直接更改调用者数据集本身)</p>
+</li>
+<li><p>注意：drop的参数含义</p>
+</li>
+<li><p>可以构建for循环 + drop_columns一次操作</p>
+</li>
+</ul>
+<h2 id="纠正异常值"><a href="#纠正异常值" class="headerlink" title="纠正异常值"></a>纠正异常值</h2><h3 id="利用for循环的样本集一键纠正"><a href="#利用for循环的样本集一键纠正" class="headerlink" title="利用for循环的样本集一键纠正"></a>利用for循环的样本集一键纠正</h3><p>因为这个案例中信息来源准确，可以认为没有异常值，故在此案例中不做处理</p>
+<h2 id="构建新特征"><a href="#构建新特征" class="headerlink" title="构建新特征"></a>构建新特征</h2><ul>
+<li>连续值用cut或者qcut来划分</li>
+<li>离散值直接划分，合并数量少的值<h3 id="同行规模"><a href="#同行规模" class="headerlink" title="同行规模"></a>同行规模</h3><pre><code>  #同行规模 = 配偶 + 兄弟姐妹 + 1(自己)
+  dataset[&#39;together_size&#39;] =  dataset[&#39;sibsp&#39;] + dataset[&#39;parch&#39;] + 1
+</code></pre>
+</li>
+</ul>
+<h3 id="是否单身"><a href="#是否单身" class="headerlink" title="是否单身"></a>是否单身</h3><pre><code>    #是否单身：单身可以不顾别人，会影响survive
+    dataset[&#39;isSingle&#39;] = 0
+    dataset[&#39;isSingle&#39;].loc[dataset[&#39;together_size&#39;] &gt; 1] = 1
+</code></pre>
+<h3 id="票价分段：cut"><a href="#票价分段：cut" class="headerlink" title="票价分段：cut"></a>票价分段：cut</h3><pre><code>    #票价分段fare_bin:票价的离散值太多，应该划分为几个集
+    #数据集中票价0~512，并且绝大多数都是便宜票，所以用cut等宽划分
+    dataset[&#39;fare_bin&#39;] = pd.cut(dataset[&#39;fare&#39;] , 4)
+</code></pre>
+<h3 id="年龄分段：qcut"><a href="#年龄分段：qcut" class="headerlink" title="年龄分段：qcut"></a>年龄分段：qcut</h3><pre><code>    #年龄分段age_bin
+    dataset[&#39;age_bin&#39;] = pd.qcut(dataset[&#39;age&#39;] , 4)
+</code></pre>
+<h3 id="身份分类：合少为1"><a href="#身份分类：合少为1" class="headerlink" title="身份分类：合少为1"></a>身份分类：合少为1</h3><pre><code>    #身份 status:因为英国人的名字会加入跟身份有关的职业，身份也会影响获救概率
+    dataset[&#39;status&#39;] = dataset[&#39;name&#39;].str.split(&#39;, &#39; , expand = True)[1].str.split(&#39;.&#39; , expand = True)[0]
+    ###参数含义：str是返回字符串，expand要为True值
+    ###按引号中的符号进行split拆分，[0]表示取前半段，[1]表示取后半段
+    print(dataset[&#39;status&#39;].value_counts())#查看统计
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/6a4e973ba6174e63a9514db8712abbc3.png" alt="可以把少的分为一类other"></p>
+<pre><code>   #把少的分为一类other
+    othersSum = dataset[&#39;status&#39;].value_counts() &lt; 10
+    #other对象 = 小于10的
+    dataset[&#39;status&#39;] = dataset[&#39;status&#39;].apply(lambda x : &#39;ohter&#39; if othersSum[x] else x)
+    #更新后的status属性 = 之前的status.aooly(lambda x : &#39;新的名字&#39; if other对象[x] else x)
+    print(dataset[&#39;status&#39;].value_counts())
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/2629dc2066e64987b95896a87db5dd6c.png" alt="少的被分到了other组"></p>
+<h2 id="新特征分析：评估新特征划分的好坏"><a href="#新特征分析：评估新特征划分的好坏" class="headerlink" title="新特征分析：评估新特征划分的好坏"></a>新特征分析：评估新特征划分的好坏</h2><p>以不同的特征分类计算各属性值的均值，以标签survived的均值为参考，不同特征值的标签均值差别越大越好</p>
+<pre><code>#简单分析上述构建特征是否有效:groupby根据属性值分组
+print(data_train[&#39;survived&#39;].groupby(data_train[&#39;status&#39;]).mean())
+#查看按这样构建的特征status的不同值survived对应的均值
+print(data_train[&#39;survived&#39;].groupby(data_train[&#39;age_bin&#39;]).mean())
+print(data_train[&#39;survived&#39;].groupby(data_train[&#39;fare_bin&#39;]).mean())
+print(data_train[&#39;survived&#39;].groupby(data_train[&#39;isSingle&#39;]).mean())
+print(data_train[&#39;survived&#39;].groupby(data_train[&#39;together_size&#39;]).mean())
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/7fb4dcd3150d4be886223a0af1715d6d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_19,color_FFFFFF,t_70,g_se,x_16" alt="新特征分析">于是对age_bin进行修改，最终尝试结果是qcut改cut，区分度提升最明显</p>
+<h1 id="格式替换-构建新字段，"><a href="#格式替换-构建新字段，" class="headerlink" title="格式替换,构建新字段，"></a>格式替换,构建新字段，</h1><p>1，基于scikit-learn中的LabelEncoder()<br>把属性值为字符串的特征转化为“特征_code”，字符串——&gt;数字，以便放入模型中跑<br><strong>机器学习模型只能处理int和float的数据</strong></p>
+<pre><code>#实例化
+label = LabelEncoder()
+#字符串——&gt;数字
+for dataset in data_sum:
+    # （1）新字段：sex_code
+    dataset[&#39;sex_code&#39;] = label.fit_transform(dataset[&#39;sex&#39;])
+    # （2）新字段：embarked_code
+    dataset[&#39;embarked_code&#39;] = label.fit_transform(dataset[&#39;embarked&#39;])
+    # （3）新字段：status_code
+    dataset[&#39;status_code&#39;] = label.fit_transform(dataset[&#39;status&#39;])
+    # （4）新字段：age_bin_code
+    dataset[&#39;age_bin_code&#39;] = label.fit_transform(dataset[&#39;age_bin&#39;])
+    # （5）新字段：fare_bin_code
+    dataset[&#39;fare_bin_code&#39;] = label.fit_transform(dataset[&#39;fare_bin&#39;])
+
+print(data_train.columns.to_list)
+    
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/e20dfbee4e5b4bb7992cfb15aaeae6ac.png" alt="新的列名"><br><img src="https://img-blog.csdnimg.cn/cda97a956c634886b678242a3a315ec8.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16"><br>2，通过Pandas中的get_dummies() 进行编码</p>
+<h1 id="建模"><a href="#建模" class="headerlink" title="建模"></a>建模</h1><h2 id="标签、特征选择"><a href="#标签、特征选择" class="headerlink" title="标签、特征选择"></a>标签、特征选择</h2><h3 id="标签选择"><a href="#标签选择" class="headerlink" title="标签选择"></a>标签选择</h3><pre><code>target = [&#39;survived&#39;]    
+</code></pre>
+<h3 id="特征选择"><a href="#特征选择" class="headerlink" title="特征选择"></a>特征选择</h3><pre><code>data_feature_one = [&#39;sex&#39;, &#39;pclass&#39;, &#39;embarked&#39;, &#39;status&#39;, &#39;sibsp&#39;, &#39;parch&#39;, &#39;age&#39;, &#39;fare&#39;, &#39;together_size&#39;,
+                    &#39;isSingle&#39;]
+</code></pre>
+<h3 id="通过Pandas中的get-dummies-进行编码"><a href="#通过Pandas中的get-dummies-进行编码" class="headerlink" title="通过Pandas中的get_dummies() 进行编码"></a>通过Pandas中的get_dummies() 进行编码</h3><p>这是一个暴力转码（字符串——&gt;数字代号）的方法，十分简单，且更好用</p>
+<pre><code>data_one_dummy = pd.get_dummies(data_train[data_feature_one])
+#把data_feature_one中需要转码的如：status、embarked转为数字代号
+data_one_dummy_list = data_one_dummy.columns.tolist()
+#转list，以便放入网格搜索的形参中去跑
+</code></pre>
+<h2 id="把train集拆分为训练集和测试"><a href="#把train集拆分为训练集和测试" class="headerlink" title="把train集拆分为训练集和测试"></a>把train集拆分为训练集和测试</h2><pre><code>X_train_one, X_test_one, y_train_one, y_test_one = model_selection.train_test_split(data_one_dummy[data_one_dummy_list],#转码后的list格式的train[feature]
+                                                                    data_train[target],#标签
+                                                                    random_state = 0)#随机种子
+
+print(X_train_one.shape)
+print(X_test_one.shape)
+#shape查看分割的大小，也可以通过size参数自己设置分割比例,数据量很大时通常使用2 8分，train_size=0.8
+print(y_train_one.shape)
+print(y_test_one.shape)
+#大X表示：特征  小y表示：标签
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/f70f693e524f4c75bfdb6ccfe37883b4.png" alt="左：数据量(行)  右：特征数(列)"></p>
+<h2 id="网格搜索：寻找最优"><a href="#网格搜索：寻找最优" class="headerlink" title="网格搜索：寻找最优"></a>网格搜索：寻找最优</h2><h3 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h3><pre><code>from sklearn.model_selection import GridSearchCV   #网格搜索
+from sklearn.ensemble import RandomForestClassifier #随机森林分类器
+
+rfc = RandomForestClassifier(max_features=&#39;auto&#39; , random_state= 0 , n_jobs=-1 )
+#实例化一个RandomForestClassifier对象
+#简单选取所有特征 ， 随机种子=0  ， 利用所有线程
+
+#这里实例化RandomForestClassifier时可以不用写入太多参数，参数可以放进网格里面自己跑出最优的
+</code></pre>
+<h3 id="搜索"><a href="#搜索" class="headerlink" title="搜索"></a>搜索</h3><pre><code>param_gird = &#123;#需要最优化的参数对象
+    &#39;criterion&#39; : [&#39;gini&#39;, &#39;entropy&#39;],#标准选择
+    &#39;min_samples_leaf&#39; : [ 1,3,5, 10],#最小子叶数
+    &#39;min_samples_split&#39; : [10, 12, 16,20,24],#最小样本数
+    &#39;n_estimators&#39; : [20,35,50,100]#决策树的个数选择
+&#125;
+
+gscv = GridSearchCV(#网格搜索交叉验证对象
+                estimator=rfc,#rf带入网格算
+                param_grid=param_gird,#需要最优化的参数带入
+                scoring= &#39;accuracy&#39;, #得分评判————准确度
+                cv=3,#交叉验证次数
+                n_jobs=-1)#-1 利用CPU所有线程
+
+
+gs = gscv.fit(X_train_one , y_train_one.values.ravel())#自动训练，两个参数都是train集
+#.values.ravel()是为了防止warning
+#自动训练的所有结果返回在gs中，这个
+
+print(gs.best_score_)#最高分数
+
+print(gs.best_params_)#最佳组合
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/7b7e4e2ba989488b8e4d553f025731fc.png"></p>
+<h3 id="网格搜索调参"><a href="#网格搜索调参" class="headerlink" title="网格搜索调参"></a>网格搜索调参</h3><ul>
+<li>如果某特征的最优值是在罗列的数的中间，那么认为比较优秀</li>
+<li>如果在边上，就需要往那个方向调参重新跑</li>
+<li>同时有多个参数需要调时，先调差距最大的</li>
+<li>即使是位于中间的参数也可以细分调整</li>
+<li>类似高中生物实验探究题《寻找最佳浓度》的思想</li>
+</ul>
+<h2 id="用最优参数训练随机森林"><a href="#用最优参数训练随机森林" class="headerlink" title="用最优参数训练随机森林"></a>用最优参数训练随机森林</h2><pre><code>#实例化RandomForestClassifier对象
+rfc2 = RandomForestClassifier(criterion=&#39;entropy&#39;,
+                             min_samples_leaf=5,
+                             min_samples_split=16,
+                             n_estimators=35,
+                             n_jobs=-1,
+                             random_state=1)
+
+#训练
+rfc2.fit(X_train_one, y_train_one.values.ravel())
+</code></pre>
+<p>此时训练完成，等待后续用<strong>split分割出来的测试集test来测试</strong></p>
+<h3 id="根据特征的重要性排序"><a href="#根据特征的重要性排序" class="headerlink" title="根据特征的重要性排序"></a>根据特征的重要性排序</h3><pre><code>print(pd.concat((pd.DataFrame(X_train_one.iloc[:, 1:].columns, columns=[&#39;Variable&#39;]),
+           pd.DataFrame(rfc2.feature_importances_, columns=[&#39;importance&#39;])),
+           axis=1).sort_values(by=&#39;importance&#39;, ascending=False))
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/1583b73b3f2845c2b203ded785146e72.png"></p>
+<ul>
+<li><strong>重要性</strong>：重要性是特征在模型中的决定能力，而不是越高就代表标签越接近1</li>
+</ul>
+<h2 id="在test上预测：是split分割出来的test"><a href="#在test上预测：是split分割出来的test" class="headerlink" title="在test上预测：是split分割出来的test"></a>在test上预测：是split分割出来的test</h2><pre><code>predict_test = rfc2.predict(X_test_one)#test集中的特征数据X
+
+pred_df = pd.DataFrame(predict_test, columns=[&#39;survived&#39;])#预测结果表
+
+print(pred_df)#test集的验证结果
+
+print(&#39;随机森林 AUC...&#39;)
+fpr_test, tpr_test, th_test = metrics.roc_curve(predict_test, y_test_one)
+# 构造 roc 曲线
+print(&#39;AUC = %.4f&#39; %metrics.auc(fpr_test, tpr_test))#参考意义最大的就是AUC
+print(&#39;随机森林精确度...&#39;)
+print(metrics.classification_report(predict_test, y_test_one))#精准度表格
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/04fabbe4baed47c68ad12214800bf1d0.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_19,color_FFFFFF,t_70,g_se,x_16"></p>
+<h2 id="验证：不是split分割出来的test，而是test-csv"><a href="#验证：不是split分割出来的test，而是test-csv" class="headerlink" title="验证：不是split分割出来的test，而是test.csv"></a>验证：不是split分割出来的test，而是test.csv</h2><pre><code>data_val_dummy = pd.get_dummies(data_test[data_feature_one])#转码
+data_val_dummy_list = data_val_dummy.columns.tolist()
+print(data_val_dummy_list)#查看转码后的列名，拿着这些列名预测
+
+pred_val = rfc2.predict(data_val_dummy[[#根据上一条语句的结果，copy了列名
+                                        &#39;pclass&#39;, &#39;sibsp&#39;, &#39;parch&#39;, &#39;age&#39;,
+                                        &#39;fare&#39;, &#39;together_size&#39;, &#39;isSingle&#39;,
+                                        &#39;sex_female&#39;, &#39;sex_male&#39;, &#39;embarked_C&#39;,
+                                        &#39;embarked_Q&#39;, &#39;embarked_S&#39;, &#39;status_Master&#39;,
+                                        &#39;status_Miss&#39;, &#39;status_Mr&#39;, &#39;status_Mrs&#39;,
+                                        &#39;status_ohter&#39;]])
+
+
+pred_val_df = pd.DataFrame(pred_val, columns=[&#39;survived&#39;])
+
+print(pred_val_df.head(10))#展示前10个数据
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/348435ac3b974dfd827f256ee10998f0.png"></p>
+
+      
+       <hr><span style="font-style: italic;color: gray;"> 投其所好，乐此不疲 </span>
+    </div>
+</article>
+
+
+
+
+
+
+
+    
+        <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="//cdn.jsdelivr.net/npm/mathjax@2.7.8/unpacked/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+<input type="hidden" id="MathJax-js"
+        value="//cdn.jsdelivr.net/npm/mathjax@2.7.8/unpacked/MathJax.js?config=TeX-MML-AM_CHTML">
+</input>
+    
+
+
+
+
+    </div>
+    <div class="copyright">
+        <p class="footer-entry">
+    ©2021 ZJH
+</p>
+<p class="footer-entry">Built with <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/yelog/hexo-theme-3-hexo" target="_blank">3-hexo</a> theme</p>
+
+    </div>
+    <div class="full-toc">
+        <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
+<a class="" id="rocket" ></a>
+
+    </div>
+</div>
+
+</body>
+<script src="/zjh/js/jquery.pjax.js?v=1.1.0" ></script>
+
+<script src="/zjh/js/script.js?v=1.1.0" ></script>
+<script>
+    var img_resize = 'default';
+    function initArticle() {
+        /*渲染对应的表格样式*/
+        
+            $("#post .pjax table").addClass("green_title");
+        
+
+        /*渲染打赏样式*/
+        
+
+        /*高亮代码块行号*/
+        
+        $('pre code').each(function(){
+            var lines = $(this).text().trim().split('\n').length, widther='';
+            if (lines>99) {
+                widther = 'widther'
+            }
+            var $numbering = $('<ul/>').addClass('pre-numbering ' + widther).attr("unselectable","on");
+            $(this).addClass('has-numbering ' + widther)
+                    .parent()
+                    .append($numbering);
+            for(var i=1;i<=lines;i++){
+                $numbering.append($('<li/>').text(i));
+            }
+        });
+        
+
+        /*访问数量*/
+        
+        $.getScript("//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js");
+        
+
+        /*代码高亮，行号对齐*/
+        $('.pre-numbering').css('line-height',$('.has-numbering').css('line-height'));
+
+        
+        
+    }
+
+    /*打赏页面隐藏与展示*/
+    
+
+</script>
+
+<!--加入行号的高亮代码块样式-->
+
+<style>
+    pre{
+        position: relative;
+        margin-bottom: 24px;
+        border-radius: 10px;
+        border: 1px solid #e2dede;
+        background: #FFF;
+        overflow: hidden;
+    }
+    code.has-numbering{
+        margin-left: 30px;
+    }
+    code.has-numbering.widther{
+        margin-left: 35px;
+    }
+    .pre-numbering{
+        margin: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 20px;
+        padding: 0.5em 3px 0.7em 5px;
+        border-right: 1px solid #C3CCD0;
+        text-align: right;
+        color: #AAA;
+        background-color: ;
+    }
+    .pre-numbering.widther {
+        width: 35px;
+    }
+</style>
+
+<!--自定义样式设置-->
+<style>
+    
+    
+    .nav {
+        width: 542px;
+    }
+    .nav.fullscreen {
+        margin-left: -542px;
+    }
+    .nav-left {
+        width: 120px;
+    }
+    
+    
+    @media screen and (max-width: 1468px) {
+        .nav {
+            width: 492px;
+        }
+        .nav.fullscreen {
+            margin-left: -492px;
+        }
+        .nav-left {
+            width: 100px;
+        }
+    }
+    
+    
+    @media screen and (max-width: 1024px) {
+        .nav {
+            width: 492px;
+            margin-left: -492px
+        }
+        .nav.fullscreen {
+            margin-left: 0;
+        }
+    }
+    
+    @media screen and (max-width: 426px) {
+        .nav {
+            width: 100%;
+        }
+        .nav-left {
+            width: 100%;
+        }
+    }
+    
+    
+    .nav-right .title-list nav a .post-title, .nav-right .title-list #local-search-result a .post-title {
+        color: #383636;
+    }
+    
+    
+    .nav-right .title-list nav a .post-date, .nav-right .title-list #local-search-result a .post-date {
+        color: #5e5e5f;
+    }
+    
+    
+    .nav-right nav a.hover, #local-search-result a.hover{
+        background-color: #e2e0e0;
+    }
+    
+    
+
+    /*列表样式*/
+    
+
+    /* 背景图样式 */
+    
+    
+
+
+    /*引用块样式*/
+    
+
+    /*文章列表背景图*/
+    
+
+    
+    #post .pjax article :not(pre) > code {
+        color: #24292e;
+        font-family: SFMono-Regular,Consolas,Liberation Mono,Menlo,Courier,monospace;
+        background-color: rgba(27,31,35,.05);
+        border-radius: 3px;
+        font-size: 85%;
+        margin: 0;
+        padding: .2em .4em;
+    }
+    
+</style>
+
+
+
+
+
+
+
+</html>

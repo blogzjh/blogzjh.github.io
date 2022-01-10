@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>回形针数字矩阵Java实现 | ZJH&#39;blog</title>
+  <title>Java泛型 | ZJH&#39;blog</title>
   <meta name="keywords" content="">
-  <meta name="description" content="回形针数字矩阵Java实现 | ZJH&#39;blog">
+  <meta name="description" content="Java泛型 | ZJH&#39;blog">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="description" content="解决思路定义问题——&gt;数据收集——&gt;数据清洗——&gt;分析——&gt;建模——&gt;验证——&gt;优化 该问题下前两步已经完成，本文从数据清洗开始 数据集的特征解读   英 中 分析    PassengeID 乘客ID 乘客ID不影响Survive与否，但可标识身份   Pclass 船舱等级 高等船舱靠近甲板，更容易Survive   Name 姓名 标记   Sex 性别">
 <meta property="og:type" content="article">
@@ -357,9 +357,9 @@
 </aside>
 <div id="post">
     <div class="pjax">
-        <article id="post-回形针数字矩阵Java实现" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-Java泛型" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">回形针数字矩阵Java实现</h1>
+        <h1 class="article-title">Java泛型</h1>
     
     <div class="article-meta">
         
@@ -369,7 +369,7 @@
             <i class="iconfont icon-category"></i>
             
             
-            <a  data-rel="数据结构算法">数据结构算法</a>
+            <a  data-rel="Java">Java</a>
             
         </span>
         
@@ -377,12 +377,12 @@
     </div>
     <div class="article-meta">
         
-            发布时间 : <time class="date" title='最后更新: 2021-12-25 02:08:07'>2021-12-25 02:07</time>
+            发布时间 : <time class="date" title='最后更新: 2022-01-02 20:00:58'>2022-01-02 19:51</time>
         
     </div>
     <div class="article-meta">
         
-        <span>字数:452</span>
+        <span>字数:3.1k</span>
         
         
         <span id="busuanzi_container_page_pv">
@@ -401,7 +401,7 @@
     
     <div class="toc-ref">
     
-        
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-0%E6%B3%9B%E5%9E%8B%E4%BD%BF%E7%94%A8%E7%89%B9%E7%82%B9"><span class="toc-text">1.0泛型使用特点</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1%E7%AC%A6%E5%8F%B7"><span class="toc-text">1.1符号</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2%E8%A7%84%E8%8C%83"><span class="toc-text">1.2规范</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-0%E6%B3%9B%E5%9E%8B%E7%9A%84%E5%A3%B0%E6%98%8E%E4%B8%8E%E6%8C%87%E5%AE%9A"><span class="toc-text">2.0泛型的声明与指定</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1%E7%B1%BB%E4%B8%8A%E5%A3%B0%E6%98%8E"><span class="toc-text">2.1类上声明</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2%E6%8E%A5%E5%8F%A3%E5%A3%B0%E6%98%8E%E3%80%81%E5%AD%90%E7%B1%BB%E5%A3%B0%E6%98%8E%E5%92%8C%E6%8C%87%E5%AE%9A"><span class="toc-text">2.2接口声明、子类声明和指定</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3%E6%B3%9B%E5%9E%8B%E9%80%9A%E9%85%8D%E7%AC%A6%EF%BC%9F-%E4%B8%8A%E9%99%90%E4%B8%8E%E4%B8%8B%E9%99%90"><span class="toc-text">2.3泛型通配符？ 上限与下限</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-4%E4%B8%8A%E4%B8%8B%E8%BE%B9%E7%95%8C%E7%9A%84%E6%B5%8B%E8%AF%95%E5%92%8Cget-set%E9%99%90%E5%88%B6%E5%8F%8A%E8%A7%A3%E9%87%8A"><span class="toc-text">2.4上下边界的测试和get set限制及解释</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-0%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BB%93%E6%9E%84%E7%9A%84%E6%B3%9B%E5%9E%8B"><span class="toc-text">3.0自定义结构的泛型</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1%E8%87%AA%E5%AE%9A%E4%B9%89%E7%B1%BB%E3%80%81%E6%8E%A5%E5%8F%A3%E7%9A%84%E6%B3%9B%E5%9E%8B"><span class="toc-text">3.1自定义类、接口的泛型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E6%B3%95%E7%9A%84%E6%B3%9B%E5%9E%8B"><span class="toc-text">自定义方法的泛型</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BB%A7%E6%89%BF%E4%B8%8E%E6%B3%9B%E5%9E%8B"><span class="toc-text">继承与泛型</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B%E5%8C%96%E8%A7%84%E5%BE%8B"><span class="toc-text">实例化规律</span></a></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -417,49 +417,284 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p><img src="https://img-blog.csdnimg.cn/20210726004539592.png"><br>我们发现这个回形数矩阵的逻辑是：→↓←↑四个为一个循环，故考虑框架为：一个外层for里面嵌套4个内层for</p>
-<p>每个内层for的起点终点都随着外层的变化而变化</p>
-<p>说实话这种问题只可意会不可言传，光看源码没什么用，你得逼着自己去思考，哪怕是一个下午，一天才做出来也比你直接看源码好啊<del>使劲想想现实逻辑怎么转化为for循环逻辑，一般看到那个→↓←↑就会感觉这四个地位等价，就尝试着把这四个for放到一个外层大for里面，一点一点试出来</del></p>
-<pre><code>import java.util.Scanner;
-public class Test1 &#123;
+        <p>Java 泛型（generic）是 JDK 5 中引入的一个新特性, 泛型提供了<strong>编译时</strong>类型安全检测机制，该机制允许程序员在编译时检测到非法的类型。</p>
+<p>泛型的本质是参数化类型，也就是说所操作的数据类型被指定为一个参数。</p>
+<p>泛型设计背景：集合容器类在设计/声明的时候不能确定到底是存储什么类型的元素，但对元素如何存储，如何使用都是清楚的，唯一不确定的是元素的类型，因此在JDK1.5的时候引入了泛型来解决这个问题；把元素的类型设置为一个参数，这个参数就叫泛型：Collection<E>  List<E>  Map<E>这个E就是类型参数，即泛型；</p>
+<p>什么时候使用：设计时只设计用法不考虑类型，使用时必须确定类型</p>
+<p>正如ArrayList<String>表示的含义即为：只能存储String类型元素的ArrayList集合</p>
+<h1 id="1-0泛型使用特点"><a href="#1-0泛型使用特点" class="headerlink" title="1.0泛型使用特点"></a>1.0泛型使用特点</h1><p>在<strong>编译之后程序会采取<u>去泛型化</u>的措施</strong>。也就是说Java中的泛型，<u>只在编译阶段有效</u>。在编译过程中，正确检验泛型结果后，会将泛型的相关信息擦出（<strong>类型擦除</strong>），并且在对象进入和离开方法的边界处添加类型检查和类型转换的方法。也就是说，泛型信息不会进入到运行时阶段。</p>
+<h2 id="1-1符号"><a href="#1-1符号" class="headerlink" title="1.1符号"></a>1.1符号</h2><p>常用的通配符有T,E,K,V分别表示类型、元素、键、值，当然这并不是硬性规定，而是大家形成的一种通识。</p>
+<h2 id="1-2规范"><a href="#1-2规范" class="headerlink" title="1.2规范"></a>1.2规范</h2><p>泛型只能是类，不能是基本数据类型：int(×) Integer(√)</p>
+<p>定义了泛型之后，在编译期也要受泛型的约束，从而在某些情况可以避免强转操作</p>
+<p>方法中不是出现<E>就一定是泛型方法，详见</p>
+<p>类上声明的泛型<T>和类中又声明的泛型<E>是两回事</p>
+<h1 id="2-0泛型的声明与指定"><a href="#2-0泛型的声明与指定" class="headerlink" title="2.0泛型的声明与指定"></a>2.0泛型的声明与指定</h1><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/GGYC/p/10951794.html?ivk_sa=1024320u">链接：泛型的使用场景</a></p>
+<h2 id="2-1类上声明"><a href="#2-1类上声明" class="headerlink" title="2.1类上声明"></a>2.1类上声明</h2><p>声明在类上时，写在类名后边；作为参数或者返回值时，如果在类上没有声明，必须在访问修饰符和返回值之间</p>
+<pre><code>/**
+ * 声明在类上时，写在类名后边
+ * @param &lt;E&gt;
+ */
+class Animal &lt;E&gt; &#123;
+    /**
+     * 作为属性声明时，必须在类上声明泛型
+     */
+    E pet;
+ 
+    /**
+     * 作为参数或者返回值时，如果在类上没有声明，必须在访问修饰符和返回值之间
+     * @param pet
+     */
+    public  void setPet(E pet)&#123;
+        this.pet = pet;
+    &#125;
+ 
+    public E getPet()&#123;
+        return pet;
+    &#125;
+//这里的T在泛型类中没有声明，所以要在泛型方法中&lt;T&gt;声明为泛型方法
+    public &lt;T&gt; void call(T t)&#123;
+        System.out.println( t.toString() );
+ 
+    &#125;
+ 
+&#125;
+</code></pre>
+<h2 id="2-2接口声明、子类声明和指定"><a href="#2-2接口声明、子类声明和指定" class="headerlink" title="2.2接口声明、子类声明和指定"></a>2.2接口声明、子类声明和指定</h2><p>使用泛型实现时，实现类必须使用对应的泛型类。<br>实现类声明泛型跟接口指定泛型可以同时使用。（“声明”“指定”互不影响）</p>
+<pre><code>/**
+ * 作用在接口上，如果实现该接口时指定实现类型
+ * @param &lt;T&gt;
+ */
+public interface Animals&lt;T&gt;&#123;
+    double PI = 3.1415926535;
+//等价于public static final double PI = 3.1415926535;
+    void call(T t);
+//等价于public abstract void call(T t);
+&#125;
+/**
+ * 拉布拉多犬
+ */
+ 
+/**
+ * 使用泛型实现时，实现类必须使用对应的泛型类。
+ * 实现类声明泛型跟接口指定泛型可以同时使用。
+ *如下代码：
+ */
+ class LaBuLaDuo&lt;T&gt; implements Animals&lt;String&gt; &#123;
+//&lt;T&gt;是声明新泛型  &lt;String&gt;是指定旧泛型
+ 
+    public void call(String s) &#123;
+        System.out.println( s );
+    &#125;
+ 
+&#125;
+</code></pre>
+<h2 id="2-3泛型通配符？-上限与下限"><a href="#2-3泛型通配符？-上限与下限" class="headerlink" title="2.3泛型通配符？ 上限与下限"></a>2.3泛型通配符？ 上限与下限</h2><p>泛型占位符  ?  的使用<br>如何设置泛型的上限下限</p>
+<p>上限：泛型为E或者E的子类：&lt;? extends E&gt;</p>
+<p>下限：泛型为E或者E的父类：&lt;? super E&gt;</p>
+<p>单独使用：泛型为Object及其子类：&lt;?&gt;</p>
+<pre><code>/**
+ * 小狗狗
+ */
+ class Dog extends  Animal &#123;
+    public String name;
+    public Integer age;
+ 
+&#125;
+ 
+ 
+/**
+ * 泛型占位符  ?  的使用
+ * 泛型的上限 &lt; ? extends E&gt;  即传入参数必须为E 的子类
+ * 泛型的下限 &lt; ? super E&gt;
+ */
+public class ErHa &lt;E&gt;  &#123;
+ 
+    //当参数传递时可以设置上下限 比如下面的是  传入类型必须是 Dog 的子类，上限为Dog
+    public  void call(Animal&lt; ? extends E&gt; s)&#123;
+        System.out.println(s.pet);
+    &#125;
+ 
+    //传入类型必须是 Dog 的父类，下限为Dog
+    public  void jump(Animal&lt; ? super E&gt; s)&#123;
+        System.out.println(s.pet);
+    &#125;
+ 
+    // ? 占位符单独使用时，相当于 &lt; ? extends Object &gt;
+    public  void smile(Animal&lt;?&gt; s)&#123;
+        System.out.println(s.pet);
+    &#125;
+ 
+ 
     public static void main(String[] args) &#123;
-        Scanner scan = new Scanner(System.in);
-        System.out.println(&quot;输入一个数，返回回形数矩阵&quot;);
-        int i = scan.nextInt();
-        // 键盘输入一个数
-        int[][] arr = new int[i][i];
-        int m = 1;//用于赋值
-        /*思考循环数的逻辑顺序，→↓←↑四个为一个循环，故考虑框架为一个外层for里面套4个内层for*/
-        /*每一个循环的→↓←↑内层for循环，其起点和终点都不断改变，所以起点终点必须表现出来这个联系，绝不能为常数*/
-        for (int j = 0; j &lt; i; j++) &#123;
- 
-            for (int k = j; k &lt; i - j; k++) &#123;//k=j和k&lt;i-j都在不断的改变
-                        arr[j][k] = m;
-                m++;
-            &#125; 
-            for (int l = j + 1; l &lt; i - j; l++) &#123;
-                arr[l][i - j - 1] = m;
-                m++;
-            &#125;
-            for (int p = i - j - 2; p &gt; j - 1; p--) &#123;
-                arr[i - j - 1][p] = m;
-                m++;
-            &#125;
-            for (int q = i - j - 2; q &gt; j; q--) &#123;
-                arr[q][j] = m;
-                m++;
-            &#125;
-        &#125;
-        // 输出矩阵
-        for (int a = 0; a &lt; arr.length; a++) &#123;
-            for (int b = 0; b &lt; arr[a].length; b++) &#123;
-                System.out.print(arr[a][b] + &quot;\t&quot;);
- 
-            &#125;
-            System.out.println();
-        &#125;
+        new ErHa&lt;Dog&gt;().call(new Dog());
     &#125;
 &#125;
+</code></pre>
+<h2 id="2-4上下边界的测试和get-set限制及解释"><a href="#2-4上下边界的测试和get-set限制及解释" class="headerlink" title="2.4上下边界的测试和get set限制及解释"></a>2.4上下边界的测试和get set限制及解释</h2><pre><code>class plate&lt;T&gt;&#123;
+    private T t;
+    public plate(T t)&#123;
+        this.t = t;
+    &#125;
+    public  void set(T t)&#123;//测试1
+        this.t = t;
+    &#125;
+    public T get()&#123;
+        return t;
+    &#125;
+&#125;
+ 
+ 
+class Food&#123;&#125;
+class Furit extends Food&#123;&#125;
+class Apple extends Furit&#123;&#125;
+class Banana extends Furit&#123;&#125;
+
+   /*************下面测试上下边界通配符***************/
+ 
+        //1.0 extends 通配符上界
+        plate&lt;? extends Furit&gt; p10 = new plate&lt;Furit&gt;(new Apple());
+        plate&lt;? extends Furit&gt; p11 = new plate&lt;Banana&gt;(new Banana());
+        p10 = p11;
+        p11 = p10;
+        //上述例子中，&lt;? extends Furit&gt;表示“该盘子可以装Furit包括Furit的所有子类”
+        //2.0 super 通配符下界(注意第二个&lt;&gt;中的细微差别)
+        plate&lt;? super Furit&gt; p12 = new plate&lt;Furit&gt;(new Apple());
+        plate&lt;? super Furit&gt; p13 = new plate&lt;Furit&gt;(new Banana());
+//        p13.set(new Food());
+        p13.set(new Furit());
+        plate&lt;? super Furit&gt; p14 = new plate&lt;Food&gt;(new Food());
+        plate&lt;? super Furit&gt; p15 = new plate&lt;Furit&gt;(new Furit());
+        p12 = p13;
+        p13 = p14;
+        p14 = p15;
+        //上述例子中，&lt;? super Furit&gt;表示“该盘子可以装Fuirt包括Fuirt的所有父类”
+        //并且可知：当指定了泛型时，可以装入泛型的实例化子类
+ 
+ 
+        /************通配符？有get和set的限制规则**************/
+        //p10 p11是extends通配符上界，p12~p15是super通配符上界
+ 
+//        p10.set(new Apple());即便是同类型也报错
+//        p15.get(0);  不能获取，报错
+        p10.get();
+        p15.set(new Furit());
+//? extends xxx只能调用get不能调用set
+//? super xxx只能调用set不能调用get
+        /*********问：为什么有这样的限制呢*************/
+        /**答：
+         * 首先明确一点，创建的plate对象具体存储什么由左右两边共同决定，set和get方法都会受二者的影响
+         * 具体就是左边的&lt;&gt;限制右边的&lt;&gt;,而右边的&lt;&gt;决定最终存储的类型
+         *  1，plate&lt;? extends Furit&gt; p10 = new plate&lt;Apple&gt;(new Apple());确定了通配符？,该plate能存储Apple及其子类的实例
+         *  ~1.1，不能使用set()的原因：
+         *  从结构出发，左边部分plate&lt;? extends Furit&gt; p10：决定了p10只能接受Furit及其子类Apple或Banana
+         *  编译看左：&lt;? extends Furit&gt;
+         *  假设set()可以使用，编译器只能识别set(形参)中是否为“new了一个Furit及其子类的形参”
+         *  运行看右：&lt;Apple&gt;
+         *  而右边部分new plate&lt;Apple&gt;(new Apple())一开始就确定了p10只能放Apple
+         *  倘若可以使用set(new Banana())，由于Banana也是Furit子类，编译器无法判断错误，但运行则会出错
+         *  因此编译器直接取消了上边界extends中的set方法
+         *
+         *  ~1.2而对于get()方法，则没有限制，因为返回值一定是由右边new plate&lt;Apple&gt;(new Apple())所决定的Apple类型,
+         *      即使是依据左边来盛放返回值，Furit getback = p.get();也是一定可以的
+         *
+         * 2，plate&lt;? super Furit&gt; p12 = new plate&lt;Food&gt;(new Apple());右边的&lt;&gt;中必须填Furit或者Food
+         *  ~2.1不能使用get()的原因：
+         *  从结构出发，左边部分plate&lt;? super Furit&gt; p12：决定了p12只能接受Furit及其父类Food
+         *  编译看左，运行看右：
+         *  假设get()方法可以使用，那么get的返回值用什么接收呢？
+         *  Furit getback = p12.get();运行时不一定正确
+         *  Food getback = p12.get();运行时也不一定正确
+         *  只有超类Object getback = p12.get();才能一定不报错
+         *  因此继续假设get返回值用Object存储
+         *  但是这样就使用不了除Object以外的任何方法，并且本身还很容易出错
+         *  因此编译器直接取消了下边界super中的get方法
+         *  ~2.2
+         *  而对于set()方法，则没有限制，因为形参中只要满足右边的&lt;&gt;即可
+         *
+         *
+         */
+</code></pre>
+<h1 id="3-0自定义结构的泛型"><a href="#3-0自定义结构的泛型" class="headerlink" title="3.0自定义结构的泛型"></a>3.0自定义结构的泛型</h1><p>（结构包括：类、接口、方法）</p>
+<h2 id="3-1自定义类、接口的泛型"><a href="#3-1自定义类、接口的泛型" class="headerlink" title="3.1自定义类、接口的泛型"></a>3.1自定义类、接口的泛型</h2><pre><code>plate p1 = new plate(new Apple());
+        plate p2 = new plate(new Banana());
+        p1 = p2;
+        /*1.0因为省略了泛型，默认泛型T为Object，
+        该plate盘子可以装所有Object及其子类，所以p1可以转化为p2*/
+ 
+        plate&lt;Food&gt; p3 = new plate&lt;&gt;(new Apple());
+        plate&lt;Food&gt; p4 = new plate&lt;&gt;(new Banana());
+        p3 = p4;
+        p4 = p3;
+        /*2.0表示该盘子plate可以装Food及其子类，因此可以相互转化*/
+ 
+        plate&lt;Furit&gt; p5 = new plate&lt;&gt;(new Apple());
+        plate&lt;Furit&gt; p6 = new plate&lt;&gt;(new Banana());
+        p5 = p6;
+        p6 = p5;
+        /*3.0表示盘子可以装Furit及其子类，因此也能相互转化*/
+ 
+        plate&lt;Apple&gt; p7 = new plate&lt;&gt;(new Apple());
+        /*4.0表示p7盘子只能装Apple及其子类，只有Apple及其子类的盘子可以相互转化*/
+//        plate&lt;Apple&gt; p8 = new plate&lt;&gt;(new Banana());泛型确定为Apple，所以不能赋值Banana
+        plate&lt;Banana&gt; p8 = new plate&lt;&gt;(new Banana());
+//        p7 = p8;泛型不同不能相互转化
+        /*4.1表示p8盘子只能装Banana及其子类，只有Banana及其子类的盘子可以相互转化*/
+</code></pre>
+<h2 id="自定义方法的泛型"><a href="#自定义方法的泛型" class="headerlink" title="自定义方法的泛型"></a>自定义方法的泛型</h2><pre><code>泛型方法与所处类是否泛型无关
+只有在public之后跟上&lt;&gt;的才是泛型方法，使用时
+
+    public &lt;T&gt; ArrayList&lt;T&gt; arrayToList(T... arr) &#123;
+        //泛型方法与所处类是否泛型无关
+        //只有在public之后跟上&lt;&gt;的才是泛型方法，使用时如下
+        ArrayList&lt;T&gt; DestArr = new ArrayList&lt;&gt;();
+       for(T t:arr)&#123;
+           DestArr.add(t);
+       &#125;//foreach循环中每个t都代表对应的arr[i]
+        return DestArr;
+    &#125;
+</code></pre>
+<h1 id="继承与泛型"><a href="#继承与泛型" class="headerlink" title="继承与泛型"></a>继承与泛型</h1><p>类A&lt;父类&gt;和 类A&lt;子类&gt;是不能相互转化的<br>        //要想实现这种转化，必须使用通配符? 利用上下边界通配符解决</p>
+<pre><code>       plate p1 = new plate(new Apple());
+        plate p2 = new plate(new Banana());
+        p1 = p2;
+        /*1.0因为省略了泛型，默认泛型T为Object，
+        该plate盘子可以装所有Object及其子类，所以p1可以转化为p2*/
+ 
+        plate&lt;Food&gt; p3 = new plate&lt;&gt;(new Apple());
+        plate&lt;Food&gt; p4 = new plate&lt;&gt;(new Banana());
+        p3 = p4;
+        p4 = p3;
+        /*2.0表示该盘子plate可以装Food及其子类，因此可以相互转化*/
+ 
+        plate&lt;Furit&gt; p5 = new plate&lt;&gt;(new Apple());
+        plate&lt;Furit&gt; p6 = new plate&lt;&gt;(new Banana());
+        p5 = p6;
+        p6 = p5;
+        /*3.0表示盘子可以装Furit及其子类，因此也能相互转化*/
+ 
+        plate&lt;Apple&gt; p7 = new plate&lt;&gt;(new Apple());
+        /*4.0表示p7盘子只能装Apple及其子类，只有Apple及其子类的盘子可以相互转化*/
+//        plate&lt;Apple&gt; p8 = new plate&lt;&gt;(new Banana());泛型确定为Apple，所以不能赋值Banana
+        plate&lt;Banana&gt; p8 = new plate&lt;&gt;(new Banana());
+//        p7 = p8;泛型不同不能相互转化
+        /*4.1表示p8盘子只能装Banana及其子类，只有Banana及其子类的盘子可以相互转化*/
+ 
+        /*************下面测试继承关系***********/
+//        p3 = p5;
+//        p5 = p3;
+//        p5 = p7;
+//以上这种看似继承却不能转化，因为编译器不认同泛型有继承多态性
+        //即：类A&lt;父类&gt;和 类A&lt;子类&gt;是不能相互转化的
+        //要想实现这种转化，必须使用通配符? 利用上下边界通配符解决
+</code></pre>
+<h1 id="实例化规律"><a href="#实例化规律" class="headerlink" title="实例化规律"></a>实例化规律</h1><pre><code>plate&lt;前面的泛型&gt; p = new plate&lt;后面的泛型&gt;(new 泛型对象);
+
+对于这样一个实例化语句，一般只有如下两种情况
+
+plate&lt;甲&gt; p = new plate&lt;甲&gt;(new 甲或甲的子类);
+plate&lt;甲&gt; p = new plate&lt;  &gt;(new 甲或甲的子类);//后面的泛型可以省略
+
+plate&lt;? extends 甲&gt; = new plate&lt;甲或甲的子类：记作乙&gt;(new 乙或乙的子类);//但如果使用了通配符？，那么后面的泛型必须先指定，不能省略
 </code></pre>
 
       
