@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>RLE算法的Java实现 | ZJH&#39;blog</title>
+  <title>File常用操作 | ZJH&#39;blog</title>
   <meta name="keywords" content="">
-  <meta name="description" content="RLE算法的Java实现 | ZJH&#39;blog">
+  <meta name="description" content="File常用操作 | ZJH&#39;blog">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta property="og:type" content="article">
 <meta property="og:title" content="File常用操作">
@@ -349,32 +349,24 @@
 </aside>
 <div id="post">
     <div class="pjax">
-        <article id="post-RLE算法的Java实现" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-File常用操作" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">RLE算法的Java实现</h1>
+        <h1 class="article-title">File常用操作</h1>
     
     <div class="article-meta">
         
         
-        
-        <span class="book">
-            <i class="iconfont icon-category"></i>
-            
-            
-            <a  data-rel="数据结构算法">数据结构算法</a>
-            
-        </span>
         
         
     </div>
     <div class="article-meta">
         
-            发布时间 : <time class="date" title='最后更新: 2021-12-25 01:46:25'>2021-12-25 01:35</time>
+            发布时间 : <time class="date" title='最后更新: 2022-01-13 18:26:31'>2022-01-13 11:36</time>
         
     </div>
     <div class="article-meta">
         
-        <span>字数:1.1k</span>
+        <span>字数:0</span>
         
         
         <span id="busuanzi_container_page_pv">
@@ -393,7 +385,7 @@
     
     <div class="toc-ref">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%92%88%E5%AF%B9%E5%AD%97%E7%AC%A6%E7%9A%84RLE%E5%8E%8B%E7%BC%A9"><span class="toc-text">针对字符的RLE压缩</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%92%88%E5%AF%B9%E4%B8%80%E7%BB%B4%E5%AF%B9%E8%B1%A1%E7%9A%84RLE%E5%8E%8B%E7%BC%A9"><span class="toc-text">针对一维对象的RLE压缩</span></a></li></ol>
+        
     
 <style>
     .left-col .switch-btn,
@@ -409,172 +401,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="针对字符的RLE压缩"><a href="#针对字符的RLE压缩" class="headerlink" title="针对字符的RLE压缩"></a>针对字符的RLE压缩</h1><pre><code>1. 针对纯字符的压缩
-2. 不考虑两位数及以上的循环
-例如：用1*2#5*3#表示：11555两个1三个5，即 数*重复次数#
-</code></pre>
-<p>至于为什么只考虑一位数：多位数可以用包装类Integer表示，并且实际压缩中不会单纯压缩字符，一般都是整个对象一起压缩，所以没必要两位相连的数与后面判断</p>
-<pre><code> public static StringBuffer RLE(char...chars)&#123;//行程编码方法，形参放char型数组
-        //因为频繁更改字符串，所以返回值不用String
-        StringBuffer dest = new StringBuffer();
-        //注意：StringBuffer必须用new，不然不分配空间
-        //StringBuffer dest = null;会空指针异常
-        for(int i = 0 ; i&lt;chars.length-1 ; i++)&#123;//chars数组遍历——————压缩
-            //每次轮到chars[i],都需要用if和屁股后面紧跟的元素判断是否相等
-            dest.append(chars[i]);
-            dest.append(&#39;*&#39;);
-            int count = 1;//相等元素计数器
-            boolean bo = true;
-            while(bo)&#123;//while循环直到碰不到一样的元素就break
-                if(i&lt;chars.length-1 &amp;&amp; chars[i]==chars[i+1])&#123;//必须要避免空指针异常
-                    //注意：此处对i的判断必须在前，否则角标越界
-                    //并且要用&amp;&amp; 不能用&amp;，否则仍角标越界
-                    count++;
-                    i++;
-                &#125;else&#123;
-                    bo = false;
-                &#125;
-            &#125;
-            //循环结束，统计相同的个数
-            dest.append(count);
-            dest.append(&#39;#&#39;);//标识符，#之后又开始新的判断
-        &#125;
-        return dest;
-        &#125;
-
-//main方法中实现
- String s1 = &quot;1112233334455566777778889999&quot;;
-        StringBuffer s2 = RLE(s1.toCharArray());
-        System.out.println(s2.toString());
-</code></pre>
-<p>输出结果：1<em>3#2</em>2#3<em>4#4</em>2#5<em>3#6</em>2#7<em>5#8</em>3#9*4#</p>
-<p>含义为：1出现了3次，2出现了2次……</p>
-<h1 id="针对一维对象的RLE压缩"><a href="#针对一维对象的RLE压缩" class="headerlink" title="针对一维对象的RLE压缩"></a>针对一维对象的RLE压缩</h1><pre><code>1. 对象具有一个属性值和一个坐标值
-2. 不考虑独立多属性值，因为很难重复
-</code></pre>
-<p> 先定义像素点：</p>
-<pre><code>public class PixelPoint &#123;//一维像素点
-   
-    private int grayScale;//灰度值
-    private int x;//x坐标
- 
-    public PixelPoint(int grayScale,int x)&#123;
-        this.grayScale = grayScale;
-        this.x = x;
-    &#125;
- 
-    public int getX()&#123;
-        return this.x;
-    &#125;
- 
-    public int getGrayScale() &#123;
-        return grayScale;
-    &#125;
-&#125;
-</code></pre>
-<p> 定义像素点的压缩方法：</p>
-<pre><code>    public static LinkedHashMap&lt;PixelPoint,Integer&gt; RLE(ArrayList&lt;PixelPoint&gt; px)&#123;
-        //形参放入ArryaList，返回值用LinkedHashMap存储键值对，并且LinkedHashMap可以按添加顺序遍历
-        LinkedHashMap&lt;ZJH.HJZ.PixelPoint,Integer&gt; linkedHashMap = new LinkedHashMap&lt;&gt;();
- 
-        for(int i = 0 ; i &lt; px.size() ; )&#123;//
-            int j = i;
-            boolean bo = true;
-            int count = 1;//计相同个数
- 
-            while(bo)&#123;
-                if(i&lt;px.size()-1)&#123;
-                    if(px.get(i).getGrayScale() == px.get(i+1).getGrayScale())&#123;
-                        count++;
-                        i++;
-                    &#125;else&#123;
-                        i++;
-                        bo = false;
-                    &#125;
-                    &#125; else&#123;
-                    bo = false;
-                    i++;
-                &#125;
-            &#125;
- 
-                linkedHashMap.put(px.get(j), count);
-            &#125;
-            return linkedHashMap;
-    &#125;
-</code></pre>
-<p>载入像素点：并使用上面定义好的压缩方法，最后迭代器遍历(完整源码如下)</p>
-<pre><code>public class RLE_complex_one &#123;//对一维像素点的RLE算法测试
-    public static void main(String[] args) &#123;
-       //此例中所有像素点x坐标连续分布，故暂不考虑排序，用ArrayList效率更高
-        ArrayList&lt;ZJH.HJZ.PixelPoint&gt; arrayList = new ArrayList&lt;&gt;(20);//初始容量设为20(默认是10，每次扩大1.5X)
-        //以下模拟像素点的连续排布及灰度值情况
-        arrayList.add(new PixelPoint(1,1));
-        arrayList.add(new PixelPoint(1,2));
-        arrayList.add(new PixelPoint(1,3));
-        arrayList.add(new PixelPoint(1,4));
-        arrayList.add(new PixelPoint(1,5));
-        arrayList.add(new PixelPoint(50,6));
-        arrayList.add(new PixelPoint(50,7));
-        arrayList.add(new PixelPoint(50,8));
-        arrayList.add(new PixelPoint(50,9));
-        arrayList.add(new PixelPoint(255,10));
-        arrayList.add(new PixelPoint(255,11));
-        arrayList.add(new PixelPoint(255,12));
-        arrayList.add(new PixelPoint(255,13));
-        arrayList.add(new PixelPoint(255,14));
-        arrayList.add(new PixelPoint(255,15));
-        arrayList.add(new PixelPoint(255,16));
-        arrayList.add(new PixelPoint(255,17));
-        arrayList.add(new PixelPoint(255,18));
- 
- 
- 
-        LinkedHashMap&lt;ZJH.HJZ.PixelPoint, Integer&gt; rleDest = RLE(arrayList);//返回编码结果
-        //以下用迭代器遍历
-        Set&lt;Map.Entry&lt;PixelPoint, Integer&gt;&gt; entries = rleDest.entrySet();
-        Iterator&lt;Map.Entry&lt;PixelPoint, Integer&gt;&gt; iterator = entries.iterator();
-            int i = 1;
-        while(iterator.hasNext())&#123;
-            Map.Entry&lt;PixelPoint, Integer&gt; nextentries = iterator.next();
-            System.out.println(&quot;第&quot;+i+&quot;位压缩后的元素的灰度值是：&quot;+nextentries.getKey().getGrayScale()+&quot;，且压缩了&quot;+nextentries.getValue()+&quot;个连续的像素点&quot;);
-            i++;
-        &#125;
- 
- 
-    &#125;
- 
-    public static LinkedHashMap&lt;PixelPoint,Integer&gt; RLE(ArrayList&lt;PixelPoint&gt; px)&#123;
-        //形参放入ArryaList，返回值用LinkedHashMap存储键值对，并且LinkedHashMap可以按添加顺序遍历
-        LinkedHashMap&lt;ZJH.HJZ.PixelPoint,Integer&gt; linkedHashMap = new LinkedHashMap&lt;&gt;();
- 
-        for(int i = 0 ; i &lt; px.size() ; )&#123;//
-            int j = i;
-            boolean bo = true;
-            int count = 1;//计相同个数
- 
-            while(bo)&#123;
-                if(i&lt;px.size()-1)&#123;
-                    if(px.get(i).getGrayScale() == px.get(i+1).getGrayScale())&#123;
-                        count++;
-                        i++;
-                    &#125;else&#123;
-                        i++;
-                        bo = false;
-                    &#125;
-                    &#125; else&#123;
-                    bo = false;
-                    i++;
-                &#125;
-            &#125;
- 
-                linkedHashMap.put(px.get(j), count);
-            &#125;
-            return linkedHashMap;
-    &#125;
-&#125;
-</code></pre>
-<p><img src="https://img-blog.csdnimg.cn/a131150dbf364cc0ada38ae815633039.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16" alt="运行结果"></p>
-
+        
       
        <hr><span style="font-style: italic;color: gray;"> 生命以负熵为食，归整以抵抗熵增； </span>
     </div>
