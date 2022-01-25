@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Springboot基本结构 | ZJH&#39;blog</title>
+  <title>JDBC | ZJH&#39;blog</title>
   <meta name="keywords" content="">
-  <meta name="description" content="Springboot基本结构 | ZJH&#39;blog">
+  <meta name="description" content="JDBC | ZJH&#39;blog">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="description" content="早年写在csdn上的笔记，因为没用markdown写，所以滕不过来，直接上链接咯~ 为什么synchronized同步代码块既不能框多，也不能框少 yield、join、sleep区别 生产者消费者案例 三种异常处理机制">
 <meta property="og:type" content="article">
@@ -421,9 +421,9 @@
 </aside>
 <div id="post">
     <div class="pjax">
-        <article id="post-Springboot基本结构" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-JDBC" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">Springboot基本结构</h1>
+        <h1 class="article-title">JDBC</h1>
     
     <div class="article-meta">
         
@@ -433,7 +433,7 @@
             <i class="iconfont icon-category"></i>
             
             
-            <a  data-rel="Java后端">Java后端</a>
+            <a  data-rel="Java">Java</a>
             
         </span>
         
@@ -441,12 +441,12 @@
     </div>
     <div class="article-meta">
         
-            发布时间 : <time class="date" title='最后更新: 2022-01-25 21:07:27'>2022-01-20 20:10</time>
+            发布时间 : <time class="date" title='最后更新: 2022-01-25 21:10:24'>2022-01-25 21:10</time>
         
     </div>
     <div class="article-meta">
         
-        <span>字数:1.4k</span>
+        <span>字数:1.8k</span>
         
         
         <span id="busuanzi_container_page_pv">
@@ -465,7 +465,7 @@
     
     <div class="toc-ref">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E8%BF%90%E8%A1%8C%E5%8A%9F%E8%83%BD"><span class="toc-text">基本运行功能</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#pom-xml"><span class="toc-text">pom.xml</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%BC%E5%BC%8F"><span class="toc-text">格式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JavaBean"><span class="toc-text">JavaBean</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3"><span class="toc-text">常用注解</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A4%BA%E4%BE%8B"><span class="toc-text">示例</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#config%E9%85%8D%E7%BD%AE%E7%B1%BB"><span class="toc-text">config配置类</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3-1"><span class="toc-text">常用注解</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A4%BA%E4%BE%8B-1"><span class="toc-text">示例</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#controller%E6%8E%A7%E5%88%B6%E7%B1%BB"><span class="toc-text">controller控制类</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3-2"><span class="toc-text">常用注解</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A4%BA%E4%BE%8B-2"><span class="toc-text">示例</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%90%E8%A1%8C%E4%B8%BB%E7%B1%BB"><span class="toc-text">运行主类</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%95%E4%BE%8B%E3%80%81%E7%BB%84%E4%BB%B6%E4%BE%9D%E8%B5%96%EF%BC%9AproxyBeanMethods"><span class="toc-text">单例、组件依赖：proxyBeanMethods</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A4%BA%E4%BE%8B-3"><span class="toc-text">示例</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Bean%E5%8D%95%E4%BE%8B%E7%9A%84%E4%BD%93%E7%8E%B0"><span class="toc-text">Bean单例的体现</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BD%93%E7%8E%B02"><span class="toc-text">体现2</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90"><span class="toc-text">结构分析</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E4%BE%9D%E8%B5%96"><span class="toc-text">基本依赖</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%BF%9E%E6%8E%A5%EF%BC%8Cmysql%E9%87%8D%E7%82%B9%E7%94%A8%E7%AC%AC4%E4%B8%AA"><span class="toc-text">连接，mysql重点用第4个</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1%EF%BC%8C%E4%B8%8D%E5%87%BA%E7%8E%B0%E7%AC%AC%E4%B8%89%E6%96%B9API%EF%BC%8C%E9%AB%98%E5%8F%AF%E7%A7%BB%E6%A4%8D%E6%80%A7"><span class="toc-text">1，不出现第三方API，高可移植性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2%EF%BC%8CDriverManager%E6%9B%BF%E6%8D%A2Driver"><span class="toc-text">2，DriverManager替换Driver</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3%EF%BC%8Cmysql%E7%9A%84%E8%87%AA%E5%8A%A8%E6%B3%A8%E5%86%8C%E9%A9%B1%E5%8A%A8"><span class="toc-text">3，mysql的自动注册驱动</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4%EF%BC%8C%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E5%8A%A0%E8%BD%BD%EF%BC%9A%E6%9D%BE%E8%80%A6%E5%90%88"><span class="toc-text">4，配置文件加载：松耦合</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#CRUD"><span class="toc-text">CRUD</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#PreparedStatement%E5%AE%9E%E7%8E%B0"><span class="toc-text">PreparedStatement实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%9C%E7%94%A8"><span class="toc-text">作用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%EF%BC%9A%E5%A2%9E"><span class="toc-text">使用：增</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%84%E8%8C%83%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81"><span class="toc-text">规范完整代码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%EF%BC%9A%E6%94%B9"><span class="toc-text">使用：改</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%EF%BC%9A%E5%88%A0"><span class="toc-text">使用：删</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9F%A5"><span class="toc-text">查</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Mybatis"><span class="toc-text">Mybatis</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BC%BA%E7%82%B9"><span class="toc-text">缺点</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Springboot%E6%95%B4%E5%90%88JDBC"><span class="toc-text">Springboot整合JDBC</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE"><span class="toc-text">配置</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BE%9D%E8%B5%96"><span class="toc-text">依赖</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#pom-yaml"><span class="toc-text">pom.yaml</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96%E8%BF%9E%E6%8E%A5"><span class="toc-text">获取连接</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JdbcTemplate-%E5%B0%81%E8%A3%85JDBC-CRUD"><span class="toc-text">JdbcTemplate:封装JDBC CRUD</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BC%98%E7%82%B9"><span class="toc-text">优点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#controller%E7%B1%BBJDBCTemplate"><span class="toc-text">controller类JDBCTemplate</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A2%9E-update-GetMapping-%E2%80%9C-add-%E2%80%A6%E2%80%A6"><span class="toc-text">增:update   +  @GetMapping(“&#x2F;add&#x2F;{……</span></a></li></ol></li></ol></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -481,220 +481,370 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="基本运行功能"><a href="#基本运行功能" class="headerlink" title="基本运行功能"></a>基本运行功能</h1><p><img src="https://img-blog.csdnimg.cn/ef2744d2043545cb80069240f28c9c6d.png" alt="基本项目结构"></p>
-<h2 id="pom-xml"><a href="#pom-xml" class="headerlink" title="pom.xml"></a>pom.xml</h2><h3 id="格式"><a href="#格式" class="headerlink" title="格式"></a>格式</h3><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_33363618/article/details/79438044">pom.xml配置详解</a><br>注意结构，如：dependencies中包括了多个dependency</p>
-<h2 id="JavaBean"><a href="#JavaBean" class="headerlink" title="JavaBean"></a>JavaBean</h2><h3 id="常用注解"><a href="#常用注解" class="headerlink" title="常用注解"></a>常用注解</h3><ul>
-<li><p>@<strong>Data</strong>：注解在类上；提供类所有属性的 getting 和 setting 方法，此外还提供了equals、canEqual、hashCode、toString 方法</p>
-</li>
-<li><p><em>有了@Data提供的get set方法才能顺利的从配置文件中读取信息</em>*</p>
-</li>
-<li><p>@<strong>ConfigurationProperties(prefix = “zjh”)</strong>//配置zjh属性，这个注解要结合config中的<strong>EnableConfigurationProperties({Person.class,Pet.class})<strong>允许配置，还要结合controller中的    <br></strong>@Autowired<br>Person zjh;</strong>//注入到IOC容器才能反应</p>
-</li>
+        <p>java.sql支持多数据库访问</p>
+<ul>
+<li>Java与SQL对应数据类型转换表</li>
 </ul>
-<p>（@Component以被@EnableConfigurationProperties替代）</p>
-<h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><pre><code>@ConfigurationProperties(prefix = &quot;zjh&quot;)//配置zjh属性
-@Data
-@ToString
-public class Person &#123;
+<table>
+<thead>
+<tr>
+<th>Java类型</th>
+<th>SQL类型</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>boolean</td>
+<td>BIT</td>
+</tr>
+<tr>
+<td>byte</td>
+<td>TINYINT</td>
+</tr>
+<tr>
+<td>short</td>
+<td>SMALLINT</td>
+</tr>
+<tr>
+<td>int</td>
+<td>INTEGER</td>
+</tr>
+<tr>
+<td>long</td>
+<td>BIGINT</td>
+</tr>
+<tr>
+<td>String</td>
+<td>CHAR,VARCHAR,LONGVARCHAR</td>
+</tr>
+<tr>
+<td>byte array</td>
+<td>BINARY , VAR BINARY</td>
+</tr>
+<tr>
+<td>java.sql.Date</td>
+<td>DATE</td>
+</tr>
+<tr>
+<td>java.sql.Time</td>
+<td>TIME</td>
+</tr>
+<tr>
+<td>java.sql.Timestamp</td>
+<td>TIMESTAMP</td>
+</tr>
+</tbody></table>
+<h1 id="连接，mysql重点用第4个"><a href="#连接，mysql重点用第4个" class="headerlink" title="连接，mysql重点用第4个"></a>连接，mysql重点用第4个</h1><h2 id="1，不出现第三方API，高可移植性"><a href="#1，不出现第三方API，高可移植性" class="headerlink" title="1，不出现第三方API，高可移植性"></a>1，不出现第三方API，高可移植性</h2><pre><code>    //Driver driver = new com.mysql.jdbc.Driver();
+    //创建Driver实例,用如下反射方法创建更有普适性
+    Class clazz = Class.forName(&quot;com.mysql.jdbc.Driver&quot;);
+    Driver driver = (Driver)clazz.newInstance();
 
-    private String userName;
-    private Boolean boss;
-    private Date birth;
-    private Integer age;
-    private Pet pet;
-    private String[] interests;
-    private List&lt;String&gt; animal;
-    private Map&lt;String, Object&gt; score;
-    private Set&lt;Double&gt; salarys;
-    private Map&lt;String, List&lt;Pet&gt;&gt; allPets;
+    String url = &quot;jdbc:mysql://localhost:3306/yeb&quot;;//数据库的url
+    //jdbc:mysql://localhost:3306/是固定前缀
+
+//Properties：用户名和密码
+    Properties info= new Properties();
+    info.setProperty(&quot;user&quot;,&quot;root&quot; );
+    info.setProperty(&quot;password&quot;, &quot;zjh521418&quot;);
+//获取连接
+    Connection connect = driver.connect(url, info);//返回一个Connection
+    System.out.println(connect);
+</code></pre>
+<h2 id="2，DriverManager替换Driver"><a href="#2，DriverManager替换Driver" class="headerlink" title="2，DriverManager替换Driver"></a>2，DriverManager替换Driver</h2><pre><code>//反射获取Driver对象
+     Class clazz = Class.forName(&quot;com.mysql.jdbc.Driver&quot;);
+        Driver driver = (Driver) clazz.newInstance();
+
+//提供三个基本信息
+        String url = &quot;jdbc:mysql://localhost:3306/yeb&quot;;
+        String user = &quot;root&quot;;
+        String password = &quot;zjh521418&quot;;
+
+//注册驱动,DriverManager替换Driver
+        DriverManager.registerDriver(driver);
+
+//获取链接
+        Connection connection = DriverManager.getConnection(url,user,password);
+        System.out.println(connection);
+</code></pre>
+<h2 id="3，mysql的自动注册驱动"><a href="#3，mysql的自动注册驱动" class="headerlink" title="3，mysql的自动注册驱动"></a>3，mysql的自动注册驱动</h2><p>中间的注册步骤全部可以省（仅对mysql可以）</p>
+<pre><code>//提供三个基本信息
+        String url = &quot;jdbc:mysql://localhost:3306/yeb&quot;;
+        String user = &quot;root&quot;;
+        String password = &quot;zjh521418&quot;;
+
+//反射，静态加载Driver对象
+//     Class clazz = Class.forName(&quot;com.mysql.jdbc.Driver&quot;);
+//        Driver driver = (Driver) clazz.newInstance();
+//注册驱动,DriverManager替换Driver::::::mysql会自动注册驱动
+//        DriverManager.registerDriver(driver);
+
+        
+//获取链接
+        Connection connection = DriverManager.getConnection(url,user,password);
+        System.out.println(connection);
+</code></pre>
+<h2 id="4，配置文件加载：松耦合"><a href="#4，配置文件加载：松耦合" class="headerlink" title="4，配置文件加载：松耦合"></a>4，配置文件加载：松耦合</h2><p>读配置文件——流——存Properties——get</p>
+<pre><code>    //读取配置信息:properties——&gt;流
+    InputStream is = ConnectionTest1.class.getClassLoader().getResourceAsStream(&quot;jdbc.properties&quot;);
+//还可以写成InputStream is =ClassLoader.getSystemClassLoader().getResourceAsStream(&quot;配置文件名&quot;);
+    Properties pros = new Properties();
+    pros.load(is);//配置信息存储到Propertires中
+
+    String user = pros.getProperty(&quot;user&quot;);
+    String password = pros.getProperty(&quot;password&quot;);
+    String url = pros.getProperty(&quot;url&quot;);
+    String driverClass = pros.getProperty(&quot;driverClass&quot;);
+
+
+    //加载驱动
+    Class.forName(driverClass);
+
+    //获取连接
+    Connection conn = DriverManager.getConnection(url, user, password);
+    
+    System.out.println(conn);
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/0c43761779654ccfbd7c3d3707883653.png" alt="用properties配置"><img src="https://img-blog.csdnimg.cn/974e80bb735e4a79882d6514b608840c.png" alt="配置信息"></p>
+<h1 id="CRUD"><a href="#CRUD" class="headerlink" title="CRUD"></a>CRUD</h1><h2 id="PreparedStatement实现"><a href="#PreparedStatement实现" class="headerlink" title="PreparedStatement实现"></a>PreparedStatement实现</h2><p>PreparedStatement是Statement的子对象，也是最常用的；原始的Statement无法解决SQL注入问题，所以弃用了。</p>
+<h3 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h3><p>SQL语句被<strong>预编译</strong>并存储再PreparedStatement对象中，方便使用此对象多次执行<br><img src="https://img-blog.csdnimg.cn/619c79af7ac1469fb23c4874e64967f0.png"></p>
+<h3 id="使用：增"><a href="#使用：增" class="headerlink" title="使用：增"></a>使用：增</h3><p>以增为例：向yeb数据库文件中的t_role表添加一组数据<br><img src="https://img-blog.csdnimg.cn/e1add7bb73354d6baa1b3dba7bf73320.png" alt="t_role表"></p>
+<ul>
+<li>固定连接操作+PreparedStatement三步操作</li>
+<li>开发中一定像IO处理异常一样try-catch而不是简单的throws</li>
+<li>开发中可以把固定操作封装成一个util工具</li>
+</ul>
+<pre><code>    /**********固定操作******************/
+        //读取配置信息:properties——&gt;流
+        InputStream is = ConnectionTest1.class.getClassLoader().getResourceAsStream(&quot;t_role.properties&quot;);
+        //还可以写成InputStream is =ClassLoader.getSystemClassLoader().getResourceAsStream(&quot;配置文件名&quot;);
+        Properties pros = new Properties();
+        pros.load(is);//配置信息存储到Propertires中
+
+        String user = pros.getProperty(&quot;user&quot;);
+        String password = pros.getProperty(&quot;password&quot;);
+        String url = pros.getProperty(&quot;url&quot;);
+        String driverClass = pros.getProperty(&quot;driverClass&quot;);
+
+
+        //加载驱动
+        Class.forName(driverClass);
+
+        //获取连接
+        Connection conn = DriverManager.getConnection(url, user, password);
+
+
+    /***************使用PreparedStatement增删改查**************/
+        String sql = &quot;insert into t_role(name,nameZh)values(?,?)&quot;;//sql操作
+        PreparedStatement ps = conn.prepareStatement(sql);//预编译sql语句，返回PreparedStatement实例
+
+        //填充占位符？  索引从1开始
+        ps.setString(1, &quot;张家豪&quot;);//第一个属性值
+        ps.setString(2,&quot;大数据开发&quot; );//第二个属性值
+        
+
+    /*******执行操作**********/
+        ps.execute();
+
+
+    /*************关闭流**************/
+        ps.close();
+        conn.close();
+</code></pre>
+<h3 id="规范完整代码"><a href="#规范完整代码" class="headerlink" title="规范完整代码"></a>规范完整代码</h3><pre><code>        Connection conn = null;
+        PreparedStatement ps = null;//预编译sql语句，返回PreparedStatement实例
+
+        try &#123;
+/**********固定操作******************/
+            //读取配置信息:properties——&gt;流
+            InputStream is = ConnectionTest1.class.getClassLoader().getResourceAsStream(&quot;t_role.properties&quot;);
+            //还可以写成InputStream is =ClassLoader.getSystemClassLoader().getResourceAsStream(&quot;配置文件名&quot;);
+            Properties pros = new Properties();
+            pros.load(is);//配置信息存储到Propertires中
+
+            String user = pros.getProperty(&quot;user&quot;);
+            String password = pros.getProperty(&quot;password&quot;);
+            String url = pros.getProperty(&quot;url&quot;);
+            String driverClass = pros.getProperty(&quot;driverClass&quot;);
+
+
+            //加载驱动
+            Class.forName(driverClass);
+
+            //获取连接
+            conn = DriverManager.getConnection(url, user, password);
+
+
+/***************使用PreparedStatement增删改查**************/
+            String sql = &quot;insert into t_role(name,nameZh)values(?,?)&quot;;//sql操作
+            ps = conn.prepareStatement(sql);
+
+            //填充占位符？  索引从1开始
+            ps.setString(1, &quot;张家豪&quot;);//第一个属性值
+            ps.setString(2,&quot;大数据开发&quot; );//第二个属性值
+
+
+/*******执行操作**********/
+            ps.execute();
+        &#125; catch (IOException e) &#123;
+            e.printStackTrace();
+        &#125; catch (ClassNotFoundException e) &#123;
+            e.printStackTrace();
+        &#125; catch (SQLException e) &#123;
+            e.printStackTrace();
+        &#125; finally &#123;
+/*************关闭流**************/
+            try &#123;
+                if(ps != null)&#123;
+                ps.close();
+                &#125;
+            &#125; catch (SQLException e) &#123;
+                e.printStackTrace();
+            &#125;
+            try &#123;
+                if(ps != null)&#123;
+                conn.close();
+                &#125;
+            &#125; catch (SQLException e) &#123;
+                e.printStackTrace();
+            &#125;
+        &#125;
+</code></pre>
+<h3 id="使用：改"><a href="#使用：改" class="headerlink" title="使用：改"></a>使用：改</h3><pre><code>/************改**********/
+String sql = &quot;updatE t_role set nameZh = ? where name = ? &quot;;
+//sql语句对语法的大小写不敏感，即便是uPdAtE也能识别为update
+        PreparedStatement ps = conn.prepareStatement(sql);
+
+        ps.setObject(1, &quot;大数据开发工程师&quot;);
+        ps.setObject(2,&quot;张家豪&quot; );
+
+        ps.execute();
+
+
+        ps.close();
+        conn.close();
+</code></pre>
+<h3 id="使用：删"><a href="#使用：删" class="headerlink" title="使用：删"></a>使用：删</h3><pre><code>    PreparedStatement ps = conn.prepareStatement(sql);
+
+    ps.setObject(1,&quot;张家豪&quot;);
+
+    ps.execute();
+
+    System.out.println(conn.getAutoCommit());
+    //返回true则提交成功
+    //但提交成功≠操作成功，操作成功需要保证业务正确
+
+    ps.close();
+    conn.close();
+</code></pre>
+<h2 id="查"><a href="#查" class="headerlink" title="查"></a>查</h2><p>execute——&gt;</p>
+<h1 id="Mybatis"><a href="#Mybatis" class="headerlink" title="Mybatis"></a>Mybatis</h1><ul>
+<li>封装的JDBC，最简单的持久化框架</li>
+<li>灵活，sql语句写在xml里，降低耦合度</li>
+<li>提供xml标签，支持编写动态sql语句</li>
+<li>提供映射标签，映射对象和数据库的字段(ORM)</li>
+</ul>
+<h2 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h2><ul>
+<li>对SQL语法要求高，编写工作量大</li>
+<li>SQL语法依赖于数据库，移植性差</li>
+</ul>
+<p>springboot对mybatis进行封装，解决了跨平台问题</p>
+<h1 id="Springboot整合JDBC"><a href="#Springboot整合JDBC" class="headerlink" title="Springboot整合JDBC"></a>Springboot整合JDBC</h1><h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><h3 id="依赖"><a href="#依赖" class="headerlink" title="依赖"></a>依赖</h3><pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-jdbc&lt;/artifactId&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;mysql&lt;/groupId&gt;
+    &lt;artifactId&gt;mysql-connector-java&lt;/artifactId&gt;
+    &lt;scope&gt;runtime&lt;/scope&gt;
+&lt;/dependency&gt;
+</code></pre>
+<h3 id="pom-yaml"><a href="#pom-yaml" class="headerlink" title="pom.yaml"></a>pom.yaml</h3><pre><code>spring:
+  datasource:
+    username: root
+    password: 123456
+    #?serverTimezone=UTC解决时区的报错
+    url: jdbc:mysql://localhost:3306/springboot?serverTimezone=UTC&amp;useUnicode=true&amp;characterEncoding=utf-8
+    driver-class-name: com.mysql.cj.jdbc.Driver
+</code></pre>
+<h2 id="获取连接"><a href="#获取连接" class="headerlink" title="获取连接"></a>获取连接</h2><pre><code>@SpringBootTest
+class Boot05ApplicationTests &#123;
+
+    @Qualifier(&quot;dataSource&quot; )
+    @Autowired
+    DataSource dataSource;
+    //注入数据源，以便下面获得数据库连接
+
+
+    @Test
+    void contextLoads() throws SQLException &#123;
+
+        //当且仅当@AutoWired注入了DataSource，这里才能运行
+        System.out.println(dataSource.getClass());//class com.zaxxer.hikari.HikariDataSource
+
+        Connection conn = dataSource.getConnection();//获取数据库连接
+        System.out.println(conn);
+
+    conn.close();
+
+&#125;
 &#125;
 </code></pre>
-<h2 id="config配置类"><a href="#config配置类" class="headerlink" title="config配置类"></a>config配置类</h2><p><img src="https://img-blog.csdnimg.cn/045ca7ac7b5f487d895018f21fa7cd8b.png"></p>
-<h3 id="常用注解-1"><a href="#常用注解-1" class="headerlink" title="常用注解"></a>常用注解</h3><ul>
-<li><p><strong>@Configuration(proxyBeanMethods = false或true)</strong><br>Full(proxyBeanMethods = <strong>true</strong>)【保证每个@Bean方法被调用多少次返回的组件都是<strong>单实例</strong>的】<br>Lite(proxyBeanMethods = <strong>false</strong>)【每个@Bean方法被调用多少次返回的组件都是<strong>新创建</strong>的】</p>
+<p><strong>数据源DataSource有什么作用:</strong></p>
+<ol>
+<li>通过DataSource可以获取数据库连接Connection</li>
+<li>通过DataSource创建JdbcTemplate操作数据库</li>
+</ol>
+<h2 id="JdbcTemplate-封装JDBC-CRUD"><a href="#JdbcTemplate-封装JDBC-CRUD" class="headerlink" title="JdbcTemplate:封装JDBC CRUD"></a>JdbcTemplate:封装JDBC CRUD</h2><h3 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h3><ol>
+<li>Spring Boot 默认提供了数据源，默认提供了org.springframework.jdbc.core.JdbcTemplate</li>
+<li>JdbcTemplate 中会自己注入数据源，用于简化 JDBC操作</li>
+<li>不用再自己来关闭数据库连接</li>
+</ol>
+<p><strong>JdbcTemplate主要提供以下几类方法：</strong></p>
+<ul>
+<li><p>   <strong>execute方法</strong>：可以用于执行任何SQL语句，一般用于执行DDL语句；</p>
 </li>
-<li><p><em>组件依赖必须使用Full模式默认。其他默认是否Lite模式</em>*</p>
+<li><p>   <strong>update方法及batchUpdate方法</strong>：update方法用于执行新增、修改、删除等语句；batchUpdate方法用于执行批处理相关语句；</p>
 </li>
-<li><p><strong>@EnableConfigurationProperties({Person.class,Pet.class})</strong>{}中的类可以由配置文件配置</p>
+<li><p>   <strong>query方法及queryForXXX方法</strong>：用于执行查询相关语句；</p>
 </li>
-<li><p>@Bean 给IOC容器添加组件，@Bean和@Import、@ConfigurationProperties 有冲突，<strong>并且@Bean也需要在controller下@Autowired注入</strong></p>
+<li><p>  <strong>call方法</strong>：用于执行存储过程、函数相关语句。</p>
 </li>
-<li><p>@Import 导入某个类，创建默认组件，组件名默认为全类名，和@Bean冲突</p>
-</li>
-<li><p>@ImportResource 解析xml配置</p>
-<h3 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h3><p>  @ImportResource(“classpath:beans.xml”)<br>  @Import({ImportTest1.class})<br>  //下面两个才是基本运行所必要的注解<br>  @EnableConfigurationProperties({Person.class,Pet.class})<br>  @Configuration(proxyBeanMethods = false)<br>  public class MyConfig {</p>
-<pre><code>  @Bean
-  public ImportTest1 importTest1()&#123;
-      ImportTest1 it1 = new ImportTest1(&quot;test&quot;);
-      return it1;
-  &#125;//这个Bean组件就唯一添加到了IOC容器中，并且可以被Cotroller或main获取
-  &#125;
+</ul>
+<h3 id="controller类JDBCTemplate"><a href="#controller类JDBCTemplate" class="headerlink" title="controller类JDBCTemplate"></a>controller类JDBCTemplate</h3><pre><code>@RestController
+public class JDBCTemplate &#123;
+
+   @Autowired
+    JdbcTemplate jdbcTemplate;
+   
+   
+   /******下面写requestmapping****/
+   
+   &#125;
 </code></pre>
-</li>
-</ul>
-<h2 id="controller控制类"><a href="#controller控制类" class="headerlink" title="controller控制类"></a>controller控制类</h2><p><img src="https://img-blog.csdnimg.cn/4ffa26c0bc7e4596bc8ff02e84a2ba12.png"></p>
-<h3 id="常用注解-2"><a href="#常用注解-2" class="headerlink" title="常用注解"></a>常用注解</h3><ul>
-<li>@RestController声明，== @ResponseBody+@Controller</li>
-<li>@RequestMapping(“/hello”),RUL后缀映射访问请求</li>
-<li>@Autowired，每个要使用的Bean都需要@Autowired注入容器</li>
-</ul>
-<h3 id="示例-2"><a href="#示例-2" class="headerlink" title="示例"></a>示例</h3><pre><code>    @RestController
-public class hello &#123;
-        //映射请求：浏览器访问请求
-    @RequestMapping(&quot;/hello&quot;)//收到hello请求
-    public String handle01()&#123;//反应
-        return &quot;world&quot;;
+<h3 id="增-update-GetMapping-“-add-……"><a href="#增-update-GetMapping-“-add-……" class="headerlink" title="增:update   +  @GetMapping(“/add/{……"></a>增:update   +  @GetMapping(“/add/{……</h3><p>前端处理注册数据，返回一个url，如：</p>
+<pre><code>localhost:8080/add/&#123;张家豪&#125;/&#123;123456&#125;/&#123;13288888888&#125;/&#123;222222222@qq.com&#125;
+</code></pre>
+<p>然后GetMapping处理这条url附带的信息</p>
+<pre><code>//增
+    @GetMapping(&quot;/add/&#123;username&#125;/&#123;password&#125;/&#123;phonenum&#125;/&#123;email&#125;&quot;)//格式标准
+
+public String addUser(@PathVariable(&quot;username&quot;) String name,
+                      @PathVariable(&quot;password&quot;) String pass,
+                      @PathVariable(&quot;phonenum&quot;) String phone,
+                      @PathVariable(&quot;email&quot;) String e)&#123;
+
+    //占位符sql语句
+    String sql = &quot;insert into userinfo(username,password,phonenum,email) &quot;
+            + &quot;values(name,pass,phone,e)&quot;;
+
+
+    //执行sql
+    jdbcTemplate.update(sql);
+
+
+    //返回值
+    return &quot;添加成功&quot;;
 
     &#125;
-
-
-//   自动注入，需要Person有空参构造
-    //或Person类直接实现@Data注解
-    @Autowired
-    Person zjh;
-
-    @RequestMapping(&quot;/zjh&quot;)//zjh必须先
-   //用 @ConfigurationProperties(prefix = &quot;zjh&quot;)
-    //并且在application.yaml中配置
-    public Person handle02()&#123;
-        return zjh;
-    &#125;
-
-
-    @Autowired
-    Pet nn;
-
-    @RequestMapping(&quot;/nn&quot;)
-
-    public Pet handle03()&#123;
-        return nn;
-    &#125;    
-&#125;
-</code></pre>
-<h2 id="运行主类"><a href="#运行主类" class="headerlink" title="运行主类"></a>运行主类</h2><ul>
-<li>@SpringBootApplication声明为主类</li>
-<li>SpringApplication.run(MainApp.class, args)运行且返回IOC容器<ul>
-<li>该单独的类MainAPP.class和以上三个包同目录<img src="https://img-blog.csdnimg.cn/9e3e59181d394103b9ac04a441494b27.png">  <h3 id="单例、组件依赖：proxyBeanMethods"><a href="#单例、组件依赖：proxyBeanMethods" class="headerlink" title="单例、组件依赖：proxyBeanMethods"></a>单例、组件依赖：proxyBeanMethods</h3>因为在config类中也遇到了proxyBeanMethods，主类中也有proxyBeanMethods参数<br>他们分别为：</li>
-</ul>
-</li>
-<li><em>@Configuration(proxyBeanMethods = true)<br>@SpringBootApplication(proxyBeanMethods = true)</em>*</li>
-</ul>
-<p>Full(proxyBeanMethods = <strong>true</strong>)【保证每个@Bean方法被调用多少次返回的组件都是<strong>单实例</strong>的】<br>Lite(proxyBeanMethods = <strong>false</strong>)【每个@Bean方法被调用多少次返回的组件都是<strong>新创建</strong>的】</p>
-<p>组件依赖必须使用默认的Full模式，其他则默认使用Lite模式。</p>
-<h3 id="示例-3"><a href="#示例-3" class="headerlink" title="示例"></a>示例</h3><pre><code>@SpringBootApplication
-public class MainApp &#123;//这是入口
-    public static void main(String[] args) &#123;
-        //不光可以启动，还可以有返回值IOC容器
-        ConfigurableApplicationContext run = SpringApplication.run(MainApp.class, args);//返回容器run
-        &#125;
-        &#125;
-</code></pre>
-<h4 id="Bean单例的体现"><a href="#Bean单例的体现" class="headerlink" title="Bean单例的体现"></a>Bean单例的体现</h4><pre><code>//单例实例的创建不能用new，而是反射机制
-//并且在MyConfig中已创建该类的@Bean
-    //或者
-    //具体属性值由yaml配置
-//总之，IOC容器中如下getBean得到的是该类的唯一：单例
-    Person person1 = run.getBean(Person.class);
-    Pet pet1 = run.getBean(Pet.class);
-    System.out.println(pet1);
-    System.out.println(person1);
-</code></pre>
-<h4 id="体现2"><a href="#体现2" class="headerlink" title="体现2"></a>体现2</h4><pre><code>    System.out.println(&quot;***************************&quot;);
-    String[] beanNamesForType = run.getBeanNamesForType(person1.getClass());
-    //获取所有Person组件的所有名字
-    for(String str : beanNamesForType)&#123;
-        System.out.println(str);
-    &#125;//单例下只有一个zjh-ZJH.inditest.bean.Person
-</code></pre>
-<h2 id="结构分析"><a href="#结构分析" class="headerlink" title="结构分析"></a>结构分析</h2><ul>
-<li><strong>属性设置</strong>：Bean声明@ConfigurationProperties(prefix = “zjh”)——&gt;在application.yaml中配置</li>
-<li><strong>配置组件</strong>：声明@Configuration的类就是配置组件——&gt;<br>@EnableConfigurationProperties({Person.class,Pet.class})<br>使配置好的Bean生效</li>
-<li><strong>控制组件</strong>：声明@RestController的类就是控制组件——&gt;<br>结合@Autowired注入，@RequestMapping(“/hello”)映射请求</li>
-<li><strong>主类运行</strong>：声明@SpringBootApplication的类就是主类，有main方法体——&gt; ConfigurableApplicationContext run = SpringApplication.run(MainApp.class, args);固定用法，运行且返回IOC容器</li>
-</ul>
-<h1 id="基本依赖"><a href="#基本依赖" class="headerlink" title="基本依赖"></a>基本依赖</h1><pre><code>&lt;!--可执行jar包--&gt;
-    &lt;!--Maven中点clean package--&gt;
-    &lt;!--cmd上方右键属性关闭快速编辑--&gt;
-    &lt;build&gt;
-        &lt;plugins&gt;
-            &lt;plugin&gt;
-                &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-                &lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;
-            &lt;/plugin&gt;
-
-
-            &lt;plugin&gt;
-                &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-                &lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;
-                &lt;configuration&gt;
-                    &lt;excludes&gt;
-                        &lt;exclude&gt;
-                            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-                            &lt;artifactId&gt;spring-boot-configuration-processor&lt;/artifactId&gt;
-                        &lt;/exclude&gt;
-                    &lt;/excludes&gt;
-                &lt;/configuration&gt;
-            &lt;/plugin&gt;
-
-
-        &lt;/plugins&gt;
-    &lt;/build&gt;
-
-
-&lt;!--父项目，依赖管理，控制版本--&gt;
-    &lt;parent&gt;
-        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-        &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
-        &lt;version&gt;2.6.2&lt;/version&gt;
-    &lt;/parent&gt;
-
-&lt;!--Web场景启动器--&gt;
-    &lt;!--启动器：springboot stater- ：相当于import--&gt;
-    &lt;dependencies&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-            &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
-        &lt;/dependency&gt;
-
-
-
-
-    &lt;!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java --&gt;
-    &lt;!--&lt;dependency&gt;--&gt;
-        &lt;!--&lt;groupId&gt;mysql&lt;/groupId&gt;--&gt;
-        &lt;!--&lt;artifactId&gt;mysql-connector-java&lt;/artifactId&gt;--&gt;
-        &lt;!--&lt;version&gt;8.0.28&lt;/version&gt;--&gt;
-    &lt;!--&lt;/dependency&gt;--&gt;
-
-
-        &lt;dependency&gt;
-            &lt;groupId&gt;org.projectlombok&lt;/groupId&gt;
-            &lt;artifactId&gt;lombok&lt;/artifactId&gt;
-            &lt;version&gt;1.16.20&lt;/version&gt;
-            &lt;scope&gt;provided&lt;/scope&gt;
-        &lt;/dependency&gt;
-
-
-
-        &lt;dependency&gt;
-            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-            &lt;artifactId&gt;spring-boot-configuration-processor&lt;/artifactId&gt;
-            &lt;optional&gt;true&lt;/optional&gt;
-        &lt;/dependency&gt;
-
-
-
-
-
-
-
-    &lt;/dependencies&gt;
-
-
-
-
-
-&lt;/project&gt;
 </code></pre>
 
       

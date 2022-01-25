@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Springboot基本结构 | ZJH&#39;blog</title>
+  <title>异常处理、多线程 | ZJH&#39;blog</title>
   <meta name="keywords" content="">
-  <meta name="description" content="Springboot基本结构 | ZJH&#39;blog">
+  <meta name="description" content="异常处理、多线程 | ZJH&#39;blog">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="description" content="早年写在csdn上的笔记，因为没用markdown写，所以滕不过来，直接上链接咯~ 为什么synchronized同步代码块既不能框多，也不能框少 yield、join、sleep区别 生产者消费者案例 三种异常处理机制">
 <meta property="og:type" content="article">
@@ -421,9 +421,9 @@
 </aside>
 <div id="post">
     <div class="pjax">
-        <article id="post-Springboot基本结构" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-异常处理、多线程" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">Springboot基本结构</h1>
+        <h1 class="article-title">异常处理、多线程</h1>
     
     <div class="article-meta">
         
@@ -433,7 +433,7 @@
             <i class="iconfont icon-category"></i>
             
             
-            <a  data-rel="Java后端">Java后端</a>
+            <a  data-rel="Java">Java</a>
             
         </span>
         
@@ -441,12 +441,12 @@
     </div>
     <div class="article-meta">
         
-            发布时间 : <time class="date" title='最后更新: 2022-01-25 21:07:27'>2022-01-20 20:10</time>
+            发布时间 : <time class="date" title='最后更新: 2022-01-25 21:24:28'>2022-01-25 21:24</time>
         
     </div>
     <div class="article-meta">
         
-        <span>字数:1.4k</span>
+        <span>字数:67</span>
         
         
         <span id="busuanzi_container_page_pv">
@@ -465,7 +465,7 @@
     
     <div class="toc-ref">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E8%BF%90%E8%A1%8C%E5%8A%9F%E8%83%BD"><span class="toc-text">基本运行功能</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#pom-xml"><span class="toc-text">pom.xml</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%BC%E5%BC%8F"><span class="toc-text">格式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JavaBean"><span class="toc-text">JavaBean</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3"><span class="toc-text">常用注解</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A4%BA%E4%BE%8B"><span class="toc-text">示例</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#config%E9%85%8D%E7%BD%AE%E7%B1%BB"><span class="toc-text">config配置类</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3-1"><span class="toc-text">常用注解</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A4%BA%E4%BE%8B-1"><span class="toc-text">示例</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#controller%E6%8E%A7%E5%88%B6%E7%B1%BB"><span class="toc-text">controller控制类</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3-2"><span class="toc-text">常用注解</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A4%BA%E4%BE%8B-2"><span class="toc-text">示例</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%90%E8%A1%8C%E4%B8%BB%E7%B1%BB"><span class="toc-text">运行主类</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%95%E4%BE%8B%E3%80%81%E7%BB%84%E4%BB%B6%E4%BE%9D%E8%B5%96%EF%BC%9AproxyBeanMethods"><span class="toc-text">单例、组件依赖：proxyBeanMethods</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A4%BA%E4%BE%8B-3"><span class="toc-text">示例</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Bean%E5%8D%95%E4%BE%8B%E7%9A%84%E4%BD%93%E7%8E%B0"><span class="toc-text">Bean单例的体现</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BD%93%E7%8E%B02"><span class="toc-text">体现2</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90"><span class="toc-text">结构分析</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E4%BE%9D%E8%B5%96"><span class="toc-text">基本依赖</span></a></li></ol>
+        
     
 <style>
     .left-col .switch-btn,
@@ -481,221 +481,11 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="基本运行功能"><a href="#基本运行功能" class="headerlink" title="基本运行功能"></a>基本运行功能</h1><p><img src="https://img-blog.csdnimg.cn/ef2744d2043545cb80069240f28c9c6d.png" alt="基本项目结构"></p>
-<h2 id="pom-xml"><a href="#pom-xml" class="headerlink" title="pom.xml"></a>pom.xml</h2><h3 id="格式"><a href="#格式" class="headerlink" title="格式"></a>格式</h3><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_33363618/article/details/79438044">pom.xml配置详解</a><br>注意结构，如：dependencies中包括了多个dependency</p>
-<h2 id="JavaBean"><a href="#JavaBean" class="headerlink" title="JavaBean"></a>JavaBean</h2><h3 id="常用注解"><a href="#常用注解" class="headerlink" title="常用注解"></a>常用注解</h3><ul>
-<li><p>@<strong>Data</strong>：注解在类上；提供类所有属性的 getting 和 setting 方法，此外还提供了equals、canEqual、hashCode、toString 方法</p>
-</li>
-<li><p><em>有了@Data提供的get set方法才能顺利的从配置文件中读取信息</em>*</p>
-</li>
-<li><p>@<strong>ConfigurationProperties(prefix = “zjh”)</strong>//配置zjh属性，这个注解要结合config中的<strong>EnableConfigurationProperties({Person.class,Pet.class})<strong>允许配置，还要结合controller中的    <br></strong>@Autowired<br>Person zjh;</strong>//注入到IOC容器才能反应</p>
-</li>
-</ul>
-<p>（@Component以被@EnableConfigurationProperties替代）</p>
-<h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><pre><code>@ConfigurationProperties(prefix = &quot;zjh&quot;)//配置zjh属性
-@Data
-@ToString
-public class Person &#123;
-
-    private String userName;
-    private Boolean boss;
-    private Date birth;
-    private Integer age;
-    private Pet pet;
-    private String[] interests;
-    private List&lt;String&gt; animal;
-    private Map&lt;String, Object&gt; score;
-    private Set&lt;Double&gt; salarys;
-    private Map&lt;String, List&lt;Pet&gt;&gt; allPets;
-&#125;
-</code></pre>
-<h2 id="config配置类"><a href="#config配置类" class="headerlink" title="config配置类"></a>config配置类</h2><p><img src="https://img-blog.csdnimg.cn/045ca7ac7b5f487d895018f21fa7cd8b.png"></p>
-<h3 id="常用注解-1"><a href="#常用注解-1" class="headerlink" title="常用注解"></a>常用注解</h3><ul>
-<li><p><strong>@Configuration(proxyBeanMethods = false或true)</strong><br>Full(proxyBeanMethods = <strong>true</strong>)【保证每个@Bean方法被调用多少次返回的组件都是<strong>单实例</strong>的】<br>Lite(proxyBeanMethods = <strong>false</strong>)【每个@Bean方法被调用多少次返回的组件都是<strong>新创建</strong>的】</p>
-</li>
-<li><p><em>组件依赖必须使用Full模式默认。其他默认是否Lite模式</em>*</p>
-</li>
-<li><p><strong>@EnableConfigurationProperties({Person.class,Pet.class})</strong>{}中的类可以由配置文件配置</p>
-</li>
-<li><p>@Bean 给IOC容器添加组件，@Bean和@Import、@ConfigurationProperties 有冲突，<strong>并且@Bean也需要在controller下@Autowired注入</strong></p>
-</li>
-<li><p>@Import 导入某个类，创建默认组件，组件名默认为全类名，和@Bean冲突</p>
-</li>
-<li><p>@ImportResource 解析xml配置</p>
-<h3 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h3><p>  @ImportResource(“classpath:beans.xml”)<br>  @Import({ImportTest1.class})<br>  //下面两个才是基本运行所必要的注解<br>  @EnableConfigurationProperties({Person.class,Pet.class})<br>  @Configuration(proxyBeanMethods = false)<br>  public class MyConfig {</p>
-<pre><code>  @Bean
-  public ImportTest1 importTest1()&#123;
-      ImportTest1 it1 = new ImportTest1(&quot;test&quot;);
-      return it1;
-  &#125;//这个Bean组件就唯一添加到了IOC容器中，并且可以被Cotroller或main获取
-  &#125;
-</code></pre>
-</li>
-</ul>
-<h2 id="controller控制类"><a href="#controller控制类" class="headerlink" title="controller控制类"></a>controller控制类</h2><p><img src="https://img-blog.csdnimg.cn/4ffa26c0bc7e4596bc8ff02e84a2ba12.png"></p>
-<h3 id="常用注解-2"><a href="#常用注解-2" class="headerlink" title="常用注解"></a>常用注解</h3><ul>
-<li>@RestController声明，== @ResponseBody+@Controller</li>
-<li>@RequestMapping(“/hello”),RUL后缀映射访问请求</li>
-<li>@Autowired，每个要使用的Bean都需要@Autowired注入容器</li>
-</ul>
-<h3 id="示例-2"><a href="#示例-2" class="headerlink" title="示例"></a>示例</h3><pre><code>    @RestController
-public class hello &#123;
-        //映射请求：浏览器访问请求
-    @RequestMapping(&quot;/hello&quot;)//收到hello请求
-    public String handle01()&#123;//反应
-        return &quot;world&quot;;
-
-    &#125;
-
-
-//   自动注入，需要Person有空参构造
-    //或Person类直接实现@Data注解
-    @Autowired
-    Person zjh;
-
-    @RequestMapping(&quot;/zjh&quot;)//zjh必须先
-   //用 @ConfigurationProperties(prefix = &quot;zjh&quot;)
-    //并且在application.yaml中配置
-    public Person handle02()&#123;
-        return zjh;
-    &#125;
-
-
-    @Autowired
-    Pet nn;
-
-    @RequestMapping(&quot;/nn&quot;)
-
-    public Pet handle03()&#123;
-        return nn;
-    &#125;    
-&#125;
-</code></pre>
-<h2 id="运行主类"><a href="#运行主类" class="headerlink" title="运行主类"></a>运行主类</h2><ul>
-<li>@SpringBootApplication声明为主类</li>
-<li>SpringApplication.run(MainApp.class, args)运行且返回IOC容器<ul>
-<li>该单独的类MainAPP.class和以上三个包同目录<img src="https://img-blog.csdnimg.cn/9e3e59181d394103b9ac04a441494b27.png">  <h3 id="单例、组件依赖：proxyBeanMethods"><a href="#单例、组件依赖：proxyBeanMethods" class="headerlink" title="单例、组件依赖：proxyBeanMethods"></a>单例、组件依赖：proxyBeanMethods</h3>因为在config类中也遇到了proxyBeanMethods，主类中也有proxyBeanMethods参数<br>他们分别为：</li>
-</ul>
-</li>
-<li><em>@Configuration(proxyBeanMethods = true)<br>@SpringBootApplication(proxyBeanMethods = true)</em>*</li>
-</ul>
-<p>Full(proxyBeanMethods = <strong>true</strong>)【保证每个@Bean方法被调用多少次返回的组件都是<strong>单实例</strong>的】<br>Lite(proxyBeanMethods = <strong>false</strong>)【每个@Bean方法被调用多少次返回的组件都是<strong>新创建</strong>的】</p>
-<p>组件依赖必须使用默认的Full模式，其他则默认使用Lite模式。</p>
-<h3 id="示例-3"><a href="#示例-3" class="headerlink" title="示例"></a>示例</h3><pre><code>@SpringBootApplication
-public class MainApp &#123;//这是入口
-    public static void main(String[] args) &#123;
-        //不光可以启动，还可以有返回值IOC容器
-        ConfigurableApplicationContext run = SpringApplication.run(MainApp.class, args);//返回容器run
-        &#125;
-        &#125;
-</code></pre>
-<h4 id="Bean单例的体现"><a href="#Bean单例的体现" class="headerlink" title="Bean单例的体现"></a>Bean单例的体现</h4><pre><code>//单例实例的创建不能用new，而是反射机制
-//并且在MyConfig中已创建该类的@Bean
-    //或者
-    //具体属性值由yaml配置
-//总之，IOC容器中如下getBean得到的是该类的唯一：单例
-    Person person1 = run.getBean(Person.class);
-    Pet pet1 = run.getBean(Pet.class);
-    System.out.println(pet1);
-    System.out.println(person1);
-</code></pre>
-<h4 id="体现2"><a href="#体现2" class="headerlink" title="体现2"></a>体现2</h4><pre><code>    System.out.println(&quot;***************************&quot;);
-    String[] beanNamesForType = run.getBeanNamesForType(person1.getClass());
-    //获取所有Person组件的所有名字
-    for(String str : beanNamesForType)&#123;
-        System.out.println(str);
-    &#125;//单例下只有一个zjh-ZJH.inditest.bean.Person
-</code></pre>
-<h2 id="结构分析"><a href="#结构分析" class="headerlink" title="结构分析"></a>结构分析</h2><ul>
-<li><strong>属性设置</strong>：Bean声明@ConfigurationProperties(prefix = “zjh”)——&gt;在application.yaml中配置</li>
-<li><strong>配置组件</strong>：声明@Configuration的类就是配置组件——&gt;<br>@EnableConfigurationProperties({Person.class,Pet.class})<br>使配置好的Bean生效</li>
-<li><strong>控制组件</strong>：声明@RestController的类就是控制组件——&gt;<br>结合@Autowired注入，@RequestMapping(“/hello”)映射请求</li>
-<li><strong>主类运行</strong>：声明@SpringBootApplication的类就是主类，有main方法体——&gt; ConfigurableApplicationContext run = SpringApplication.run(MainApp.class, args);固定用法，运行且返回IOC容器</li>
-</ul>
-<h1 id="基本依赖"><a href="#基本依赖" class="headerlink" title="基本依赖"></a>基本依赖</h1><pre><code>&lt;!--可执行jar包--&gt;
-    &lt;!--Maven中点clean package--&gt;
-    &lt;!--cmd上方右键属性关闭快速编辑--&gt;
-    &lt;build&gt;
-        &lt;plugins&gt;
-            &lt;plugin&gt;
-                &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-                &lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;
-            &lt;/plugin&gt;
-
-
-            &lt;plugin&gt;
-                &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-                &lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;
-                &lt;configuration&gt;
-                    &lt;excludes&gt;
-                        &lt;exclude&gt;
-                            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-                            &lt;artifactId&gt;spring-boot-configuration-processor&lt;/artifactId&gt;
-                        &lt;/exclude&gt;
-                    &lt;/excludes&gt;
-                &lt;/configuration&gt;
-            &lt;/plugin&gt;
-
-
-        &lt;/plugins&gt;
-    &lt;/build&gt;
-
-
-&lt;!--父项目，依赖管理，控制版本--&gt;
-    &lt;parent&gt;
-        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-        &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
-        &lt;version&gt;2.6.2&lt;/version&gt;
-    &lt;/parent&gt;
-
-&lt;!--Web场景启动器--&gt;
-    &lt;!--启动器：springboot stater- ：相当于import--&gt;
-    &lt;dependencies&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-            &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
-        &lt;/dependency&gt;
-
-
-
-
-    &lt;!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java --&gt;
-    &lt;!--&lt;dependency&gt;--&gt;
-        &lt;!--&lt;groupId&gt;mysql&lt;/groupId&gt;--&gt;
-        &lt;!--&lt;artifactId&gt;mysql-connector-java&lt;/artifactId&gt;--&gt;
-        &lt;!--&lt;version&gt;8.0.28&lt;/version&gt;--&gt;
-    &lt;!--&lt;/dependency&gt;--&gt;
-
-
-        &lt;dependency&gt;
-            &lt;groupId&gt;org.projectlombok&lt;/groupId&gt;
-            &lt;artifactId&gt;lombok&lt;/artifactId&gt;
-            &lt;version&gt;1.16.20&lt;/version&gt;
-            &lt;scope&gt;provided&lt;/scope&gt;
-        &lt;/dependency&gt;
-
-
-
-        &lt;dependency&gt;
-            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-            &lt;artifactId&gt;spring-boot-configuration-processor&lt;/artifactId&gt;
-            &lt;optional&gt;true&lt;/optional&gt;
-        &lt;/dependency&gt;
-
-
-
-
-
-
-
-    &lt;/dependencies&gt;
-
-
-
-
-
-&lt;/project&gt;
-</code></pre>
+        <p>早年写在csdn上的笔记，因为没用markdown写，所以滕不过来，直接上链接咯~</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/m0_56079407/article/details/119790045?spm=1001.2014.3001.5501">为什么synchronized同步代码块既不能框多，也不能框少</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/m0_56079407/article/details/119788505?spm=1001.2014.3001.5501">yield、join、sleep区别</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/m0_56079407/article/details/119839272?spm=1001.2014.3001.5501">生产者消费者案例</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/m0_56079407/article/details/119676784?spm=1001.2014.3001.5501">三种异常处理机制</a></p>
 
       
        <hr><span style="font-style: italic;color: gray;"> 生命以负熵为食，归整以抵抗熵增； </span>
