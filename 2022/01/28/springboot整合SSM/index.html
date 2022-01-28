@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Java四种next用法 | ZJH&#39;blog</title>
+  <title>springboot整合SSM | ZJH&#39;blog</title>
   <meta name="keywords" content="">
-  <meta name="description" content="Java四种next用法 | ZJH&#39;blog">
+  <meta name="description" content="springboot整合SSM | ZJH&#39;blog">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="description" content="问题使用axios修改，向后台put请求时，报错400  分析后端controller前端axios.put查看前端控制台  那么问题就很可能出在了后端 解决思路postman测试，仍然报错  那么问题基本锁定在后端控制层了查看后端控制台 postman点击一次put，后台就输出如下内容，仔细阅读后发现 2022-01-28 14:38:55.920  WARN 17460 — [nio-8080">
 <meta property="og:type" content="article">
@@ -502,9 +502,9 @@
 </aside>
 <div id="post">
     <div class="pjax">
-        <article id="post-Java四种next用法" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-springboot整合SSM" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">Java四种next用法</h1>
+        <h1 class="article-title">springboot整合SSM</h1>
     
     <div class="article-meta">
         
@@ -514,7 +514,7 @@
             <i class="iconfont icon-category"></i>
             
             
-            <a  data-rel="Java">Java</a>
+            <a  data-rel="Java后端">Java后端</a>
             
         </span>
         
@@ -522,12 +522,12 @@
     </div>
     <div class="article-meta">
         
-            发布时间 : <time class="date" title='最后更新: 2022-01-02 20:03:17'>2021-12-25 01:59</time>
+            发布时间 : <time class="date" title='最后更新: 2022-01-28 21:08:21'>2022-01-28 21:08</time>
         
     </div>
     <div class="article-meta">
         
-        <span>字数:1.6k</span>
+        <span>字数:838</span>
         
         
         <span id="busuanzi_container_page_pv">
@@ -546,7 +546,7 @@
     
     <div class="toc-ref">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#hasNext%E5%92%8ChasNextLine%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-text">hasNext和hasNextLine的区别</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#hasNext-%E5%92%8C-next%E7%BB%84%E5%90%88"><span class="toc-text">hasNext 和 next组合</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#hasNext-%E5%92%8C-NextLine%E7%BB%84%E5%90%88"><span class="toc-text">hasNext 和 NextLine组合</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#hasNextLine-%E5%92%8C-nextLine%E7%BB%84%E5%90%88"><span class="toc-text">hasNextLine 和 nextLine组合</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-text">总结</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#SSM%E6%95%B4%E5%90%88"><span class="toc-text">SSM整合</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B4%E5%90%88JUnit"><span class="toc-text">整合JUnit</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%BB%E6%84%8F%E4%BD%8D%E7%BD%AEtest-%E8%AE%BE%E7%BD%AE%E5%BC%95%E5%AF%BC%E7%B1%BB"><span class="toc-text">任意位置test(设置引导类)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B4%E5%90%88MyBatis"><span class="toc-text">整合MyBatis</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%85%8D%E7%BD%AEyml"><span class="toc-text">配置yml</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Mybatis%E6%B5%8B%E8%AF%95"><span class="toc-text">Mybatis测试</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#dao%E5%B1%82%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="toc-text">dao层的使用</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B4%E5%90%88MyBatis-Plus"><span class="toc-text">整合MyBatis-Plus</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%EF%BC%8C%E6%B7%BB%E5%8A%A0%E5%9D%90%E6%A0%87%E4%BE%9D%E8%B5%96"><span class="toc-text">1，添加坐标依赖</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%EF%BC%8C%E5%AE%9A%E4%B9%89%E6%95%B0%E6%8D%AE%E5%B1%82%E6%8E%A5%E5%8F%A3%E4%BA%8E%E6%98%A0%E5%B0%84%E9%85%8D%E7%BD%AE"><span class="toc-text">2，定义数据层接口于映射配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%EF%BC%8CMyBatisPlus%E5%8F%AF%E7%94%A8%E7%9A%84CRUD%E6%96%B9%E6%B3%95"><span class="toc-text">3，MyBatisPlus可用的CRUD方法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%80%E5%AE%9A%E8%A6%81%E5%85%B3%E9%97%AD%E9%A9%BC%E5%B3%B0%E5%91%BD%E5%90%8D"><span class="toc-text">一定要关闭驼峰命名</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B4%E5%90%88Druid"><span class="toc-text">整合Druid</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B4%E5%90%88%E6%80%BB%E7%BB%93"><span class="toc-text">整合总结</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#postman%E6%B5%8B%E8%AF%95%E6%8E%A5%E5%8F%A3"><span class="toc-text">postman测试接口</span></a></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -562,86 +562,109 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在查阅了大量网上相关资料都没有一个完整的解释，并且我查的几篇高赞回答都是错误的时候，我决定用一整天的时间来精细写下这篇文章，希望对你有帮助。</p>
-<pre><code>大多数人对hasNext的印象停留在“判断是否有下一个值”上，而该方法还是一个阻塞式的方法
+        <h1 id="SSM整合"><a href="#SSM整合" class="headerlink" title="SSM整合"></a>SSM整合</h1><h2 id="整合JUnit"><a href="#整合JUnit" class="headerlink" title="整合JUnit"></a>整合JUnit</h2><ul>
+<li><p>@SpringBootTest支持@Autowired注入</p>
+</li>
+<li><p>Test依赖会自动生成</p>
+<p>  @SpringBootTest//表示这是一个测试类<br>  class BootAjaxtestApplicationTests {</p>
+<p>  //1,@Autowired注入要测试的对象</p>
+<p>  @Test//各个Test方法<br>  void contextLoads() {<br>  //2，Test方法体中调用注入对象的方法或属性</p>
+<p>  }</p>
+<p>  @Test<br>  void contextLoads2() {<br>  }}    </p>
+</li>
+</ul>
+<h3 id="任意位置test-设置引导类"><a href="#任意位置test-设置引导类" class="headerlink" title="任意位置test(设置引导类)"></a>任意位置test(设置引导类)</h3><p>如果更改了测试类的位置，那么需要修改为<br>@SpringBootTest(classes = 主类名.class)<br><strong>即指明测试集的配置类是主类下的 or 这个测试类是主类的测试类</strong></p>
+<h2 id="整合MyBatis"><a href="#整合MyBatis" class="headerlink" title="整合MyBatis"></a>整合MyBatis</h2><h3 id="配置yml"><a href="#配置yml" class="headerlink" title="配置yml"></a>配置yml</h3><pre><code>spring:
+  datasource:
+    username: 账号(通常为root)
+    password: 密码
+    url: jdbc:mysql://localhost:3306/数据库名
+    driver-class-name: com.mysql.cj.jdbc.Driver
 </code></pre>
-<h1 id="hasNext和hasNextLine的区别"><a href="#hasNext和hasNextLine的区别" class="headerlink" title="hasNext和hasNextLine的区别"></a>hasNext和hasNextLine的区别</h1><p>二者都是用于判断“有无键盘输入”的，有则返回true，没有则阻塞！一定记住是阻塞而不是返回false，很多人都说是返回false，但你查源码会发现是不会返回false的，他会让你一直阻塞在判断阶段，二者只是在细节上有不同</p>
-<pre><code>hasNext()方法会判断接下来是否有非空字符.如果有,则返回true，没有则阻塞。例如一直敲回车相当于一直判断为空字符，但是不会返回false，而是一直阻塞在判断阶段，直到你输入了非空字符
-hasNextLine() 方法会根据行匹配模式去判断接下来是否有一行(包括空行),如果有,则返回true。这个没什么特别的，只要是你敲了回车那都是true并且不会阻塞
-</code></pre>
-<p>例如像这种if语句是永远不可能执行到内部方法体的</p>
-<pre><code>if(scan.hasNext()==false)&#123;
-    System.out.println(&quot;hasNext和hasNextLine不会返回false&quot;);
+<ul>
+<li>url后可以接时区，utf-8等设置</li>
+<li>mysql5.0驱动名去掉cj</li>
+</ul>
+<h3 id="Mybatis测试"><a href="#Mybatis测试" class="headerlink" title="Mybatis测试"></a>Mybatis测试</h3><h4 id="dao层的使用"><a href="#dao层的使用" class="headerlink" title="dao层的使用"></a>dao层的使用</h4><p><strong>DAO层定义的接口可以添加一些方法，并且可以直接注入使用，如果不进行前后端交互，仅仅使用接口就可以了</strong></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/mn_kw/article/details/80985392">链接：domain和dao层</a><br><strong>domain类就是bean类</strong><br><strong>有dao和domain才能从数据库拿出来的数据编程bean，bean又可以通过ajax技术转为json和前端交互</strong></p>
+<p>@Mapper使其被容器识别到<br>@Mapper的作用是可以给mapper接口自动生成一个实现类,让spring对mapper接口的bean进行管理,并且可以省略去写复杂的xml文件<br>    <img src="https://img-blog.csdnimg.cn/f7620aa9c03d4632bac0c875a2be71b7.png" alt="定义Dao接口"></p>
+<pre><code>@Mapper
+public interface YebDao &#123;
+    @Select(&quot;select * from t_joblevel where id = #&#123;id&#125;&quot;)
+    public JobLevel getById(Integer id);
 &#125;
 </code></pre>
-<p> 再举一个例子加深理解：</p>
-<pre><code>Scanner scan = new Scanner(System.in);
-System.out.println(scan.hasNextLine());
-System.out.println(scan.hasNext());
-</code></pre>
-<p> 运行该代码，一直不停敲回车键，第一次回车会直接输出true，而后面一直敲都会阻塞在hasNext语句上，运行如下图</p>
-<p><img src="https://img-blog.csdnimg.cn/20211001130739982.png"></p>
-<p>首先，在看用法和解释之前，有以下几个点必须时刻牢记</p>
-<blockquote>
-<p>next方法不能录入空格，在特定情况下会把空格当作回车，nextLine方法可以识录入空格<br>hasNext和hasNextLine的返回值都是boolean类型，但只有可能返回true，不可能返回false，并且都默认以回车键为结束（hasNext可以设置为任意符号为结束键，不在本文研究范围之内）<br>hasNext、next不能直接识别裸回车，而hasNextLine和nextLine都可以直接识别裸回车。换句话讲：对于不输入符号而直接裸敲一个回车的操作，只有后两个能识别<br>hasNext、hasNextLine在返回一个boolean类型结果true的同时，会在堆空间中开辟一块专门用于存放刚刚输入的字符串，用于下次next或者nextLine：即下次next或者nextLine不需要再从键盘输入，相当于系统自动把刚刚输入的字符串再原封不动的输入了一遍。同时这个存储寿命＝调用对象的寿命<br>对于hasNext来说，每次敲击回车都相当于在堆空间中开辟一行，敲几次回车就会直接给后续next、nextLine方法赋值几次<br>hasNext是线程阻塞的，对于hasNext来说，如果一直不输入字符，反而一直敲回车的话，整个线程会卡在这个输入的地方，直到有字符输入</p>
-</blockquote>
-<p>在知道 hasNext的方法用于判断和存储，next的方法用于输入之后，来做如下预备工作</p>
-<blockquote>
-<p>因为hasNext、hasNextLine与next、nextLine有2X2种组合方式，所以我们用4段代码做4次实验就可以大体上了解他们的特性</p>
-</blockquote>
-<p>以下4段代码希望看客们能亲自复制粘贴了试一试，以便更深理解</p>
-<h2 id="hasNext-和-next组合"><a href="#hasNext-和-next组合" class="headerlink" title="hasNext 和 next组合"></a>hasNext 和 next组合</h2><pre><code>Scanner scan = new Scanner(System.in);
-System.out.println(&quot;请输入字符串，并多混入空格回车尝试不同结果&quot;);
-if(scan.hasNext() ) &#123;
-    System.out.println(&quot;第一次&quot;+scan.next());
-    System.out.println(&quot;第二次&quot;+scan.next());
-    System.out.println(&quot;第三次&quot;+scan.next());
+<p>需要注入<br><img src="https://img-blog.csdnimg.cn/3fd0cdc8cc904e24a1e49a41041499fa.png" alt="注入，测试"></p>
+<pre><code>@SpringBootTest//表示这是一个测试类
+class BootAjaxtestApplicationTests &#123;
+
+    //1,@Autowired注入要测试的对象,Dao接口也可以注入
+@Autowired
+private YebDao yebDao;//可能会假报错，能正常运行
+    //注入了Dao接口，可以使用Dao定义的@Select
+
+    @Test
+    void sql1() &#123;
+        System.out.println(yebDao.getById(1));
+    &#125;
+
 &#125;
 </code></pre>
-<p>尝试输入：空格aaa空格bbb空格ccc回车<br><img src="https://img-blog.csdnimg.cn/20211001131608748.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_18,color_FFFFFF,t_70,g_se,x_16"><br>解释：<br><img src="https://img-blog.csdnimg.cn/20211001125303907.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_15,color_FFFFFF,t_70,g_se,x_16"></p>
-<h2 id="hasNext-和-NextLine组合"><a href="#hasNext-和-NextLine组合" class="headerlink" title="hasNext 和 NextLine组合"></a>hasNext 和 NextLine组合</h2><pre><code>Scanner scan = new Scanner(System.in);
-System.out.println(&quot;请输入字符串，并多混入空格回车尝试不同结果&quot;);
-if(scan.hasNext() ) &#123;
-    System.out.println(&quot;第一次&quot;+scan.nextLine());
-    System.out.println(&quot;第二次&quot;+scan.nextLine());
-    System.out.println(&quot;第三次&quot;+scan.nextLine());
+<h2 id="整合MyBatis-Plus"><a href="#整合MyBatis-Plus" class="headerlink" title="整合MyBatis-Plus"></a>整合MyBatis-Plus</h2><p>这玩意是真的叼~<br><strong>extends BaseMapper&lt;&gt;之后连sql都可以不用写了</strong></p>
+<h3 id="1，添加坐标依赖"><a href="#1，添加坐标依赖" class="headerlink" title="1，添加坐标依赖"></a>1，添加坐标依赖</h3><p>MyBatis-Plus是国内开发的，只能通过手动在pom.xml添加依赖</p>
+<pre><code>        &lt;!-- https://mvnrepository.com/artifact/com.baomidou/mybatis-plus-boot-starter --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;com.baomidou&lt;/groupId&gt;
+            &lt;artifactId&gt;mybatis-plus-boot-starter&lt;/artifactId&gt;
+            &lt;version&gt;3.5.0&lt;/version&gt;
+        &lt;/dependency&gt;
+</code></pre>
+<p>坐标查询方式在上面的两个大标题中</p>
+<h3 id="2，定义数据层接口于映射配置"><a href="#2，定义数据层接口于映射配置" class="headerlink" title="2，定义数据层接口于映射配置"></a>2，定义数据层接口于映射配置</h3><pre><code>@Mapper
+public interface YebDao extends BaseMapper&lt;JobLevel&gt; &#123;
+   //继承BaseMapper，作用于JobLevel的Bean
 &#125;
 </code></pre>
-<p>解释：光标仍然闪烁，证明堆空间中的  aaa bbb ccc只赋值给了第一个，这也验证了nextLine可以录入空格。此时线程正在等待用户输入第二个nextLine<br>hasNextLine 和 next组合</p>
-<pre><code>Scanner scan = new Scanner(System.in);
-System.out.println(&quot;请输入字符串，并多混入空格回车尝试不同结果&quot;);
-if(scan.hasNextLine() ) &#123;
-    System.out.println(&quot;第一次&quot;+scan.next());
-    System.out.println(&quot;第二次&quot;+scan.next());
-    System.out.println(&quot;第三次&quot;+scan.next());
-&#125;
+<h3 id="3，MyBatisPlus可用的CRUD方法"><a href="#3，MyBatisPlus可用的CRUD方法" class="headerlink" title="3，MyBatisPlus可用的CRUD方法"></a>3，MyBatisPlus可用的CRUD方法</h3><p><img src="https://img-blog.csdnimg.cn/0ef764fe9ad74536ba802e2d7e161b2f.png" alt="包含了太多方法了，CRUD啥都有"><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/ceb1df475021">链接：方法使用示例</a></p>
+<h4 id="一定要关闭驼峰命名"><a href="#一定要关闭驼峰命名" class="headerlink" title="一定要关闭驼峰命名"></a>一定要关闭驼峰命名</h4><pre><code>mybatis-plus:
+  configuration:
+    # 是否开启自动驼峰命名规则（camel case）映射，
+#    即从经典数据库列名 A_COLUMN（下划线命名） 
+#    到经典 Java 属性名 aColumn（驼峰命名） 的类似映射
+    map-underscore-to-camel-case: false
 </code></pre>
-<h2 id="hasNextLine-和-nextLine组合"><a href="#hasNextLine-和-nextLine组合" class="headerlink" title="hasNextLine 和 nextLine组合"></a>hasNextLine 和 nextLine组合</h2><pre><code>Scanner scan = new Scanner(System.in);
-System.out.println(&quot;请输入字符串，并多混入空格回车尝试不同结果&quot;);
-if(scan.hasNextLine() ) &#123;
-    System.out.println(&quot;第一次&quot;+scan.nextLine());
-    System.out.println(&quot;第二次&quot;+scan.nextLine());
-    System.out.println(&quot;第三次&quot;+scan.nextLine());
-&#125;
+<h2 id="整合Druid"><a href="#整合Druid" class="headerlink" title="整合Druid"></a>整合Druid</h2><p>同样，德鲁伊是阿里开发的数据源（数据连接池）框架，需要在maven repository找坐标<br>    <img src="https://img-blog.csdnimg.cn/ea0773633f974665bb8ef656987ea1b9.png" alt="选择启动器"></p>
+<pre><code>&lt;!-- https://mvnrepository.com/artifact/com.alibaba/druid-spring-boot-starter --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;com.alibaba&lt;/groupId&gt;
+    &lt;artifactId&gt;druid-spring-boot-starter&lt;/artifactId&gt;
+    &lt;version&gt;1.2.6&lt;/version&gt;
+&lt;/dependency&gt;
+
+ /****************application.yml************/
+#spring:
+#  datasource:
+#    username: root
+#    password: zjh521418
+#    url: jdbc:mysql://localhost:3306/yeb
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+##    type: com.alibaba.druid.pool.DruidDataSource在标准配置下加这句，或下面
+
+整合配置：
+spring: 
+  datasource:
+    druid:
+      username: root
+      password: zjh521418
+      url: jdbc:mysql://localhost:3306/yeb
+      driver-class-name: com.mysql.cj.jdbc.Driver
+#德鲁伊专用配置法
 </code></pre>
-<p>发现规律了吗<br><img src="https://img-blog.csdnimg.cn/20211001132037981.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_18,color_FFFFFF,t_70,g_se,x_16"></p>
-<p><strong>如果直接连续敲回车，那么hasNextLine会判断为true，同时进入if语句执行，并且输入了三个空行也会输出三个空行</strong></p>
-<p>验证hasNext、hasNextLine对输入代码的存储寿命</p>
-<p>hasNextLine在if语句内，我们将验证语句next放在if语句之外，输入aaa bbb ccc ddd测试</p>
-<pre><code>Scanner scan = new Scanner(System.in);
-System.out.println(&quot;请输入字符串，并多混入空格回车尝试不同结果&quot;);
-if(scan.hasNextLine() ) &#123;
-    System.out.println(&quot;第一次&quot;+scan.next());
-    System.out.println(&quot;第二次&quot;+scan.next());
-    System.out.println(&quot;第三次&quot;+scan.next());
-&#125;
-        System.out.println(&quot;验证存储寿命是否＝scan对象寿命&quot;+scan.next());
-</code></pre>
-<p> <img src="https://img-blog.csdnimg.cn/20211001132824820.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_17,color_FFFFFF,t_70,g_se,x_16"></p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>hasNext、hasNextLine不可能返回false，只有true和阻塞两种结果</p>
-<p>hasNext、hasNextLine会判断有无输入，并且hasNext一直敲回车而不输入字符会导致线程阻塞</p>
-<p>hasNext、hasNextLine也有存储功能，从“开始输入”到“判断结束”的过程中的所有输入都将储存，直到之后遇到需要键盘输入的next、nextLine，这些存储的字符串和空格会自动填写给后面的next、nextLine。而空格再next和nextLine上有不同的表现</p>
-<p>查看API还有很多同类型的不同方法，按照这个思路可以一通百通<br><img src="https://img-blog.csdnimg.cn/2021100113530823.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16"><br><img src="https://img-blog.csdnimg.cn/20211001135328579.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16"></p>
+<h2 id="整合总结"><a href="#整合总结" class="headerlink" title="整合总结"></a>整合总结</h2><ul>
+<li>导入对应的starter依赖</li>
+<li>对非默认值的项进行配置</li>
+</ul>
+<h1 id="postman测试接口"><a href="#postman测试接口" class="headerlink" title="postman测试接口"></a>postman测试接口</h1><p><a target="_blank" rel="noopener" href="https://www.postman.com/downloads/">https://www.postman.com/downloads/</a><br><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/d3eaed7b876a">教程</a></p>
 
       
        <hr><span style="font-style: italic;color: gray;"> 生命以负熵为食，归整以抵抗熵增； </span>

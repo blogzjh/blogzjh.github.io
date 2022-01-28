@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Java四种next用法 | ZJH&#39;blog</title>
+  <title>axios时间交互报400 | ZJH&#39;blog</title>
   <meta name="keywords" content="">
-  <meta name="description" content="Java四种next用法 | ZJH&#39;blog">
+  <meta name="description" content="axios时间交互报400 | ZJH&#39;blog">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="description" content="问题使用axios修改，向后台put请求时，报错400  分析后端controller前端axios.put查看前端控制台  那么问题就很可能出在了后端 解决思路postman测试，仍然报错  那么问题基本锁定在后端控制层了查看后端控制台 postman点击一次put，后台就输出如下内容，仔细阅读后发现 2022-01-28 14:38:55.920  WARN 17460 — [nio-8080">
 <meta property="og:type" content="article">
@@ -502,9 +502,9 @@
 </aside>
 <div id="post">
     <div class="pjax">
-        <article id="post-Java四种next用法" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-axios时间交互报400" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">Java四种next用法</h1>
+        <h1 class="article-title">axios时间交互报400</h1>
     
     <div class="article-meta">
         
@@ -514,7 +514,7 @@
             <i class="iconfont icon-category"></i>
             
             
-            <a  data-rel="Java">Java</a>
+            <a  data-rel="找吖找Bug">找吖找Bug</a>
             
         </span>
         
@@ -522,12 +522,12 @@
     </div>
     <div class="article-meta">
         
-            发布时间 : <time class="date" title='最后更新: 2022-01-02 20:03:17'>2021-12-25 01:59</time>
+            发布时间 : <time class="date" title='最后更新: 2022-01-28 21:22:32'>2022-01-28 21:21</time>
         
     </div>
     <div class="article-meta">
         
-        <span>字数:1.6k</span>
+        <span>字数:766</span>
         
         
         <span id="busuanzi_container_page_pv">
@@ -546,7 +546,7 @@
     
     <div class="toc-ref">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#hasNext%E5%92%8ChasNextLine%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-text">hasNext和hasNextLine的区别</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#hasNext-%E5%92%8C-next%E7%BB%84%E5%90%88"><span class="toc-text">hasNext 和 next组合</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#hasNext-%E5%92%8C-NextLine%E7%BB%84%E5%90%88"><span class="toc-text">hasNext 和 NextLine组合</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#hasNextLine-%E5%92%8C-nextLine%E7%BB%84%E5%90%88"><span class="toc-text">hasNextLine 和 nextLine组合</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-text">总结</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%97%AE%E9%A2%98"><span class="toc-text">问题</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%88%86%E6%9E%90"><span class="toc-text">分析</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%A7%A3%E5%86%B3%E6%80%9D%E8%B7%AF"><span class="toc-text">解决思路</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-text">总结</span></a></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -562,86 +562,73 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在查阅了大量网上相关资料都没有一个完整的解释，并且我查的几篇高赞回答都是错误的时候，我决定用一整天的时间来精细写下这篇文章，希望对你有帮助。</p>
-<pre><code>大多数人对hasNext的印象停留在“判断是否有下一个值”上，而该方法还是一个阻塞式的方法
+        <h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>使用axios修改，向后台put请求时，报错400</p>
+<p><img src="https://img-blog.csdnimg.cn/8e7d21bd4b3544999cd3f40238cae5cc.png"></p>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>后端controller<br><img src="https://img-blog.csdnimg.cn/27c3a5f3a5124714ad1ca6a64fc811cb.png"><br>前端axios.put<br><img src="https://img-blog.csdnimg.cn/5c2f284297a440fa8bff70f950341e4d.png"><br>查看前端控制台</p>
+<p><img src="https://img-blog.csdnimg.cn/68f4c407446f4306a9525bcaefefe288.png" alt="确实PUT请求发出了"></p>
+<p>那么问题就很可能出在了后端</p>
+<h1 id="解决思路"><a href="#解决思路" class="headerlink" title="解决思路"></a>解决思路</h1><p>postman测试，仍然报错</p>
+<p><img src="https://img-blog.csdnimg.cn/c1cb6a840e364747af03749e66f4d876.png"></p>
+<p>那么问题基本锁定在后端控制层了<br>查看后端控制台</p>
+<p>postman点击一次put，后台就输出如下内容，仔细阅读后发现</p>
+<p>2022-01-28 14:38:55.920  WARN 17460 — [nio-8080-exec-7] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.http.converter.HttpMessageNotReadableException: JSON parse error: Cannot deserialize value of type <code>java.time.LocalDateTime</code> from String “2022-01-28”: Failed to deserialize java.time.LocalDateTime: (java.time.format.DateTimeParseException) Text ‘2022-01-28’ could not be parsed: <strong>Unable to obtain LocalDateTime from TemporalAccessor: {},ISO,Asia/Shanghai resolved to 2022-01-28 of type</strong> <strong>java.time.format.Parsed</strong>; nested exception is com.fasterxml.jackson.databind.exc.InvalidFormatException: Cannot deserialize value of type <code>java.time.LocalDateTime</code> from String “2022-01-28”: Failed to deserialize java.time.LocalDateTime: (java.time.format.DateTimeParseException) Text ‘2022-01-28’ could not be <strong>parsed: Unable to obtain LocalDateTime from TemporalAccessor</strong>: {},ISO,Asia/Shanghai resolved to 2022-01-28 of type java.time.format.Parsed<EOL> at [Source: (PushbackInputStream); line: 1, column: 75] (through reference chain: com.bootadmin1.bootajaxtest.domain.NXBMembers[“createDate”])]</p>
+<p>指向了时间格式问题，仔细观察发现，后端的数据是这样<br><img src="https://img-blog.csdnimg.cn/29b1ec75b1b54a5fad357a009230e2b7.png" alt="数据库中"><br>而前端的数据是这样<br><img src="https://img-blog.csdnimg.cn/20ab6c6452be4daca14eb6ffc34c75e7.png" alt="页面的格式"></p>
+<p>然后使用postman补全数据，发现还是报错，根据上面的信息考虑是不是前端将数据转为了String，从而无法解析</p>
+<p><img src="https://img-blog.csdnimg.cn/e04aa8c07efe477a80ce9ea3d376db3b.png" alt="仍然报错">结果发现是controller层少写了时间hh:mm:ss<br><img src="https://img-blog.csdnimg.cn/fdedd334f6c74bbbad5eda58543da559.png" alt="添加上"></p>
+<p>重新运行后修改操作还是报错400</p>
+<p>因为时间不需要修改，在此尝试直接不传日期数据（属于是掩耳盗铃，不过没办法）<br>把this.formData = res.data直接list赋值改为属性赋值<br><img src="https://img-blog.csdnimg.cn/2ecddf31edb94b368c36120b0696b3d6.png" alt="但是不能三个属性都双向绑定，否则都不能修改"></p>
+<p><img src="https://img-blog.csdnimg.cn/17d0d8c481704f72a817164e1d0111ad.png" alt="不要绑定position"></p>
+<pre><code>      //弹出编辑窗口
+        handleUpdate(row) &#123;
+            axios.get(&quot;/nxbmem/&quot;+row.memberid).then((res)=&gt;&#123;
+                // if(res.data.flag &amp;&amp; res.data != null )&#123;
+                    this.dialogFormVisible4Edit = true;
+                    this.formData.username = res.data.username;
+                    this.formData.memberid = res.data.memberid;
+                    // this.formData.position = res.data.position;
+                //我们希望不能修改id和name，可以修改position
+                //因此position不要动态双向绑定
+                //一定要一个属性一个属性的挨个赋值，否则会把不想重传的属性给赋值重传了
+                //并且可以防止有些属性不便于修改所带来的问题
+
+                // &#125;else&#123;
+                //     this.$message.error(&quot;数据同步失败，自动刷新&quot;);
+                // &#125;
+            &#125;).finally(()=&gt;&#123;
+                //2.重新加载数据
+                this.getAll();
+            &#125;);
+        &#125;,
+
+        //修改
+        handleEdit() &#123;
+            axios.put(&quot;/nxbmem&quot;,this.formData).then((res)=&gt;&#123;
+                //判断当前操作是否成功
+
+                    //1.关闭弹层
+                    this.dialogFormVisible4Edit = false;
+                    this.$message.success(&quot;自动刷新&quot;);
+
+                    // this.$message.error(&quot;修改失败&quot;);
+
+            &#125;).finally(()=&gt;&#123;
+                //2.重新加载数据
+                this.getAll();
+            &#125;);
+        &#125;,
 </code></pre>
-<h1 id="hasNext和hasNextLine的区别"><a href="#hasNext和hasNextLine的区别" class="headerlink" title="hasNext和hasNextLine的区别"></a>hasNext和hasNextLine的区别</h1><p>二者都是用于判断“有无键盘输入”的，有则返回true，没有则阻塞！一定记住是阻塞而不是返回false，很多人都说是返回false，但你查源码会发现是不会返回false的，他会让你一直阻塞在判断阶段，二者只是在细节上有不同</p>
-<pre><code>hasNext()方法会判断接下来是否有非空字符.如果有,则返回true，没有则阻塞。例如一直敲回车相当于一直判断为空字符，但是不会返回false，而是一直阻塞在判断阶段，直到你输入了非空字符
-hasNextLine() 方法会根据行匹配模式去判断接下来是否有一行(包括空行),如果有,则返回true。这个没什么特别的，只要是你敲了回车那都是true并且不会阻塞
+<p>这样后台就成这样了~<br><img src="https://img-blog.csdnimg.cn/06b27812b6c54529b80bf880c7b2cdde.png" alt="可以正常修改"></p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ul>
+<li><p>由于前端对数据类型并不会区分，后端传的啥前端就显示啥，所以DateTime的前端显示和后端输出不一致，需要指定@JsonFormat</p>
+<pre><code>  @TableField(value = &quot;creatDate&quot;)
+  @JsonFormat(pattern = &quot;yyyy-MM-dd hh:mm:ss&quot;, timezone = &quot;Asia/Shanghai&quot;)
+  private LocalDateTime createDate;
 </code></pre>
-<p>例如像这种if语句是永远不可能执行到内部方法体的</p>
-<pre><code>if(scan.hasNext()==false)&#123;
-    System.out.println(&quot;hasNext和hasNextLine不会返回false&quot;);
-&#125;
-</code></pre>
-<p> 再举一个例子加深理解：</p>
-<pre><code>Scanner scan = new Scanner(System.in);
-System.out.println(scan.hasNextLine());
-System.out.println(scan.hasNext());
-</code></pre>
-<p> 运行该代码，一直不停敲回车键，第一次回车会直接输出true，而后面一直敲都会阻塞在hasNext语句上，运行如下图</p>
-<p><img src="https://img-blog.csdnimg.cn/20211001130739982.png"></p>
-<p>首先，在看用法和解释之前，有以下几个点必须时刻牢记</p>
-<blockquote>
-<p>next方法不能录入空格，在特定情况下会把空格当作回车，nextLine方法可以识录入空格<br>hasNext和hasNextLine的返回值都是boolean类型，但只有可能返回true，不可能返回false，并且都默认以回车键为结束（hasNext可以设置为任意符号为结束键，不在本文研究范围之内）<br>hasNext、next不能直接识别裸回车，而hasNextLine和nextLine都可以直接识别裸回车。换句话讲：对于不输入符号而直接裸敲一个回车的操作，只有后两个能识别<br>hasNext、hasNextLine在返回一个boolean类型结果true的同时，会在堆空间中开辟一块专门用于存放刚刚输入的字符串，用于下次next或者nextLine：即下次next或者nextLine不需要再从键盘输入，相当于系统自动把刚刚输入的字符串再原封不动的输入了一遍。同时这个存储寿命＝调用对象的寿命<br>对于hasNext来说，每次敲击回车都相当于在堆空间中开辟一行，敲几次回车就会直接给后续next、nextLine方法赋值几次<br>hasNext是线程阻塞的，对于hasNext来说，如果一直不输入字符，反而一直敲回车的话，整个线程会卡在这个输入的地方，直到有字符输入</p>
-</blockquote>
-<p>在知道 hasNext的方法用于判断和存储，next的方法用于输入之后，来做如下预备工作</p>
-<blockquote>
-<p>因为hasNext、hasNextLine与next、nextLine有2X2种组合方式，所以我们用4段代码做4次实验就可以大体上了解他们的特性</p>
-</blockquote>
-<p>以下4段代码希望看客们能亲自复制粘贴了试一试，以便更深理解</p>
-<h2 id="hasNext-和-next组合"><a href="#hasNext-和-next组合" class="headerlink" title="hasNext 和 next组合"></a>hasNext 和 next组合</h2><pre><code>Scanner scan = new Scanner(System.in);
-System.out.println(&quot;请输入字符串，并多混入空格回车尝试不同结果&quot;);
-if(scan.hasNext() ) &#123;
-    System.out.println(&quot;第一次&quot;+scan.next());
-    System.out.println(&quot;第二次&quot;+scan.next());
-    System.out.println(&quot;第三次&quot;+scan.next());
-&#125;
-</code></pre>
-<p>尝试输入：空格aaa空格bbb空格ccc回车<br><img src="https://img-blog.csdnimg.cn/20211001131608748.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_18,color_FFFFFF,t_70,g_se,x_16"><br>解释：<br><img src="https://img-blog.csdnimg.cn/20211001125303907.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_15,color_FFFFFF,t_70,g_se,x_16"></p>
-<h2 id="hasNext-和-NextLine组合"><a href="#hasNext-和-NextLine组合" class="headerlink" title="hasNext 和 NextLine组合"></a>hasNext 和 NextLine组合</h2><pre><code>Scanner scan = new Scanner(System.in);
-System.out.println(&quot;请输入字符串，并多混入空格回车尝试不同结果&quot;);
-if(scan.hasNext() ) &#123;
-    System.out.println(&quot;第一次&quot;+scan.nextLine());
-    System.out.println(&quot;第二次&quot;+scan.nextLine());
-    System.out.println(&quot;第三次&quot;+scan.nextLine());
-&#125;
-</code></pre>
-<p>解释：光标仍然闪烁，证明堆空间中的  aaa bbb ccc只赋值给了第一个，这也验证了nextLine可以录入空格。此时线程正在等待用户输入第二个nextLine<br>hasNextLine 和 next组合</p>
-<pre><code>Scanner scan = new Scanner(System.in);
-System.out.println(&quot;请输入字符串，并多混入空格回车尝试不同结果&quot;);
-if(scan.hasNextLine() ) &#123;
-    System.out.println(&quot;第一次&quot;+scan.next());
-    System.out.println(&quot;第二次&quot;+scan.next());
-    System.out.println(&quot;第三次&quot;+scan.next());
-&#125;
-</code></pre>
-<h2 id="hasNextLine-和-nextLine组合"><a href="#hasNextLine-和-nextLine组合" class="headerlink" title="hasNextLine 和 nextLine组合"></a>hasNextLine 和 nextLine组合</h2><pre><code>Scanner scan = new Scanner(System.in);
-System.out.println(&quot;请输入字符串，并多混入空格回车尝试不同结果&quot;);
-if(scan.hasNextLine() ) &#123;
-    System.out.println(&quot;第一次&quot;+scan.nextLine());
-    System.out.println(&quot;第二次&quot;+scan.nextLine());
-    System.out.println(&quot;第三次&quot;+scan.nextLine());
-&#125;
-</code></pre>
-<p>发现规律了吗<br><img src="https://img-blog.csdnimg.cn/20211001132037981.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_18,color_FFFFFF,t_70,g_se,x_16"></p>
-<p><strong>如果直接连续敲回车，那么hasNextLine会判断为true，同时进入if语句执行，并且输入了三个空行也会输出三个空行</strong></p>
-<p>验证hasNext、hasNextLine对输入代码的存储寿命</p>
-<p>hasNextLine在if语句内，我们将验证语句next放在if语句之外，输入aaa bbb ccc ddd测试</p>
-<pre><code>Scanner scan = new Scanner(System.in);
-System.out.println(&quot;请输入字符串，并多混入空格回车尝试不同结果&quot;);
-if(scan.hasNextLine() ) &#123;
-    System.out.println(&quot;第一次&quot;+scan.next());
-    System.out.println(&quot;第二次&quot;+scan.next());
-    System.out.println(&quot;第三次&quot;+scan.next());
-&#125;
-        System.out.println(&quot;验证存储寿命是否＝scan对象寿命&quot;+scan.next());
-</code></pre>
-<p> <img src="https://img-blog.csdnimg.cn/20211001132824820.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_17,color_FFFFFF,t_70,g_se,x_16"></p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>hasNext、hasNextLine不可能返回false，只有true和阻塞两种结果</p>
-<p>hasNext、hasNextLine会判断有无输入，并且hasNext一直敲回车而不输入字符会导致线程阻塞</p>
-<p>hasNext、hasNextLine也有存储功能，从“开始输入”到“判断结束”的过程中的所有输入都将储存，直到之后遇到需要键盘输入的next、nextLine，这些存储的字符串和空格会自动填写给后面的next、nextLine。而空格再next和nextLine上有不同的表现</p>
-<p>查看API还有很多同类型的不同方法，按照这个思路可以一通百通<br><img src="https://img-blog.csdnimg.cn/2021100113530823.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16"><br><img src="https://img-blog.csdnimg.cn/20211001135328579.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16"></p>
+</li>
+</ul>
+<ul>
+<li>并且即便是格式相同，也只能一定保证前端正确接受，而前端如果设置时间post给后端，后端可能需要额外重写业务层的post逻辑</li>
+</ul>
 
       
        <hr><span style="font-style: italic;color: gray;"> 生命以负熵为食，归整以抵抗熵增； </span>

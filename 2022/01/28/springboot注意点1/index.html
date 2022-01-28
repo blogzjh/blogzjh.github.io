@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Java四种next用法 | ZJH&#39;blog</title>
+  <title>springboot注意点1 | ZJH&#39;blog</title>
   <meta name="keywords" content="">
-  <meta name="description" content="Java四种next用法 | ZJH&#39;blog">
+  <meta name="description" content="springboot注意点1 | ZJH&#39;blog">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="description" content="问题使用axios修改，向后台put请求时，报错400  分析后端controller前端axios.put查看前端控制台  那么问题就很可能出在了后端 解决思路postman测试，仍然报错  那么问题基本锁定在后端控制层了查看后端控制台 postman点击一次put，后台就输出如下内容，仔细阅读后发现 2022-01-28 14:38:55.920  WARN 17460 — [nio-8080">
 <meta property="og:type" content="article">
@@ -502,9 +502,9 @@
 </aside>
 <div id="post">
     <div class="pjax">
-        <article id="post-Java四种next用法" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-springboot注意点1" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">Java四种next用法</h1>
+        <h1 class="article-title">springboot注意点1</h1>
     
     <div class="article-meta">
         
@@ -514,7 +514,7 @@
             <i class="iconfont icon-category"></i>
             
             
-            <a  data-rel="Java">Java</a>
+            <a  data-rel="Java后端">Java后端</a>
             
         </span>
         
@@ -522,12 +522,12 @@
     </div>
     <div class="article-meta">
         
-            发布时间 : <time class="date" title='最后更新: 2022-01-02 20:03:17'>2021-12-25 01:59</time>
+            发布时间 : <time class="date" title='最后更新: 2022-01-28 21:06:58'>2022-01-28 21:06</time>
         
     </div>
     <div class="article-meta">
         
-        <span>字数:1.6k</span>
+        <span>字数:741</span>
         
         
         <span id="busuanzi_container_page_pv">
@@ -546,7 +546,7 @@
     
     <div class="toc-ref">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#hasNext%E5%92%8ChasNextLine%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-text">hasNext和hasNextLine的区别</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#hasNext-%E5%92%8C-next%E7%BB%84%E5%90%88"><span class="toc-text">hasNext 和 next组合</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#hasNext-%E5%92%8C-NextLine%E7%BB%84%E5%90%88"><span class="toc-text">hasNext 和 NextLine组合</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#hasNextLine-%E5%92%8C-nextLine%E7%BB%84%E5%90%88"><span class="toc-text">hasNextLine 和 nextLine组合</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-text">总结</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%BE%B9%E7%BC%98%E7%9F%A5%E8%AF%86"><span class="toc-text">边缘知识</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#tomcat%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="toc-text">tomcat服务器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#REST%E9%A3%8E%E6%A0%BC%E5%BC%80%E5%8F%91-%E9%A3%8E%E6%A0%BC%E4%B8%8D%E6%98%AF%E8%A7%84%E8%8C%83"><span class="toc-text">REST风格开发(风格不是规范)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%93%AA%E4%BA%9B%E4%B8%8D%E5%90%8C%EF%BC%9F"><span class="toc-text">哪些不同？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#yml%E9%85%8D%E7%BD%AE"><span class="toc-text">yml配置</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%8C%E6%97%B6%E5%87%BA%E7%8E%B0properties-yml-yaml%E6%97%B6"><span class="toc-text">同时出现properties.yml.yaml时</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#yml-yaml%E6%B2%A1%E6%9C%89%E8%87%AA%E5%8A%A8%E6%8F%90%E7%A4%BA"><span class="toc-text">yml yaml没有自动提示</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%95%E4%B8%80%E5%8F%96%E5%80%BC-Value-SpEL"><span class="toc-text">单一取值@Value + SpEL</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9C%A8%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BC%95%E7%94%A8%E9%85%8D%E7%BD%AE"><span class="toc-text">在配置中引用配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BD%AC%E4%B9%89%E8%A7%A3%E6%9E%90"><span class="toc-text">转义解析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%87%AA%E5%8A%A8%E8%A3%85%E9%85%8DEnvironment"><span class="toc-text">自动装配Environment</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Spring%E7%9A%84%E5%8F%96%E6%95%B0%E6%8D%AE%E6%96%B9%E5%BC%8F%EF%BC%9ABean%E7%BB%91%E5%AE%9A"><span class="toc-text">Spring的取数据方式：Bean绑定</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Autowired%E5%92%8CBean%E6%B3%A8%E6%84%8F%E7%82%B9"><span class="toc-text">Autowired和Bean注意点</span></a></li></ol></li></ol></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -562,86 +562,102 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在查阅了大量网上相关资料都没有一个完整的解释，并且我查的几篇高赞回答都是错误的时候，我决定用一整天的时间来精细写下这篇文章，希望对你有帮助。</p>
-<pre><code>大多数人对hasNext的印象停留在“判断是否有下一个值”上，而该方法还是一个阻塞式的方法
-</code></pre>
-<h1 id="hasNext和hasNextLine的区别"><a href="#hasNext和hasNextLine的区别" class="headerlink" title="hasNext和hasNextLine的区别"></a>hasNext和hasNextLine的区别</h1><p>二者都是用于判断“有无键盘输入”的，有则返回true，没有则阻塞！一定记住是阻塞而不是返回false，很多人都说是返回false，但你查源码会发现是不会返回false的，他会让你一直阻塞在判断阶段，二者只是在细节上有不同</p>
-<pre><code>hasNext()方法会判断接下来是否有非空字符.如果有,则返回true，没有则阻塞。例如一直敲回车相当于一直判断为空字符，但是不会返回false，而是一直阻塞在判断阶段，直到你输入了非空字符
-hasNextLine() 方法会根据行匹配模式去判断接下来是否有一行(包括空行),如果有,则返回true。这个没什么特别的，只要是你敲了回车那都是true并且不会阻塞
-</code></pre>
-<p>例如像这种if语句是永远不可能执行到内部方法体的</p>
-<pre><code>if(scan.hasNext()==false)&#123;
-    System.out.println(&quot;hasNext和hasNextLine不会返回false&quot;);
+        <h1 id="边缘知识"><a href="#边缘知识" class="headerlink" title="边缘知识"></a>边缘知识</h1><h2 id="tomcat服务器"><a href="#tomcat服务器" class="headerlink" title="tomcat服务器"></a>tomcat服务器</h2><p>tomcat是用java编写的服务器，在springboot中把tomcat的内容全部托管，因此可以使用tomcat服务器。但需要导入依赖tomcat-embed-core和spring-boot-starter-tomcat</p>
+<p>同时tomcat也可以被其他的技术所替换，例如Jetty:spring-boot-starter-Jetty<br>例如:undertow<br><strong>轻量级的项目可以尝试使用以下配置，tomcat负载能力较强！</strong><br><img src="https://img-blog.csdnimg.cn/234a6f7d00104eeea27db83136fc8ac7.png" alt="剔除tomcat依赖，导入jetty依赖"></p>
+<p><strong>springboot封装了这些技术，如果发现哪个技术不好用，直接改依赖就好了~~</strong></p>
+<h2 id="REST风格开发-风格不是规范"><a href="#REST风格开发-风格不是规范" class="headerlink" title="REST风格开发(风格不是规范)"></a>REST风格开发(风格不是规范)</h2><p>Representational State Transfer:表现形式状态转换——一种访问网络资源的格式</p>
+<p><img src="https://img-blog.csdnimg.cn/de6261b1d72545b284a66cc97906b243.png" alt="定义"><br><img src="https://img-blog.csdnimg.cn/95326a9abe5d4c978b145b90545219a4.png" alt="常见访问行为"></p>
+<h3 id="哪些不同？"><a href="#哪些不同？" class="headerlink" title="哪些不同？"></a>哪些不同？</h3><p>例如：</p>
+<ul>
+<li>在controller包下的UserController类中，@RequestMapping有8种提交方式method,通过不同的提交方式来区分上图种的不同访问行为</li>
+<li>路径变量@PathVariable的格式要注意</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/71710de3e6bb477f813fa3f288927c42.png" alt="简化操作"></p>
+<pre><code>//Rest模式
+@RestController
+@RequestMapping(&quot;该BookController下的跟访问路径&quot;)
+public class BookController &#123;
+
+    @GetMapping//可以带路径参数，没有可以不写
+    public String getById()&#123;
+        System.out.println(&quot;springboot is running...&quot;);
+        return &quot;springboot is running...&quot;;
+    &#125;
+
 &#125;
 </code></pre>
-<p> 再举一个例子加深理解：</p>
-<pre><code>Scanner scan = new Scanner(System.in);
-System.out.println(scan.hasNextLine());
-System.out.println(scan.hasNext());
+<h2 id="yml配置"><a href="#yml配置" class="headerlink" title="yml配置"></a>yml配置</h2><p><a target="_blank" rel="noopener" href="https://docs.spring.io/spring-boot/docs/current/reference/html/">springboot——application-properties官方文档</a></p>
+<p><strong>“每一个配置对应的都是一种技术”</strong></p>
+<h3 id="同时出现properties-yml-yaml时"><a href="#同时出现properties-yml-yaml时" class="headerlink" title="同时出现properties.yml.yaml时"></a>同时出现properties.yml.yaml时</h3><ul>
+<li>不同属性相互叠加</li>
+<li>相同属性优先级：properties&gt;yml&gt;yaml</li>
+</ul>
+<h3 id="yml-yaml没有自动提示"><a href="#yml-yaml没有自动提示" class="headerlink" title="yml yaml没有自动提示"></a>yml yaml没有自动提示</h3><p>弹提示的功能是springboot提供的，而不是idea提供的<br><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV15b4y1a7yG?p=20&spm_id_from=pageDriver">链接：解决属性提示消失</a></p>
+<p><img src="https://img-blog.csdnimg.cn/dd67d73d9653432abbcb2c05ab4b111e.png" alt="yaml为什么优秀">注：</p>
+<ul>
+<li>IDEA处理yml文件可以使用tab</li>
+<li>不用加引号</li>
+</ul>
+<h3 id="单一取值-Value-SpEL"><a href="#单一取值-Value-SpEL" class="headerlink" title="单一取值@Value + SpEL"></a>单一取值@Value + SpEL</h3><ul>
+<li>只能在注册类中使用，例如@RestController下</li>
+<li>可能跟Lombok下的@value冲突</li>
+</ul>
+<p>已经在application.yml文件中配置了</p>
+<pre><code>user1:
+  name: 张家豪
+
+
+users3: [&#123;name:zhangsan,age:18&#125;,&#123;name:lisi,age:17&#125;]
+
+users2:
+  -
+    name: zhangsan
+    age: 18
+  -
+    name: lisi
+    age: 17
 </code></pre>
-<p> 运行该代码，一直不停敲回车键，第一次回车会直接输出true，而后面一直敲都会阻塞在hasNext语句上，运行如下图</p>
-<p><img src="https://img-blog.csdnimg.cn/20211001130739982.png"></p>
-<p>首先，在看用法和解释之前，有以下几个点必须时刻牢记</p>
-<blockquote>
-<p>next方法不能录入空格，在特定情况下会把空格当作回车，nextLine方法可以识录入空格<br>hasNext和hasNextLine的返回值都是boolean类型，但只有可能返回true，不可能返回false，并且都默认以回车键为结束（hasNext可以设置为任意符号为结束键，不在本文研究范围之内）<br>hasNext、next不能直接识别裸回车，而hasNextLine和nextLine都可以直接识别裸回车。换句话讲：对于不输入符号而直接裸敲一个回车的操作，只有后两个能识别<br>hasNext、hasNextLine在返回一个boolean类型结果true的同时，会在堆空间中开辟一块专门用于存放刚刚输入的字符串，用于下次next或者nextLine：即下次next或者nextLine不需要再从键盘输入，相当于系统自动把刚刚输入的字符串再原封不动的输入了一遍。同时这个存储寿命＝调用对象的寿命<br>对于hasNext来说，每次敲击回车都相当于在堆空间中开辟一行，敲几次回车就会直接给后续next、nextLine方法赋值几次<br>hasNext是线程阻塞的，对于hasNext来说，如果一直不输入字符，反而一直敲回车的话，整个线程会卡在这个输入的地方，直到有字符输入</p>
-</blockquote>
-<p>在知道 hasNext的方法用于判断和存储，next的方法用于输入之后，来做如下预备工作</p>
-<blockquote>
-<p>因为hasNext、hasNextLine与next、nextLine有2X2种组合方式，所以我们用4段代码做4次实验就可以大体上了解他们的特性</p>
-</blockquote>
-<p>以下4段代码希望看客们能亲自复制粘贴了试一试，以便更深理解</p>
-<h2 id="hasNext-和-next组合"><a href="#hasNext-和-next组合" class="headerlink" title="hasNext 和 next组合"></a>hasNext 和 next组合</h2><pre><code>Scanner scan = new Scanner(System.in);
-System.out.println(&quot;请输入字符串，并多混入空格回车尝试不同结果&quot;);
-if(scan.hasNext() ) &#123;
-    System.out.println(&quot;第一次&quot;+scan.next());
-    System.out.println(&quot;第二次&quot;+scan.next());
-    System.out.println(&quot;第三次&quot;+scan.next());
+<p>那么可以在任意位置按如下操作取值</p>
+<pre><code>@Value(&quot;$&#123;name2[1].name&#125;&quot;)//取出1号索引位的lisi
+private String namexxx;//赋值给namexxx
+</code></pre>
+<h3 id="在配置中引用配置"><a href="#在配置中引用配置" class="headerlink" title="在配置中引用配置"></a>在配置中引用配置</h3><pre><code>yml文件中
+
+baseDir: d:/spring/springboot
+tempDir: $&#123;baseDir&#125;/temp
+</code></pre>
+<h3 id="转义解析"><a href="#转义解析" class="headerlink" title="转义解析"></a>转义解析</h3><p>yml文件不需要加引号“” 如果加了引号，内容将被解析，比如</p>
+<pre><code>tempDir: &quot;$&#123;baseDir&#125;/temp&quot;
+会被转义出一个/t制表符
+</code></pre>
+<h2 id="自动装配Environment"><a href="#自动装配Environment" class="headerlink" title="自动装配Environment"></a>自动装配Environment</h2><pre><code>@Autowired
+private Environment environment;
+</code></pre>
+<p>这样一来，所有配置信息都封装了，引用的时候用getProperties就可以取出</p>
+<h2 id="Spring的取数据方式：Bean绑定"><a href="#Spring的取数据方式：Bean绑定" class="headerlink" title="Spring的取数据方式：Bean绑定"></a>Spring的取数据方式：Bean绑定</h2><p>Bean包下</p>
+<pre><code>@Component//注入容器，让这个bean成为spring管控的bean
+@ConfigurationProperties(prefix = &quot;user1&quot;)//前缀
+//因为配置了
+// user1:
+//  name: 张家豪
+//  age: 21
+@Data//lombok下的的注解，提供get set等方法
+public class UserBean &#123;
+    private String name;
+    private int age;
 &#125;
 </code></pre>
-<p>尝试输入：空格aaa空格bbb空格ccc回车<br><img src="https://img-blog.csdnimg.cn/20211001131608748.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_18,color_FFFFFF,t_70,g_se,x_16"><br>解释：<br><img src="https://img-blog.csdnimg.cn/20211001125303907.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_15,color_FFFFFF,t_70,g_se,x_16"></p>
-<h2 id="hasNext-和-NextLine组合"><a href="#hasNext-和-NextLine组合" class="headerlink" title="hasNext 和 NextLine组合"></a>hasNext 和 NextLine组合</h2><pre><code>Scanner scan = new Scanner(System.in);
-System.out.println(&quot;请输入字符串，并多混入空格回车尝试不同结果&quot;);
-if(scan.hasNext() ) &#123;
-    System.out.println(&quot;第一次&quot;+scan.nextLine());
-    System.out.println(&quot;第二次&quot;+scan.nextLine());
-    System.out.println(&quot;第三次&quot;+scan.nextLine());
-&#125;
+<p>controller包下</p>
+<pre><code>@Autowired
+UserBean userBean;//实例化bean
+
+
+@GetMapping(&quot;/test&quot;)
+    public void beantest()&#123;
+        System.out.println(userBean);//当页面访问时，控制台输出
+    &#125;
 </code></pre>
-<p>解释：光标仍然闪烁，证明堆空间中的  aaa bbb ccc只赋值给了第一个，这也验证了nextLine可以录入空格。此时线程正在等待用户输入第二个nextLine<br>hasNextLine 和 next组合</p>
-<pre><code>Scanner scan = new Scanner(System.in);
-System.out.println(&quot;请输入字符串，并多混入空格回车尝试不同结果&quot;);
-if(scan.hasNextLine() ) &#123;
-    System.out.println(&quot;第一次&quot;+scan.next());
-    System.out.println(&quot;第二次&quot;+scan.next());
-    System.out.println(&quot;第三次&quot;+scan.next());
-&#125;
-</code></pre>
-<h2 id="hasNextLine-和-nextLine组合"><a href="#hasNextLine-和-nextLine组合" class="headerlink" title="hasNextLine 和 nextLine组合"></a>hasNextLine 和 nextLine组合</h2><pre><code>Scanner scan = new Scanner(System.in);
-System.out.println(&quot;请输入字符串，并多混入空格回车尝试不同结果&quot;);
-if(scan.hasNextLine() ) &#123;
-    System.out.println(&quot;第一次&quot;+scan.nextLine());
-    System.out.println(&quot;第二次&quot;+scan.nextLine());
-    System.out.println(&quot;第三次&quot;+scan.nextLine());
-&#125;
-</code></pre>
-<p>发现规律了吗<br><img src="https://img-blog.csdnimg.cn/20211001132037981.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_18,color_FFFFFF,t_70,g_se,x_16"></p>
-<p><strong>如果直接连续敲回车，那么hasNextLine会判断为true，同时进入if语句执行，并且输入了三个空行也会输出三个空行</strong></p>
-<p>验证hasNext、hasNextLine对输入代码的存储寿命</p>
-<p>hasNextLine在if语句内，我们将验证语句next放在if语句之外，输入aaa bbb ccc ddd测试</p>
-<pre><code>Scanner scan = new Scanner(System.in);
-System.out.println(&quot;请输入字符串，并多混入空格回车尝试不同结果&quot;);
-if(scan.hasNextLine() ) &#123;
-    System.out.println(&quot;第一次&quot;+scan.next());
-    System.out.println(&quot;第二次&quot;+scan.next());
-    System.out.println(&quot;第三次&quot;+scan.next());
-&#125;
-        System.out.println(&quot;验证存储寿命是否＝scan对象寿命&quot;+scan.next());
-</code></pre>
-<p> <img src="https://img-blog.csdnimg.cn/20211001132824820.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_17,color_FFFFFF,t_70,g_se,x_16"></p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>hasNext、hasNextLine不可能返回false，只有true和阻塞两种结果</p>
-<p>hasNext、hasNextLine会判断有无输入，并且hasNext一直敲回车而不输入字符会导致线程阻塞</p>
-<p>hasNext、hasNextLine也有存储功能，从“开始输入”到“判断结束”的过程中的所有输入都将储存，直到之后遇到需要键盘输入的next、nextLine，这些存储的字符串和空格会自动填写给后面的next、nextLine。而空格再next和nextLine上有不同的表现</p>
-<p>查看API还有很多同类型的不同方法，按照这个思路可以一通百通<br><img src="https://img-blog.csdnimg.cn/2021100113530823.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16"><br><img src="https://img-blog.csdnimg.cn/20211001135328579.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16"></p>
+<h3 id="Autowired和Bean注意点"><a href="#Autowired和Bean注意点" class="headerlink" title="Autowired和Bean注意点"></a>Autowired和Bean注意点</h3><p>这两个都是配套使用，Bean代表只有这一个单例并绑定配置文件的哪个前缀；Autowired是注入Bean实例<br>这个userBean实例只能在当前的controller层读取，不能在其他地方使用</p>
 
       
        <hr><span style="font-style: italic;color: gray;"> 生命以负熵为食，归整以抵抗熵增； </span>
