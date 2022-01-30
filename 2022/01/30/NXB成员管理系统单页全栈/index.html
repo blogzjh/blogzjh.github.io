@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>axios+element+vue的前端数据交互框架 | ZJH&#39;blog</title>
+  <title>NXB成员管理系统单页全栈 | ZJH&#39;blog</title>
   <meta name="keywords" content="">
-  <meta name="description" content="axios+element+vue的前端数据交互框架 | ZJH&#39;blog">
+  <meta name="description" content="NXB成员管理系统单页全栈 | ZJH&#39;blog">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="description" content="技术实现springboot+mybatisplus+lombok+vue+element+axios  数据属性绑定层面数据库与domain绑定 前端属性和domain统一 R类的前后端交互后端传给前端的是一个R对象，并且需要前端对R对象进行判断解析R类属性：flag\data\msg 后端控制层 前端视图层 异常处理拦截器 MybatisPlus：持久层+业务层  控制层调用业务层接口 前后端">
 <meta property="og:type" content="article">
@@ -541,9 +541,9 @@
 </aside>
 <div id="post">
     <div class="pjax">
-        <article id="post-axios-element-vue的前端数据交互框架" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-NXB成员管理系统单页全栈" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">axios+element+vue的前端数据交互框架</h1>
+        <h1 class="article-title">NXB成员管理系统单页全栈</h1>
     
     <div class="article-meta">
         
@@ -553,7 +553,7 @@
             <i class="iconfont icon-category"></i>
             
             
-            <a  data-rel="前端">前端</a>
+            <a  data-rel="项目">项目</a>
             
         </span>
         
@@ -561,12 +561,12 @@
     </div>
     <div class="article-meta">
         
-            发布时间 : <time class="date" title='最后更新: 2022-01-26 21:39:02'>2022-01-26 21:38</time>
+            发布时间 : <time class="date" title='最后更新: 2022-01-30 12:51:10'>2022-01-30 12:50</time>
         
     </div>
     <div class="article-meta">
         
-        <span>字数:1.2k</span>
+        <span>字数:469</span>
         
         
         <span id="busuanzi_container_page_pv">
@@ -585,7 +585,7 @@
     
     <div class="toc-ref">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Element%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84"><span class="toc-text">Element基本结构</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BB%84%E4%BB%B6%E5%B8%83%E5%B1%80%EF%BC%9A%E8%A1%A8%E6%A0%BC"><span class="toc-text">组件布局：表格</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%9D%99%E6%80%81%E6%B5%8B%E8%AF%95"><span class="toc-text">静态测试</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9%E8%A1%A8%E7%9A%84%E7%BB%93%E6%9E%84%EF%BC%8C%E5%86%85%E5%AE%B9"><span class="toc-text">修改表的结构，内容</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0%E6%95%B0%E6%8D%AE%E6%97%A0%E5%85%B3%E5%88%97-%E6%93%8D%E4%BD%9C%E6%8C%89%E9%92%AE"><span class="toc-text">添加数据无关列(操作按钮)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E5%AD%97%E7%BC%96%E5%8F%B7"><span class="toc-text">数字编号</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%8D%E9%80%89%E6%A1%86"><span class="toc-text">复选框</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%8D%E9%80%89%E5%8F%96%E5%AF%B9%E8%B1%A1%EF%BC%9A%E5%8F%AF%E4%BB%A5%E6%89%B9%E9%87%8F%E6%93%8D%E4%BD%9C"><span class="toc-text">复选取对象：可以批量操作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%B9%E9%87%8F%E5%88%A0%E9%99%A4%E3%80%81%E6%96%B0%E5%A2%9E%E6%8C%89%E9%92%AE"><span class="toc-text">批量删除、新增按钮</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9%E8%AF%9D%E6%A1%86-%E8%A1%A8%E5%8D%95%EF%BC%9A%E6%9F%A5%E8%AF%A2%E5%92%8C%E6%96%B0%E5%A2%9E"><span class="toc-text">对话框+表单：查询和新增</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%B9%E8%AF%9D%E6%A1%86"><span class="toc-text">对话框</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%B0%E5%A2%9E%E8%A1%A8%E5%8D%95"><span class="toc-text">新增表单</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9F%A5%E8%AF%A2%E8%A1%A8%E5%8D%95"><span class="toc-text">查询表单</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%89%8D%E7%AB%AF%E9%A1%B5%E9%9D%A2%E6%A1%86%E6%9E%B6"><span class="toc-text">前端页面框架</span></a></li></ol></li></ol></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%8A%80%E6%9C%AF%E5%AE%9E%E7%8E%B0"><span class="toc-text">技术实现</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%B1%9E%E6%80%A7%E7%BB%91%E5%AE%9A%E5%B1%82%E9%9D%A2"><span class="toc-text">数据属性绑定层面</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%8Edomain%E7%BB%91%E5%AE%9A"><span class="toc-text">数据库与domain绑定</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E7%AB%AF%E5%B1%9E%E6%80%A7%E5%92%8Cdomain%E7%BB%9F%E4%B8%80"><span class="toc-text">前端属性和domain统一</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#R%E7%B1%BB%E7%9A%84%E5%89%8D%E5%90%8E%E7%AB%AF%E4%BA%A4%E4%BA%92"><span class="toc-text">R类的前后端交互</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%90%8E%E7%AB%AF%E6%8E%A7%E5%88%B6%E5%B1%82"><span class="toc-text">后端控制层</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E7%AB%AF%E8%A7%86%E5%9B%BE%E5%B1%82"><span class="toc-text">前端视图层</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E6%8B%A6%E6%88%AA%E5%99%A8"><span class="toc-text">异常处理拦截器</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#MybatisPlus%EF%BC%9A%E6%8C%81%E4%B9%85%E5%B1%82-%E4%B8%9A%E5%8A%A1%E5%B1%82"><span class="toc-text">MybatisPlus：持久层+业务层</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%8E%A7%E5%88%B6%E5%B1%82%E8%B0%83%E7%94%A8%E4%B8%9A%E5%8A%A1%E5%B1%82%E6%8E%A5%E5%8F%A3"><span class="toc-text">控制层调用业务层接口</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%89%8D%E5%90%8E%E7%AB%AF%E5%AF%B9%E5%BA%94%E4%BA%A4%E4%BA%92"><span class="toc-text">前后端对应交互</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%86%E9%A1%B5%E6%9F%A5%E8%AF%A2Get"><span class="toc-text">分页查询Get</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%8E%E7%AB%AF-GetMapping-%E2%80%9C-currentPage-pageSize-%E2%80%9D"><span class="toc-text">后端@GetMapping(“{currentPage}&#x2F;{pageSize}”)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%89%8D%E7%AB%AF%E9%92%A9%E5%AD%90%E5%87%BD%E6%95%B0"><span class="toc-text">前端钩子函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%89%8D%E7%AB%AF%E5%88%86%E9%A1%B5%E6%9F%A5-%E6%9D%A1%E4%BB%B6%E6%9F%A5"><span class="toc-text">前端分页查+条件查</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9D%A1%E4%BB%B6%E6%9F%A5%E8%AF%A2%E4%BC%A0%E8%B7%AF%E5%BE%84%E5%8F%98%E9%87%8For%E5%AF%B9%E8%B1%A1%EF%BC%9F"><span class="toc-text">条件查询传路径变量or对象？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A2%9EPost"><span class="toc-text">增Post</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%8E%E7%AB%AF-RequestBody"><span class="toc-text">后端@RequestBody</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%89%8D%E7%AB%AFformData-%E4%BC%A0%E5%AF%B9%E8%B1%A1"><span class="toc-text">前端formData:{}传对象</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%A0Delete"><span class="toc-text">删Delete</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%8E%E7%AB%AF-%E5%88%A0%E5%8F%AA%E8%83%BD%E9%80%9A%E8%BF%87ID%E5%88%A0"><span class="toc-text">后端:删只能通过ID删</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%89%8D%E7%AB%AF%E5%8F%AA%E7%AE%A1%E4%BC%A0id%E8%B7%AF%E5%BE%84%E5%8F%98%E9%87%8F"><span class="toc-text">前端只管传id路径变量</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%94%B9Put"><span class="toc-text">改Put</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%8E%E7%AB%AF%EF%BC%9A%E6%8E%A5%E5%8F%97%E5%AF%B9%E8%B1%A1-RequestBody"><span class="toc-text">后端：接受对象@RequestBody</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%89%8D%E7%AB%AF%EF%BC%9A%E5%AF%B9%E4%BA%8E%E6%94%B9%E7%9A%84%E9%80%BB%E8%BE%91%E6%AF%94%E5%90%8E%E7%AB%AF%E5%A4%8D%E6%9D%82"><span class="toc-text">前端：对于改的逻辑比后端复杂</span></a></li></ol></li></ol></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -601,169 +601,34 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="Element基本结构"><a href="#Element基本结构" class="headerlink" title="Element基本结构"></a>Element基本结构</h1><p>一个网页组件库，需要调用导入的库，语法比较特别，不同于前端语法</p>
-<p><strong>固定的几个引入链接，位置千万不能弄错</strong>，链接的作用是在线引入渲染文件，可以不用下载到本地<br>添加组件和修改功能只再body中的div  和 script中的new Vue代码块中进行，并且要注意绑定~~<br><a target="_blank" rel="noopener" href="https://element.eleme.cn/#/zh-CN/component/button">Element官网</a><br>Element给出的代码是一整块，需要自己区分哪个是组件，哪个是依赖，哪个是控制，分别放入哪个位置<br><img src="https://img-blog.csdnimg.cn/3050347e2d1a48f589b657ce16f9156e.png"></p>
-<pre><code>&lt;!DOCTYPE html&gt;
-&lt;html lang=&quot;en&quot;&gt;
-&lt;head&gt;
-    &lt;meta charset=&quot;UTF-8&quot;&gt;
-    &lt;title&gt;后台管理&lt;/title&gt;
-&lt;!--Style相当于CSS--&gt;
-&lt;!-- 引入样式 --&gt;
-&lt;link rel=&quot;stylesheet&quot; href=&quot;https://unpkg.com/element-ui/lib/theme-chalk/index.css&quot;&gt;
-
-&lt;/head&gt;
-
-
-&lt;body&gt;
-&lt;div id=&quot;对应模块名&quot;&gt;
-    &lt;!--这里放入组件--&gt;
-  
-
-&lt;/div&gt;
-&lt;/body&gt;
-
-
-&lt;!-- import Vue before Element --&gt;
-&lt;script src=&quot;https://unpkg.com/vue/dist/vue.js&quot;&gt;&lt;/script&gt;
-&lt;!-- import JavaScript --&gt;
-&lt;script src=&quot;https://unpkg.com/element-ui/lib/index.js&quot;&gt;&lt;/script&gt;
-
-&lt;script&gt;
-    &lt;!--Vue的核心对象相当于js--&gt;
-    new Vue(&#123;
-        el:&quot;#对应模块名&quot;
-
-    &#125;)
-
-&lt;/script&gt;
-
-
-&lt;/html&gt;
-</code></pre>
-<h1 id="组件布局：表格"><a href="#组件布局：表格" class="headerlink" title="组件布局：表格"></a>组件布局：表格</h1><h2 id="静态测试"><a href="#静态测试" class="headerlink" title="静态测试"></a>静态测试</h2><pre><code>&lt;template&gt;引入&lt;body&gt;
-&lt;style&gt;引入&lt;head&gt;
-&lt;script&gt;引入new Vue(&#123;
-    el:&quot;#对应模块名&quot;,
-    )&#125;
-</code></pre>
-<p><img src="https://img-blog.csdnimg.cn/66c55d2e4e754dd2afa82bbcf6a7f3da.png"></p>
-<h3 id="修改表的结构，内容"><a href="#修改表的结构，内容" class="headerlink" title="修改表的结构，内容"></a>修改表的结构，内容</h3><ul>
-<li><p>要把templeate和@data()中return的tableData:[{ ]}对应都修改了</p>
-</li>
-<li><p>align=”center”</p>
-</li>
-<li><p>注意配置要被左&lt;&gt;包裹</p>
-<h3 id="添加数据无关列-操作按钮"><a href="#添加数据无关列-操作按钮" class="headerlink" title="添加数据无关列(操作按钮)"></a>添加数据无关列(操作按钮)</h3></li>
-<li><p>先添加一个操作列operate</p>
-</li>
-<li><p>这个列不需要属性prop</p>
-</li>
-<li><p>这个列都需要操作按钮，所以把按钮放在列中</p>
-<pre><code>  &lt;template&gt;
-  &lt;el-table&gt;
-      ......略
-      &lt;el-table-column
-                  align=&quot;center&quot;
-                  label=&quot;操作&quot;&gt;
-  &lt;!--这个列不需要属性，所以不加prop--&gt;
-          &lt;el-row&gt;
-              &lt;el-button type=&quot;primary&quot; icon=&quot;el-icon-edit&quot; circle&gt;&lt;/el-button&gt;
-              &lt;el-button type=&quot;danger&quot; icon=&quot;el-icon-delete&quot; circle&gt;&lt;/el-button&gt;
-          &lt;/el-row&gt;
-
-  &lt;!--按钮放在table-column列中，每列都有--&gt;
-      &lt;/el-table-column&gt;
-
-
-
-      &lt;/el-table&gt;
-  &lt;/template&gt;
-</code></pre>
-</li>
-</ul>
-<h3 id="数字编号"><a href="#数字编号" class="headerlink" title="数字编号"></a>数字编号</h3><p><img src="https://img-blog.csdnimg.cn/503071d83ceb4d418a41994a4c04a1a5.png" alt="找到了有数字编号的(不同于id)">这个数字编号是第一列，所以去源码中找第一列  直接扔进去</p>
-<pre><code>   &lt;el-table-column
-  type=&quot;index&quot;
-  width=&quot;50&quot;&gt;
-&lt;/el-table-column&gt;
-</code></pre>
-<h3 id="复选框"><a href="#复选框" class="headerlink" title="复选框"></a>复选框</h3><p>同理，找到有复选框的源码，选择第一列</p>
-<h3 id="复选取对象：可以批量操作"><a href="#复选取对象：可以批量操作" class="headerlink" title="复选取对象：可以批量操作"></a>复选取对象：可以批量操作</h3><ul>
-<li>表头属性加@selection-change=”handleSelectionChange”</li>
-<li>在method屁股后面 handleSelectionChange(val) {<pre><code>  this.multipleSelection = val;
-  可以添加具体执行方法
-&#125;，
-</code></pre>
-</li>
-<li>在data()return{}中添加multipleSelection: []，注意不要加到tabledata中了</li>
-</ul>
-<h3 id="批量删除、新增按钮"><a href="#批量删除、新增按钮" class="headerlink" title="批量删除、新增按钮"></a>批量删除、新增按钮</h3><ul>
-<li>添加<strong>按钮</strong>，绑定@click事件，点击后弹出对话框<br><img src="https://img-blog.csdnimg.cn/bd023d9dd3ef415c9318d3059b5c760b.png" alt="官方文档解析"></li>
-</ul>
-<h3 id="对话框-表单：查询和新增"><a href="#对话框-表单：查询和新增" class="headerlink" title="对话框+表单：查询和新增"></a>对话框+表单：查询和新增</h3><p>当点击“新增”按钮的时候，弹出对话框，对话框的内容是一个表单，表单中填数据，点击“确定”则POST给服务器，返回一个是否成功的信息</p>
-<h4 id="对话框"><a href="#对话框" class="headerlink" title="对话框"></a>对话框</h4><ul>
-<li>点击按钮弹出对话框@click=” 对话框名 “</li>
-<li>对话框设置对应的“对话框名” :visible.sync=”对话框名”</li>
-<li>在return中添加初始不可见 对话框名:false</li>
-</ul>
-<pre><code>    &lt;!--批量删除、新增按钮--&gt;
-    &lt;el-row&gt;
-        &lt;el-button type=&quot;danger&quot; &gt;批量删除&lt;/el-button&gt;
-        &lt;el-button type=&quot;primary&quot; @click=&quot;dialogVisible1=true&quot; &gt;新增&lt;/el-button&gt;
-        &lt;el-button type=&quot;primary&quot; @click=&quot;dialogVisible2=true&quot; &gt;查询&lt;/el-button&gt;
-        &lt;!--查询用dialogVisible2表单--&gt;
-    &lt;/el-row&gt;
-
-    &lt;!--新增对话框dialogVisible1--&gt;
-    &lt;el-dialog
-            title=&quot;新增数据，填写表单后确定&quot;
-            :visible.sync=&quot;dialogVisible1&quot;
-            width=&quot;30%&quot;
-           &gt;
-
-        &lt;span slot=&quot;footer&quot; class=&quot;dialog-footer&quot;&gt;
-    &lt;el-button @click=&quot;dialogVisible1 = false&quot;&gt;取 消&lt;/el-button&gt;
-    &lt;el-button type=&quot;primary&quot; @click=&quot;dialogVisible1 = false&quot;&gt;确 定&lt;/el-button&gt;
-            &lt;!--确定取消都使dialogVisible1不可见--&gt;
-  &lt;/span&gt;
-    &lt;/el-dialog&gt;
-
-
-    &lt;!--查询对话框dialogVisible2--&gt;
-    &lt;el-dialog
-            title=&quot;新增数据，填写表单后查询&quot;
-            :visible.sync=&quot;dialogVisible2&quot;
-            width=&quot;30%&quot;
-    &gt;
-
-        &lt;span slot=&quot;footer&quot; class=&quot;dialog-footer&quot;&gt;
-    &lt;el-button @click=&quot;dialogVisible2 = false&quot;&gt;取 消&lt;/el-button&gt;
-    &lt;el-button type=&quot;primary&quot; @click=&quot;dialogVisible2 = false&quot;&gt;查 询&lt;/el-button&gt;
-            &lt;!--确定取消都使dialogVisible2不可见--&gt;
-  &lt;/span&gt;
-    &lt;/el-dialog&gt;
-
-
-/*********************************************/
- data() &#123;
-            return &#123;
-
-            dialogVisible1: false,
-            dialogVisible2: false,
-            //表单初始不可见，必须设置，不然点都点不出来
-&#125;&#125;
-</code></pre>
-<h3 id="新增表单"><a href="#新增表单" class="headerlink" title="新增表单"></a>新增表单</h3><p>添加在两个el-dialog对话框&lt;&gt;尖括号之间</p>
-<h3 id="查询表单"><a href="#查询表单" class="headerlink" title="查询表单"></a>查询表单</h3><p>添加在两个el-dialog对话框&lt;&gt;尖括号之间</p>
-<ul>
-<li>这个案例的查询功能为：同时选定职称名 和 职称等级</li>
-</ul>
-<h3 id="前端页面框架"><a href="#前端页面框架" class="headerlink" title="前端页面框架"></a>前端页面框架</h3><ul>
-<li>批量删除需要getID的List</li>
-<li>查询可以共用一个模型绑定数据</li>
-</ul>
-<p><img src="https://img-blog.csdnimg.cn/19ad40a967454ea5897ed7c5ff7d1f17.png" alt="基本结构"></p>
+        <h1 id="技术实现"><a href="#技术实现" class="headerlink" title="技术实现"></a>技术实现</h1><p>springboot+mybatisplus+lombok+vue+element+axios</p>
+<p><img src="https://img-blog.csdnimg.cn/fd601084dd4d45dba2b44154bef09135.png" alt="案例结构"></p>
+<h1 id="数据属性绑定层面"><a href="#数据属性绑定层面" class="headerlink" title="数据属性绑定层面"></a>数据属性绑定层面</h1><h2 id="数据库与domain绑定"><a href="#数据库与domain绑定" class="headerlink" title="数据库与domain绑定"></a>数据库与domain绑定</h2><p><img src="https://img-blog.csdnimg.cn/e349e9ec3b33419285906d31207d40fa.png" alt="设置自动填充当前时间"><br><img src="https://img-blog.csdnimg.cn/b360980ee55d40f7a55e735ae652a267.png" alt="domain"></p>
+<h2 id="前端属性和domain统一"><a href="#前端属性和domain统一" class="headerlink" title="前端属性和domain统一"></a>前端属性和domain统一</h2><p><img src="https://img-blog.csdnimg.cn/3ec59c343c7240a8bf243366e53c334c.png" alt="名字和domain统一"></p>
+<h1 id="R类的前后端交互"><a href="#R类的前后端交互" class="headerlink" title="R类的前后端交互"></a>R类的前后端交互</h1><p>后端传给前端的是一个R对象，并且需要前端对R对象进行判断解析<br>R类属性：flag\data\msg<br><img src="https://img-blog.csdnimg.cn/d4cb960282f7478d9820fb5011226d18.png"></p>
+<h2 id="后端控制层"><a href="#后端控制层" class="headerlink" title="后端控制层"></a>后端控制层</h2><p><img src="https://img-blog.csdnimg.cn/50f9b0eda19248cab1ab5452454bcd9e.png" alt="返回R对象，设置属性"></p>
+<h2 id="前端视图层"><a href="#前端视图层" class="headerlink" title="前端视图层"></a>前端视图层</h2><p><img src="https://img-blog.csdnimg.cn/5ec3daf8ec704312b30e1795ec3ef397.png" alt="res.data==R"></p>
+<h1 id="异常处理拦截器"><a href="#异常处理拦截器" class="headerlink" title="异常处理拦截器"></a>异常处理拦截器</h1><p><img src="https://img-blog.csdnimg.cn/ad91f2d27bd1457996f435d8420ca2b6.png" alt="返回一个只设置msg的R对象"></p>
+<h1 id="MybatisPlus：持久层-业务层"><a href="#MybatisPlus：持久层-业务层" class="headerlink" title="MybatisPlus：持久层+业务层"></a>MybatisPlus：持久层+业务层</h1><p><img src="https://img-blog.csdnimg.cn/42143a6991b0403f86e14b54cd9c0ec7.png"><br><img src="https://img-blog.csdnimg.cn/61b77d74244b4bebb2b3d0a9c5175094.png"></p>
+<p><img src="https://img-blog.csdnimg.cn/0f5493531971421580cad3a082dac698.png" alt="业务层需要重写分页查询"></p>
+<h1 id="控制层调用业务层接口"><a href="#控制层调用业务层接口" class="headerlink" title="控制层调用业务层接口"></a>控制层调用业务层接口</h1><p><img src="https://img-blog.csdnimg.cn/dcb50e6e5ef442e18cf07411c7277c0e.png" alt="调用业务层接口的方法间接操作数据库"></p>
+<h1 id="前后端对应交互"><a href="#前后端对应交互" class="headerlink" title="前后端对应交互"></a>前后端对应交互</h1><h2 id="分页查询Get"><a href="#分页查询Get" class="headerlink" title="分页查询Get"></a>分页查询Get</h2><p>一个页面要么不分页，要么分页，分页也只能使用同一个分页组件，即便是后面的条件查询，也必须在分页的基础上<br><strong>像下面这种查完不分页的话，在前端是展示不出来的</strong><br><img src="https://img-blog.csdnimg.cn/ff8960944c3e47e88e646afe63d7c4a3.png" alt="错误示例"></p>
+<h3 id="后端-GetMapping-“-currentPage-pageSize-”"><a href="#后端-GetMapping-“-currentPage-pageSize-”" class="headerlink" title="后端@GetMapping(“{currentPage}/{pageSize}”)"></a>后端@GetMapping(“{currentPage}/{pageSize}”)</h3><p><img src="https://img-blog.csdnimg.cn/0f92033ffb954be6a7d2bba187804ebc.png"></p>
+<h3 id="前端钩子函数"><a href="#前端钩子函数" class="headerlink" title="前端钩子函数"></a>前端钩子函数</h3><p><img src="https://img-blog.csdnimg.cn/3c0a0cb658bb49319193dae27ccffdeb.png"></p>
+<h3 id="前端分页查-条件查"><a href="#前端分页查-条件查" class="headerlink" title="前端分页查+条件查"></a>前端分页查+条件查</h3><p><img src="https://img-blog.csdnimg.cn/76f3aa44f3f947c790aa4c8bc62c739b.png" alt="可查id可全查">前端data中定义的是一个变量，而不是对象，所以后端使用@PathVariable来接受<img src="https://img-blog.csdnimg.cn/456e9a2bb20547f6b7f11a3c6778d6b6.png"></p>
+<h3 id="条件查询传路径变量or对象？"><a href="#条件查询传路径变量or对象？" class="headerlink" title="条件查询传路径变量or对象？"></a>条件查询传路径变量or对象？</h3><p>因为这个案例的查询需求是“只要求从ID查询”，所以这里get的第三个参数可以只传一个路径变量this.searchById，后端通过@PathVariable Integer id来接受参数</p>
+<p>如果是需要多条件查，可以通过多个路径变量@PathVariable<br><strong>多条件查如果条件过多，最好直接传一个对象，让后端处理</strong></p>
+<p><strong>但是get方法是不能搭配@RequestBody的，后端直接不要用@RequestBody</strong></p>
+<h2 id="增Post"><a href="#增Post" class="headerlink" title="增Post"></a>增Post</h2><h3 id="后端-RequestBody"><a href="#后端-RequestBody" class="headerlink" title="后端@RequestBody"></a>后端@RequestBody</h3><p><img src="https://img-blog.csdnimg.cn/a1b3590853c5478593ac78014f190673.png"></p>
+<h3 id="前端formData-传对象"><a href="#前端formData-传对象" class="headerlink" title="前端formData:{}传对象"></a>前端formData:{}传对象</h3><p><img src="https://img-blog.csdnimg.cn/472856aa87bb4414b4f56608af9bbf49.png" alt="formData是对象"></p>
+<p><img src="https://img-blog.csdnimg.cn/3e3293406a864102b233ae51c4f4e53c.png"></p>
+<h2 id="删Delete"><a href="#删Delete" class="headerlink" title="删Delete"></a>删Delete</h2><h3 id="后端-删只能通过ID删"><a href="#后端-删只能通过ID删" class="headerlink" title="后端:删只能通过ID删"></a>后端:删只能通过ID删</h3><p><img src="https://img-blog.csdnimg.cn/f523f55642e042a0bb65927913b2cc18.png" alt="不允许删除开发者"></p>
+<h3 id="前端只管传id路径变量"><a href="#前端只管传id路径变量" class="headerlink" title="前端只管传id路径变量"></a>前端只管传id路径变量</h3><p><img src="https://img-blog.csdnimg.cn/30450590f5ca46589a799125d0f81b36.png"></p>
+<h2 id="改Put"><a href="#改Put" class="headerlink" title="改Put"></a>改Put</h2><h3 id="后端：接受对象-RequestBody"><a href="#后端：接受对象-RequestBody" class="headerlink" title="后端：接受对象@RequestBody"></a>后端：接受对象@RequestBody</h3><p><img src="https://img-blog.csdnimg.cn/babc5941f8e249b5921200b2e3e267c2.png"></p>
+<p>前端获取待编辑的数据是不需要分页查询的，因此下面的“非分页条件查询id”是必不可少的</p>
+<p><img src="https://img-blog.csdnimg.cn/93e30f19236b41aeac3b840b6fd6695e.png"></p>
+<h3 id="前端：对于改的逻辑比后端复杂"><a href="#前端：对于改的逻辑比后端复杂" class="headerlink" title="前端：对于改的逻辑比后端复杂"></a>前端：对于改的逻辑比后端复杂</h3><p><img src="https://img-blog.csdnimg.cn/f4cbae77004541c389335095c4bd4b2e.png" alt="绑定点击事件"><br><img src="https://img-blog.csdnimg.cn/7abe1a128d6744eda2ac95753013d829.png" alt="重置表单，清除原有数据"></p>
+<p><img src="https://img-blog.csdnimg.cn/e20417070e1243fa8b6c82c445b87247.png" alt="交互：先读后改"><br>dialogFormVisible4Edit = true后弹出表单，并读取数据<br><img src="https://img-blog.csdnimg.cn/c79b5ed9bcf94d16bc63dbab0088841a.png"><br><img src="https://img-blog.csdnimg.cn/bef7b71f403945d9918ae075545d6552.png" alt="跳转到修改put方法"></p>
 
       
        <hr><span style="font-style: italic;color: gray;"> 生命以负熵为食，归整以抵抗熵增； </span>
