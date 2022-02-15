@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>ZJH&#39;blog</title>
+  <title>Bean的配置，注入，操作，校验 | ZJH&#39;blog</title>
   <meta name="keywords" content="">
-  <meta name="description" content="ZJH&#39;blog">
+  <meta name="description" content="Bean的配置，注入，操作，校验 | ZJH&#39;blog">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="description" content="下载jar包并导入一般是在maven网站上直接搜索需要的jar包下载，并在pom中导入依赖 有时候需要添加systemPath来指定jar包的位置，让springboot引用 fastjson，因为是maven中下载的包，所以要指定scope和systemPath     &lt;dependency&gt;         &lt;groupId&gt;com.alibaba&lt;&#x2F;group">
 <meta property="og:type" content="article">
@@ -62,7 +62,7 @@
 
 
 <body>
-<aside class="nav mobile">
+<aside class="nav">
     <div class="nav-left">
         <a href="/zjh/"
    class="avatar_target">
@@ -595,12 +595,53 @@
         </div>
     </div>
 </aside>
-<div id="post" class="index">
+<div id="post">
     <div class="pjax">
-        <article class="index">
-            <div class="toc-ref">
+        <article id="post-Bean的配置，注入，操作，校验" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BC%95%E5%AF%BC"><span class="toc-text">引导</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%A5%E5%8D%9A%E5%AE%A2%E4%B8%8B%E7%9A%84%E5%BF%AB%E6%8D%B7%E9%94%AE"><span class="toc-text">该博客下的快捷键</span></a></li></ol></li></ol>
+        <h1 class="article-title">Bean的配置，注入，操作，校验</h1>
+    
+    <div class="article-meta">
+        
+        
+        
+        <span class="book">
+            <i class="iconfont icon-category"></i>
+            
+            
+            <a  data-rel="Java后端">Java后端</a>
+            
+        </span>
+        
+        
+    </div>
+    <div class="article-meta">
+        
+            发布时间 : <time class="date" title='最后更新: 2022-02-15 15:34:05'>2022-02-15 15:33</time>
+        
+    </div>
+    <div class="article-meta">
+        
+        <span>字数:824</span>
+        
+        
+        <span id="busuanzi_container_page_pv">
+            阅读 :<span id="busuanzi_value_page_pv">
+                <span class="count-comment">
+                    <span class="spinner">
+                      <div class="cube1"></div>
+                      <div class="cube2"></div>
+                    </span>
+                </span>
+            </span>
+        </span>
+        
+        
+    </div>
+    
+    <div class="toc-ref">
+    
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E7%9A%84%E8%A7%84%E5%88%99"><span class="toc-text">配置的规则</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%B3%A8%E5%85%A5%E7%9A%84%E4%B8%89%E7%A7%8D%E6%96%B9%E5%BC%8F"><span class="toc-text">注入的三种方式</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Component%E6%B3%A8%E5%85%A5"><span class="toc-text">@Component注入</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Bean-ConfigurationProperties"><span class="toc-text">@Bean + @ConfigurationProperties</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#EnableConfigurationProperties-class-class"><span class="toc-text">@EnableConfigurationProperties({class,class})</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Bean%E7%9A%84%E6%93%8D%E4%BD%9C"><span class="toc-text">Bean的操作</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B7%A5%E5%85%B7%E7%B1%BB%E5%AE%9E%E7%8E%B0ApplicationContextAware%E6%8E%A5%E5%8F%A3"><span class="toc-text">工具类实现ApplicationContextAware接口</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Value"><span class="toc-text">@Value</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8D%95%E4%BD%8D%E7%9A%84%E9%85%8D%E7%BD%AE"><span class="toc-text">单位的配置</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B1%9E%E6%80%A7%E6%A0%A1%E9%AA%8Cvalidation-validator"><span class="toc-text">属性校验validation+validator</span></a></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -613,64 +654,203 @@
     }
 </style>
 </div>
-            <h1 id="引导"><a href="#引导" class="headerlink" title="引导"></a>引导</h1><h2 id="该博客下的快捷键"><a href="#该博客下的快捷键" class="headerlink" title="该博客下的快捷键"></a>该博客下的快捷键</h2><table>
-<thead>
-<tr>
-<th align="center">快捷键</th>
-<th align="center">功能</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">s/S</td>
-<td align="center">全屏/取消全屏</td>
-</tr>
-<tr>
-<td align="center">w/W</td>
-<td align="center">打开/关闭文章目录</td>
-</tr>
-<tr>
-<td align="center">i/I</td>
-<td align="center">获取搜索框焦点</td>
-</tr>
-<tr>
-<td align="center">j/J</td>
-<td align="center">向下滑动</td>
-</tr>
-<tr>
-<td align="center">k/K</td>
-<td align="center">向上滑动</td>
-</tr>
-<tr>
-<td align="center">gg/GG</td>
-<td align="center">到最顶端</td>
-</tr>
-<tr>
-<td align="center">shift+G/g</td>
-<td align="center">到最下端</td>
-</tr>
-<tr>
-<td align="center">ESC</td>
-<td align="center">1.如果输入框有内容，清除内容<br>2.如果输入框无内容，失去焦点</td>
-</tr>
-<tr>
-<td align="center">下</td>
-<td align="center">向下选择文章</td>
-</tr>
-<tr>
-<td align="center">上</td>
-<td align="center">向上选择文章</td>
-</tr>
-<tr>
-<td align="center">回车</td>
-<td align="center">打开当前选中的文章，若没有，则默认打开第一个</td>
-</tr>
-</tbody></table>
-<p>到目前为止已经写了<code class="article_number"></code>篇文章， 共<code class="site_word_count"></code>字。</p>
-<p>本站访问人数：<code class="site_uv"></code>人次 ， 访问量：<code class="site_pv"></code>次</p>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="配置的规则"><a href="#配置的规则" class="headerlink" title="配置的规则"></a>配置的规则</h1><ul>
+<li>尽量全都小写</li>
+<li>支持松散绑定(小写数字下划线)</li>
+<li>@Value不支持松散绑定<br><img src="https://img-blog.csdnimg.cn/5a36be72159744ecbc5ced8e2381b893.png" alt="application.yml"></li>
+</ul>
+<h1 id="注入的三种方式"><a href="#注入的三种方式" class="headerlink" title="注入的三种方式"></a>注入的三种方式</h1><p>同一个Bean只能有一个注入，多次注入会报错（Bean是单例的）</p>
+<h2 id="Component注入"><a href="#Component注入" class="headerlink" title="@Component注入"></a>@Component注入</h2><p>1，config类</p>
+<pre><code>@Component//加载配置属性必须先要受spring管控，先注入bean
+@Data//加载配置属性必须要有set
+@ConfigurationProperties(prefix = &quot;aliyossphoto&quot;)
+public class OSSphotoConfig &#123;
+    private String endpoint;
+    private String accessKeyId;
+    private String accessKeySecret;
+    private String bucketName;
+&#125;
+</code></pre>
+<p>2，启动类<br>可以直接 run.getBean(OSSphotoConfig.class)</p>
+<pre><code>@SpringBootApplication
+public class BootAjaxtestApplication &#123;
+    public static void main(String[] args) &#123;
+        ConfigurableApplicationContext run = SpringApplication.run(BootAjaxtestApplication.class, args);
 
-        </article>
-        
-        
+        OSSphotoConfig bean = run.getBean(OSSphotoConfig.class);
+        System.out.println(bean);
+        &#125;
+</code></pre>
+<h2 id="Bean-ConfigurationProperties"><a href="#Bean-ConfigurationProperties" class="headerlink" title="@Bean + @ConfigurationProperties"></a>@Bean + @ConfigurationProperties</h2><p>1,config类不能注入@Component</p>
+<pre><code>@Data//加载配置属性必须要有set
+public class OSSphotoConfig &#123;
+    private String endpoint;
+    private String accessKeyId;
+    private String accessKeySecret;
+    private String bucketName;
+&#125;
+</code></pre>
+<p>2，启动类中需要@Bean注入，至于@ConfigurationProperties(prefix = “”)<br>    写在哪都可以，只要在config类或者启动类中有绑定即可</p>
+<pre><code>@SpringBootApplication
+public class BootAjaxtestApplication &#123;
+
+    @Bean
+    @ConfigurationProperties(prefix = &quot;aliyossphoto&quot;)
+    public OSSphotoConfig getbean()&#123;
+        OSSphotoConfig osSphotoConfig = new OSSphotoConfig();
+        return osSphotoConfig;
+    &#125;
+
+public static void main(String[] args) &#123;
+    ConfigurableApplicationContext run = SpringApplication.run(BootAjaxtestApplication.class, args);
+
+        OSSphotoConfig bean = run.getBean(OSSphotoConfig.class);
+        System.out.println(bean);
+        &#125;
+</code></pre>
+<h2 id="EnableConfigurationProperties-class-class"><a href="#EnableConfigurationProperties-class-class" class="headerlink" title="@EnableConfigurationProperties({class,class})"></a>@EnableConfigurationProperties({class,class})</h2><ul>
+<li>这个注解可以清晰的看见到底注入了什么Bean，同时与@Component冲突，也与@Bean冲突；不过<strong>需要在config类中进行配置绑定</strong></li>
+<li>{}中利用反射，可以同时注入多个Bean</li>
+</ul>
+<p>1，config类</p>
+<pre><code>@ConfigurationProperties(prefix = &quot;aliyossphoto&quot;)
+@Data//加载配置属性必须要有set
+public class OSSphotoConfig &#123;
+    private String endpoint;
+    private String accessKeyId;
+    private String accessKeySecret;
+    private String bucketName;
+&#125;
+</code></pre>
+<p>2，启动类中</p>
+<pre><code>@EnableConfigurationProperties(&#123;OSSphotoConfig.class&#125;)
+@SpringBootApplication
+public class BootAjaxtestApplication &#123;
+
+public static void main(String[] args) &#123;
+    ConfigurableApplicationContext run = SpringApplication.run(BootAjaxtestApplication.class, args);
+
+    OSSphotoConfig bean = run.getBean(OSSphotoConfig.class);
+    System.out.println(bean);
+        &#125;&#125;
+</code></pre>
+<h1 id="Bean的操作"><a href="#Bean的操作" class="headerlink" title="Bean的操作"></a>Bean的操作</h1><ul>
+<li>run.getBean(xxx.class)获得的对象由于@Data的存在可以调用get set方法</li>
+<li>获取属性值除了用get方法还可以用@Value(“${xx.xx}”)</li>
+<li>在主类，测试类，MVC层都可以直接@Autowired获取，但在<strong>普通类需要使用工具类</strong></li>
+</ul>
+<h1 id="工具类实现ApplicationContextAware接口"><a href="#工具类实现ApplicationContextAware接口" class="headerlink" title="工具类实现ApplicationContextAware接口"></a>工具类实现ApplicationContextAware接口</h1><ul>
+<li>任意找一个包下创建一个工具类，这个工具类可以通过反射获取bean，不需要通过@Autowired或@Bean即可在普通类中使用bean</li>
+<li>并且这个工具类是通用的</li>
+<li>使用的时候直接SpringContext.getBean(xxx.class)获取bean即可</li>
+</ul>
+<pre><code>    @Component
+    public class SpringContextUtil implements ApplicationContextAware &#123;
+    private static ApplicationContext applicationContext;
+
+    @Override
+    public void setApplicationContext(ApplicationContext context) throws     BeansException &#123;
+        applicationContext = context;
+    &#125;
+
+    //静态加载applicationContext
+    public static ApplicationContext getApplicationContext() &#123;
+        return applicationContext;
+    &#125;
+    //通过反射获取Bean
+    public static &lt;T&gt; T getBean(Class&lt;T&gt; requiredType)&#123;
+        return getApplicationContext().getBean(requiredType);
+    &#125;
+    //通过id名获取bean
+    public static &lt;T&gt; T getBean(String name)&#123;
+        return (T) getApplicationContext().getBean(name);
+    &#125;
+    &#125;
+</code></pre>
+<h1 id="Value"><a href="#Value" class="headerlink" title="@Value"></a>@Value</h1><h1 id="单位的配置"><a href="#单位的配置" class="headerlink" title="单位的配置"></a>单位的配置</h1><p>@XxxxxUnit</p>
+<h1 id="属性校验validation-validator"><a href="#属性校验validation-validator" class="headerlink" title="属性校验validation+validator"></a>属性校验validation+validator</h1><p>1，maven坐标，二者缺一不可<br>1,1 JSR303规范</p>
+<pre><code>    &lt;dependency&gt;
+        &lt;groupId&gt;javax.validation&lt;/groupId&gt;
+        &lt;artifactId&gt;validation-api&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+</code></pre>
+<p>1,2 Hibernate validator属性校验器</p>
+<pre><code>    &lt;dependency&gt;
+        &lt;groupId&gt;org.hibernate.validator&lt;/groupId&gt;
+        &lt;artifactId&gt;hibernate-validator&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+</code></pre>
+<p>2，开启属性注入校验@Validated+@Max等</p>
+<pre><code>@ConfigurationProperties(prefix = &quot;aliyossphoto&quot;)
+@Data//加载配置属性必须要有set
+@Validated
+public class OSSphotoConfig &#123;
+  @Max(value = 200, message = &quot;最大值不超过200&quot;)
+  @Min(value = 0 , message = &quot;最小值不能低于0&quot;)
+  private Integer age;
+&#125;
+</code></pre>
+<p>校验规则有很多，有具体需要的时候搜一下就好</p>
+
+      
+       <hr><span style="font-style: italic;color: gray;"> 生命以负熵为食，归整以抵抗熵增； </span>
+    </div>
+</article>
+
+
+
+
+
+
+
+    
+        <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="//cdn.jsdelivr.net/npm/mathjax@2.7.8/unpacked/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+<input type="hidden" id="MathJax-js"
+        value="//cdn.jsdelivr.net/npm/mathjax@2.7.8/unpacked/MathJax.js?config=TeX-MML-AM_CHTML">
+</input>
+    
+
+
+
+
     </div>
     <div class="copyright">
         <p class="footer-entry">
@@ -679,11 +859,11 @@
 <p class="footer-entry">"生命以负熵为食"
 
     </div>
-</div>
-<div class="full-toc">
-    <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
+    <div class="full-toc">
+        <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
 <a class="" id="rocket" ></a>
 
+    </div>
 </div>
 
 </body>

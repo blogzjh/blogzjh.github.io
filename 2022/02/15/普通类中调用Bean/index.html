@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>ZJH&#39;blog</title>
+  <title>普通类中调用Bean | ZJH&#39;blog</title>
   <meta name="keywords" content="">
-  <meta name="description" content="ZJH&#39;blog">
+  <meta name="description" content="普通类中调用Bean | ZJH&#39;blog">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="description" content="下载jar包并导入一般是在maven网站上直接搜索需要的jar包下载，并在pom中导入依赖 有时候需要添加systemPath来指定jar包的位置，让springboot引用 fastjson，因为是maven中下载的包，所以要指定scope和systemPath     &lt;dependency&gt;         &lt;groupId&gt;com.alibaba&lt;&#x2F;group">
 <meta property="og:type" content="article">
@@ -62,7 +62,7 @@
 
 
 <body>
-<aside class="nav mobile">
+<aside class="nav">
     <div class="nav-left">
         <a href="/zjh/"
    class="avatar_target">
@@ -595,12 +595,53 @@
         </div>
     </div>
 </aside>
-<div id="post" class="index">
+<div id="post">
     <div class="pjax">
-        <article class="index">
-            <div class="toc-ref">
+        <article id="post-普通类中调用Bean" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BC%95%E5%AF%BC"><span class="toc-text">引导</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%A5%E5%8D%9A%E5%AE%A2%E4%B8%8B%E7%9A%84%E5%BF%AB%E6%8D%B7%E9%94%AE"><span class="toc-text">该博客下的快捷键</span></a></li></ol></li></ol>
+        <h1 class="article-title">普通类中调用Bean</h1>
+    
+    <div class="article-meta">
+        
+        
+        
+        <span class="book">
+            <i class="iconfont icon-category"></i>
+            
+            
+            <a  data-rel="Java">Java</a>
+            
+        </span>
+        
+        
+    </div>
+    <div class="article-meta">
+        
+            发布时间 : <time class="date" title='最后更新: 2022-02-15 15:30:20'>2022-02-15 15:29</time>
+        
+    </div>
+    <div class="article-meta">
+        
+        <span>字数:374</span>
+        
+        
+        <span id="busuanzi_container_page_pv">
+            阅读 :<span id="busuanzi_value_page_pv">
+                <span class="count-comment">
+                    <span class="spinner">
+                      <div class="cube1"></div>
+                      <div class="cube2"></div>
+                    </span>
+                </span>
+            </span>
+        </span>
+        
+        
+    </div>
+    
+    <div class="toc-ref">
+    
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%97%AE%E9%A2%98"><span class="toc-text">问题</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Bean%E7%BB%93%E6%9E%84"><span class="toc-text">Bean结构</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%97%9B%E7%82%B9"><span class="toc-text">痛点</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B7%A5%E5%85%B7%E7%B1%BB%E5%AE%9E%E7%8E%B0ApplicationContextAware%E6%8E%A5%E5%8F%A3"><span class="toc-text">工具类实现ApplicationContextAware接口</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9C%A8%E6%99%AE%E9%80%9A%E7%B1%BB%E4%B8%AD%E8%B0%83%E7%94%A8%E6%8E%A5%E5%8F%A3%E7%9A%84%E9%9D%99%E6%80%81%E6%96%B9%E6%B3%95%E8%8E%B7%E5%8F%96bean"><span class="toc-text">在普通类中调用接口的静态方法获取bean</span></a></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -613,64 +654,107 @@
     }
 </style>
 </div>
-            <h1 id="引导"><a href="#引导" class="headerlink" title="引导"></a>引导</h1><h2 id="该博客下的快捷键"><a href="#该博客下的快捷键" class="headerlink" title="该博客下的快捷键"></a>该博客下的快捷键</h2><table>
-<thead>
-<tr>
-<th align="center">快捷键</th>
-<th align="center">功能</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">s/S</td>
-<td align="center">全屏/取消全屏</td>
-</tr>
-<tr>
-<td align="center">w/W</td>
-<td align="center">打开/关闭文章目录</td>
-</tr>
-<tr>
-<td align="center">i/I</td>
-<td align="center">获取搜索框焦点</td>
-</tr>
-<tr>
-<td align="center">j/J</td>
-<td align="center">向下滑动</td>
-</tr>
-<tr>
-<td align="center">k/K</td>
-<td align="center">向上滑动</td>
-</tr>
-<tr>
-<td align="center">gg/GG</td>
-<td align="center">到最顶端</td>
-</tr>
-<tr>
-<td align="center">shift+G/g</td>
-<td align="center">到最下端</td>
-</tr>
-<tr>
-<td align="center">ESC</td>
-<td align="center">1.如果输入框有内容，清除内容<br>2.如果输入框无内容，失去焦点</td>
-</tr>
-<tr>
-<td align="center">下</td>
-<td align="center">向下选择文章</td>
-</tr>
-<tr>
-<td align="center">上</td>
-<td align="center">向上选择文章</td>
-</tr>
-<tr>
-<td align="center">回车</td>
-<td align="center">打开当前选中的文章，若没有，则默认打开第一个</td>
-</tr>
-</tbody></table>
-<p>到目前为止已经写了<code class="article_number"></code>篇文章， 共<code class="site_word_count"></code>字。</p>
-<p>本站访问人数：<code class="site_uv"></code>人次 ， 访问量：<code class="site_pv"></code>次</p>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><ul>
+<li>@Autowired @Bean注入但是空指针异常</li>
+<li>测试类中能获取，但普通类中空指针</li>
+<li>需要在普通类中调用bean</li>
+</ul>
+<h1 id="Bean结构"><a href="#Bean结构" class="headerlink" title="Bean结构"></a>Bean结构</h1><p><img src="https://img-blog.csdnimg.cn/4e11edb32c7143d29c9a24204b5cee88.png" alt="yml"><br><img src="https://img-blog.csdnimg.cn/6b0d4d06be02405aa1f62619fad020b9.png" alt="bean类"></p>
+<h1 id="痛点"><a href="#痛点" class="headerlink" title="痛点"></a>痛点</h1><p>这样的结构可以直接在@Controller层 @Service层 @Mapper层  @SpringBootApplication启动类中 @SpringBootTest测试类中<br>直接通过</p>
+<pre><code>@Autowired 
+private OSSphotoConfig osspc;
+</code></pre>
+<p>来获取bean的实例，并且可以正常调用，但是这些调用方的类都不是普通类，有时需要在普通类中调用bean，通过@Autowired @Bean等方法注入都会失效，运行会报空指针异常，以下使用工具类解决这个问题</p>
+<h1 id="工具类实现ApplicationContextAware接口"><a href="#工具类实现ApplicationContextAware接口" class="headerlink" title="工具类实现ApplicationContextAware接口"></a>工具类实现ApplicationContextAware接口</h1><ul>
+<li>任意找一个包下创建一个工具类，这个工具类可以通过反射获取bean，不需要通过@Autowired或@Bean即可在普通类中使用bean</li>
+<li>并且这个工具类是通用的</li>
+</ul>
+<pre><code>    @Component
+    public class SpringContexUtil implements ApplicationContextAware &#123;
+    private static ApplicationContext applicationContext;
 
-        </article>
-        
-        
+    @Override
+    public void setApplicationContext(ApplicationContext context) throws     BeansException &#123;
+        applicationContext = context;
+    &#125;
+
+    //静态加载applicationContext
+    public static ApplicationContext getApplicationContext() &#123;
+        return applicationContext;
+    &#125;
+    //通过反射获取Bean
+    public static &lt;T&gt; T getBean(Class&lt;T&gt; requiredType)&#123;
+        return getApplicationContext().getBean(requiredType);
+    &#125;
+    //通过id名获取bean
+    public static &lt;T&gt; T getBean(String name)&#123;
+        return (T) getApplicationContext().getBean(name);
+    &#125;
+    &#125;
+</code></pre>
+<h1 id="在普通类中调用接口的静态方法获取bean"><a href="#在普通类中调用接口的静态方法获取bean" class="headerlink" title="在普通类中调用接口的静态方法获取bean"></a>在普通类中调用接口的静态方法获取bean</h1><p><img src="https://img-blog.csdnimg.cn/19bb9798ee0c4dadb408bb93be858b10.png"></p>
+<p>用这种方法就不会报错了</p>
+<p>引用一句话——“如果说BeanFactory是Spring的心脏，那么ApplicationContext就是完整的身躯了。ApplicationContext由BeanFactory派生而来，提供了更多面向实际应用的功能。”</p>
+
+      
+       <hr><span style="font-style: italic;color: gray;"> 生命以负熵为食，归整以抵抗熵增； </span>
+    </div>
+</article>
+
+
+
+
+
+
+
+    
+        <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="//cdn.jsdelivr.net/npm/mathjax@2.7.8/unpacked/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+<input type="hidden" id="MathJax-js"
+        value="//cdn.jsdelivr.net/npm/mathjax@2.7.8/unpacked/MathJax.js?config=TeX-MML-AM_CHTML">
+</input>
+    
+
+
+
+
     </div>
     <div class="copyright">
         <p class="footer-entry">
@@ -679,11 +763,11 @@
 <p class="footer-entry">"生命以负熵为食"
 
     </div>
-</div>
-<div class="full-toc">
-    <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
+    <div class="full-toc">
+        <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
 <a class="" id="rocket" ></a>
 
+    </div>
 </div>
 
 </body>
