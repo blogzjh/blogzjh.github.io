@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>多线程和线程同步汇总 | ZJH&#39;blog</title>
+  <meta name="keywords" content="">
+  <meta name="description" content="多线程和线程同步汇总 | ZJH&#39;blog">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="description" content="池化思想资源反复利用，用后归还，免去大量建立销毁浪费的时间和资源，建立和销毁占用的资源还是很多的 字符串常量池常量池独立于栈和堆，以下两种创建方式区别1，直接保存常量池的内容String s1 &#x3D; “直接保存” 2，new String间接保存String s2 &#x3D; new String(“间接保存”) 区别： 直接保存，无论创建多少个都是相同的 间接保存实际上保存的是地址值，指向线程池，此方式会">
+<meta property="og:type" content="article">
+<meta property="og:title" content="池化思想">
+<meta property="og:url" content="https://zjhblog.gitee.io/2022/02/15/%E6%B1%A0%E5%8C%96%E6%80%9D%E6%83%B3/index.html">
+<meta property="og:site_name" content="ZJH&#39;blog">
+<meta property="og:description" content="池化思想资源反复利用，用后归还，免去大量建立销毁浪费的时间和资源，建立和销毁占用的资源还是很多的 字符串常量池常量池独立于栈和堆，以下两种创建方式区别1，直接保存常量池的内容String s1 &#x3D; “直接保存” 2，new String间接保存String s2 &#x3D; new String(“间接保存”) 区别： 直接保存，无论创建多少个都是相同的 间接保存实际上保存的是地址值，指向线程池，此方式会">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/54b57105930740ba8eacad4690c0843d.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8af4df5f8e154e68afbcb752262d9064.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/6323c68d6d694d1fb8e62f6ae49cd152.png">
+<meta property="article:published_time" content="2022-02-15T06:53:32.000Z">
+<meta property="article:modified_time" content="2022-02-15T06:54:31.935Z">
+<meta property="article:author" content="ZJH">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/54b57105930740ba8eacad4690c0843d.png">
+
+
+<link rel="icon" href="/img/QQ图片20211224224200.jpg">
+
+<link href="/zjh/css/style.css?v=1.1.0" rel="stylesheet">
+
+<link href="/zjh/css/hl_theme/atom-dark.css?v=1.1.0" rel="stylesheet">
+
+<link href="//cdn.jsdelivr.net/npm/animate.css@4.1.0/animate.min.css" rel="stylesheet">
+
+<script src="//cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+<script src="/zjh/js/titleTip.js?v=1.1.0" ></script>
+
+<script src="//cdn.jsdelivr.net/npm/highlightjs@9.16.2/highlight.pack.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+<script src="//cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js"></script>
+
+
+
+<script src="//cdn.jsdelivr.net/npm/jquery.cookie@1.4.1/jquery.cookie.min.js" ></script>
+
+<script src="/zjh/js/iconfont.js?v=1.1.0" ></script>
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<div style="display: none">
+  <input class="theme_disqus_on" value="false">
+  <input class="theme_preload_comment" value="">
+  <input class="theme_blog_path" value="/zjh">
+  <input id="theme_shortcut" value="true" />
+  <input id="theme_highlight_on" value="true" />
+  <input id="theme_code_copy" value="true" />
+</div>
+
+
+
+<body>
+<aside class="nav">
+    <div class="nav-left">
+        <a href="/zjh/"
+   class="avatar_target">
+    <img class="avatar"
+         src="/zjh/img/QQ图片20211224224200.jpg"/>
+</a>
+<div class="author">
+    <span>ZJH</span>
+</div>
+
+<div class="icon">
+    
+        
+            <a title="github"
+               href="https://github.com/BetterZJH"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-github"></use>
+                    </svg>
+                
+            </a>
+        
+    
+        
+            <a title="csdn"
+               href="https://blog.csdn.net/m0_56079407"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-csdn"></use>
+                    </svg>
+                
+            </a>
+        
+    
+        
+            <a title="email"
+               href="mailto:847829122@qq.com"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-email"></use>
+                    </svg>
+                
+            </a>
+        
+    
+        
+            <a title="qq"
+               href="http://wpa.qq.com/msgrd?v=3&uin=847829122&site=qq&menu=yes"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-qq"></use>
+                    </svg>
+                
+            </a>
+        
+    
+</div>
+
+
+
+
+<ul>
+    <li>
+        <div class="all active" data-rel="全部文章">全部文章
+            
+                <small>(29)</small>
+            
+        </div>
+    </li>
+    
+        
+            
+                <li>
+                    <div data-rel="工具">
+                        
+                        工具
+                        <small>(3)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="数据结构算法">
+                        
+                        数据结构算法
+                        <small>(2)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="机器学习">
+                        
+                        机器学习
+                        <small>(2)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="前端">
+                        
+                        前端
+                        <small>(1)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="Bug">
+                        
+                        Bug
+                        <small>(3)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="Demo">
+                        
+                        Demo
+                        <small>(1)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="Java">
+                        
+                        Java
+                        <small>(11)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="Java后端">
+                        
+                        Java后端
+                        <small>(5)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+</ul>
+<div class="left-bottom">
+    <div class="menus">
+        
+            
+            
+            
+    </div>
+    <div>
+        
+        
+    </div>
+</div>
+<input type="hidden" id="yelog_site_posts_number" value="29">
+<input type="hidden" id="yelog_site_word_count" value="42.1k">
+<div style="display: none">
+    <span id="busuanzi_value_site_uv"></span>
+    <span id="busuanzi_value_site_pv"></span>
+</div>
+
+    </div>
+    <div class="nav-right">
+        <div class="friends-area">
+    <div class="friends-title">
+        友情链接
+        <i class="iconfont icon-left"></i>
+    </div>
+    <div class="friends-content">
+        <ul>
+            
+            <li><a target="_blank" href="http://yelog.org/">叶落阁</a></li>
+            
+        </ul>
+    </div>
+</div>
+        <div class="title-list">
+    <div class="right-top">
+        <div id="default-panel">
+            <i class="iconfont icon-search" data-title="搜索 快捷键 i"></i>
+            <div class="right-title">全部文章</div>
+            <i class="iconfont icon-file-tree" data-title="切换到大纲视图 快捷键 w"></i>
+        </div>
+        <div id="search-panel">
+            <i class="iconfont icon-left" data-title="返回"></i>
+            <input id="local-search-input" autocomplete="off"/>
+            <label class="border-line" for="input"></label>
+            <i class="iconfont icon-case-sensitive" data-title="大小写敏感"></i>
+            <i class="iconfont icon-tag" data-title="标签"></i>
+        </div>
+        <div id="outline-panel" style="display: none">
+            <div class="right-title">大纲</div>
+            <i class="iconfont icon-list" data-title="切换到文章列表"></i>
+        </div>
+    </div>
+
+    <div class="tags-list">
+    <input id="tag-search" />
+    <div class="tag-wrapper">
+        
+    </div>
+
+</div>
+
+    
+    <nav id="title-list-nav">
+        
+        <a id="top" class="全部文章 工具 "
+           href="/zjh/2021/12/25/IDEA%E5%B8%B8%E7%94%A8%E5%BF%AB%E6%8D%B7%E9%94%AE/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="IDEA常用快捷键">IDEA常用快捷键</span>
+            <span class="post-date" title="2021-12-25 21:55:46">2021/12/25</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/02/15/%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E6%B1%87%E6%80%BB/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="异常处理汇总">异常处理汇总</span>
+            <span class="post-date" title="2022-02-15 14:55:04">2022/02/15</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/02/15/%E6%B1%A0%E5%8C%96%E6%80%9D%E6%83%B3/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="池化思想">池化思想</span>
+            <span class="post-date" title="2022-02-15 14:53:32">2022/02/15</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/02/15/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E6%B1%87%E6%80%BB/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="面向对象汇总">面向对象汇总</span>
+            <span class="post-date" title="2022-02-15 14:52:05">2022/02/15</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/02/15/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%92%8C%E7%BA%BF%E7%A8%8B%E5%90%8C%E6%AD%A5%E6%B1%87%E6%80%BB/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="多线程和线程同步汇总">多线程和线程同步汇总</span>
+            <span class="post-date" title="2022-02-15 14:51:32">2022/02/15</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/02/09/%E5%AE%9E%E7%8E%B0%E6%9C%8B%E5%8F%8B%E5%9C%88%E4%B8%8B%E6%8B%89%E5%88%B7%E6%96%B0%E6%8B%BC%E6%8E%A5%E7%9A%84%E6%80%9D%E8%B7%AF/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="实现朋友圈下拉刷新拼接的思路">实现朋友圈下拉刷新拼接的思路</span>
+            <span class="post-date" title="2022-02-09 15:40:54">2022/02/09</span>
+        </a>
+        
+        <a  class="全部文章 Bug "
+           href="/zjh/2022/02/09/IO%E4%BC%A0%E8%BE%93%E5%9B%BE%E7%89%87%E8%83%BD%E6%89%93%E5%BC%80%E4%BD%86%E8%8A%B1%E5%B1%8F/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="IO传输图片能打开但花屏">IO传输图片能打开但花屏</span>
+            <span class="post-date" title="2022-02-09 15:39:11">2022/02/09</span>
+        </a>
+        
+        <a  class="全部文章 Demo "
+           href="/zjh/2022/01/30/NXB%E6%88%90%E5%91%98%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F%E5%8D%95%E9%A1%B5%E5%85%A8%E6%A0%88/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="NXB成员管理系统单页crud">NXB成员管理系统单页crud</span>
+            <span class="post-date" title="2022-01-30 12:50:33">2022/01/30</span>
+        </a>
+        
+        <a  class="全部文章 Bug "
+           href="/zjh/2022/01/28/axios%E6%97%B6%E9%97%B4%E4%BA%A4%E4%BA%92%E6%8A%A5400/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="axios时间交互报400">axios时间交互报400</span>
+            <span class="post-date" title="2022-01-28 21:21:56">2022/01/28</span>
+        </a>
+        
+        <a  class="全部文章 Bug "
+           href="/zjh/2022/01/28/BindingException-Invalid-bound-statement-not-found/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="BindingException: Invalid bound statement (not found)">BindingException: Invalid bound statement (not found)</span>
+            <span class="post-date" title="2022-01-28 21:09:28">2022/01/28</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/01/28/springboot%E6%95%B4%E5%90%88SSM/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="springboot整合SSM">springboot整合SSM</span>
+            <span class="post-date" title="2022-01-28 21:08:03">2022/01/28</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/01/28/springboot%E6%B3%A8%E6%84%8F%E7%82%B91/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="springboot注意点1">springboot注意点1</span>
+            <span class="post-date" title="2022-01-28 21:06:38">2022/01/28</span>
+        </a>
+        
+        <a  class="全部文章 前端 "
+           href="/zjh/2022/01/26/axios-element-vue%E7%9A%84%E5%89%8D%E7%AB%AF%E6%95%B0%E6%8D%AE%E4%BA%A4%E4%BA%92%E6%A1%86%E6%9E%B6/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="axios+element+vue的前端数据交互框架">axios+element+vue的前端数据交互框架</span>
+            <span class="post-date" title="2022-01-26 21:38:41">2022/01/26</span>
+        </a>
+        
+        <a  class="全部文章 "
+           href="/zjh/2022/01/25/File%E7%9A%84%E4%B8%80%E4%BA%9B%E7%BB%86%E8%8A%82/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="File的一些细节">File的一些细节</span>
+            <span class="post-date" title="2022-01-25 21:15:36">2022/01/25</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/01/25/IO-TCP-URL%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="IO:TCP URL网络编程">IO:TCP URL网络编程</span>
+            <span class="post-date" title="2022-01-25 21:12:23">2022/01/25</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/01/25/JDBC/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="JDBC">JDBC</span>
+            <span class="post-date" title="2022-01-25 21:10:07">2022/01/25</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/01/25/SSMp%E6%95%B4%E5%90%88%E6%A1%88%E4%BE%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="SSMp整合案例">SSMp整合案例</span>
+            <span class="post-date" title="2022-01-25 21:06:05">2022/01/25</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/01/20/Springboot%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Springboot基本结构">Springboot基本结构</span>
+            <span class="post-date" title="2022-01-20 20:10:08">2022/01/20</span>
+        </a>
+        
+        <a  class="全部文章 工具 "
+           href="/zjh/2022/01/16/%E6%96%87%E4%BB%B6%E5%8A%A0%E5%AF%86%E8%A7%A3%E5%AF%86%E5%99%A8/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="软件:文件加密解密器">软件:文件加密解密器</span>
+            <span class="post-date" title="2022-01-16 21:28:42">2022/01/16</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/01/16/IO%E6%B5%81/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="IO流">IO流</span>
+            <span class="post-date" title="2022-01-16 21:26:38">2022/01/16</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/01/13/File%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="File常用操作">File常用操作</span>
+            <span class="post-date" title="2022-01-13 11:36:05">2022/01/13</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/zjh/2022/01/11/%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E6%B3%B0%E5%9D%A6%E5%B0%BC%E5%85%8B%E5%8F%B7%E8%8E%B7%E6%95%91%E9%A2%84%E6%B5%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="随机森林——泰坦尼克号获救预测">随机森林——泰坦尼克号获救预测</span>
+            <span class="post-date" title="2022-01-11 03:06:10">2022/01/11</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/01/03/Java%E9%9B%86%E5%90%88/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Java集合">Java集合</span>
+            <span class="post-date" title="2022-01-03 10:02:27">2022/01/03</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/01/02/Java%E6%B3%9B%E5%9E%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Java泛型">Java泛型</span>
+            <span class="post-date" title="2022-01-02 19:51:37">2022/01/02</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/zjh/2022/01/01/%E5%86%B3%E7%AD%96%E6%A0%91-%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E7%94%A8%E6%88%B7%E6%B5%81%E5%A4%B1%E9%A2%84%E6%B5%8B%E7%9A%84%E6%A1%88%E4%BE%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="决策树/随机森林——用户流失预测的案例">决策树/随机森林——用户流失预测的案例</span>
+            <span class="post-date" title="2022-01-01 00:41:40">2022/01/01</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2021/12/25/%E5%9B%9E%E5%BD%A2%E9%92%88%E6%95%B0%E5%AD%97%E7%9F%A9%E9%98%B5Java%E5%AE%9E%E7%8E%B0/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="回形针数字矩阵Java实现">回形针数字矩阵Java实现</span>
+            <span class="post-date" title="2021-12-25 02:07:12">2021/12/25</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2021/12/25/Java%E5%9B%9B%E7%A7%8Dnext%E7%94%A8%E6%B3%95/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Java四种next用法">Java四种next用法</span>
+            <span class="post-date" title="2021-12-25 01:59:30">2021/12/25</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2021/12/25/RLE%E7%AE%97%E6%B3%95%E7%9A%84Java%E5%AE%9E%E7%8E%B0/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="RLE算法的Java实现">RLE算法的Java实现</span>
+            <span class="post-date" title="2021-12-25 01:35:20">2021/12/25</span>
+        </a>
+        
+        <a  class="全部文章 工具 "
+           href="/zjh/2021/12/24/MarkDown%E5%B8%B8%E7%94%A8%E8%AF%AD%E6%B3%95/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="MarkDown常用语法">MarkDown常用语法</span>
+            <span class="post-date" title="2021-12-24 23:33:22">2021/12/24</span>
+        </a>
+        
+        <div id="no-item-tips">
+
+        </div>
+    </nav>
+    <div id="outline-list">
+    </div>
+</div>
+
+    </div>
+    <div class="hide-list">
+        <div class="semicircle" data-title="切换全屏 快捷键 s">
+            <div class="brackets first"><</div>
+            <div class="brackets">&gt;</div>
+        </div>
+    </div>
+</aside>
+<div id="post">
+    <div class="pjax">
+        <article id="post-多线程和线程同步汇总" class="article article-type-post" itemscope itemprop="blogPost">
+    
+        <h1 class="article-title">多线程和线程同步汇总</h1>
+    
+    <div class="article-meta">
+        
+        
+        
+        <span class="book">
+            <i class="iconfont icon-category"></i>
+            
+            
+            <a  data-rel="Java">Java</a>
+            
+        </span>
+        
+        
+    </div>
+    <div class="article-meta">
+        
+            发布时间 : <time class="date" title='最后更新: 2022-02-15 14:52:47'>2022-02-15 14:51</time>
+        
+    </div>
+    <div class="article-meta">
+        
+        <span>字数:4k</span>
+        
+        
+        <span id="busuanzi_container_page_pv">
+            阅读 :<span id="busuanzi_value_page_pv">
+                <span class="count-comment">
+                    <span class="spinner">
+                      <div class="cube1"></div>
+                      <div class="cube2"></div>
+                    </span>
+                </span>
+            </span>
+        </span>
+        
+        
+    </div>
+    
+    <div class="toc-ref">
+    
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%A4%9A%E7%BA%BF%E7%A8%8B"><span class="toc-text">多线程</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F-%E8%BF%9B%E7%A8%8B-%E7%BA%BF%E7%A8%8B"><span class="toc-text">程序 进程 线程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CPU%E7%9A%84%E5%8D%95%E6%A0%B8%E5%92%8C%E5%A4%9A%E6%A0%B8"><span class="toc-text">CPU的单核和多核</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B9%B6%E5%8F%91%E3%80%81%E5%B9%B6%E8%A1%8C"><span class="toc-text">并发、并行</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%88%9B%E5%BB%BA%E5%92%8C%E4%BD%BF%E7%94%A8"><span class="toc-text">多线程的创建和使用</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BC%A0%E7%BB%9F%E5%A4%9A%E7%BA%BF%E7%A8%8B"><span class="toc-text">传统多线程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Thread%E7%B1%BB%E7%9A%84%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95"><span class="toc-text">Thread类的常用方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#sleep-yield-join-wait-notify%E7%9A%84%E5%8C%BA%E5%88%AB%E6%94%BE%E5%9C%A8%E5%90%8E%E9%9D%A2%E7%9A%84%E7%BA%BF%E7%A8%8B%E5%90%8C%E6%AD%A5%E4%B8%AD"><span class="toc-text">sleep yield join wait notify的区别放在后面的线程同步中</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Runnable%E6%8E%A5%E5%8F%A3%EF%BC%9A%E4%BD%9C%E4%B8%BAThread%E5%AF%B9%E8%B1%A1%E7%9A%84%E6%9E%84%E9%80%A0%E5%BD%A2%E5%8F%82"><span class="toc-text">Runnable接口：作为Thread对象的构造形参</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Callable%E6%8E%A5%E5%8F%A3%EF%BC%9A%E5%80%9F%E5%8A%A9FutureTask%E8%A7%A3%E8%80%A6%E5%90%88"><span class="toc-text">Callable接口：借助FutureTask解耦合</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E6%B1%A0"><span class="toc-text">线程池</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%8E%E4%BC%A0%E7%BB%9F%E7%9B%B8%E6%AF%94%E7%9A%84%E4%BC%98%E7%82%B9"><span class="toc-text">与传统相比的优点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E6%B1%A0%E6%A8%A1%E5%9E%8B%E2%80%94%E2%80%94%E9%93%B6%E8%A1%8C"><span class="toc-text">线程池模型——银行</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%88%9B%E5%BB%BA"><span class="toc-text">线程池创建</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E5%90%8C%E6%AD%A5"><span class="toc-text">线程同步</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%94%81%E6%9C%BA%E5%88%B6"><span class="toc-text">锁机制</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%BB%E9%94%81"><span class="toc-text">死锁</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%82%B2%E8%A7%82%E9%94%81"><span class="toc-text">悲观锁</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B9%90%E8%A7%82%E9%94%81"><span class="toc-text">乐观锁</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%BB%E9%94%81-S%E9%94%81-%E5%85%B1%E4%BA%AB%E9%94%81"><span class="toc-text">读锁(S锁)(共享锁)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%99%E9%94%81-X%E9%94%81-%E6%8E%92%E4%BB%96%E9%94%81"><span class="toc-text">写锁(X锁)(排他锁)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%AC%E5%B9%B3%E9%94%81"><span class="toc-text">公平锁</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%9D%9E%E5%85%AC%E5%B9%B3%E9%94%81"><span class="toc-text">非公平锁</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#volatile%E5%85%B3%E9%94%AE%E5%AD%97"><span class="toc-text">volatile关键字</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#synchronized%E5%85%B3%E9%94%AE%E5%AD%97"><span class="toc-text">synchronized关键字</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%8C%E6%AD%A5%E6%96%B9%E6%B3%95-%E7%B2%97%E7%B2%92%E5%BA%A6%E9%94%81"><span class="toc-text">同步方法(粗粒度锁)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%8C%E6%AD%A5%E4%BB%A3%E7%A0%81%E5%9D%97-%E7%BB%86%E7%B2%92%E5%BA%A6%E9%94%81"><span class="toc-text">同步代码块(细粒度锁)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Lock%E6%8E%A5%E5%8F%A3"><span class="toc-text">Lock接口</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#ReentrantLock%E6%8E%A5%E5%8F%A3"><span class="toc-text">ReentrantLock接口</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BE%8B%E5%AD%90"><span class="toc-text">例子</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#sleep-yield-join-wait-notify"><span class="toc-text">sleep yield join wait notify</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#CPU%E8%B5%84%E6%BA%90%E8%A7%92%E5%BA%A6"><span class="toc-text">CPU资源角度</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#sleep%E7%BA%BF%E7%A8%8B%E4%BC%91%E7%9C%A0"><span class="toc-text">sleep线程休眠</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#yield%E7%BA%BF%E7%A8%8B%E8%AE%A9%E6%AD%A5"><span class="toc-text">yield线程让步</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E5%90%8C%E6%AD%A5%E8%A7%92%E5%BA%A6"><span class="toc-text">线程同步角度</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#wati"><span class="toc-text">wati</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#notify-notifyAll"><span class="toc-text">notify notifyAll</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9%E8%B1%A1%E5%86%85%E9%83%A8%E9%94%81"><span class="toc-text">对象内部锁</span></a></li></ol></li></ol></li></ol>
+    
+<style>
+    .left-col .switch-btn,
+    .left-col .switch-area {
+        display: none;
+    }
+    .toc-level-3 i,
+    .toc-level-3 ol {
+        display: none !important;
+    }
+</style>
+</div>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="多线程"><a href="#多线程" class="headerlink" title="多线程"></a>多线程</h1><h2 id="程序-进程-线程"><a href="#程序-进程-线程" class="headerlink" title="程序 进程 线程"></a>程序 进程 线程</h2><ul>
+<li><p>程序：静态的代码，没有运行起来的才叫程序<br>eg：文件夹中的所有文件<br>整个文件夹内包括的所有静态代码的集合就是程序</p>
+</li>
+<li><p>进程：是程序的一次运行or正在运行的一个程序，是一个动态的过程，并且有自身的产生、存在、消亡的过程——生命周期<br>eg：运行中的QQ、运行中的LOL、运行中的360安全卫士</p>
+</li>
+<li><p>线程：进程可以细分为线程，是程序内部的一条执行路径。如果一个进程可以同时并行执行多个线程，就是支持多线程的。<br>线程是调度和执行的单位，有独立的运行栈和程序计数器，线程切换的开销小<br>一个进程中多个线程共享相同的资源，因此可以进程间通信更高效，但也带来了安全隐患<br>eg：同时扫漏洞、扫毒、清理垃圾就是多线程，多线程增加了cpu利用率<br>eg：图形化界面的基本都是多线程<br>eg：QQ同时有很多人互相发消息</p>
+</li>
+</ul>
+<ul>
+<li>一个java应用程序java.exe<strong>至少</strong>有三个线程：main()主线程、gc()垃圾回收线程、异常处理线程，还可以有内存监控 操作日志</li>
+</ul>
+<h2 id="CPU的单核和多核"><a href="#CPU的单核和多核" class="headerlink" title="CPU的单核和多核"></a>CPU的单核和多核</h2><ul>
+<li>单核CPU：实际上是一种假的多线程，表象的多线程实际上是快速在不同线程之间切换（<strong>时分复用</strong>），是一种并发</li>
+</ul>
+<p>eg：同一个进程，使用单核cpu，单线程比多线程更快，<strong>因为没有线程切换时间</strong></p>
+<ul>
+<li>多核CPU：可以实现并行，且</li>
+</ul>
+<p>eg：现在的很多手机都是8核心，但这8核并不是完全相同，当手机写备忘录时，<strong>调用功耗小功能更弱的核</strong>，玩游戏时调用更强但功耗大的核</p>
+<h2 id="并发、并行"><a href="#并发、并行" class="headerlink" title="并发、并行"></a>并发、并行</h2><p>并发：一个CPU同时执行多个线程</p>
+<p>并行：多个CPU同时执行多个线程</p>
+<h1 id="多线程的创建和使用"><a href="#多线程的创建和使用" class="headerlink" title="多线程的创建和使用"></a>多线程的创建和使用</h1><h2 id="传统多线程"><a href="#传统多线程" class="headerlink" title="传统多线程"></a>传统多线程</h2><ul>
+<li>线程具有优先级1~10，且是一个统计学上的优先级，满足大数定律</li>
+<li>Thread类实现了Runnable接口，可以创建线程</li>
+<li>开发中常用的是线程池，线程池减少了线程的创建和销毁的用时</li>
+<li>在自己手写多线程时，可能出现逻辑正确，但有几个输出特例不符合多线程，这可能是由于多线程运行到屏幕输出的不稳定时间差造成的</li>
+</ul>
+<h3 id="Thread类的常用方法"><a href="#Thread类的常用方法" class="headerlink" title="Thread类的常用方法"></a>Thread类的常用方法</h3><ul>
+<li>void start(): 启动线程，并执行对象的run()方法</li>
+<li>void run(): 线程在被调度时执行的操作</li>
+<li>String getName(): 返回线程的名称</li>
+<li>void setName(String name):设置该线程名称</li>
+<li>static Thread currentThread(): 返回当前线程对象。在Thread子类中就 是this，通常用于主线程和Runnable Callable实现类</li>
+<li>static void yield()：线程让步。暂停当前正在执行的线程，把执行机会让给优先级相同或更高的线程 若队列中没有同优先级的线程，忽略此方法。</li>
+<li>join() ：当某个程序执行流中调用其他线程的 join() 方法时，调用线程将 被阻塞，直到 join() 方法加入的 join 线程执行完为止，低优先级的线程也可以获得执行。该方法需要try-catch</li>
+<li>static void sleep(long millis)：(指定时间:毫秒) 令当前活动线程在指定时间段内放弃对CPU控制,使其他线程有机会被执行,时间到后重排队。 抛出* InterruptedException异常。该方法需要try-catch</li>
+<li>stop(): 强制线程生命期结束，不推荐使用</li>
+<li>boolean isAlive()：返回boolean，判断线程是否还活着</li>
+</ul>
+<h3 id="sleep-yield-join-wait-notify的区别放在后面的线程同步中"><a href="#sleep-yield-join-wait-notify的区别放在后面的线程同步中" class="headerlink" title="sleep yield join wait notify的区别放在后面的线程同步中"></a>sleep yield join wait notify的区别放在后面的线程同步中</h3><h3 id="Runnable接口：作为Thread对象的构造形参"><a href="#Runnable接口：作为Thread对象的构造形参" class="headerlink" title="Runnable接口：作为Thread对象的构造形参"></a>Runnable接口：作为Thread对象的构造形参</h3><ol>
+<li>相比直接使用Thread，可以实现“多继承”</li>
+<li>线程的开启仍需要实现Thread类</li>
+<li>new Thread( new MyThread() ) .start来启动</li>
+</ol>
+<p>示例：</p>
+<pre><code>class MyrunThread implements Runnable &#123;
+ 
+    public void run() &#123;
+        for (int i = 1; i &lt; 100; i++) &#123;
+            System.out.println(Thread.currentThread().getName() + &quot;:&quot; + i);
+        &#125;
+    &#125;
+&#125;
+public class RunnableTest &#123;
+    public static void main(String[] args) &#123;
+     //一步写法
+        new Thread(new MyrunThread()).start();
+        //两步写法
+        MyrunThread m1 = new MyrunThread();
+        Thread M1 = new Thread(m1);
+        //M1可以调用Thread类的所有方法
+        M1.start();
+    &#125;
+&#125;
+</code></pre>
+<h3 id="Callable接口：借助FutureTask解耦合"><a href="#Callable接口：借助FutureTask解耦合" class="headerlink" title="Callable接口：借助FutureTask解耦合"></a>Callable接口：借助FutureTask解耦合</h3><ol>
+<li>与Runnable相比，Callable功能更强大，可以有返回值，可以抛异常</li>
+<li>Runnable是重写run()方法，Callable是重写call()方法</li>
+<li>返回值的功能需要借助FutureTask类，并且从FutureTask类对象.get()获取返回值</li>
+<li><strong>因为即便是用Callable接口实现，也存在不需要返回值的情况，因此引入FutureTask类来解耦合</strong></li>
+<li>new Thread( new FutureTask( new MyThread() ) ).start来启动</li>
+</ol>
+<p>实现Callable接口，重写call()方法</p>
+<pre><code>class Mythread implements Callable&lt;Integer&gt;&#123;
+ 
+    @Override
+    public Integer call() throws Exception &#123;
+int  sum = 0;
+        for (int  i = 1 ; i&lt;100 ; i++)&#123;
+            if(i%4==0)&#123;
+                System.out.println(i);
+                sum+=i;
+            &#125;
+        &#125;
+        return sum;
+        //这里的返回值是不能通过Thread直接获取的
+        //需要利用FutureTask
+    &#125;
+&#125;
+</code></pre>
+<p>借助FutureTask，实现Thread</p>
+<pre><code>public class CallableTest &#123;
+    public static void main(String[] args) throws ExecutionException, InterruptedException &#123;
+       Mythread M1 = new Mythread();//实现Callable接口实例
+       FutureTask F1 = new FutureTask(M1);//传入FutureTask中
+       Thread T1 = new Thread(F1);//传入Thread中
+        T1.start();//启动
+        System.out.println(F1.get());
+ 
+        //start运行call方法，但是不一定必须接收返回值
+    &#125;
+&#125;
+</code></pre>
+<h2 id="线程池"><a href="#线程池" class="headerlink" title="线程池"></a>线程池</h2><h3 id="与传统相比的优点"><a href="#与传统相比的优点" class="headerlink" title="与传统相比的优点"></a>与传统相比的优点</h3><ul>
+<li>传统的线程实现方式有包含了线程创建 线程销毁 的时间，而线程是可以复用的，因此引入线程池，<strong>把线程创建和销毁 改为 用后归还，不销毁</strong>，重复利用资源，提高线程利用率，提高程序的响应速度</li>
+<li><strong>便于统一管理线程对象</strong></li>
+<li><strong>可以控制最大并发量</strong></li>
+</ul>
+<h3 id="线程池模型——银行"><a href="#线程池模型——银行" class="headerlink" title="线程池模型——银行"></a>线程池模型——银行</h3><p>柜台窗口：线程，且不销毁<br>等待区：等待队列<br>窗口不够用时：增加线程<br>等待区没有座位时：拒绝策略——报异常或交给某个线程去左<br>窗口空闲太多：减少线程</p>
+<h3 id="线程池创建"><a href="#线程池创建" class="headerlink" title="线程池创建"></a>线程池创建</h3><p>JUC并发工具包提供了ThreadPoolExecutor创建线程池，ThreadPoolExecutor有8个参数，分别为：</p>
+<ul>
+<li>corePoolSize：核心线程数——永不关闭的柜台窗口数</li>
+<li>maximumPoolSize：最大线程数——最多的窗口总数</li>
+<li>keepAliveTime：线程存活时间——非核心线程过多长时间没有接到任务就销毁——需要设置单位unit</li>
+<li>unit：TimeUnit.SECONDS  或TimeUnit.MICROSECONDS等等都可以</li>
+<li> BlockingQueue<Runnable> ：等待队列，new ArrayBlockingQueue&lt;&gt;(capacity:10)这里capacity的值设为10</li>
+<li>ThreadFactory：线程工厂——无需自己创建，直接调用Executors.defaultThreadFactory()</li>
+<li>RejectedExecutionHandler：拒绝策略——new ThreadPoolExecutor.AbortPolicy()被拒绝的任务的处理程序，抛出一个 RejectedExecutionException </li>
+</ul>
+<p>创建好之后用ExecutorService类对象来接收，之后就可以直接调用了<br>例如：利用lambda表达式</p>
+<pre><code>for()&#123;
+executorService.execute( ()-&gt;&#123; 线程业务逻辑 &#125; );
+&#125;//线程池会自动调整当前线程数
+executorService.shutdown();//关闭线程池
+</code></pre>
+<p>参考：<br><img src="https://img-blog.csdnimg.cn/54b57105930740ba8eacad4690c0843d.png" alt="拒绝策略"><img src="https://img-blog.csdnimg.cn/8af4df5f8e154e68afbcb752262d9064.png" alt="实现步骤"></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_43061290/article/details/106911277">线程池详解</a></p>
+<h1 id="线程同步"><a href="#线程同步" class="headerlink" title="线程同步"></a>线程同步</h1><p>线程同步的同步意为：协同步调，按预定的先后次序进行运行<br>防止因为并发导致的数据读写错误</p>
+<p><img src="https://img-blog.csdnimg.cn/b28c427c630846fb8d84743a19e996f6.png" alt="线程的生命周期"></p>
+<h2 id="锁机制"><a href="#锁机制" class="headerlink" title="锁机制"></a>锁机制</h2><p>同步的实现离不开锁机制，以下几种常见的锁<br><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_37601506/article/details/114320658?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522164488362516780265434774%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=164488362516780265434774&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduend~default-1-114320658.pc_search_insert_es_download&utm_term=%E5%B8%B8%E8%A7%81%E7%9A%84%E9%94%81&spm=1018.2226.3001.4187">参考资料</a></p>
+<h3 id="死锁"><a href="#死锁" class="headerlink" title="死锁"></a>死锁</h3><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/hd12370/article/details/82814348">参考：死锁的预防</a><br>死锁的预防一般有：<br><img src="https://img-blog.csdnimg.cn/992ffc3a82944aaf96230eb56d7e9c04.png" alt="hashCode指定顺序"><img src="https://img-blog.csdnimg.cn/063a05a7b2fe4e0eabfa85767eb51f8f.png" alt="Lock接口超时放弃"></p>
+<p>手写死锁：</p>
+<pre><code>class Mythread implements Runnable&#123;
+public void run()&#123;
+......
+synchronized(锁A)&#123;
+//A锁套B锁
+    synchronized(锁B)&#123;
+     ......
+    &#125;
+&#125;
+......
+&#125;
+&#125;
+ 
+class Youthread implements Runnable&#123;
+public void run()&#123;
+......
+synchronized(锁B)&#123;
+//B锁套A锁
+    synchronized(锁A)&#123;
+     ......
+    &#125;
+&#125;
+......
+&#125;
+&#125;
+</code></pre>
+<p><strong>如果是锁进行了递归调用，一个锁也是可能产生死锁的</strong></p>
+<h3 id="悲观锁"><a href="#悲观锁" class="headerlink" title="悲观锁"></a>悲观锁</h3><ul>
+<li>认为总有线程会操作自己正在操作的数据</li>
+<li>使用场景：频繁写入；保证安全性</li>
+<li>锁实现：synchronized关键字、Lock接口</li>
+</ul>
+<h3 id="乐观锁"><a href="#乐观锁" class="headerlink" title="乐观锁"></a>乐观锁</h3><ul>
+<li>认为没有线程会操作自己正在操作的数据</li>
+<li>使用场景：多读少写；保证效率高</li>
+<li>锁实现：CAS算法</li>
+</ul>
+<h3 id="读锁-S锁-共享锁"><a href="#读锁-S锁-共享锁" class="headerlink" title="读锁(S锁)(共享锁)"></a>读锁(S锁)(共享锁)</h3><ul>
+<li>只读，例如SELECT</li>
+<li>加S锁后，别的事务只能再加S锁而不能加X锁，但加锁者本身可以再加X锁</li>
+</ul>
+<p>若事务T对数据对象A加上S锁，则事务T可以读A但不能修改A，其他事务只能再对A加S锁，而不能加X锁，直到T释放A上的S锁。这保证了其他事务可以读A，但在T释放A上的S锁之前不能对A做任何修改。</p>
+<h3 id="写锁-X锁-排他锁"><a href="#写锁-X锁-排他锁" class="headerlink" title="写锁(X锁)(排他锁)"></a>写锁(X锁)(排他锁)</h3><ul>
+<li>写，例如INSERT、UPDATE 或 DELETE</li>
+<li>加X锁后，其他任何事务不能再加任何S锁和X锁</li>
+</ul>
+<p>若事务T对数据对象A加上X锁，事务T可以读A也可以修改A，其他事务不能再对A加任何锁，直到T释放A上的锁。这保证了其他事务在T释放A上的锁之前不能再读取和修改A。</p>
+<h3 id="公平锁"><a href="#公平锁" class="headerlink" title="公平锁"></a>公平锁</h3><ul>
+<li>多个共用同一把锁的线程有序排队，并按排队顺序上锁</li>
+<li>private  ReentrantLock lockkk = new ReentrantLock(true);叫公平锁</li>
+</ul>
+<p>手写公平锁：</p>
+<pre><code>private  ReentrantLock lockkk = new ReentrantLock(true);//公平锁
+。。。。。。。。。
+    public void run()&#123;
+        for(int i = 1;i&lt;=100;i++)&#123;
+            lockkk.lock();//上公平锁lockkk
+            System.out.print(Thread.currentThread().getName());
+            Depot(this.account,1000);
+            //输出内容
+            try &#123;
+            Thread.sleep(100);
+        &#125; catch (InterruptedException e) &#123;
+            e.printStackTrace();
+        &#125;//加上sleep效果更明显，防止因为屏幕输出时间差造成的误导
+ 
+            lockkk.unlock();//释放公平锁lockkk
+
+//此后该调用lock的线程进入排队的末尾，不与其他线程争抢资源
+        &#125;
+&#125;
+</code></pre>
+<h3 id="非公平锁"><a href="#非公平锁" class="headerlink" title="非公平锁"></a>非公平锁</h3><ul>
+<li>多个共用同一把锁的线程有序排队，但不按顺序上锁，仍像synchronized一样靠抢</li>
+<li>private  ReentrantLock lockkk = new ReentrantLock(false);<br>private  ReentrantLock lockkk = new ReentrantLock();都是非公平锁</li>
+</ul>
+<h2 id="volatile关键字"><a href="#volatile关键字" class="headerlink" title="volatile关键字"></a>volatile关键字</h2><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/dolphin0520/p/3920373.html">参考资料</a></p>
+<ul>
+<li>只能修饰变量，如：private volatile static int phoneNumber = 0;</li>
+<li><strong>对变量的写操作不依赖于当前值</strong>，若是++i , i+=5这种依赖于原有值的操作则可能仍然会有错误</li>
+<li><strong>该变量是独立的</strong>：该变量没有包含在具有其他变量的不变式中</li>
+<li>volatile不需要加锁，比synchronized更轻量级，不会阻塞线程</li>
+<li>synchronized既能保证可见性，又能保证原子性，<strong>而volatile只能保证可见性，无法保证原子性</strong>。</li>
+</ul>
+<h2 id="synchronized关键字"><a href="#synchronized关键字" class="headerlink" title="synchronized关键字"></a>synchronized关键字</h2><p>为什么用对象来充当监视器？：<br> 由于java的<strong>每个对象都有一个内置锁</strong>，当用此关键字修饰方法时，内置锁会保护整个方法。在调用该方法前，要获取内置锁，否则处于阻塞状态。</p>
+<h3 id="同步方法-粗粒度锁"><a href="#同步方法-粗粒度锁" class="headerlink" title="同步方法(粗粒度锁)"></a>同步方法(粗粒度锁)</h3><ul>
+<li>比同步代码块更笨重，开销更大</li>
+<li>用this上锁，因此也有潜在的风险</li>
+<li>同步方法(粗粒度锁)：<br>  A、修饰一般方法: public <strong>synchronized</strong> void method(){…}，获取的是当前调用对象 this 上的锁；<br>  B、修饰静态方法: public <strong>static synchronized</strong> void method (){…}，获取当前类的字节码对象上的锁。</li>
+</ul>
+<h3 id="同步代码块-细粒度锁"><a href="#同步代码块-细粒度锁" class="headerlink" title="同步代码块(细粒度锁)"></a>同步代码块(细粒度锁)</h3><ul>
+<li>对象监视器：同一个对象同一把锁，处于同一个同步机制里</li>
+<li>监视器用<strong>this</strong>指的是当前类对象，<br>例如：用Runnable接口实现的线程，run()方法写为synchronized，那么这个锁就是Runnable的对象，如果用这一个对象作为形参创建了多个线程，就是线程同步的<br>例如：用extends直接继承Thread，run()方法写为synchronized，那么new几个线程就加了几把锁，失去了同步功能</li>
+</ul>
+<h2 id="Lock接口"><a href="#Lock接口" class="headerlink" title="Lock接口"></a>Lock接口</h2><p>Lock接口可以主动在任意位置lock和unlock，所以更加灵活</p>
+<h3 id="ReentrantLock接口"><a href="#ReentrantLock接口" class="headerlink" title="ReentrantLock接口"></a>ReentrantLock接口</h3><p>public class ReentrantLock implements <strong>Lock</strong>, java.io.Serializable </p>
+<ul>
+<li>提供公平锁机制，而synchronized是非公平的</li>
+<li>boolean tryLock() 方法：如果拿不到锁就返回false，不会像synchronized一直等待</li>
+<li>void lock()  上锁，且需要void unlock()  主动解锁</li>
+<li>当发生异常时，synchronized会自动释放锁，而Lock接口需要在try-catch-<strong>finally中手动释放锁，防止死锁</strong></li>
+<li>在性能上来说，如果线程竞争资源不激烈时，两者的性能是差不多的，而<strong>当竞争资源非常激烈时（即有大量线程同时竞争），此时 Lock 的性能要远远优于 synchronized</strong></li>
+</ul>
+<h2 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h2><pre><code>private  ReentrantLock locker = new ReentrantLock(true);//公平锁
+。。。。。。。。。
+    public void run()&#123;
+        for(int i = 1;i&lt;=100;i++)&#123;//模拟多线程
+            locker.lock();//上公平锁lockkk
+          try&#123;执行的可能出错的代码
+          &#125;catch(Exception e)&#123;
+             e.printStackTrace();
+        &#125;finally&#123;
+            locker.unlock()
+        &#125;
+        &#125;
+    &#125;
+</code></pre>
+<h1 id="sleep-yield-join-wait-notify"><a href="#sleep-yield-join-wait-notify" class="headerlink" title="sleep yield join wait notify"></a>sleep yield join wait notify</h1><p>首先确定一点，CPU资源调度和线程同步不是同一个概念，即便是没有监视器(没有锁)，也存在CPU资源调度问题(也有sleep和yield方法)；<br>而只有加锁之后才有wait和notify来操作线程的执行</p>
+<h2 id="CPU资源角度"><a href="#CPU资源角度" class="headerlink" title="CPU资源角度"></a>CPU资源角度</h2><ul>
+<li>sleep和yield<strong>都不释放锁，因此影响的是cpu资源调度</strong></li>
+<li>都是静态方法，因此可以<strong>无关监视器，无关同步</strong></li>
+</ul>
+<h3 id="sleep线程休眠"><a href="#sleep线程休眠" class="headerlink" title="sleep线程休眠"></a>sleep线程休眠</h3><ul>
+<li><strong>不释放锁</strong>，同监视器的线程仍然阻塞</li>
+<li>稳定让渡cpu资源，不同监视器的线程可以执行</li>
+<li>静态方法，Thread.sleep(123123)随处可用</li>
+</ul>
+<h3 id="yield线程让步"><a href="#yield线程让步" class="headerlink" title="yield线程让步"></a>yield线程让步</h3><ul>
+<li><strong>不释放锁</strong>，同监视器的线程仍然阻塞</li>
+<li>不稳定让渡cpu资源，重新争夺cpu资源，可能没有明显效果</li>
+<li>其他监视器的线程需：<strong>优先级&gt;=调用yield的线程</strong>，才能争夺cpu资源</li>
+</ul>
+<h2 id="线程同步角度"><a href="#线程同步角度" class="headerlink" title="线程同步角度"></a>线程同步角度</h2><ul>
+<li><p>wait notify notifyAll 都是需要写在同步代码块之中的，针对已经获取了Obj锁进行操作，<strong>都不是静态方法</strong></p>
+</li>
+<li><p>从语法角度来说就是<strong>Obj.wait(),Obj.notify必须在synchronized(Obj){…}语句块内。</strong></p>
+</li>
+<li><p>从功能上来说wait就是说线程在获取对象锁后，主动释放对象锁，同时本线程休眠。直到有其它线程调用对象的notify()唤醒该线程，才能继续获取对象锁</p>
+<h2 id="wati"><a href="#wati" class="headerlink" title="wati"></a>wati</h2></li>
+<li><p>释放CPU的同时释放锁</p>
+</li>
+<li><p>进入<strong>等待池</strong>，等待其他线程使用obj.notify()唤醒</p>
+</li>
+<li><p>调用obj.wait()后直接释放资源</p>
+</li>
+<li><p>因为是写在synchronized代码块中，所以调用obj.wait()之后还需等其他线程obj.notifyAll()之后<strong>才执行wait之后剩余的代码</strong></p>
+</li>
+</ul>
+<h2 id="notify-notifyAll"><a href="#notify-notifyAll" class="headerlink" title="notify notifyAll"></a>notify notifyAll</h2><ul>
+<li>在相同监视器下(相同锁下)，前者是随机唤醒一个线程，后者是唤醒所有线程</li>
+<li>notify和notifyAll的最终效果都是从等待池唤醒一个，但notify可能会导致两个线程都挂起，造成阻塞（所有线程都wait进入了等待池，没有线程再执行唤醒）</li>
+</ul>
+<h3 id="对象内部锁"><a href="#对象内部锁" class="headerlink" title="对象内部锁"></a>对象内部锁</h3><p>其实，每个对象都拥有两个池，分别为锁池(EntrySet)和(WaitSet)等待池。</p>
+<ul>
+<li>锁池：假如已经有线程A获取到了锁，这时候又有线程B需要获取这把锁(比如需要调用synchronized修饰的方法或者需要执行synchronized修饰的代码块)，由于该锁已经被占用，所以线程B只能等待这把锁，这时候线程B将会进入这把锁的锁池。</li>
+<li>等待池：假设线程A获取到锁之后，由于一些条件的不满足(例如生产者消费者模式中生产者获取到锁，然后判断队列为满)，此时需要调用对象锁的wait方法，那么线程A将放弃这把锁，并进入这把锁的等待池。</li>
+</ul>
+<p>如果有其他线程调用了锁的notify方法，则会根据一定的算法从等待池中选取一个线程，将此线程放入锁池。<br>如果有其他线程调用了锁的notifyAll方法，则会将等待池中所有线程全部放入锁池，并争抢锁。</p>
+<p>锁池与等待池的区别：等待池中的线程不能获取锁，而是需要被唤醒进入锁池，才有获取到锁的机会。</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/liuzhixiong_521/article/details/86677057">参考资料1</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/37601861/answer/145545371">参考资料2</a></p>
+
+      
+       <hr><span style="font-style: italic;color: gray;"> 生命以负熵为食，归整以抵抗熵增； </span>
+    </div>
+</article>
+
+
+
+
+
+
+
+    
+        <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="//cdn.jsdelivr.net/npm/mathjax@2.7.8/unpacked/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+<input type="hidden" id="MathJax-js"
+        value="//cdn.jsdelivr.net/npm/mathjax@2.7.8/unpacked/MathJax.js?config=TeX-MML-AM_CHTML">
+</input>
+    
+
+
+
+
+    </div>
+    <div class="copyright">
+        <p class="footer-entry">
+    ©2021 ZJH
+</p>
+<p class="footer-entry">"生命以负熵为食"
+
+    </div>
+    <div class="full-toc">
+        <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
+<a class="" id="rocket" ></a>
+
+    </div>
+</div>
+
+</body>
+<script src="/zjh/js/jquery.pjax.js?v=1.1.0" ></script>
+
+<script src="/zjh/js/script.js?v=1.1.0" ></script>
+<script>
+    var img_resize = 'default';
+    function initArticle() {
+        /*渲染对应的表格样式*/
+        
+            $("#post .pjax table").addClass("green_title");
+        
+
+        /*渲染打赏样式*/
+        
+
+        /*高亮代码块行号*/
+        
+        $('pre code').each(function(){
+            var lines = $(this).text().trim().split('\n').length, widther='';
+            if (lines>99) {
+                widther = 'widther'
+            }
+            var $numbering = $('<ul/>').addClass('pre-numbering ' + widther).attr("unselectable","on");
+            $(this).addClass('has-numbering ' + widther)
+                    .parent()
+                    .append($numbering);
+            for(var i=1;i<=lines;i++){
+                $numbering.append($('<li/>').text(i));
+            }
+        });
+        
+
+        /*访问数量*/
+        
+        $.getScript("//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js");
+        
+
+        /*代码高亮，行号对齐*/
+        $('.pre-numbering').css('line-height',$('.has-numbering').css('line-height'));
+
+        
+        
+    }
+
+    /*打赏页面隐藏与展示*/
+    
+
+</script>
+
+<!--加入行号的高亮代码块样式-->
+
+<style>
+    pre{
+        position: relative;
+        margin-bottom: 24px;
+        border-radius: 10px;
+        border: 1px solid #e2dede;
+        background: #FFF;
+        overflow: hidden;
+    }
+    code.has-numbering{
+        margin-left: 30px;
+    }
+    code.has-numbering.widther{
+        margin-left: 35px;
+    }
+    .pre-numbering{
+        margin: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 20px;
+        padding: 0.5em 3px 0.7em 5px;
+        border-right: 1px solid #C3CCD0;
+        text-align: right;
+        color: #AAA;
+        background-color: ;
+    }
+    .pre-numbering.widther {
+        width: 35px;
+    }
+</style>
+
+<!--自定义样式设置-->
+<style>
+    
+    
+    .nav {
+        width: 542px;
+    }
+    .nav.fullscreen {
+        margin-left: -542px;
+    }
+    .nav-left {
+        width: 120px;
+    }
+    
+    
+    @media screen and (max-width: 1468px) {
+        .nav {
+            width: 492px;
+        }
+        .nav.fullscreen {
+            margin-left: -492px;
+        }
+        .nav-left {
+            width: 100px;
+        }
+    }
+    
+    
+    @media screen and (max-width: 1024px) {
+        .nav {
+            width: 492px;
+            margin-left: -492px
+        }
+        .nav.fullscreen {
+            margin-left: 0;
+        }
+    }
+    
+    @media screen and (max-width: 426px) {
+        .nav {
+            width: 100%;
+        }
+        .nav-left {
+            width: 100%;
+        }
+    }
+    
+    
+    .nav-right .title-list nav a .post-title, .nav-right .title-list #local-search-result a .post-title {
+        color: #383636;
+    }
+    
+    
+    .nav-right .title-list nav a .post-date, .nav-right .title-list #local-search-result a .post-date {
+        color: #5e5e5f;
+    }
+    
+    
+    .nav-right nav a.hover, #local-search-result a.hover{
+        background-color: #e2e0e0;
+    }
+    
+    
+
+    /*列表样式*/
+    
+
+    /* 背景图样式 */
+    
+    
+
+
+    /*引用块样式*/
+    
+
+    /*文章列表背景图*/
+    
+
+    
+</style>
+
+
+
+
+
+
+
+</html>

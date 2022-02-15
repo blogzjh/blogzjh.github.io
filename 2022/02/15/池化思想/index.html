@@ -2,51 +2,25 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>ZJH&#39;blog</title>
+  <title>池化思想 | ZJH&#39;blog</title>
   <meta name="keywords" content="">
-  <meta name="description" content="ZJH&#39;blog">
+  <meta name="description" content="池化思想 | ZJH&#39;blog">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="技术实现springboot+mybatisplus+lombok+vue+element+axios  数据属性绑定层面数据库与domain绑定 前端属性和domain统一 R类的前后端交互后端传给前端的是一个R对象，并且需要前端对R对象进行判断解析R类属性：flag\data\msg 后端控制层 前端视图层 异常处理拦截器 MybatisPlus：持久层+业务层  控制层调用业务层接口 前后端">
+<meta name="description" content="池化思想资源反复利用，用后归还，免去大量建立销毁浪费的时间和资源，建立和销毁占用的资源还是很多的 字符串常量池常量池独立于栈和堆，以下两种创建方式区别1，直接保存常量池的内容String s1 &#x3D; “直接保存” 2，new String间接保存String s2 &#x3D; new String(“间接保存”) 区别： 直接保存，无论创建多少个都是相同的 间接保存实际上保存的是地址值，指向线程池，此方式会">
 <meta property="og:type" content="article">
-<meta property="og:title" content="NXB成员管理系统单页全栈">
-<meta property="og:url" content="https://zjhblog.gitee.io/2022/01/30/NXB%E6%88%90%E5%91%98%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F%E5%8D%95%E9%A1%B5%E5%85%A8%E6%A0%88/index.html">
+<meta property="og:title" content="池化思想">
+<meta property="og:url" content="https://zjhblog.gitee.io/2022/02/15/%E6%B1%A0%E5%8C%96%E6%80%9D%E6%83%B3/index.html">
 <meta property="og:site_name" content="ZJH&#39;blog">
-<meta property="og:description" content="技术实现springboot+mybatisplus+lombok+vue+element+axios  数据属性绑定层面数据库与domain绑定 前端属性和domain统一 R类的前后端交互后端传给前端的是一个R对象，并且需要前端对R对象进行判断解析R类属性：flag\data\msg 后端控制层 前端视图层 异常处理拦截器 MybatisPlus：持久层+业务层  控制层调用业务层接口 前后端">
+<meta property="og:description" content="池化思想资源反复利用，用后归还，免去大量建立销毁浪费的时间和资源，建立和销毁占用的资源还是很多的 字符串常量池常量池独立于栈和堆，以下两种创建方式区别1，直接保存常量池的内容String s1 &#x3D; “直接保存” 2，new String间接保存String s2 &#x3D; new String(“间接保存”) 区别： 直接保存，无论创建多少个都是相同的 间接保存实际上保存的是地址值，指向线程池，此方式会">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/fd601084dd4d45dba2b44154bef09135.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/e349e9ec3b33419285906d31207d40fa.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/b360980ee55d40f7a55e735ae652a267.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/3ec59c343c7240a8bf243366e53c334c.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/d4cb960282f7478d9820fb5011226d18.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/50f9b0eda19248cab1ab5452454bcd9e.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/5ec3daf8ec704312b30e1795ec3ef397.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/ad91f2d27bd1457996f435d8420ca2b6.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/42143a6991b0403f86e14b54cd9c0ec7.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/61b77d74244b4bebb2b3d0a9c5175094.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/0f5493531971421580cad3a082dac698.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/dcb50e6e5ef442e18cf07411c7277c0e.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/ff8960944c3e47e88e646afe63d7c4a3.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/0f92033ffb954be6a7d2bba187804ebc.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/3c0a0cb658bb49319193dae27ccffdeb.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/76f3aa44f3f947c790aa4c8bc62c739b.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/456e9a2bb20547f6b7f11a3c6778d6b6.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/a1b3590853c5478593ac78014f190673.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/472856aa87bb4414b4f56608af9bbf49.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/3e3293406a864102b233ae51c4f4e53c.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/f523f55642e042a0bb65927913b2cc18.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/30450590f5ca46589a799125d0f81b36.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/babc5941f8e249b5921200b2e3e267c2.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/93e30f19236b41aeac3b840b6fd6695e.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/f4cbae77004541c389335095c4bd4b2e.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/7abe1a128d6744eda2ac95753013d829.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/e20417070e1243fa8b6c82c445b87247.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/c79b5ed9bcf94d16bc63dbab0088841a.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/bef7b71f403945d9918ae075545d6552.png">
-<meta property="article:published_time" content="2022-01-30T04:50:33.000Z">
-<meta property="article:modified_time" content="2022-01-30T04:51:10.503Z">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/54b57105930740ba8eacad4690c0843d.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8af4df5f8e154e68afbcb752262d9064.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/6323c68d6d694d1fb8e62f6ae49cd152.png">
+<meta property="article:published_time" content="2022-02-15T06:53:32.000Z">
+<meta property="article:modified_time" content="2022-02-15T06:54:31.935Z">
 <meta property="article:author" content="ZJH">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://img-blog.csdnimg.cn/fd601084dd4d45dba2b44154bef09135.png">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/54b57105930740ba8eacad4690c0843d.png">
 
 
 <link rel="icon" href="/img/QQ图片20211224224200.jpg">
@@ -86,7 +60,7 @@
 
 
 <body>
-<aside class="nav mobile">
+<aside class="nav">
     <div class="nav-left">
         <a href="/zjh/"
    class="avatar_target">
@@ -156,7 +130,7 @@
     <li>
         <div class="all active" data-rel="全部文章">全部文章
             
-                <small>(23)</small>
+                <small>(29)</small>
             
         </div>
     </li>
@@ -220,10 +194,10 @@
         
             
                 <li>
-                    <div data-rel="项目">
+                    <div data-rel="Bug">
                         
-                        项目
-                        <small>(1)</small>
+                        Bug
+                        <small>(3)</small>
                         
                     </div>
                     
@@ -234,10 +208,10 @@
         
             
                 <li>
-                    <div data-rel="找吖找Bug">
+                    <div data-rel="Demo">
                         
-                        找吖找Bug
-                        <small>(2)</small>
+                        Demo
+                        <small>(1)</small>
                         
                     </div>
                     
@@ -251,7 +225,7 @@
                     <div data-rel="Java">
                         
                         Java
-                        <small>(8)</small>
+                        <small>(11)</small>
                         
                     </div>
                     
@@ -265,7 +239,7 @@
                     <div data-rel="Java后端">
                         
                         Java后端
-                        <small>(4)</small>
+                        <small>(5)</small>
                         
                     </div>
                     
@@ -286,8 +260,8 @@
         
     </div>
 </div>
-<input type="hidden" id="yelog_site_posts_number" value="23">
-<input type="hidden" id="yelog_site_word_count" value="33.4k">
+<input type="hidden" id="yelog_site_posts_number" value="29">
+<input type="hidden" id="yelog_site_word_count" value="42.1k">
 <div style="display: none">
     <span id="busuanzi_value_site_uv"></span>
     <span id="busuanzi_value_site_pv"></span>
@@ -347,15 +321,63 @@
             <span class="post-date" title="2021-12-25 21:55:46">2021/12/25</span>
         </a>
         
-        <a  class="全部文章 项目 "
+        <a  class="全部文章 Java "
+           href="/zjh/2022/02/15/%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E6%B1%87%E6%80%BB/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="异常处理汇总">异常处理汇总</span>
+            <span class="post-date" title="2022-02-15 14:55:04">2022/02/15</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/02/15/%E6%B1%A0%E5%8C%96%E6%80%9D%E6%83%B3/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="池化思想">池化思想</span>
+            <span class="post-date" title="2022-02-15 14:53:32">2022/02/15</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/02/15/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E6%B1%87%E6%80%BB/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="面向对象汇总">面向对象汇总</span>
+            <span class="post-date" title="2022-02-15 14:52:05">2022/02/15</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/02/15/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%92%8C%E7%BA%BF%E7%A8%8B%E5%90%8C%E6%AD%A5%E6%B1%87%E6%80%BB/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="多线程和线程同步汇总">多线程和线程同步汇总</span>
+            <span class="post-date" title="2022-02-15 14:51:32">2022/02/15</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/02/09/%E5%AE%9E%E7%8E%B0%E6%9C%8B%E5%8F%8B%E5%9C%88%E4%B8%8B%E6%8B%89%E5%88%B7%E6%96%B0%E6%8B%BC%E6%8E%A5%E7%9A%84%E6%80%9D%E8%B7%AF/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="实现朋友圈下拉刷新拼接的思路">实现朋友圈下拉刷新拼接的思路</span>
+            <span class="post-date" title="2022-02-09 15:40:54">2022/02/09</span>
+        </a>
+        
+        <a  class="全部文章 Bug "
+           href="/zjh/2022/02/09/IO%E4%BC%A0%E8%BE%93%E5%9B%BE%E7%89%87%E8%83%BD%E6%89%93%E5%BC%80%E4%BD%86%E8%8A%B1%E5%B1%8F/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="IO传输图片能打开但花屏">IO传输图片能打开但花屏</span>
+            <span class="post-date" title="2022-02-09 15:39:11">2022/02/09</span>
+        </a>
+        
+        <a  class="全部文章 Demo "
            href="/zjh/2022/01/30/NXB%E6%88%90%E5%91%98%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F%E5%8D%95%E9%A1%B5%E5%85%A8%E6%A0%88/"
            data-tag=""
            data-author="" >
-            <span class="post-title" title="NXB成员管理系统单页全栈">NXB成员管理系统单页全栈</span>
+            <span class="post-title" title="NXB成员管理系统单页crud">NXB成员管理系统单页crud</span>
             <span class="post-date" title="2022-01-30 12:50:33">2022/01/30</span>
         </a>
         
-        <a  class="全部文章 找吖找Bug "
+        <a  class="全部文章 Bug "
            href="/zjh/2022/01/28/axios%E6%97%B6%E9%97%B4%E4%BA%A4%E4%BA%92%E6%8A%A5400/"
            data-tag=""
            data-author="" >
@@ -363,7 +385,7 @@
             <span class="post-date" title="2022-01-28 21:21:56">2022/01/28</span>
         </a>
         
-        <a  class="全部文章 找吖找Bug "
+        <a  class="全部文章 Bug "
            href="/zjh/2022/01/28/BindingException-Invalid-bound-statement-not-found/"
            data-tag=""
            data-author="" >
@@ -395,12 +417,12 @@
             <span class="post-date" title="2022-01-26 21:38:41">2022/01/26</span>
         </a>
         
-        <a  class="全部文章 Java "
-           href="/zjh/2022/01/25/%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E3%80%81%E5%A4%9A%E7%BA%BF%E7%A8%8B/"
+        <a  class="全部文章 "
+           href="/zjh/2022/01/25/File%E7%9A%84%E4%B8%80%E4%BA%9B%E7%BB%86%E8%8A%82/"
            data-tag=""
            data-author="" >
-            <span class="post-title" title="异常处理、多线程">异常处理、多线程</span>
-            <span class="post-date" title="2022-01-25 21:24:16">2022/01/25</span>
+            <span class="post-title" title="File的一些细节">File的一些细节</span>
+            <span class="post-date" title="2022-01-25 21:15:36">2022/01/25</span>
         </a>
         
         <a  class="全部文章 Java "
@@ -539,12 +561,53 @@
         </div>
     </div>
 </aside>
-<div id="post" class="index">
+<div id="post">
     <div class="pjax">
-        <article class="index">
-            <div class="toc-ref">
+        <article id="post-池化思想" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BC%95%E5%AF%BC"><span class="toc-text">引导</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%A5%E5%8D%9A%E5%AE%A2%E4%B8%8B%E7%9A%84%E5%BF%AB%E6%8D%B7%E9%94%AE"><span class="toc-text">该博客下的快捷键</span></a></li></ol></li></ol>
+        <h1 class="article-title">池化思想</h1>
+    
+    <div class="article-meta">
+        
+        
+        
+        <span class="book">
+            <i class="iconfont icon-category"></i>
+            
+            
+            <a  data-rel="Java">Java</a>
+            
+        </span>
+        
+        
+    </div>
+    <div class="article-meta">
+        
+            发布时间 : <time class="date" title='最后更新: 2022-02-15 14:54:31'>2022-02-15 14:53</time>
+        
+    </div>
+    <div class="article-meta">
+        
+        <span>字数:895</span>
+        
+        
+        <span id="busuanzi_container_page_pv">
+            阅读 :<span id="busuanzi_value_page_pv">
+                <span class="count-comment">
+                    <span class="spinner">
+                      <div class="cube1"></div>
+                      <div class="cube2"></div>
+                    </span>
+                </span>
+            </span>
+        </span>
+        
+        
+    </div>
+    
+    <div class="toc-ref">
+    
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%B1%A0%E5%8C%96%E6%80%9D%E6%83%B3"><span class="toc-text">池化思想</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%B8%B8%E9%87%8F%E6%B1%A0"><span class="toc-text">字符串常量池</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B8%B8%E9%87%8F%E6%B1%A0%E7%8B%AC%E7%AB%8B%E4%BA%8E%E6%A0%88%E5%92%8C%E5%A0%86%EF%BC%8C%E4%BB%A5%E4%B8%8B%E4%B8%A4%E7%A7%8D%E5%88%9B%E5%BB%BA%E6%96%B9%E5%BC%8F%E5%8C%BA%E5%88%AB"><span class="toc-text">常量池独立于栈和堆，以下两种创建方式区别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8C%BA%E5%88%AB%EF%BC%9A"><span class="toc-text">区别：</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E6%B1%A0"><span class="toc-text">线程池</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%8E%E4%BC%A0%E7%BB%9F%E7%9B%B8%E6%AF%94%E7%9A%84%E4%BC%98%E7%82%B9"><span class="toc-text">与传统相比的优点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E6%B1%A0%E6%A8%A1%E5%9E%8B%E2%80%94%E2%80%94%E9%93%B6%E8%A1%8C"><span class="toc-text">线程池模型——银行</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%88%9B%E5%BB%BA"><span class="toc-text">线程池创建</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%9E%E6%8E%A5%E6%B1%A0"><span class="toc-text">数据库连接池</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BC%98%E7%82%B9"><span class="toc-text">优点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BC%98%E7%A7%80%E7%9A%84%E5%BC%80%E6%BA%90%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%9E%E6%8E%A5%E6%B1%A0%E4%BB%A3%E7%90%86"><span class="toc-text">优秀的开源数据库连接池代理</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%BF%98%E6%9C%89%E9%94%81%E6%B1%A0%EF%BC%8C%E7%AD%89%E5%BE%85%E6%B1%A0"><span class="toc-text">还有锁池，等待池</span></a></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -557,64 +620,112 @@
     }
 </style>
 </div>
-            <h1 id="引导"><a href="#引导" class="headerlink" title="引导"></a>引导</h1><h2 id="该博客下的快捷键"><a href="#该博客下的快捷键" class="headerlink" title="该博客下的快捷键"></a>该博客下的快捷键</h2><table>
-<thead>
-<tr>
-<th align="center">快捷键</th>
-<th align="center">功能</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">s/S</td>
-<td align="center">全屏/取消全屏</td>
-</tr>
-<tr>
-<td align="center">w/W</td>
-<td align="center">打开/关闭文章目录</td>
-</tr>
-<tr>
-<td align="center">i/I</td>
-<td align="center">获取搜索框焦点</td>
-</tr>
-<tr>
-<td align="center">j/J</td>
-<td align="center">向下滑动</td>
-</tr>
-<tr>
-<td align="center">k/K</td>
-<td align="center">向上滑动</td>
-</tr>
-<tr>
-<td align="center">gg/GG</td>
-<td align="center">到最顶端</td>
-</tr>
-<tr>
-<td align="center">shift+G/g</td>
-<td align="center">到最下端</td>
-</tr>
-<tr>
-<td align="center">ESC</td>
-<td align="center">1.如果输入框有内容，清除内容<br>2.如果输入框无内容，失去焦点</td>
-</tr>
-<tr>
-<td align="center">下</td>
-<td align="center">向下选择文章</td>
-</tr>
-<tr>
-<td align="center">上</td>
-<td align="center">向上选择文章</td>
-</tr>
-<tr>
-<td align="center">回车</td>
-<td align="center">打开当前选中的文章，若没有，则默认打开第一个</td>
-</tr>
-</tbody></table>
-<p>到目前为止已经写了<code class="article_number"></code>篇文章， 共<code class="site_word_count"></code>字。</p>
-<p>本站访问人数：<code class="site_uv"></code>人次 ， 访问量：<code class="site_pv"></code>次</p>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="池化思想"><a href="#池化思想" class="headerlink" title="池化思想"></a>池化思想</h1><p>资源反复利用，用后归还，免去大量建立销毁浪费的时间和资源，建立和销毁占用的资源还是很多的</p>
+<h2 id="字符串常量池"><a href="#字符串常量池" class="headerlink" title="字符串常量池"></a>字符串常量池</h2><h3 id="常量池独立于栈和堆，以下两种创建方式区别"><a href="#常量池独立于栈和堆，以下两种创建方式区别" class="headerlink" title="常量池独立于栈和堆，以下两种创建方式区别"></a>常量池独立于栈和堆，以下两种创建方式区别</h3><p>1，直接保存常量池的内容<br>String s1 = “直接保存”</p>
+<p>2，new String间接保存<br>String s2 = new String(“间接保存”)</p>
+<h3 id="区别："><a href="#区别：" class="headerlink" title="区别："></a>区别：</h3><ul>
+<li>直接保存，无论创建多少个都是相同的</li>
+<li>间接保存实际上保存的是地址值，指向线程池，此方式会产生两个对象；如果多次间接保存，例如：<br>String s3 = new String(“间接保存”)<br>String s4 = new String(“间接保存”)<br>String s5 = new String(“间接保存”)</li>
+</ul>
+<p>实际上在常量池中只创建了一个”间接保存”的对象，而引用对象却创建了3次</p>
+<h2 id="线程池"><a href="#线程池" class="headerlink" title="线程池"></a>线程池</h2><h3 id="与传统相比的优点"><a href="#与传统相比的优点" class="headerlink" title="与传统相比的优点"></a>与传统相比的优点</h3><ul>
+<li>传统的线程实现方式有包含了线程创建 线程销毁 的时间，而线程是可以复用的，因此引入线程池，<strong>把线程创建和销毁 改为 用后归还，不销毁</strong>，重复利用资源，提高线程利用率，提高程序的响应速度</li>
+<li><strong>便于统一管理线程对象</strong></li>
+<li><strong>可以控制最大并发量</strong></li>
+</ul>
+<h3 id="线程池模型——银行"><a href="#线程池模型——银行" class="headerlink" title="线程池模型——银行"></a>线程池模型——银行</h3><p>柜台窗口：线程，且不销毁<br>等待区：等待队列<br>窗口不够用时：增加线程<br>等待区没有座位时：拒绝策略——报异常或交给某个线程去左<br>窗口空闲太多：减少线程</p>
+<h3 id="线程池创建"><a href="#线程池创建" class="headerlink" title="线程池创建"></a>线程池创建</h3><p>JUC并发工具包提供了ThreadPoolExecutor创建线程池，ThreadPoolExecutor有8个参数，分别为：</p>
+<ul>
+<li>corePoolSize：核心线程数——永不关闭的柜台窗口数</li>
+<li>maximumPoolSize：最大线程数——最多的窗口总数</li>
+<li>keepAliveTime：线程存活时间——非核心线程过多长时间没有接到任务就销毁——需要设置单位unit</li>
+<li>unit：TimeUnit.SECONDS  或TimeUnit.MICROSECONDS等等都可以</li>
+<li> BlockingQueue<Runnable> ：等待队列，new ArrayBlockingQueue&lt;&gt;(capacity:10)这里capacity的值设为10</li>
+<li>ThreadFactory：线程工厂——无需自己创建，直接调用Executors.defaultThreadFactory()</li>
+<li>RejectedExecutionHandler：拒绝策略——new ThreadPoolExecutor.AbortPolicy()被拒绝的任务的处理程序，抛出一个 RejectedExecutionException </li>
+</ul>
+<p>创建好之后用ExecutorService类对象来接收，之后就可以直接调用了<br>例如：利用lambda表达式</p>
+<pre><code>for()&#123;
+executorService.execute( ()-&gt;&#123; 线程业务逻辑 &#125; );
+&#125;//线程池会自动调整当前线程数
+executorService.shutdown();//关闭线程池
+</code></pre>
+<p>参考：<br><img src="https://img-blog.csdnimg.cn/54b57105930740ba8eacad4690c0843d.png" alt="拒绝策略"><img src="https://img-blog.csdnimg.cn/8af4df5f8e154e68afbcb752262d9064.png" alt="实现步骤"></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_43061290/article/details/106911277">线程池详解</a></p>
+<h2 id="数据库连接池"><a href="#数据库连接池" class="headerlink" title="数据库连接池"></a>数据库连接池</h2><h3 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h3><ul>
+<li>资源重用</li>
+<li>更快的系统反应速度</li>
+<li>新的资源分配手段</li>
+<li>统一的连接管理，避免数据库连接泄漏</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1Gr4y1c7jd?spm_id_from=333.999.0.0">参考1</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_43520450/article/details/107231118?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522164484874416780271532521%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=164484874416780271532521&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~top_positive~default-1-107231118.pc_search_insert_es_download&utm_term=%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%9E%E6%8E%A5%E6%B1%A0&spm=1018.2226.3001.4187">参考2</a><br><img src="https://img-blog.csdnimg.cn/6323c68d6d694d1fb8e62f6ae49cd152.png"></p>
+<h3 id="优秀的开源数据库连接池代理"><a href="#优秀的开源数据库连接池代理" class="headerlink" title="优秀的开源数据库连接池代理"></a>优秀的开源数据库连接池代理</h3><p>（1）DBCP 是Apache提供的数据库连接池。tomcat服务器自带dbcp数据库连接池。速度相对c3p0较快，但因自身存在BUG，Hibernate3已不再提供支持。</p>
+<p>（2）C3P0 是一个开源组织提供的一个数据库连接池，速度相对较慢，稳定性还可以，hibernate官方推荐使用。</p>
+<p>（3）Proxool 是sourceforge下的一个开源项目数据库连接池，有监控连接池状态的功能，稳定性较c3p0差一点.</p>
+<p>（4）BoneCP 是一个开源组织提供的数据库连接池，速度快。</p>
+<p>（5）Druid 是阿里提供的数据库连接池，据说是集DBCP 、C3P0 、Proxool优点于一身的数据库连接池，但是速度不确定是否有BoneCP快。</p>
+<h1 id="还有锁池，等待池"><a href="#还有锁池，等待池" class="headerlink" title="还有锁池，等待池"></a>还有锁池，等待池</h1><p>具体在线程同步的汇总中，wait和notify</p>
 
-        </article>
-        
-        
+      
+       <hr><span style="font-style: italic;color: gray;"> 生命以负熵为食，归整以抵抗熵增； </span>
+    </div>
+</article>
+
+
+
+
+
+
+
+    
+        <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="//cdn.jsdelivr.net/npm/mathjax@2.7.8/unpacked/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+<input type="hidden" id="MathJax-js"
+        value="//cdn.jsdelivr.net/npm/mathjax@2.7.8/unpacked/MathJax.js?config=TeX-MML-AM_CHTML">
+</input>
+    
+
+
+
+
     </div>
     <div class="copyright">
         <p class="footer-entry">
@@ -623,11 +734,11 @@
 <p class="footer-entry">"生命以负熵为食"
 
     </div>
-</div>
-<div class="full-toc">
-    <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
+    <div class="full-toc">
+        <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
 <a class="" id="rocket" ></a>
 
+    </div>
 </div>
 
 </body>

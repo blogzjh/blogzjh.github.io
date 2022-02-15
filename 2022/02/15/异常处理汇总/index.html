@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>ZJH&#39;blog</title>
+  <title>异常处理汇总 | ZJH&#39;blog</title>
   <meta name="keywords" content="">
-  <meta name="description" content="ZJH&#39;blog">
+  <meta name="description" content="异常处理汇总 | ZJH&#39;blog">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="description" content="池化思想资源反复利用，用后归还，免去大量建立销毁浪费的时间和资源，建立和销毁占用的资源还是很多的 字符串常量池常量池独立于栈和堆，以下两种创建方式区别1，直接保存常量池的内容String s1 &#x3D; “直接保存” 2，new String间接保存String s2 &#x3D; new String(“间接保存”) 区别： 直接保存，无论创建多少个都是相同的 间接保存实际上保存的是地址值，指向线程池，此方式会">
 <meta property="og:type" content="article">
@@ -60,7 +60,7 @@
 
 
 <body>
-<aside class="nav mobile">
+<aside class="nav">
     <div class="nav-left">
         <a href="/zjh/"
    class="avatar_target">
@@ -561,12 +561,53 @@
         </div>
     </div>
 </aside>
-<div id="post" class="index">
+<div id="post">
     <div class="pjax">
-        <article class="index">
-            <div class="toc-ref">
+        <article id="post-异常处理汇总" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BC%95%E5%AF%BC"><span class="toc-text">引导</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%A5%E5%8D%9A%E5%AE%A2%E4%B8%8B%E7%9A%84%E5%BF%AB%E6%8D%B7%E9%94%AE"><span class="toc-text">该博客下的快捷键</span></a></li></ol></li></ol>
+        <h1 class="article-title">异常处理汇总</h1>
+    
+    <div class="article-meta">
+        
+        
+        
+        <span class="book">
+            <i class="iconfont icon-category"></i>
+            
+            
+            <a  data-rel="Java">Java</a>
+            
+        </span>
+        
+        
+    </div>
+    <div class="article-meta">
+        
+            发布时间 : <time class="date" title='最后更新: 2022-02-15 14:55:20'>2022-02-15 14:55</time>
+        
+    </div>
+    <div class="article-meta">
+        
+        <span>字数:949</span>
+        
+        
+        <span id="busuanzi_container_page_pv">
+            阅读 :<span id="busuanzi_value_page_pv">
+                <span class="count-comment">
+                    <span class="spinner">
+                      <div class="cube1"></div>
+                      <div class="cube2"></div>
+                    </span>
+                </span>
+            </span>
+        </span>
+        
+        
+    </div>
+    
+    <div class="toc-ref">
+    
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86"><span class="toc-text">异常处理</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E5%88%86%E7%B1%BB"><span class="toc-text">异常处理分类</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Exception%E5%BC%82%E5%B8%B8%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84"><span class="toc-text">Exception异常体系结构</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BC%96%E8%AF%91%E6%97%B6%E5%BC%82%E5%B8%B8checked"><span class="toc-text">编译时异常checked</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%90%E8%A1%8C%E6%97%B6%E5%BC%82%E5%B8%B8unchecked"><span class="toc-text">运行时异常unchecked</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86-1"><span class="toc-text">异常处理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3%E4%B8%AA%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E8%AF%AD%E5%8F%A5"><span class="toc-text">3个异常处理语句</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#try-catch-finally"><span class="toc-text">try-catch-finally</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#throws%E6%8A%9B%E5%BC%82%E5%B8%B8"><span class="toc-text">throws抛异常</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#throw%E4%B8%BB%E5%8A%A8%E6%8A%9B%E5%BC%82%E5%B8%B8"><span class="toc-text">throw主动抛异常</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E5%BC%82%E5%B8%B8%E7%B1%BB"><span class="toc-text">自定义异常类</span></a></li></ol></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -579,64 +620,169 @@
     }
 </style>
 </div>
-            <h1 id="引导"><a href="#引导" class="headerlink" title="引导"></a>引导</h1><h2 id="该博客下的快捷键"><a href="#该博客下的快捷键" class="headerlink" title="该博客下的快捷键"></a>该博客下的快捷键</h2><table>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="异常处理"><a href="#异常处理" class="headerlink" title="异常处理"></a>异常处理</h1><h2 id="异常处理分类"><a href="#异常处理分类" class="headerlink" title="异常处理分类"></a>异常处理分类</h2><ul>
+<li>Error错误<br>Java虚拟机无法解决的严重问题，如JVM系统内部错误、资源耗尽等严重情况。如：StackOverflowError栈溢出 和 OutOfMemoryError堆溢出OOM ，<strong>一般不编写针对性的代码进行处理（异常处理代码），而只是对原本代码进行改动</strong>。</li>
+<li>Exception异常<br>其他编程错误或偶然的外在因素导致的一般性问题，可以使用针对性的代码进行处理，<strong>不改动原有代码，只增加异常预处理</strong>：</li>
+</ul>
+<h2 id="Exception异常体系结构"><a href="#Exception异常体系结构" class="headerlink" title="Exception异常体系结构"></a>Exception异常体系结构</h2><h3 id="编译时异常checked"><a href="#编译时异常checked" class="headerlink" title="编译时异常checked"></a>编译时异常checked</h3><ul>
+<li>运行时异常：都是RuntimeException类及其子类异常，如NullPointerException(空指针异常)、IndexOutOfBoundsException(下标越界异常)等，这些异常是不检查异常，程序中可以选择捕获处理，也可以不处理。这些异常一般是由程序逻辑错误引起的，程序应该从逻辑角度尽可能避免这类异常的发生。</li>
+<li>运行时异常的特点是Java编译器不会检查它，也就是说，当程序中可能出现这类异常，<strong>即使没有用try-catch语句捕获它，也没有用throws子句声明抛出它，也会编译通过。</strong></li>
+</ul>
+<h3 id="运行时异常unchecked"><a href="#运行时异常unchecked" class="headerlink" title="运行时异常unchecked"></a>运行时异常unchecked</h3><ul>
+<li> 非运行时异常 （编译异常）：是RuntimeException以外的异常，类型上都属于Exception类及其子类。从程序语法角度讲是必须进行处理的异常，如果不处理，程序就不能编译通过。如IOException、SQLException等以及用户自定义的Exception异常，</li>
+<li><strong>一般情况下不自定义检查异常。</strong></li>
+</ul>
+<h2 id="异常处理-1"><a href="#异常处理-1" class="headerlink" title="异常处理"></a>异常处理</h2><h3 id="3个异常处理语句"><a href="#3个异常处理语句" class="headerlink" title="3个异常处理语句"></a>3个异常处理语句</h3><p>printStackTrance是最常用的</p>
+<pre><code>e.toString()：  获得异常种类和错误信息
+e.getMessage():获得错误信息
+e.printStackTrace()：在控制台打印出异常种类，错误信息和出错位置等
+</code></pre>
+<h3 id="try-catch-finally"><a href="#try-catch-finally" class="headerlink" title="try-catch-finally"></a>try-catch-finally</h3><ul>
+<li>catch可以有多个，也可以把多个catch合并为一个父类的catch</li>
+<li><strong>finally中不建议有return，但分情况</strong>，下面说明几种特殊的return的情况，注意区分基本数据类型和引用数据类型的差异</li>
+</ul>
+<table>
 <thead>
 <tr>
-<th align="center">快捷键</th>
-<th align="center">功能</th>
+<th>try中</th>
+<th>catch中</th>
+<th>finally中</th>
+<th>返回值情况(基本数据类型)</th>
+<th>返回值情况(引用类型)</th>
 </tr>
 </thead>
 <tbody><tr>
-<td align="center">s/S</td>
-<td align="center">全屏/取消全屏</td>
+<td>有</td>
+<td>无</td>
+<td>有</td>
+<td>返回finally中的入栈值</td>
+<td>同左</td>
 </tr>
 <tr>
-<td align="center">w/W</td>
-<td align="center">打开/关闭文章目录</td>
+<td>有</td>
+<td>有且异常(执行)</td>
+<td>有</td>
+<td>执行finally，但返回catch中入栈的return值</td>
+<td>执行finally且返回finally</td>
 </tr>
 <tr>
-<td align="center">i/I</td>
-<td align="center">获取搜索框焦点</td>
-</tr>
-<tr>
-<td align="center">j/J</td>
-<td align="center">向下滑动</td>
-</tr>
-<tr>
-<td align="center">k/K</td>
-<td align="center">向上滑动</td>
-</tr>
-<tr>
-<td align="center">gg/GG</td>
-<td align="center">到最顶端</td>
-</tr>
-<tr>
-<td align="center">shift+G/g</td>
-<td align="center">到最下端</td>
-</tr>
-<tr>
-<td align="center">ESC</td>
-<td align="center">1.如果输入框有内容，清除内容<br>2.如果输入框无内容，失去焦点</td>
-</tr>
-<tr>
-<td align="center">下</td>
-<td align="center">向下选择文章</td>
-</tr>
-<tr>
-<td align="center">上</td>
-<td align="center">向上选择文章</td>
-</tr>
-<tr>
-<td align="center">回车</td>
-<td align="center">打开当前选中的文章，若没有，则默认打开第一个</td>
+<td>无</td>
+<td>有</td>
+<td>有</td>
+<td>无异常则finally中，有异常则catch中</td>
+<td>无条件执行且返回finally的值</td>
 </tr>
 </tbody></table>
-<p>到目前为止已经写了<code class="article_number"></code>篇文章， 共<code class="site_word_count"></code>字。</p>
-<p>本站访问人数：<code class="site_uv"></code>人次 ， 访问量：<code class="site_pv"></code>次</p>
+<h3 id="throws抛异常"><a href="#throws抛异常" class="headerlink" title="throws抛异常"></a>throws抛异常</h3><p>这种处理方法并没有真正解决Exception，并且如果调用方法，throws会层层向上抛，一般引用别人定义好的方法时，可将其方法throws出来的Exception进行try-catch处理，这样可以更灵活</p>
+<h3 id="throw主动抛异常"><a href="#throw主动抛异常" class="headerlink" title="throw主动抛异常"></a>throw主动抛异常</h3><p> throw new RuntimeException() ，有时候为了保证逻辑的完整性，需要抛异常来阻止操作，并返回throw异常交给拦截器来处理<br><img src="https://img-blog.csdnimg.cn/b1a0c367a4f540d09a1916d3f4ecbf4c.png"></p>
+<ul>
+<li>throw编译时异常(throw new Exception(“”))，其方法要throws对应的编译时异常</li>
+<li>throw运行时异常(throw new RuntimeException(“”))，其方法不需要throws</li>
+</ul>
+<p>举个例子：throw运行时异常，不用thorws</p>
+<pre><code>class Student &#123;
+    int id;
+    public Student(int id)&#123;
+        if(id&gt;0)&#123;
+        this.id = id;
+        &#125;
+        else&#123;
+            throw new RuntimeException(&quot;id不能为负数&quot;);
+    &#125;
+    &#125;&#125;
+</code></pre>
+<p>再举个例子：throw编译时异常，需要throws</p>
+<pre><code>class Student &#123;
+    int id;
+    public Student(int id) throws Exception&#123;
+        if(id&gt;0)&#123;
+        this.id = id;
+        &#125;
+        else&#123;
+            throw new Exception();
+        &#125;
+    &#125;
+&#125;
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/74ea4db3474e465d8ac9b5556eef2d8c.png"></p>
+<h2 id="自定义异常类"><a href="#自定义异常类" class="headerlink" title="自定义异常类"></a>自定义异常类</h2><p>自定义异常类需要满足</p>
+<ul>
+<li>继承于某一个异常类</li>
+<li>空参构造和String msg构造</li>
+<li>指定serialVersionUID(指定序列化版本)</li>
+</ul>
+<p>示例：</p>
+<pre><code>class MyException extends RuntimeException&#123;
+    static final long serialVersionUID = -123456789L;
+    
+    public MyException()&#123;&#125;
+    
+    public MyException(String msg)&#123;
+        super(msg);
+    &#125;
+&#125;
+</code></pre>
+<p>在使用上和普通异常类是完全一样的</p>
 
-        </article>
-        
-        
+      
+       <hr><span style="font-style: italic;color: gray;"> 生命以负熵为食，归整以抵抗熵增； </span>
+    </div>
+</article>
+
+
+
+
+
+
+
+    
+        <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="//cdn.jsdelivr.net/npm/mathjax@2.7.8/unpacked/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+<input type="hidden" id="MathJax-js"
+        value="//cdn.jsdelivr.net/npm/mathjax@2.7.8/unpacked/MathJax.js?config=TeX-MML-AM_CHTML">
+</input>
+    
+
+
+
+
     </div>
     <div class="copyright">
         <p class="footer-entry">
@@ -645,11 +791,11 @@
 <p class="footer-entry">"生命以负熵为食"
 
     </div>
-</div>
-<div class="full-toc">
-    <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
+    <div class="full-toc">
+        <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
 <a class="" id="rocket" ></a>
 
+    </div>
 </div>
 
 </body>

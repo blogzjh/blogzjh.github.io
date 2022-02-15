@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>ZJH&#39;blog</title>
+  <title>File的一些细节 | ZJH&#39;blog</title>
   <meta name="keywords" content="">
-  <meta name="description" content="ZJH&#39;blog">
+  <meta name="description" content="File的一些细节 | ZJH&#39;blog">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="description" content="池化思想资源反复利用，用后归还，免去大量建立销毁浪费的时间和资源，建立和销毁占用的资源还是很多的 字符串常量池常量池独立于栈和堆，以下两种创建方式区别1，直接保存常量池的内容String s1 &#x3D; “直接保存” 2，new String间接保存String s2 &#x3D; new String(“间接保存”) 区别： 直接保存，无论创建多少个都是相同的 间接保存实际上保存的是地址值，指向线程池，此方式会">
 <meta property="og:type" content="article">
@@ -60,7 +60,7 @@
 
 
 <body>
-<aside class="nav mobile">
+<aside class="nav">
     <div class="nav-left">
         <a href="/zjh/"
    class="avatar_target">
@@ -561,12 +561,45 @@
         </div>
     </div>
 </aside>
-<div id="post" class="index">
+<div id="post">
     <div class="pjax">
-        <article class="index">
-            <div class="toc-ref">
+        <article id="post-File的一些细节" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BC%95%E5%AF%BC"><span class="toc-text">引导</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%A5%E5%8D%9A%E5%AE%A2%E4%B8%8B%E7%9A%84%E5%BF%AB%E6%8D%B7%E9%94%AE"><span class="toc-text">该博客下的快捷键</span></a></li></ol></li></ol>
+        <h1 class="article-title">File的一些细节</h1>
+    
+    <div class="article-meta">
+        
+        
+        
+        
+    </div>
+    <div class="article-meta">
+        
+            发布时间 : <time class="date" title='最后更新: 2022-02-05 11:06:08'>2022-01-25 21:15</time>
+        
+    </div>
+    <div class="article-meta">
+        
+        <span>字数:1k</span>
+        
+        
+        <span id="busuanzi_container_page_pv">
+            阅读 :<span id="busuanzi_value_page_pv">
+                <span class="count-comment">
+                    <span class="spinner">
+                      <div class="cube1"></div>
+                      <div class="cube2"></div>
+                    </span>
+                </span>
+            </span>
+        </span>
+        
+        
+    </div>
+    
+    <div class="toc-ref">
+    
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#File%E5%AF%B9%E8%B1%A1%E5%AE%9E%E4%BE%8B%E5%8C%96"><span class="toc-text">File对象实例化</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%83%A8%E5%88%86API"><span class="toc-text">部分API</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BA%94%E7%94%A8"><span class="toc-text">应用</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%80%92%E5%BD%92%E9%81%8D%E5%8E%86"><span class="toc-text">递归遍历</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%EF%BC%8C%E9%81%8D%E5%8E%86%E5%88%A0%E9%99%A4"><span class="toc-text">1，遍历删除</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%EF%BC%8C%E9%81%8D%E5%8E%86%E8%AE%A1%E7%AE%97%E5%A4%A7%E5%B0%8F"><span class="toc-text">2，遍历计算大小</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%9C%80%E5%90%8E%E7%9A%84%E6%96%87%E4%BB%B6%E6%80%BB%E9%95%BF%E8%AE%A1%E7%AE%97%E7%BB%93%E6%9E%9C%E4%B8%BA0%EF%BC%9F"><span class="toc-text">为什么最后的文件总长计算结果为0？</span></a></li></ol></li></ol></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -579,64 +612,207 @@
     }
 </style>
 </div>
-            <h1 id="引导"><a href="#引导" class="headerlink" title="引导"></a>引导</h1><h2 id="该博客下的快捷键"><a href="#该博客下的快捷键" class="headerlink" title="该博客下的快捷键"></a>该博客下的快捷键</h2><table>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="File对象实例化"><a href="#File对象实例化" class="headerlink" title="File对象实例化"></a>File对象实例化</h1><p>三种构造器</p>
+<pre><code>File file = new File(&quot;C:\\Users\\Administrator\\Desktop\\数据结构代码\\algorithm&quot;);//绝对路径
+File file1 = new File(file,&quot;testtss.txt&quot;);//根据parent和child构造
+File file2 = new File(file,&quot;test&quot;);//相对路径
+</code></pre>
+<p>相对路径的例子：</p>
+<pre><code>    用junit单元测试创建的文件在当前moudle下
+    在main中创建的文件在当前project下
+</code></pre>
+<p>跨平台路径分隔符</p>
+<pre><code>    File file3 = new File(&quot;D:&quot; + File.separator + &quot;io&quot; + File.separator + &quot;test11.txt&quot;)
+</code></pre>
+<ul>
+<li>File对象的实例化仅仅是内存层面开辟了一个空间</li>
+<li>File对象可以存储<strong>文件</strong>，也可以存储<strong>文件目录</strong></li>
+<li>File对象表示的是<strong>路径的最后一个文件</strong>，例如：”C:\Users\Administrator\Desktop\数据结构代码\algorithm”的对象对其操作更改的是algorithm文件目录<br><img src="https://img-blog.csdnimg.cn/7a49bfba1e4f42128289965a77f5c149.png" alt="该文件目录实际存在与否的区别"><h1 id="部分API"><a href="#部分API" class="headerlink" title="部分API"></a>部分API</h1><table>
 <thead>
 <tr>
-<th align="center">快捷键</th>
-<th align="center">功能</th>
+<th>方法</th>
+<th>解释</th>
+<th>备注</th>
 </tr>
 </thead>
 <tbody><tr>
-<td align="center">s/S</td>
-<td align="center">全屏/取消全屏</td>
+<td>createTempFile</td>
+<td><br>(String prefix, String suffix) <br> (String prefix, String suffix, File directory)</td>
+<td>static方法，“创建空文件”<br>文件名前缀(最少3字符)，文件名后缀<br>前缀，后缀，指定路径的File对象</td>
 </tr>
 <tr>
-<td align="center">w/W</td>
-<td align="center">打开/关闭文章目录</td>
+<td>deleteOnExit</td>
+<td>run结束后就删掉</td>
+<td>创建的方式是mkdirs，但删除时是只删除该File对象路径的最末尾文件</td>
 </tr>
 <tr>
-<td align="center">i/I</td>
-<td align="center">获取搜索框焦点</td>
+<td>delete</td>
+<td>删除File对象对应的文件or文件目录</td>
+<td>必须保证是末梢路径，不然不能删除并且返回false</td>
 </tr>
 <tr>
-<td align="center">j/J</td>
-<td align="center">向下滑动</td>
+<td>renameTo(File dest)</td>
+<td>1,如果<strong>destFile对象与源文件File对象</strong>是在同一个路径下，那么renameTo的作用是重命名<br> 2,如果目标文件与源文件不是在同一个路径下，那么renameTo的作用就是剪切，而且还不能操作文件夹。</td>
+<td>见代码详解 [^1]</td>
 </tr>
 <tr>
-<td align="center">k/K</td>
-<td align="center">向上滑动</td>
+<td>getParent<br>getParentFile</td>
+<td>返回父路径String<br>返回父路径File</td>
+<td>用于同路径创建等操作</td>
 </tr>
 <tr>
-<td align="center">gg/GG</td>
-<td align="center">到最顶端</td>
-</tr>
-<tr>
-<td align="center">shift+G/g</td>
-<td align="center">到最下端</td>
-</tr>
-<tr>
-<td align="center">ESC</td>
-<td align="center">1.如果输入框有内容，清除内容<br>2.如果输入框无内容，失去焦点</td>
-</tr>
-<tr>
-<td align="center">下</td>
-<td align="center">向下选择文章</td>
-</tr>
-<tr>
-<td align="center">上</td>
-<td align="center">向上选择文章</td>
-</tr>
-<tr>
-<td align="center">回车</td>
-<td align="center">打开当前选中的文章，若没有，则默认打开第一个</td>
+<td>length</td>
+<td>返回字节长度long</td>
+<td>非空小文件的length返回值可能为0</td>
 </tr>
 </tbody></table>
-<p>到目前为止已经写了<code class="article_number"></code>篇文章， 共<code class="site_word_count"></code>字。</p>
-<p>本站访问人数：<code class="site_uv"></code>人次 ， 访问量：<code class="site_pv"></code>次</p>
+</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/wangjinlong-padan/p/6382924.html">参考链接</a></p>
+<p>[^1]:</p>
+<pre><code>    File file1 = new File(&quot;D:\\io\\io2\\io3\\start.txt&quot;);
+    System.out.println(file1.createNewFile());//true创建成功，存在则false
+    File file2 = new File(&quot;D:\\io\\io1\\io3\\dest.txt&quot;);
+    System.out.println(file1.renameTo(file2));//dest不存在，则true
+    // &quot;D:\\io\\io2\\io3\\start.txt&quot;变成了&quot;D:\\io\\io1\\io3\\dest.txt&quot;( 路径不同：剪切 )
+    //若dest文件已存在，则返回false
+    File file3 = new File(&quot;D:\\io\\io1\\io3\\file.txt&quot;);
+    System.out.println(file2.renameTo(file3));( 同路径：重命名)
+</code></pre>
+<h1 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h1><h2 id="递归遍历"><a href="#递归遍历" class="headerlink" title="递归遍历"></a>递归遍历</h2><h3 id="1，遍历删除"><a href="#1，遍历删除" class="headerlink" title="1，遍历删除"></a>1，遍历删除</h3><p>要求：</p>
+<ul>
+<li>遍历d:\io目录下的所有文件and文件目录名</li>
+<li>删除png，img格式的文件，并告知删除成功</li>
+</ul>
+<p>代码示例：</p>
+<pre><code>public class FileTest1 &#123;
+    public static void intoDir(File f)&#123;//定义静态方法
+            File[] files = f.listFiles();//罗列内部所有File对象
+        for(File ff : files)&#123;
+            if (ff.isFile())&#123;
+                System.out.println(&quot;文件&quot; + ff.toString());
+                /*****************删除img，png格式的图片文件**********/
+                if(ff.toString().endsWith(&quot;img&quot;) || ff.toString().endsWith(&quot;png&quot;))&#123;
+                    ff.delete();
+                    System.out.println(&quot;删除成功：&quot;+ff.toString());
+                &#125;
+                /****************************************************/
+            &#125;
+            else&#123;
+                System.out.println(&quot;文件目录&quot; + ff.toString());
+                intoDir(ff);//递归
+            &#125;
+        &#125;
+    &#125;
+    public static void main(String[] args) throws IOException &#123;
+    File file = new File(&quot;D:\\io&quot;);
+   FileTest1.intoDir(file);//调用静态遍历方法
+    &#125;
+&#125;
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/7d1eec4e4ffa462dbea8d2fadcb2a6d4.png" alt="运行结果"></p>
+<h3 id="2，遍历计算大小"><a href="#2，遍历计算大小" class="headerlink" title="2，遍历计算大小"></a>2，遍历计算大小</h3><p>要求：</p>
+<ul>
+<li>计算指定文件目录的大小</li>
+<li>删除空文件（不是删空的文件目录）</li>
+</ul>
+<p>代码示例：</p>
+<pre><code>public class FileTest1 &#123;
+    public static long sumLength(File file)&#123;
+        File[] files = file.listFiles();
+        long sum = 0;
+        for(File f : files)&#123;
+            if (f.isFile())&#123;
+                /****判断是否为空文件，若是则删除并告知****/
+                long length = f.length();
+                if(length == 0)&#123;
+                    f.delete();
+                    System.out.println(&quot;删除空文件：&quot;+f.toString());
+                &#125;
+                else&#123;
+                    sum += length;
+                &#125;
+                /*******************  *****************/
+            &#125;
+            else&#123;
+                FileTest1.sumLength(f);
+            &#125;
+        &#125;
+        return sum;
+    &#125;
 
-        </article>
-        
-        
+
+    public static void main(String[] args) &#123;
+        File file = new File(&quot;D:\\io&quot;);
+        long l = FileTest1.sumLength(file);
+        System.out.println(&quot;该文件总长为：&quot;+l);
+    &#125;
+&#125;
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/42f104763d8742e3b6dd707a10e1b2e6.png" alt="运行结果"></p>
+<h3 id="为什么最后的文件总长计算结果为0？"><a href="#为什么最后的文件总长计算结果为0？" class="headerlink" title="为什么最后的文件总长计算结果为0？"></a>为什么最后的文件总长计算结果为0？</h3><p> <strong>因为小文件会内联存储</strong></p>
+<p><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/23972911?rf=51585723">NTFS文件系统是如何处理小文件的</a></p>
+<p><a target="_blank" rel="noopener" href="https://product.pconline.com.cn/itbk/software/dnyw/1703/8961027.html">占用空间和文件大小的区别</a><br>| |大小对比 |解释 |<br>|–|–|–|<br>小文件|文件大小 &gt; 占用空间<br>通常占用空间为0|因为小文件内联存储<br>大文件|文件大小 &lt; 占用空间|大文件占用空间包括了<strong>没有使用的簇</strong>的空间大小</p>
+
+      
+       <hr><span style="font-style: italic;color: gray;"> 生命以负熵为食，归整以抵抗熵增； </span>
+    </div>
+</article>
+
+
+
+
+
+
+
+    
+        <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="//cdn.jsdelivr.net/npm/mathjax@2.7.8/unpacked/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+<input type="hidden" id="MathJax-js"
+        value="//cdn.jsdelivr.net/npm/mathjax@2.7.8/unpacked/MathJax.js?config=TeX-MML-AM_CHTML">
+</input>
+    
+
+
+
+
     </div>
     <div class="copyright">
         <p class="footer-entry">
@@ -645,11 +821,11 @@
 <p class="footer-entry">"生命以负熵为食"
 
     </div>
-</div>
-<div class="full-toc">
-    <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
+    <div class="full-toc">
+        <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
 <a class="" id="rocket" ></a>
 
+    </div>
 </div>
 
 </body>
