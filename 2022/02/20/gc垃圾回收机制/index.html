@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>外部jar包的引入和打包 | ZJH&#39;blog</title>
+  <title>gc垃圾回收机制 | ZJH&#39;blog</title>
   <meta name="keywords" content="">
-  <meta name="description" content="外部jar包的引入和打包 | ZJH&#39;blog">
+  <meta name="description" content="gc垃圾回收机制 | ZJH&#39;blog">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="description" content="今天在看LinkedList源码的时候发现clear和unlink源码都对Node的前后和itme进行了分别置空，我之前的想法是直接把所有的Node本身直接置空，x.prev&#x3D;null和x.next&#x3D;null，直接x &#x3D; null也可以使得所有节点为空啊 但在参考了很多资料后发现，如果单纯的x&#x3D;null而不x.prev&#x3D;null和x.next&#x3D;null，可能不会正常触发GC，事情远远没有那么简单…">
 <meta property="og:type" content="article">
@@ -638,9 +638,9 @@
 </aside>
 <div id="post">
     <div class="pjax">
-        <article id="post-外部jar包的引入和打包" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-gc垃圾回收机制" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">外部jar包的引入和打包</h1>
+        <h1 class="article-title">gc垃圾回收机制</h1>
     
     <div class="article-meta">
         
@@ -650,7 +650,7 @@
             <i class="iconfont icon-category"></i>
             
             
-            <a  data-rel="Java后端">Java后端</a>
+            <a  data-rel="JVM">JVM</a>
             
         </span>
         
@@ -658,12 +658,12 @@
     </div>
     <div class="article-meta">
         
-            发布时间 : <time class="date" title='最后更新: 2022-02-15 15:51:05'>2022-02-15 15:47</time>
+            发布时间 : <time class="date" title='最后更新: 2022-02-20 00:20:02'>2022-02-20 00:17</time>
         
     </div>
     <div class="article-meta">
         
-        <span>字数:669</span>
+        <span>字数:2.3k</span>
         
         
         <span id="busuanzi_container_page_pv">
@@ -682,7 +682,7 @@
     
     <div class="toc-ref">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%8B%E8%BD%BDjar%E5%8C%85%E5%B9%B6%E5%AF%BC%E5%85%A5"><span class="toc-text">下载jar包并导入</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#pom%E9%85%8D%E7%BD%AE%E6%89%93%E5%8C%85%E7%8E%AF%E5%A2%83"><span class="toc-text">pom配置打包环境</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BE%9D%E8%B5%96-lt-dependencies-gt-%E4%B8%AD"><span class="toc-text">依赖&lt;dependencies&gt;中</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8F%92%E4%BB%B6-lt-build-gt-%E4%B8%AD"><span class="toc-text">插件&lt;build&gt;中</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%A4%96%E9%83%A8%E5%BC%95%E5%85%A5jar%E5%8C%85"><span class="toc-text">外部引入jar包</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#clean-package"><span class="toc-text">clean package</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%A1%A5-%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA"><span class="toc-text">补:运行时数据区</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A1%A5-%E7%A8%8B%E5%BA%8F%E8%AE%A1%E6%95%B0%E5%99%A8"><span class="toc-text">补:程序计数器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A1%A5-JVM%E5%A0%86%E7%A9%BA%E9%97%B4%EF%BC%88gc%E5%A0%86%EF%BC%89"><span class="toc-text">补:JVM堆空间（gc堆）</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%A1%A5-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%9A%84%E6%B5%81%E7%A8%8B"><span class="toc-text">补:垃圾回收的流程</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#JVM%E5%A6%82%E4%BD%95%E5%88%A4%E5%AE%9A%E4%B8%80%E4%B8%AA%E5%AF%B9%E8%B1%A1%E6%98%AF%E5%90%A6%E5%BA%94%E8%AF%A5%E8%A2%AB%E5%9B%9E%E6%94%B6"><span class="toc-text">JVM如何判定一个对象是否应该被回收?</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%BC%95%E7%94%A8%E8%AE%A1%E6%95%B0%E5%99%A8%E7%AE%97%E6%B3%95%C3%97"><span class="toc-text">1.引用计数器算法×</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%8F%AF%E8%BE%BE%E6%80%A7%E5%88%86%E6%9E%90%E7%AE%97%E6%B3%95%E2%88%9A"><span class="toc-text">2.可达性分析算法√</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#GC-Roots"><span class="toc-text">GC Roots</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A1%A5%E5%85%85%EF%BC%9A%E5%BC%95%E7%94%A8%E7%9A%84%E5%9B%9B%E7%A7%8D%E6%96%B9%E5%BC%8F%EF%BC%9A"><span class="toc-text">补充：引用的四种方式：</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%BA%E5%BC%95%E7%94%A8"><span class="toc-text">强引用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BD%AF%E5%BC%95%E7%94%A8SoftReference"><span class="toc-text">软引用SoftReference</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%B1%E5%BC%95%E7%94%A8WeakReference"><span class="toc-text">弱引用WeakReference</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%99%9A%E5%BC%95%E7%94%A8PhantomReference"><span class="toc-text">虚引用PhantomReference</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#JVM%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%AE%97%E6%B3%95%E6%9C%89%E5%93%AA%E4%BA%9B%EF%BC%9F"><span class="toc-text">JVM垃圾回收算法有哪些？</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%87%E8%AE%B0%E6%B8%85%E9%99%A4%E7%AE%97%E6%B3%95"><span class="toc-text">标记清除算法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%87%E8%AE%B0%E6%95%B4%E7%90%86%E7%AE%97%E6%B3%95"><span class="toc-text">标记整理算法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%8D%E5%88%B6%E7%AE%97%E6%B3%95"><span class="toc-text">复制算法</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#JVM%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%9C%BA%E5%88%B6"><span class="toc-text">JVM垃圾回收机制</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%A3%E7%9A%84%E5%88%92%E5%88%86"><span class="toc-text">代的划分</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%B0%E7%94%9F%E4%BB%A3%E7%9A%84%E4%B8%89%E4%B8%AA%E5%88%86%E5%8C%BA8-1-1"><span class="toc-text">新生代的三个分区8:1:1</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Minor-GC"><span class="toc-text">Minor GC</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Full-GC"><span class="toc-text">Full GC</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#STW"><span class="toc-text">STW</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8"><span class="toc-text">垃圾收集器</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#G1%E2%80%94%E2%80%94Garbage-one"><span class="toc-text">G1——Garbage one</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%B2%E8%A1%8C"><span class="toc-text">串行</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%90%9E%E5%90%90%E9%87%8F%E4%BC%98%E5%85%88"><span class="toc-text">吞吐量优先</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%93%8D%E5%BA%94%E6%97%B6%E9%97%B4%E6%9C%89%E9%99%90"><span class="toc-text">响应时间有限</span></a></li></ol></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -698,98 +698,109 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="下载jar包并导入"><a href="#下载jar包并导入" class="headerlink" title="下载jar包并导入"></a>下载jar包并导入</h1><p>一般是在maven网站上直接搜索需要的jar包下载，并在pom中导入依赖</p>
-<p><img src="https://img-blog.csdnimg.cn/3a4ff0af536445c0989a73a412a37678.png">有时候需要添加systemPath来指定jar包的位置，让springboot引用</p>
-<p>fastjson，因为是maven中下载的包，<strong>所以要指定scope和systemPath</strong></p>
-<pre><code>    &lt;dependency&gt;
-        &lt;groupId&gt;com.alibaba&lt;/groupId&gt;
-        &lt;artifactId&gt;fastjson&lt;/artifactId&gt;
-        &lt;version&gt;1.2.75&lt;/version&gt;
-        &lt;scope&gt;system&lt;/scope&gt;
-        &lt;systemPath&gt;$&#123;pom.basedir&#125;/src/main/resources/lib/fastjson-1.2.75.jar&lt;/systemPath&gt;
-    &lt;/dependency&gt;
-</code></pre>
-<p>pom.basedir还有project.basedir 也有直接basedir，具体出了问题搜bug就好<br><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_39132177/article/details/109023743?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522164491100016781685372508%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=164491100016781685372508&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduend~default-1-109023743.pc_search_result_control_group&utm_term=pom.basedir%E5%92%8Cproject.basedir&spm=1018.2226.3001.4187">Maven: Maven的六类属性</a></p>
-<p>下载好的jar包放在设置为resources的包下，一般是另外在下面建立一个lib表示外部导入<br><img src="https://img-blog.csdnimg.cn/9a2754b4c5b647c3a5b8a45ab1ed00c2.png" alt="下载好的jar"></p>
-<h1 id="pom配置打包环境"><a href="#pom配置打包环境" class="headerlink" title="pom配置打包环境"></a>pom配置打包环境</h1><p>注意<strong>依赖和插件</strong>是加在不同地方的</p>
-<h2 id="依赖-lt-dependencies-gt-中"><a href="#依赖-lt-dependencies-gt-中" class="headerlink" title="依赖&lt;dependencies&gt;中"></a>依赖&lt;dependencies&gt;中</h2><pre><code>&lt;!--maven打包插件--&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-            &lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;
-            &lt;version&gt;2.6.3&lt;/version&gt;
-        &lt;/dependency&gt;
-
-&lt;!--maven默认插件，用于编译源码--&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
-            &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
-            &lt;version&gt;3.8.1&lt;/version&gt;
-        &lt;/dependency&gt;
-</code></pre>
-<h2 id="插件-lt-build-gt-中"><a href="#插件-lt-build-gt-中" class="headerlink" title="插件&lt;build&gt;中"></a>插件&lt;build&gt;中</h2><p>忽视lombok插件</p>
-<pre><code>&lt;build&gt;
-    &lt;plugins&gt;
-        &lt;plugin&gt;
-            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-            &lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;
-            &lt;configuration&gt;
-
-                &lt;includeSystemScope&gt;true&lt;/includeSystemScope&gt;
-
-                &lt;excludes&gt;
-                    &lt;exclude&gt;
-                        &lt;groupId&gt;org.projectlombok&lt;/groupId&gt;
-                        &lt;artifactId&gt;lombok&lt;/artifactId&gt;
-                    &lt;/exclude&gt;
-                &lt;/excludes&gt;
-            &lt;/configuration&gt;
-        &lt;/plugin&gt;
-    &lt;/plugins&gt;
-&lt;/build&gt;
-</code></pre>
-<p>解释：</p>
-<ul>
-<li><p>spring-boot-maven-plugin是打包插件，<strong>引入这个插件之后用maven打包出来的jar包才是可执行的完整jar包</strong></p>
-</li>
-<li><p>而includeSystemScope&gt;true&lt;/includeSystemScope是<strong>设置打包的时候是否包括外部引入的jar包</strong></p>
-<pre><code>  &lt;build&gt;
-      &lt;plugins&gt;
-          &lt;plugin&gt;
-              &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-              &lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;
-              &lt;configuration&gt;
-
-                  &lt;includeSystemScope&gt;true&lt;/includeSystemScope&gt;
-
-                  &lt;excludes&gt;
-                      &lt;exclude&gt;
-                          &lt;groupId&gt;org.projectlombok&lt;/groupId&gt;
-                          &lt;artifactId&gt;lombok&lt;/artifactId&gt;
-                      &lt;/exclude&gt;
-                  &lt;/excludes&gt;
-              &lt;/configuration&gt;
-          &lt;/plugin&gt;
-      &lt;/plugins&gt;
-  &lt;/build&gt;
-</code></pre>
-</li>
+        <p>参考链接：<br><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1AE411E7uj?p=1">https://www.bilibili.com/video/BV1AE411E7uj?p=1</a><br><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1yE411Z7AP?spm_id_from=333.999.0.0">https://www.bilibili.com/video/BV1yE411Z7AP?spm_id_from=333.999.0.0</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/chenpt/p/9803298.html">https://www.cnblogs.com/chenpt/p/9803298.html</a><br><a target="_blank" rel="noopener" href="https://www.iteye.com/problems/71569">https://www.iteye.com/problems/71569</a><br><a target="_blank" rel="noopener" href="https://codingdict.com/questions/113892">https://codingdict.com/questions/113892</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/dmzna/archive/2020/05/18/12913458.html">https://www.cnblogs.com/dmzna/archive/2020/05/18/12913458.html</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/shouyaya/p/13524476.html">https://www.cnblogs.com/shouyaya/p/13524476.html</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/mccand1234/article/details/52078645">https://blog.csdn.net/mccand1234/article/details/52078645</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_41701956/article/details/81664921">https://blog.csdn.net/qq_41701956/article/details/81664921</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/yubujian_l/article/details/80804708">https://blog.csdn.net/yubujian_l/article/details/80804708</a></p>
+<h1 id="补-运行时数据区"><a href="#补-运行时数据区" class="headerlink" title="补:运行时数据区"></a>补:运行时数据区</h1><p><img src="https://img-blog.csdnimg.cn/82bc155c3ade45cca26dbad5798bd46c.png"></p>
+<h2 id="补-程序计数器"><a href="#补-程序计数器" class="headerlink" title="补:程序计数器"></a>补:程序计数器</h2><p>为了<strong>保证程序（在操作系统中理解为进程）能够连续地执行下去</strong>，处理器必须具有某些手段来确定下一条指令的地址。而程序计数器正是起到这种作用，所以通常又称为指令计数器。在程序开始执行前，必须将它的起始地址，即程序的第一条指令所在的内存单元地址送入程序计数器，因此程序计数器的内容即是从内存提取的一条指令的地址。当执行指令时，处理器将自动修改PC的内容，即每执行一条指令PC增加一个量，这个量等于指令所含的字节数，以便使其保持的总是将要执行的下一条指令的地址。由于大多数指令都是按顺序来执行的，所以修改的过程通常只是简单的对PC加1。<br>但是，当遇到转移指令如JMP（跳转、外语全称：JUMP）指令时，后继指令的地址（即PC的内容）必须从指令寄存器中的地址字段取得。在这种情况下，下一条从内存取出的指令将由转移指令来规定，而不像通常一样按顺序来取得。因此程序计数器的结构应当是具有寄存信息和计数两种功能的结构。<br><strong>这一部分不会发生内存泄漏</strong>，程序计数器指令可以标记<strong>if for 多线程</strong>等“<strong>运行到哪里”</strong>  通常又称之为‘指令计数器’</p>
+<h2 id="补-JVM堆空间（gc堆）"><a href="#补-JVM堆空间（gc堆）" class="headerlink" title="补:JVM堆空间（gc堆）"></a>补:JVM堆空间（gc堆）</h2><ul>
+<li>存放: 对象实例 and  数组</li>
+<li>每次new操作都是在堆中开辟空间，不一定是连续的空间，</li>
+<li>堆空间的分配常用分代策略（新生代 老年代 永久代（现：元空间））</li>
 </ul>
-<h1 id="外部引入jar包"><a href="#外部引入jar包" class="headerlink" title="外部引入jar包"></a>外部引入jar包</h1><p>这里以阿里的fastJson为例<br><img src="https://img-blog.csdnimg.cn/e8289d1b669640ceb709e11c0cea7e2e.png"><br>同时，需要在pom中引入依赖</p>
-<pre><code>    &lt;dependency&gt;
-        &lt;groupId&gt;com.alibaba&lt;/groupId&gt;
-        &lt;artifactId&gt;fastjson&lt;/artifactId&gt;
-        &lt;version&gt;1.2.75&lt;/version&gt;
-        &lt;scope&gt;system&lt;/scope&gt;
-        &lt;systemPath&gt;$&#123;pom.basedir&#125;/src/main/resources/lib/fastjson-1.2.75.jar&lt;/systemPath&gt;
-    &lt;/dependency&gt;
-</code></pre>
-<p>注意：</p>
+<h1 id="补-垃圾回收的流程"><a href="#补-垃圾回收的流程" class="headerlink" title="补:垃圾回收的流程"></a>补:垃圾回收的流程</h1><p>以分代机制+回收算法+G1垃圾收集器为例：</p>
 <ul>
-<li>scope&gt;system&lt;/scope必须设置system，这里和上面的includeSystemScope&gt;true&lt;/includeSystemScope呼应</li>
-<li>systemPath&gt;${pom.basedir}/src/main/resources/lib/fastjson-1.2.75.jar&lt;/systemPath中的路径必须指明引入的jar包</li>
+<li><strong>G1垃圾收集器</strong>决定了：垃圾回收的cpu资源调度方式是并发兼顾延迟和吞吐量，分堆；能结合多种算法策略，是一个监视者的角色。</li>
+<li>回收算法决定了：xx对象在本轮回收中是否被回收，如强引用则不回收，其他引用回收策略不同</li>
+<li>分代机制决定了：什么时候调用垃圾回收，如新生代区的Eden满后调用Minor GC</li>
+<li>过程：不停的new，因为引用方式不同and对象大小不同，会导致不同的对象分在了元空间(相当于JDK8之前的永久代)、新生代(Eden满后Minor GC)、老年代(System.gc()或老年代区满后Full GC)<br>————因为垃圾回收器的区别，如G1会动态监控并标记GC Roots，调用回收算法<br>————进行可达性分析，决定对象的去留<br>————调用Full GC来进行垃圾回收，释放内存</li>
 </ul>
-<h1 id="clean-package"><a href="#clean-package" class="headerlink" title="clean package"></a>clean package</h1><p>打包之后，点开jar包<br><img src="https://img-blog.csdnimg.cn/3de292498eda49b18388da2934d0ec98.png" alt="打包之后"></p>
-<p>搜索lib<br><img src="https://img-blog.csdnimg.cn/e3a21d2529674a099e53caf6a7a0f931.png" alt="在jar包中找到了fastJson包"></p>
+<h1 id="JVM如何判定一个对象是否应该被回收"><a href="#JVM如何判定一个对象是否应该被回收" class="headerlink" title="JVM如何判定一个对象是否应该被回收?"></a>JVM如何判定一个对象是否应该被回收?</h1><h2 id="1-引用计数器算法×"><a href="#1-引用计数器算法×" class="headerlink" title="1.引用计数器算法×"></a>1.引用计数器算法×</h2><p>方法内容：<br>对象被引用一次，计数器+1；失效一次，计数器-1，计数器归零后失效</p>
+<p><strong>不能解决互相引用</strong>情况下的垃圾回收问题，例如：LinkedList源码中clear方法和unLinked方法需要多步操作<strong>来消除循环引用</strong></p>
+<h2 id="2-可达性分析算法√"><a href="#2-可达性分析算法√" class="headerlink" title="2.可达性分析算法√"></a>2.可达性分析算法√</h2><p>在Java C＃中的主流算法<br>算法思想：<br>通过一些列成为“GC Roots”的<strong>根对象</strong>作为起始点，如果一条引用链的起始点不是GC Roots，那么就会被垃圾回收（<strong>不是强引用就会被垃圾回收，只是时间问题</strong>）<br>GC Roots包括：</p>
+<ol>
+<li>虚拟机栈中引用的对象</li>
+<li>方法区静态属性引用的对象</li>
+<li>方法区常量引用的对象</li>
+<li>本地方法引用的对象（底层是c或操作系统语言）<br><img src="https://img-blog.csdnimg.cn/dc4ad3fb230748bf8f14980cbcbf1449.png" alt="打圈的会被回收"><h3 id="GC-Roots"><a href="#GC-Roots" class="headerlink" title="GC Roots"></a>GC Roots</h3>这其实是一个相对的概念，在调用Minor GC的时候，老年代就是根对象<br>像上面的那4种是“即使Full GC”也不会回收的，就是绝对的根对象</li>
+</ol>
+<h2 id="补充：引用的四种方式："><a href="#补充：引用的四种方式：" class="headerlink" title="补充：引用的四种方式："></a>补充：引用的四种方式：</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/linzhiqiang0316/article/details/88591907?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_title~default-0.pc_relevant_default&spm=1001.2101.3001.4242.1&utm_relevant_index=2">参考链接</a></p>
+<h3 id="强引用"><a href="#强引用" class="headerlink" title="强引用"></a>强引用</h3><p>Object obj = new Object();强引用在，垃圾收集器就一直不会被回收该对象，JVM宁愿抛出OutOfMemory错误也不会回收这种对象。如果想中断强引用和某个对象之间的关联，可以显示地将引用赋值为null，这样一来的话，JVM在合适的时间就会回收该对象。</p>
+<h3 id="软引用SoftReference"><a href="#软引用SoftReference" class="headerlink" title="软引用SoftReference"></a>软引用SoftReference</h3><p>SoftReference aSoftRef=new SoftReference(obj);如果一个对象具有软引用，内存空间足够，垃圾回收器就不会回收它；软引用可用来实现内存敏感的高速缓存，<strong>一旦垃圾线程回收该Java对象之 后，get()方法将返回null</strong></p>
+<p><img src="https://img-blog.csdnimg.cn/5c02dfba92cc4a4ca626b50c48ea0369.png"></p>
+<h3 id="弱引用WeakReference"><a href="#弱引用WeakReference" class="headerlink" title="弱引用WeakReference"></a>弱引用WeakReference</h3><p>创建方法和WeakReference 相同，但比SoftReference更弱，<strong>仅仅能生存到下次垃圾回收之前</strong>，无论内存是否足够 都会回收</p>
+<pre><code>    People people=new People(&quot;zjh&quot;,21);  
+    WeakReference&lt;People&gt;reference=new WeakReference&lt;People&gt;(people);
+    System.out.println(reference.get());  //zjh 21
+    System.gc();  
+    System.out.println(reference.get()); //null
+</code></pre>
+<h3 id="虚引用PhantomReference"><a href="#虚引用PhantomReference" class="headerlink" title="虚引用PhantomReference"></a>虚引用PhantomReference</h3><p>最弱的引用关系，虚引用主要用来<strong>跟踪</strong>对象被垃圾回收的活动，在回收之前通知系统，但<strong>不影响对象的生命周期</strong>。</p>
+<h1 id="JVM垃圾回收算法有哪些？"><a href="#JVM垃圾回收算法有哪些？" class="headerlink" title="JVM垃圾回收算法有哪些？"></a>JVM垃圾回收算法有哪些？</h1><ul>
+<li>以下三种方法，在实际的虚拟机中是组合使用，去其糟粕，取其精华</li>
+<li>垃圾回收算法 和 回收机制不同</li>
+</ul>
+<h2 id="标记清除算法"><a href="#标记清除算法" class="headerlink" title="标记清除算法"></a>标记清除算法</h2><p>标记不连续，可用内存被分割，在申请连续大空间时可能没有可用的内存，资源浪费大<br><img src="https://img-blog.csdnimg.cn/592240b2bc514b7ea211e3fa194d9f16.png"></p>
+<h2 id="标记整理算法"><a href="#标记整理算法" class="headerlink" title="标记整理算法"></a>标记整理算法</h2><p>标记的同时把可用对象整理在一起</p>
+<p><img src="https://img-blog.csdnimg.cn/53fe5484d0554b6db22d524888041867.png"></p>
+<h2 id="复制算法"><a href="#复制算法" class="headerlink" title="复制算法"></a>复制算法</h2><p>局限性很大，内存利用率很差，先复制可用存活对象复制到一块区域</p>
+<p><img src="https://img-blog.csdnimg.cn/87e917f8d1b8489e8fcc834e22e1a41a.png">右边这块的内存都是不能使用的</p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/dmzna/archive/2020/05/18/12913458.html">参考链接</a></p>
+<h1 id="JVM垃圾回收机制"><a href="#JVM垃圾回收机制" class="headerlink" title="JVM垃圾回收机制"></a>JVM垃圾回收机制</h1><ul>
+<li>回收机制≠回收算法</li>
+<li>常用的是<strong>分代回收策略</strong></li>
+<li>一般是只要<strong>空间不足就触发</strong>垃圾回收机制<h2 id="代的划分"><a href="#代的划分" class="headerlink" title="代的划分"></a>代的划分</h2></li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/3c26182da16a4119a79f012073d0e2d1.png"></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/mccand1234/article/details/52078645">参考链接1</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/jichi/p/12580906.html">参考链接2</a></p>
+<p>商用Java内存分配和回收的机制概括的说，就是：<strong>分代分配，分代回收</strong>。</p>
+<ul>
+<li>对象将根据<strong>存活的时间</strong>被分为：<br>年轻代（Young Generation）：<strong>回收频率快</strong><br>年老代（Old Generation）：<strong>回收频率慢</strong><br>永久代（Permanent Generation，也就是方法区，JDK1.8之后删除了永久代）</li>
+<li>不同代有不同的算法，不同的处理机制</li>
+<li>内存担保机制：新生代到老年代</li>
+</ul>
+<h3 id="新生代的三个分区8-1-1"><a href="#新生代的三个分区8-1-1" class="headerlink" title="新生代的三个分区8:1:1"></a>新生代的三个分区8:1:1</h3><p>Eden伊甸园:From幸存区:To幸存区=8：1：1<br>From是上一次幸存的对象<br>To是本次幸存的对象</p>
+<ul>
+<li>new一个对象，默认采用伊甸园的空间，<strong>大对象则直接到老年代</strong></li>
+<li>一直new直到伊甸园空间放不够了就触发<strong>新生代垃圾回收Minor GC</strong></li>
+<li>直到连老年代都快满了，触发<strong>老年代垃圾回收Full GC</strong></li>
+</ul>
+<h3 id="Minor-GC"><a href="#Minor-GC" class="headerlink" title="Minor GC"></a>Minor GC</h3><ul>
+<li><strong>触发</strong>了Minor GC之后就调用<strong>垃圾回收算法</strong>（标记清除、标记整理、复制算法）</li>
+<li>例如调用了标记算法，就把标记存活的对象复制到幸存区To中，<strong>寿命计数器+1</strong>；而被标记回收的伊甸园对象则被回收</li>
+<li>伊甸园再次空闲，直到下次满的时候<strong>触发第二次Minor GC</strong></li>
+<li>寿命计数器&gt;15(4bit)时(可能因为新生代空间严重不足而提前晋升)，对象从新生代传入老年代，此后不会被Minor GC回收</li>
+<li><strong>会触发STW，但耗时短</strong><h3 id="Full-GC"><a href="#Full-GC" class="headerlink" title="Full GC"></a>Full GC</h3></li>
+<li>新生代老年代<strong>同时进行垃圾回收</strong></li>
+<li><strong>会触发STW，且耗时长</strong></li>
+<li>调用System.gc()</li>
+</ul>
+<h2 id="STW"><a href="#STW" class="headerlink" title="STW"></a>STW</h2><ul>
+<li>stop thr world 当触发STW时，其他的所有线程都停止，直到垃圾回收完成</li>
+<li>因此回收效率高，但会有停顿时间，适合在Client端使用，不适合在Sever端使用</li>
+<li>Minor GC 和 Full GC都会触发STW</li>
+</ul>
+<h1 id="垃圾收集器"><a href="#垃圾收集器" class="headerlink" title="垃圾收集器"></a>垃圾收集器</h1><p>JVM中的垃圾收集器主要包括7种，即Serial，Serial Old，ParNew，Parallel Scavenge，Parallel Old以及CMS，G1收集器。<br><img src="https://img-blog.csdnimg.cn/3107e1c7f6c44dc59dd32dba530ca563.png"></p>
+<h2 id="G1——Garbage-one"><a href="#G1——Garbage-one" class="headerlink" title="G1——Garbage one"></a>G1——Garbage one</h2><ul>
+<li><strong>取代CMS</strong>垃圾回收器</li>
+<li>出自JDK7，JDK9之后成为<strong>默认</strong>的垃圾回收器</li>
+<li><strong>并发</strong></li>
+<li><strong>同时注重吞吐量和响应时间</strong></li>
+<li>适合于超大内存场景，<strong>会将堆均匀分区以便并发</strong>，每个区都有独立的年轻代、老年代堆区域</li>
+<li>CMS和G1都是<strong>Full GC</strong>(老年代垃圾回收机制)<br><img src="https://img-blog.csdnimg.cn/4038af9659a6445fb1f3391d9633622b.png"></li>
+</ul>
+<h2 id="串行"><a href="#串行" class="headerlink" title="串行"></a>串行</h2><ul>
+<li>单线程</li>
+<li>堆内存小，适合个人电脑</li>
+</ul>
+<h2 id="吞吐量优先"><a href="#吞吐量优先" class="headerlink" title="吞吐量优先"></a>吞吐量优先</h2><ul>
+<li>多线程</li>
+<li>堆内存大，需要多核CPU支持（真并发），适合服务器</li>
+<li>一次大量回收，<strong>单位时间STW时间尽可能短</strong>，总时间更短</li>
+</ul>
+<h2 id="响应时间有限"><a href="#响应时间有限" class="headerlink" title="响应时间有限"></a>响应时间有限</h2><ul>
+<li>多线程</li>
+<li>堆内存大，需要多核CPU支持（真并发），适合服务器</li>
+<li>单次少量回收，<strong>单次STW时间尽可能短</strong>，每次影响更小</li>
+</ul>
 
       
        <hr><span style="font-style: italic;color: gray;"> 生命以负熵为食，归整以抵抗熵增； </span>
