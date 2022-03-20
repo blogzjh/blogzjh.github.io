@@ -6,21 +6,53 @@
   <meta name="keywords" content="">
   <meta name="description" content="File常用操作 | ZJH&#39;blog">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="一些总结 因为.next可以移动指针，所以某些for循环条件不需用index 双向链表有双向指针，需要相互指定 要巧用“假设索引为0”来进行微调代码 因为LinkedList的设计是有first和last头尾节点，所以在根据index增删的时候需要对头尾节点先进行判断 因此在LinkeList源码中会事先定义addFirst addLast removeFirst removeLast方法以便调用">
+<meta name="description" content="黑马2022Redis教程 Redis命令官方文档 Redis通用命令KEYS查KEYS：查看符合模板的key(模糊查询)，单线程，且不适合大规模的生产环境 DEL删可以一次删一个or一次删多个 EXIST判断是否存在返回值就是个数  EXPIRE设置有效期到有效期后自动删除。Redis消耗的是内存空间，为了节省空间or满足应用场景（例如短信验证码就必须在几分钟之内确认）单位是seconds  T">
 <meta property="og:type" content="article">
-<meta property="og:title" content="手写双向链表+反转单向链表">
-<meta property="og:url" content="https://zjhblog.gitee.io/2022/03/07/%E6%89%8B%E5%86%99%E5%8F%8C%E5%90%91%E9%93%BE%E8%A1%A8-%E5%8F%8D%E8%BD%AC%E5%8D%95%E5%90%91%E9%93%BE%E8%A1%A8/index.html">
+<meta property="og:title" content="Redis基础">
+<meta property="og:url" content="https://zjhblog.gitee.io/2022/03/21/Redis%E5%9F%BA%E7%A1%80/index.html">
 <meta property="og:site_name" content="ZJH&#39;blog">
-<meta property="og:description" content="一些总结 因为.next可以移动指针，所以某些for循环条件不需用index 双向链表有双向指针，需要相互指定 要巧用“假设索引为0”来进行微调代码 因为LinkedList的设计是有first和last头尾节点，所以在根据index增删的时候需要对头尾节点先进行判断 因此在LinkeList源码中会事先定义addFirst addLast removeFirst removeLast方法以便调用">
+<meta property="og:description" content="黑马2022Redis教程 Redis命令官方文档 Redis通用命令KEYS查KEYS：查看符合模板的key(模糊查询)，单线程，且不适合大规模的生产环境 DEL删可以一次删一个or一次删多个 EXIST判断是否存在返回值就是个数  EXPIRE设置有效期到有效期后自动删除。Redis消耗的是内存空间，为了节省空间or满足应用场景（例如短信验证码就必须在几分钟之内确认）单位是seconds  T">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/49d84236a26c4e4080d79a170ed461ba.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/c74c4beefccd436d9b4baf704712ed1b.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/2b95766d786f41289b105cb726debec8.png">
-<meta property="article:published_time" content="2022-03-07T14:14:38.000Z">
-<meta property="article:modified_time" content="2022-03-07T14:14:57.094Z">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/67bd8c29a4a04d3c866f356c397485b0.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/823b535252a54838b46f2bb0b8ab6081.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/68dfdcbcaddf432199d98df12be1b4d9.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8575d9a3dfb2453c91aadebc670f6267.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b89cef186fab4a19b00dab7e3ddb1508.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d74d579593404ab4bb8bac3897cf6f93.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f9ead04d04be4064a376435a23dbad81.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/acd52ff1e6aa40abb90b3992171d6bab.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/60f049bd6825481b9653e831c18621bf.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e37a50b398114b9eba301cffc69ccb71.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5773760d4c5e43928c8b589d3fb17f3a.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a721d2deca964993a160deb5a1e9f7ca.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d1d3d535c8d7403d88cc338e473526b5.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/22b614d872864172a67c25c852d8d1c7.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/07d4ec5129984fc098a5385b5d95af2f.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/36f686094029449db06cc6c8061f000a.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7ecebb90d3ff4709a2cbb11dff352398.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/3ab41f5d40114712b9de262be2553e16.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7d367666b9e7422486aeb5109f34bc19.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/cbcfc4462d024f27bb037953ec5398e6.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8dc17f21cbd04ab583e95cccd80c35ef.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2876aaa9f2424a2c9d38303b7fe8623f.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/580ccaf647664c789be1b3b860b82b95.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4d640d9939824332b124ffb467d1eead.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/49f4398a80b34411b5d6c4218d805638.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/046f3597185f4738bf6fec90812f5239.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5ff23d4bc3314c1d9149c78b38dee152.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5789df7f16fa4b649d2f61bf95947319.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5cf26591d6394c639a6c0bb147184cab.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/aa16604a29ff4f72859cfe491e69ac57.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/bb8b505c296844658f3bc3e08e8c71da.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d2a6995212ea420484cd51601770bd66.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/12394b40245e47dd9f98b005a8da8821.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4280c1b7617b43158796b9936ecf26dd.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/30714d15cc9245db8d867498bc32757c.png">
+<meta property="article:published_time" content="2022-03-20T16:20:03.000Z">
+<meta property="article:modified_time" content="2022-03-20T16:22:35.542Z">
 <meta property="article:author" content="ZJH">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://img-blog.csdnimg.cn/49d84236a26c4e4080d79a170ed461ba.png">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/67bd8c29a4a04d3c866f356c397485b0.png">
 
 
 <link rel="icon" href="/img/QQ图片20211224224200.jpg">
@@ -130,7 +162,7 @@
     <li>
         <div class="all active" data-rel="全部文章">全部文章
             
-                <small>(45)</small>
+                <small>(50)</small>
             
         </div>
     </li>
@@ -211,7 +243,7 @@
                     <div data-rel="源码">
                         
                         源码
-                        <small>(2)</small>
+                        <small>(4)</small>
                         
                     </div>
                     
@@ -267,7 +299,7 @@
                     <div data-rel="Java后端">
                         
                         Java后端
-                        <small>(12)</small>
+                        <small>(15)</small>
                         
                     </div>
                     
@@ -302,8 +334,8 @@
         
     </div>
 </div>
-<input type="hidden" id="yelog_site_posts_number" value="45">
-<input type="hidden" id="yelog_site_word_count" value="57.9k">
+<input type="hidden" id="yelog_site_posts_number" value="50">
+<input type="hidden" id="yelog_site_word_count" value="68.4k">
 <div style="display: none">
     <span id="busuanzi_value_site_uv"></span>
     <span id="busuanzi_value_site_pv"></span>
@@ -348,6 +380,14 @@
     <input id="tag-search" />
     <div class="tag-wrapper">
         
+            <li class="article-tag-list-item">
+                <i class="iconfont icon-tag"></i><a>HashMap</a>
+            </li>
+        
+            <li class="article-tag-list-item">
+                <i class="iconfont icon-tag"></i><a>MVC</a>
+            </li>
+        
     </div>
 
 </div>
@@ -361,6 +401,46 @@
            data-author="" >
             <span class="post-title" title="IDEA常用快捷键">IDEA常用快捷键</span>
             <span class="post-date" title="2021-12-25 21:55:46">2021/12/25</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/03/21/Redis%E5%9F%BA%E7%A1%80/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Redis基础">Redis基础</span>
+            <span class="post-date" title="2022-03-21 00:20:03">2022/03/21</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/03/21/JavaWeb%E5%9F%BA%E7%A1%80/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="JavaWeb基础">JavaWeb基础</span>
+            <span class="post-date" title="2022-03-21 00:19:19">2022/03/21</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/03/21/SpringMVC%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3/"
+           data-tag="MVC"
+           data-author="" >
+            <span class="post-title" title="SpringMVC常用注解">SpringMVC常用注解</span>
+            <span class="post-date" title="2022-03-21 00:18:03">2022/03/21</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/03/21/HashMap%E4%B8%ADentrySet-%E8%AF%A6%E8%A7%A3/"
+           data-tag="HashMap"
+           data-author="" >
+            <span class="post-title" title="HashMap中entrySet()详解">HashMap中entrySet()详解</span>
+            <span class="post-date" title="2022-03-21 00:15:10">2022/03/21</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/03/21/HashMap/"
+           data-tag="HashMap"
+           data-author="" >
+            <span class="post-title" title="HashMap">HashMap</span>
+            <span class="post-date" title="2022-03-21 00:13:23">2022/03/21</span>
         </a>
         
         <a  class="全部文章 数据结构算法 "

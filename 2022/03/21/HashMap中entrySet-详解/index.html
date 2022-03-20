@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>HashMap中entrySet()详解 | ZJH&#39;blog</title>
+  <meta name="keywords" content=" HashMap ">
+  <meta name="description" content="HashMap中entrySet()详解 | ZJH&#39;blog">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="description" content="黑马2022Redis教程 Redis命令官方文档 Redis通用命令KEYS查KEYS：查看符合模板的key(模糊查询)，单线程，且不适合大规模的生产环境 DEL删可以一次删一个or一次删多个 EXIST判断是否存在返回值就是个数  EXPIRE设置有效期到有效期后自动删除。Redis消耗的是内存空间，为了节省空间or满足应用场景（例如短信验证码就必须在几分钟之内确认）单位是seconds  T">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis基础">
+<meta property="og:url" content="https://zjhblog.gitee.io/2022/03/21/Redis%E5%9F%BA%E7%A1%80/index.html">
+<meta property="og:site_name" content="ZJH&#39;blog">
+<meta property="og:description" content="黑马2022Redis教程 Redis命令官方文档 Redis通用命令KEYS查KEYS：查看符合模板的key(模糊查询)，单线程，且不适合大规模的生产环境 DEL删可以一次删一个or一次删多个 EXIST判断是否存在返回值就是个数  EXPIRE设置有效期到有效期后自动删除。Redis消耗的是内存空间，为了节省空间or满足应用场景（例如短信验证码就必须在几分钟之内确认）单位是seconds  T">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/67bd8c29a4a04d3c866f356c397485b0.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/823b535252a54838b46f2bb0b8ab6081.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/68dfdcbcaddf432199d98df12be1b4d9.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8575d9a3dfb2453c91aadebc670f6267.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b89cef186fab4a19b00dab7e3ddb1508.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d74d579593404ab4bb8bac3897cf6f93.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f9ead04d04be4064a376435a23dbad81.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/acd52ff1e6aa40abb90b3992171d6bab.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/60f049bd6825481b9653e831c18621bf.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e37a50b398114b9eba301cffc69ccb71.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5773760d4c5e43928c8b589d3fb17f3a.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a721d2deca964993a160deb5a1e9f7ca.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d1d3d535c8d7403d88cc338e473526b5.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/22b614d872864172a67c25c852d8d1c7.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/07d4ec5129984fc098a5385b5d95af2f.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/36f686094029449db06cc6c8061f000a.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7ecebb90d3ff4709a2cbb11dff352398.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/3ab41f5d40114712b9de262be2553e16.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7d367666b9e7422486aeb5109f34bc19.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/cbcfc4462d024f27bb037953ec5398e6.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8dc17f21cbd04ab583e95cccd80c35ef.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2876aaa9f2424a2c9d38303b7fe8623f.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/580ccaf647664c789be1b3b860b82b95.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4d640d9939824332b124ffb467d1eead.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/49f4398a80b34411b5d6c4218d805638.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/046f3597185f4738bf6fec90812f5239.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5ff23d4bc3314c1d9149c78b38dee152.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5789df7f16fa4b649d2f61bf95947319.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5cf26591d6394c639a6c0bb147184cab.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/aa16604a29ff4f72859cfe491e69ac57.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/bb8b505c296844658f3bc3e08e8c71da.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d2a6995212ea420484cd51601770bd66.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/12394b40245e47dd9f98b005a8da8821.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4280c1b7617b43158796b9936ecf26dd.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/30714d15cc9245db8d867498bc32757c.png">
+<meta property="article:published_time" content="2022-03-20T16:20:03.000Z">
+<meta property="article:modified_time" content="2022-03-20T16:22:35.542Z">
+<meta property="article:author" content="ZJH">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/67bd8c29a4a04d3c866f356c397485b0.png">
+
+
+<link rel="icon" href="/img/QQ图片20211224224200.jpg">
+
+<link href="/zjh/css/style.css?v=1.1.0" rel="stylesheet">
+
+<link href="/zjh/css/hl_theme/atom-dark.css?v=1.1.0" rel="stylesheet">
+
+<link href="//cdn.jsdelivr.net/npm/animate.css@4.1.0/animate.min.css" rel="stylesheet">
+
+<script src="//cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+<script src="/zjh/js/titleTip.js?v=1.1.0" ></script>
+
+<script src="//cdn.jsdelivr.net/npm/highlightjs@9.16.2/highlight.pack.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+<script src="//cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js"></script>
+
+
+
+<script src="//cdn.jsdelivr.net/npm/jquery.cookie@1.4.1/jquery.cookie.min.js" ></script>
+
+<script src="/zjh/js/iconfont.js?v=1.1.0" ></script>
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<div style="display: none">
+  <input class="theme_disqus_on" value="false">
+  <input class="theme_preload_comment" value="">
+  <input class="theme_blog_path" value="/zjh">
+  <input id="theme_shortcut" value="true" />
+  <input id="theme_highlight_on" value="true" />
+  <input id="theme_code_copy" value="true" />
+</div>
+
+
+
+<body>
+<aside class="nav">
+    <div class="nav-left">
+        <a href="/zjh/"
+   class="avatar_target">
+    <img class="avatar"
+         src="/zjh/img/QQ图片20211224224200.jpg"/>
+</a>
+<div class="author">
+    <span>ZJH</span>
+</div>
+
+<div class="icon">
+    
+        
+            <a title="github"
+               href="https://github.com/BetterZJH"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-github"></use>
+                    </svg>
+                
+            </a>
+        
+    
+        
+            <a title="csdn"
+               href="https://blog.csdn.net/m0_56079407"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-csdn"></use>
+                    </svg>
+                
+            </a>
+        
+    
+        
+            <a title="email"
+               href="mailto:847829122@qq.com"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-email"></use>
+                    </svg>
+                
+            </a>
+        
+    
+        
+            <a title="qq"
+               href="http://wpa.qq.com/msgrd?v=3&uin=847829122&site=qq&menu=yes"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-qq"></use>
+                    </svg>
+                
+            </a>
+        
+    
+</div>
+
+
+
+
+<ul>
+    <li>
+        <div class="all active" data-rel="全部文章">全部文章
+            
+                <small>(50)</small>
+            
+        </div>
+    </li>
+    
+        
+            
+                <li>
+                    <div data-rel="工具">
+                        
+                        工具
+                        <small>(3)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="数据库">
+                        
+                        数据库
+                        <small>(2)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="数据结构算法">
+                        
+                        数据结构算法
+                        <small>(5)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="机器学习">
+                        
+                        机器学习
+                        <small>(2)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="前端">
+                        
+                        前端
+                        <small>(1)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="源码">
+                        
+                        源码
+                        <small>(4)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="Bug">
+                        
+                        Bug
+                        <small>(4)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="Demo">
+                        
+                        Demo
+                        <small>(1)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="Java">
+                        
+                        Java
+                        <small>(11)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="Java后端">
+                        
+                        Java后端
+                        <small>(15)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="JVM">
+                        
+                        JVM
+                        <small>(1)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+</ul>
+<div class="left-bottom">
+    <div class="menus">
+        
+            
+            
+            
+    </div>
+    <div>
+        
+        
+    </div>
+</div>
+<input type="hidden" id="yelog_site_posts_number" value="50">
+<input type="hidden" id="yelog_site_word_count" value="68.4k">
+<div style="display: none">
+    <span id="busuanzi_value_site_uv"></span>
+    <span id="busuanzi_value_site_pv"></span>
+</div>
+
+    </div>
+    <div class="nav-right">
+        <div class="friends-area">
+    <div class="friends-title">
+        友情链接
+        <i class="iconfont icon-left"></i>
+    </div>
+    <div class="friends-content">
+        <ul>
+            
+            <li><a target="_blank" href="http://yelog.org/">叶落阁</a></li>
+            
+        </ul>
+    </div>
+</div>
+        <div class="title-list">
+    <div class="right-top">
+        <div id="default-panel">
+            <i class="iconfont icon-search" data-title="搜索 快捷键 i"></i>
+            <div class="right-title">全部文章</div>
+            <i class="iconfont icon-file-tree" data-title="切换到大纲视图 快捷键 w"></i>
+        </div>
+        <div id="search-panel">
+            <i class="iconfont icon-left" data-title="返回"></i>
+            <input id="local-search-input" autocomplete="off"/>
+            <label class="border-line" for="input"></label>
+            <i class="iconfont icon-case-sensitive" data-title="大小写敏感"></i>
+            <i class="iconfont icon-tag" data-title="标签"></i>
+        </div>
+        <div id="outline-panel" style="display: none">
+            <div class="right-title">大纲</div>
+            <i class="iconfont icon-list" data-title="切换到文章列表"></i>
+        </div>
+    </div>
+
+    <div class="tags-list">
+    <input id="tag-search" />
+    <div class="tag-wrapper">
+        
+            <li class="article-tag-list-item">
+                <i class="iconfont icon-tag"></i><a>HashMap</a>
+            </li>
+        
+            <li class="article-tag-list-item">
+                <i class="iconfont icon-tag"></i><a>MVC</a>
+            </li>
+        
+    </div>
+
+</div>
+
+    
+    <nav id="title-list-nav">
+        
+        <a id="top" class="全部文章 工具 "
+           href="/zjh/2021/12/25/IDEA%E5%B8%B8%E7%94%A8%E5%BF%AB%E6%8D%B7%E9%94%AE/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="IDEA常用快捷键">IDEA常用快捷键</span>
+            <span class="post-date" title="2021-12-25 21:55:46">2021/12/25</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/03/21/Redis%E5%9F%BA%E7%A1%80/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Redis基础">Redis基础</span>
+            <span class="post-date" title="2022-03-21 00:20:03">2022/03/21</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/03/21/JavaWeb%E5%9F%BA%E7%A1%80/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="JavaWeb基础">JavaWeb基础</span>
+            <span class="post-date" title="2022-03-21 00:19:19">2022/03/21</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/03/21/SpringMVC%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3/"
+           data-tag="MVC"
+           data-author="" >
+            <span class="post-title" title="SpringMVC常用注解">SpringMVC常用注解</span>
+            <span class="post-date" title="2022-03-21 00:18:03">2022/03/21</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/03/21/HashMap%E4%B8%ADentrySet-%E8%AF%A6%E8%A7%A3/"
+           data-tag="HashMap"
+           data-author="" >
+            <span class="post-title" title="HashMap中entrySet()详解">HashMap中entrySet()详解</span>
+            <span class="post-date" title="2022-03-21 00:15:10">2022/03/21</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/03/21/HashMap/"
+           data-tag="HashMap"
+           data-author="" >
+            <span class="post-title" title="HashMap">HashMap</span>
+            <span class="post-date" title="2022-03-21 00:13:23">2022/03/21</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/03/07/%E6%89%8B%E5%86%99%E5%8F%8C%E5%90%91%E9%93%BE%E8%A1%A8-%E5%8F%8D%E8%BD%AC%E5%8D%95%E5%90%91%E9%93%BE%E8%A1%A8/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="手写双向链表+反转单向链表">手写双向链表+反转单向链表</span>
+            <span class="post-date" title="2022-03-07 22:14:38">2022/03/07</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/03/07/IOC%E6%8E%A7%E5%88%B6%E5%8F%8D%E8%BD%AC-DI/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="IOC控制反转+DI">IOC控制反转+DI</span>
+            <span class="post-date" title="2022-03-07 22:13:22">2022/03/07</span>
+        </a>
+        
+        <a  class="全部文章 数据库 "
+           href="/zjh/2022/03/07/Mysql%E4%BA%8B%E5%8A%A1%E5%92%8C%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Mysql事务和存储引擎">Mysql事务和存储引擎</span>
+            <span class="post-date" title="2022-03-07 22:11:06">2022/03/07</span>
+        </a>
+        
+        <a  class="全部文章 数据库 "
+           href="/zjh/2022/03/07/Mysql-InnoDB-%E7%B4%A2%E5%BC%95%E5%8E%9F%E7%90%86%E5%8F%8A%E7%9A%84%E4%BD%BF%E7%94%A8/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Mysql(InnoDB)索引原理及的使用">Mysql(InnoDB)索引原理及的使用</span>
+            <span class="post-date" title="2022-03-07 22:10:05">2022/03/07</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/03/07/%E7%B1%BB%E8%87%AA%E8%BA%AB%E5%B5%8C%E5%A5%97-%E4%BA%8C%E5%8F%89%E6%A0%91%E5%88%A0%E9%99%A4-%E6%A0%88%E5%A0%86%E5%88%86%E6%9E%90/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="类自身嵌套(二叉树删除)栈堆分析">类自身嵌套(二叉树删除)栈堆分析</span>
+            <span class="post-date" title="2022-03-07 22:09:09">2022/03/07</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/03/07/Java%E5%A0%86%E6%8E%92%E5%BA%8F%E7%9A%84%E8%BF%87%E7%A8%8B%E5%88%B0%E8%AE%BE%E8%AE%A1/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Java堆排序的过程到设计">Java堆排序的过程到设计</span>
+            <span class="post-date" title="2022-03-07 22:08:08">2022/03/07</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/03/07/Bean%E6%A0%87%E7%AD%BE%E5%88%B0Spring%E7%9A%84IOC%E6%B3%A8%E8%A7%A3/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Bean标签到Spring的IOC注解">Bean标签到Spring的IOC注解</span>
+            <span class="post-date" title="2022-03-07 22:07:07">2022/03/07</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/03/07/%E6%B3%A8%E8%A7%A3PropertySource%E8%87%AA%E5%AE%9A%E4%B9%89%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E4%B8%89%E7%A7%8D%E6%96%B9%E6%B3%95/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="注解PropertySource自定义配置文件的三种方法">注解PropertySource自定义配置文件的三种方法</span>
+            <span class="post-date" title="2022-03-07 22:05:56">2022/03/07</span>
+        </a>
+        
+        <a  class="全部文章 Bug "
+           href="/zjh/2022/03/07/Cannot-find-method-%E2%80%98value%E2%80%98-lombok%E5%86%B2%E7%AA%81/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Cannot find method ‘value‘(lombok冲突)">Cannot find method ‘value‘(lombok冲突)</span>
+            <span class="post-date" title="2022-03-07 22:02:56">2022/03/07</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/02/21/LinkedList%E6%BA%90%E7%A0%81%E4%B8%AD%E4%B8%BA%E4%BD%95%E5%A4%A7%E9%87%8F%E5%87%BA%E7%8E%B0final/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="LinkedList源码中为何大量出现final">LinkedList源码中为何大量出现final</span>
+            <span class="post-date" title="2022-02-21 09:57:35">2022/02/21</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/02/20/LinkedList%E4%B8%ADclear%E5%92%8Cunlink%E6%96%B9%E6%B3%95%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%A4%9A%E6%AC%A1%E7%BD%AE%E7%A9%BA/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="LinkedList中clear和unlink方法为什么要多次置空">LinkedList中clear和unlink方法为什么要多次置空</span>
+            <span class="post-date" title="2022-02-20 00:25:11">2022/02/20</span>
+        </a>
+        
+        <a  class="全部文章 JVM "
+           href="/zjh/2022/02/20/gc%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%9C%BA%E5%88%B6/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="gc垃圾回收机制">gc垃圾回收机制</span>
+            <span class="post-date" title="2022-02-20 00:17:43">2022/02/20</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/02/15/%E5%A4%96%E9%83%A8jar%E5%8C%85%E7%9A%84%E5%BC%95%E5%85%A5%E5%92%8C%E6%89%93%E5%8C%85/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="外部jar包的引入和打包">外部jar包的引入和打包</span>
+            <span class="post-date" title="2022-02-15 15:47:39">2022/02/15</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/02/15/Bean%E7%9A%84%E9%85%8D%E7%BD%AE%EF%BC%8C%E6%B3%A8%E5%85%A5%EF%BC%8C%E6%93%8D%E4%BD%9C%EF%BC%8C%E6%A0%A1%E9%AA%8C/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Bean的配置，注入，操作，校验">Bean的配置，注入，操作，校验</span>
+            <span class="post-date" title="2022-02-15 15:33:42">2022/02/15</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/02/15/%E6%99%AE%E9%80%9A%E7%B1%BB%E4%B8%AD%E8%B0%83%E7%94%A8Bean/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="普通类中调用Bean">普通类中调用Bean</span>
+            <span class="post-date" title="2022-02-15 15:29:09">2022/02/15</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/02/15/%E8%BF%9E%E6%8E%A5%E9%98%BF%E9%87%8C%E4%BA%91OSS/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="连接阿里云OSS，url转存OSS">连接阿里云OSS，url转存OSS</span>
+            <span class="post-date" title="2022-02-15 15:12:00">2022/02/15</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/02/15/%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E6%B1%87%E6%80%BB/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="异常处理汇总">异常处理汇总</span>
+            <span class="post-date" title="2022-02-15 14:55:04">2022/02/15</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/02/15/%E6%B1%A0%E5%8C%96%E6%80%9D%E6%83%B3/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="池化思想">池化思想</span>
+            <span class="post-date" title="2022-02-15 14:53:32">2022/02/15</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/02/15/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E6%B1%87%E6%80%BB/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="面向对象汇总">面向对象汇总</span>
+            <span class="post-date" title="2022-02-15 14:52:05">2022/02/15</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/02/15/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%92%8C%E7%BA%BF%E7%A8%8B%E5%90%8C%E6%AD%A5%E6%B1%87%E6%80%BB/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="多线程和线程同步汇总">多线程和线程同步汇总</span>
+            <span class="post-date" title="2022-02-15 14:51:32">2022/02/15</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/02/09/%E5%AE%9E%E7%8E%B0%E6%9C%8B%E5%8F%8B%E5%9C%88%E4%B8%8B%E6%8B%89%E5%88%B7%E6%96%B0%E6%8B%BC%E6%8E%A5%E7%9A%84%E6%80%9D%E8%B7%AF/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="实现朋友圈下拉刷新拼接的思路">实现朋友圈下拉刷新拼接的思路</span>
+            <span class="post-date" title="2022-02-09 15:40:54">2022/02/09</span>
+        </a>
+        
+        <a  class="全部文章 Bug "
+           href="/zjh/2022/02/09/IO%E4%BC%A0%E8%BE%93%E5%9B%BE%E7%89%87%E8%83%BD%E6%89%93%E5%BC%80%E4%BD%86%E8%8A%B1%E5%B1%8F/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="IO传输图片能打开但花屏">IO传输图片能打开但花屏</span>
+            <span class="post-date" title="2022-02-09 15:39:11">2022/02/09</span>
+        </a>
+        
+        <a  class="全部文章 Demo "
+           href="/zjh/2022/01/30/NXB%E6%88%90%E5%91%98%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F%E5%8D%95%E9%A1%B5crud/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="NXB成员管理系统单页crud">NXB成员管理系统单页crud</span>
+            <span class="post-date" title="2022-01-30 12:50:33">2022/01/30</span>
+        </a>
+        
+        <a  class="全部文章 Bug "
+           href="/zjh/2022/01/28/axios%E6%97%B6%E9%97%B4%E4%BA%A4%E4%BA%92%E6%8A%A5400/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="axios时间交互报400">axios时间交互报400</span>
+            <span class="post-date" title="2022-01-28 21:21:56">2022/01/28</span>
+        </a>
+        
+        <a  class="全部文章 Bug "
+           href="/zjh/2022/01/28/BindingException-Invalid-bound-statement-not-found/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="BindingException: Invalid bound statement (not found)">BindingException: Invalid bound statement (not found)</span>
+            <span class="post-date" title="2022-01-28 21:09:28">2022/01/28</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/01/28/springboot%E6%95%B4%E5%90%88SSM/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="springboot整合SSM">springboot整合SSM</span>
+            <span class="post-date" title="2022-01-28 21:08:03">2022/01/28</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/01/28/springboot%E6%B3%A8%E6%84%8F%E7%82%B91/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="springboot注意点1">springboot注意点1</span>
+            <span class="post-date" title="2022-01-28 21:06:38">2022/01/28</span>
+        </a>
+        
+        <a  class="全部文章 前端 "
+           href="/zjh/2022/01/26/axios-element-vue%E7%9A%84%E5%89%8D%E7%AB%AF%E6%95%B0%E6%8D%AE%E4%BA%A4%E4%BA%92%E6%A1%86%E6%9E%B6/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="axios+element+vue的前端数据交互框架">axios+element+vue的前端数据交互框架</span>
+            <span class="post-date" title="2022-01-26 21:38:41">2022/01/26</span>
+        </a>
+        
+        <a  class="全部文章 "
+           href="/zjh/2022/01/25/File%E7%9A%84%E4%B8%80%E4%BA%9B%E7%BB%86%E8%8A%82/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="File的一些细节">File的一些细节</span>
+            <span class="post-date" title="2022-01-25 21:15:36">2022/01/25</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/01/25/IO-TCP-URL%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="IO:TCP URL网络编程">IO:TCP URL网络编程</span>
+            <span class="post-date" title="2022-01-25 21:12:23">2022/01/25</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/01/25/JDBC/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="JDBC">JDBC</span>
+            <span class="post-date" title="2022-01-25 21:10:07">2022/01/25</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/01/25/SSMp%E6%95%B4%E5%90%88%E6%A1%88%E4%BE%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="SSMp整合案例">SSMp整合案例</span>
+            <span class="post-date" title="2022-01-25 21:06:05">2022/01/25</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/01/20/Springboot%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Springboot基本结构">Springboot基本结构</span>
+            <span class="post-date" title="2022-01-20 20:10:08">2022/01/20</span>
+        </a>
+        
+        <a  class="全部文章 工具 "
+           href="/zjh/2022/01/16/%E6%96%87%E4%BB%B6%E5%8A%A0%E5%AF%86%E8%A7%A3%E5%AF%86%E5%99%A8/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="软件:文件加密解密器">软件:文件加密解密器</span>
+            <span class="post-date" title="2022-01-16 21:28:42">2022/01/16</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/01/16/IO%E6%B5%81/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="IO流">IO流</span>
+            <span class="post-date" title="2022-01-16 21:26:38">2022/01/16</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/01/13/File%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="File常用操作">File常用操作</span>
+            <span class="post-date" title="2022-01-13 11:36:05">2022/01/13</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/zjh/2022/01/11/%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E6%B3%B0%E5%9D%A6%E5%B0%BC%E5%85%8B%E5%8F%B7%E8%8E%B7%E6%95%91%E9%A2%84%E6%B5%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="随机森林——泰坦尼克号获救预测">随机森林——泰坦尼克号获救预测</span>
+            <span class="post-date" title="2022-01-11 03:06:10">2022/01/11</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/01/03/Java%E9%9B%86%E5%90%88/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Java集合">Java集合</span>
+            <span class="post-date" title="2022-01-03 10:02:27">2022/01/03</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/01/02/Java%E6%B3%9B%E5%9E%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Java泛型">Java泛型</span>
+            <span class="post-date" title="2022-01-02 19:51:37">2022/01/02</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/zjh/2022/01/01/%E5%86%B3%E7%AD%96%E6%A0%91-%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E7%94%A8%E6%88%B7%E6%B5%81%E5%A4%B1%E9%A2%84%E6%B5%8B%E7%9A%84%E6%A1%88%E4%BE%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="决策树/随机森林——用户流失预测的案例">决策树/随机森林——用户流失预测的案例</span>
+            <span class="post-date" title="2022-01-01 00:41:40">2022/01/01</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2021/12/25/%E5%9B%9E%E5%BD%A2%E9%92%88%E6%95%B0%E5%AD%97%E7%9F%A9%E9%98%B5Java%E5%AE%9E%E7%8E%B0/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="回形针数字矩阵Java实现">回形针数字矩阵Java实现</span>
+            <span class="post-date" title="2021-12-25 02:07:12">2021/12/25</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2021/12/25/Java%E5%9B%9B%E7%A7%8Dnext%E7%94%A8%E6%B3%95/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Java四种next用法">Java四种next用法</span>
+            <span class="post-date" title="2021-12-25 01:59:30">2021/12/25</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2021/12/25/RLE%E7%AE%97%E6%B3%95%E7%9A%84Java%E5%AE%9E%E7%8E%B0/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="RLE算法的Java实现">RLE算法的Java实现</span>
+            <span class="post-date" title="2021-12-25 01:35:20">2021/12/25</span>
+        </a>
+        
+        <a  class="全部文章 工具 "
+           href="/zjh/2021/12/24/MarkDown%E5%B8%B8%E7%94%A8%E8%AF%AD%E6%B3%95/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="MarkDown常用语法">MarkDown常用语法</span>
+            <span class="post-date" title="2021-12-24 23:33:22">2021/12/24</span>
+        </a>
+        
+        <div id="no-item-tips">
+
+        </div>
+    </nav>
+    <div id="outline-list">
+    </div>
+</div>
+
+    </div>
+    <div class="hide-list">
+        <div class="semicircle" data-title="切换全屏 快捷键 s">
+            <div class="brackets first"><</div>
+            <div class="brackets">&gt;</div>
+        </div>
+    </div>
+</aside>
+<div id="post">
+    <div class="pjax">
+        <article id="post-HashMap中entrySet-详解" class="article article-type-post" itemscope itemprop="blogPost">
+    
+        <h1 class="article-title">HashMap中entrySet()详解</h1>
+    
+    <div class="article-meta">
+        
+        
+        
+        <span class="book">
+            <i class="iconfont icon-category"></i>
+            
+            
+            <a  data-rel="源码">源码</a>
+            
+        </span>
+        
+        
+        <span class="tag">
+            <i class="iconfont icon-tag"></i>
+            
+            <a class="color3">HashMap</a>
+            
+        </span>
+        
+    </div>
+    <div class="article-meta">
+        
+            发布时间 : <time class="date" title='最后更新: 2022-03-21 00:16:00'>2022-03-21 00:15</time>
+        
+    </div>
+    <div class="article-meta">
+        
+        <span>字数:1.2k</span>
+        
+        
+        <span id="busuanzi_container_page_pv">
+            阅读 :<span id="busuanzi_value_page_pv">
+                <span class="count-comment">
+                    <span class="spinner">
+                      <div class="cube1"></div>
+                      <div class="cube2"></div>
+                    </span>
+                </span>
+            </span>
+        </span>
+        
+        
+    </div>
+    
+    <div class="toc-ref">
+    
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#entrySet-%E5%92%8CkeySet-%E8%AF%A6%E8%A7%A3"><span class="toc-text">entrySet()和keySet()详解</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B5%8B%E8%AF%95%E4%BB%A3%E7%A0%81%E7%A4%BA%E4%BE%8B%EF%BC%8C%E5%B9%B6%E6%8F%90%E5%87%BA%E9%97%AE%E9%A2%98"><span class="toc-text">测试代码示例，并提出问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-debug%E5%88%86%E6%9E%90"><span class="toc-text">1 debug分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#new-EntrySet"><span class="toc-text">new EntrySet()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E4%B8%AA%E7%BB%93%E8%AE%BA%EF%BC%9AentrySet%E6%98%AF%E7%A9%BA%E5%AF%B9%E8%B1%A1"><span class="toc-text">第一个结论：entrySet是空对象</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2%E7%AC%AC%E4%BA%8C%E4%B8%AA%E9%97%AE%E9%A2%98%EF%BC%9AentrySet%E5%AF%B9%E8%B1%A1%E8%B0%83%E7%94%A8%E6%96%B9%E6%B3%95%E6%97%B6%E4%B8%BA%E4%BD%95%E6%9C%89%E5%80%BC%EF%BC%9F"><span class="toc-text">2第二个问题：entrySet对象调用方法时为何有值？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90"><span class="toc-text">2 源码分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#toString%E6%96%B9%E6%B3%95"><span class="toc-text">toString方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#iterator%E6%96%B9%E6%B3%95"><span class="toc-text">iterator方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#toArray%E6%96%B9%E6%B3%95"><span class="toc-text">toArray方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#size%E3%80%81clear%E6%96%B9%E6%B3%95"><span class="toc-text">size、clear方法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3%E5%B0%8F%E6%80%BB%E7%BB%93"><span class="toc-text">3小总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A1%A5%E5%85%85%EF%BC%9AputVal-%E6%96%B9%E6%B3%95%E5%92%8CentrySet-%E6%97%A0%E5%85%B3"><span class="toc-text">补充：putVal()方法和entrySet()无关</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4%E5%85%B3%E4%BA%8Eidea%E5%9C%A8debug%E6%97%B6%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-text">4关于idea在debug时的问题</span></a></li></ol></li></ol>
+    
+<style>
+    .left-col .switch-btn,
+    .left-col .switch-area {
+        display: none;
+    }
+    .toc-level-3 i,
+    .toc-level-3 ol {
+        display: none !important;
+    }
+</style>
+</div>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文能解决的疑惑：</p>
+<ol>
+<li><strong>idea在debug时偷偷调用toString方法</strong>，在HashMap追源码时产生的疑惑</li>
+<li><strong>HashMap的entrySet()和keySet()方法真的创建了一个存满数据的set对象吗</strong>？</li>
+<li><strong>内部类：EntrySet类没有构造器，那它是怎么初始化的呢？</strong></li>
+<li>为什么集合框架中一定要<strong>利用好迭代器iterator()来获取入口</strong>？</li>
+<li>entrySet().size()获取的值是该set的实际大小吗？</li>
+<li>……</li>
+</ol>
+<h1 id="entrySet-和keySet-详解"><a href="#entrySet-和keySet-详解" class="headerlink" title="entrySet()和keySet()详解"></a>entrySet()和keySet()详解</h1><ul>
+<li>entrySet()和keySet()方法都是返回一个set对象，并且在debug时也能看到set的值和size；但是源码中<strong>并没有利用构造器</strong>对其初始化。</li>
+<li>在此文中以entrySet()举例，来阐述entrySet和keySet的生命周期</li>
+</ul>
+<h2 id="测试代码示例，并提出问题"><a href="#测试代码示例，并提出问题" class="headerlink" title="测试代码示例，并提出问题"></a>测试代码示例，并提出问题</h2><pre><code>    HashMap hs = new HashMap();
+    hs.put(&quot;啊啊&quot;, &quot;2&quot;);
+    hs.put(&quot;2&quot;, &quot;2&quot;);
+    hs.put(&quot;3&quot;, &quot;2&quot;);
+    hs.put(&quot;4&quot;, &quot;2&quot;);
+    hs.put(&quot;5&quot;, &quot;2&quot;);
+    hs.put(&quot;6&quot;, &quot;2&quot;);
+    hs.put(&quot;7&quot;, &quot;2&quot;);
+    hs.put(&quot;8&quot;, &quot;2&quot;);
+    hs.put(&quot;9&quot;, &quot;2&quot;);
+
+    Set entrySet = hs.entrySet();//1.获取entrySet对象
+    System.out.println(entrySet );//2.结果：正确输出了上面put的内容
+    Object[] objects = entrySet .toArray();
+    System.out.println(objects[3]);//3.结果：正确打印了5=2
+
+    Iterator iterator = entrySet .iterator();//4.获取迭代器
+    while (iterator.hasNext())&#123;//5.迭代器遍历
+        Map.Entry next = (Map.Entry) iterator.next();
+        next.getKey();
+        next.getValue();
+    &#125;
+</code></pre>
+<ul>
+<li>如果在idea中使用debug对<code>Set entrySet = hs.entrySet()</code>打断点，你会发现即便是没有运行到第二步，<strong>debug信息栏中已然出现了该set全部的内容。</strong></li>
+<li>跟着debug一直step into进行分析，发现并没有任何一个方法对entrySet对象进行过赋值，那么hashMap对象中的内容是如何进入到entrySet中的呢？</li>
+</ul>
+<h2 id="1-debug分析"><a href="#1-debug分析" class="headerlink" title="1 debug分析"></a>1 debug分析</h2><h3 id="new-EntrySet"><a href="#new-EntrySet" class="headerlink" title="new EntrySet()"></a>new EntrySet()</h3><ol>
+<li>没有找到构造函数</li>
+</ol>
+<p><img src="https://img-blog.csdnimg.cn/08ff8cd5337849618e6dfc90c22b84a5.png"></p>
+<ol start="2">
+<li>AbstractSet中只有一个空参且空函数体的方法</li>
+</ol>
+<p><img src="https://img-blog.csdnimg.cn/8cc53005bae44722845836798f466b1e.png"></p>
+<h3 id="第一个结论：entrySet是空对象"><a href="#第一个结论：entrySet是空对象" class="headerlink" title="第一个结论：entrySet是空对象"></a>第一个结论：entrySet是空对象</h3><p>entrySet只是new出来了，但它是一个没有内容的空对象。</p>
+<h2 id="2第二个问题：entrySet对象调用方法时为何有值？"><a href="#2第二个问题：entrySet对象调用方法时为何有值？" class="headerlink" title="2第二个问题：entrySet对象调用方法时为何有值？"></a>2第二个问题：entrySet对象调用方法时为何有值？</h2><p>既然    <code> Set entrySet = hs.entrySet()</code>出来的entrySet 对象是个空对象，那为何<code>System.out.println(entrySet );</code><br><code>Object[] objects = entrySet .toArray();</code><br><code>  Iterator iterator = entrySet .iterator()</code><br>对entrySet对象进行调用方法的时候却能正确的执行呢？</p>
+<h2 id="2-源码分析"><a href="#2-源码分析" class="headerlink" title="2 源码分析"></a>2 源码分析</h2><h3 id="toString方法"><a href="#toString方法" class="headerlink" title="toString方法"></a>toString方法</h3><p><code>System.out.println(entrySet );</code>  显然调用的是toString方法；</p>
+<ul>
+<li>在2.5中的源码可知entrySet对象继承于<code>AbstractSet</code>类，间接实现了<code>AbstractCollection</code>接口</li>
+<li><strong>重写的</strong>toString()方法调用了<code>this.iterator()</code>即EntrySet类的iterator()方法进行输出</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/62ee4cb2c23940579532b0b9816bba61.png"></p>
+<h3 id="iterator方法"><a href="#iterator方法" class="headerlink" title="iterator方法"></a>iterator方法</h3><ol>
+<li><p>我们发现HashMap中的内部类EntrySet中重写了iterator()方法，<strong>实际调用的是EntryIterator对象</strong><br><img src="https://img-blog.csdnimg.cn/e7a3d92938864dbfa739efcbe0412b7f.png"></p>
+</li>
+<li><p>EntryIterator类继承于HashIterator类 ：nextNode方法是HashIterator中的方法<br><img src="https://img-blog.csdnimg.cn/03f2e6ca1f0b4351bd1f8e8874207bb6.png" alt="EntryIterator"></p>
+</li>
+<li><p>跟进nextNode方法，框体内容是指针的变化的判断细节，不是本论题的重点</p>
+</li>
+</ol>
+<p><img src="https://img-blog.csdnimg.cn/66322df3e3be43ac834ef9674557c2c1.png"><br>由此可知：</p>
+<p>这个EntrySet类重写的iterator()方法可以使得指针<strong>正确得指向下一个节点</strong>..</p>
+<h3 id="toArray方法"><a href="#toArray方法" class="headerlink" title="toArray方法"></a>toArray方法</h3><ul>
+<li>测试代码中也正确输出了toArray()的结果，同样的，这个方法也是重写在其父类<code>AbstractCollection</code>中的</li>
+<li>同理，其底层实现还是调用了iterator()，利用HashIterator类中的nextNode()方法对指针进行下移</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/21842f3c7f454b26aea052afb93d4961.png"></p>
+<h3 id="size、clear方法"><a href="#size、clear方法" class="headerlink" title="size、clear方法"></a>size、clear方法</h3><p>这两个方法很简单，就是直接用的当前HashMap对象的属性和方法<br><img src="https://img-blog.csdnimg.cn/ddae87f117b94c039337ca30b8df092a.png"><br><strong>hashMap.entrySet().size()的大小并不是真正这个entrySet对象的大小，而是调用了size属性的fake size</strong></p>
+<h2 id="3小总结"><a href="#3小总结" class="headerlink" title="3小总结"></a>3小总结</h2><ul>
+<li>entrySet()和keySet()都是<strong>懒汉式</strong>，调用方法，<strong>new对象的时候并没有对其进行赋值</strong>,并且其size()方法也是一个虚假的size</li>
+<li>而是在使用hashMap.entrySet().**toString()**、hashMap.entrySet(). <strong>toArray()</strong> 等方法的时候才<code>调用iterator()来获取迭代器</code></li>
+<li>EntrySet类和KeySet类也都<strong>没有构造器能进行初始化</strong></li>
+<li>不得不说HashMap的设计十分精巧，entrySet()表面上获取了一个set对象，实际上这个set对象是空的，<strong>几乎所有的方法都是先直接获取迭代器入口</strong>，<strong>节约内存的同时性能大幅提升</strong></li>
+</ul>
+<h2 id="补充：putVal-方法和entrySet-无关"><a href="#补充：putVal-方法和entrySet-无关" class="headerlink" title="补充：putVal()方法和entrySet()无关"></a>补充：putVal()方法和entrySet()无关</h2><p>在翻阅资料的时候看到很多人说是putVal()方法中调用了resize()来维护了entrySet(),在看完源码之后才会发现这种说法是没有根据的。</p>
+<p>resize()放是扩容的方法，代码中也没有出现任何的跟EntrySet相关的逻辑</p>
+<h2 id="4关于idea在debug时的问题"><a href="#4关于idea在debug时的问题" class="headerlink" title="4关于idea在debug时的问题"></a>4关于idea在debug时的问题</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/lkforce/article/details/90479650">参考</a></p>
+<ul>
+<li>DEA在debug时，当debug到某个对象时，会调用对象的toString()方法，用来在debug界面显示对象信息。</li>
+<li>IDEA调用toString()方法时，即使在toString()方法中设置了断点，该断点也不会被触发，也就是说，开发者多数情况下不会知道toString()方法被调用了。</li>
+<li>多数情况下调用一下toString()方法没有什么问题，但是也有例外，<code>比如重写了toString()方法的类，随意的调用toString()方法会导致未知的问题</code>。<strong>本案例就是因为重写toString()方法而产生了问题</strong></li>
+</ul>
+
+      
+       <hr><span style="font-style: italic;color: gray;"> 生命以负熵为食，归整以抵抗熵增； </span>
+    </div>
+</article>
+
+
+
+
+
+
+
+    
+        <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="//cdn.jsdelivr.net/npm/mathjax@2.7.8/unpacked/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+<input type="hidden" id="MathJax-js"
+        value="//cdn.jsdelivr.net/npm/mathjax@2.7.8/unpacked/MathJax.js?config=TeX-MML-AM_CHTML">
+</input>
+    
+
+
+
+
+    </div>
+    <div class="copyright">
+        <p class="footer-entry">
+    ©2021 ZJH
+</p>
+<p class="footer-entry">"生命以负熵为食"
+
+    </div>
+    <div class="full-toc">
+        <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
+<a class="" id="rocket" ></a>
+
+    </div>
+</div>
+
+</body>
+<script src="/zjh/js/jquery.pjax.js?v=1.1.0" ></script>
+
+<script src="/zjh/js/script.js?v=1.1.0" ></script>
+<script>
+    var img_resize = 'default';
+    function initArticle() {
+        /*渲染对应的表格样式*/
+        
+            $("#post .pjax table").addClass("green_title");
+        
+
+        /*渲染打赏样式*/
+        
+
+        /*高亮代码块行号*/
+        
+        $('pre code').each(function(){
+            var lines = $(this).text().trim().split('\n').length, widther='';
+            if (lines>99) {
+                widther = 'widther'
+            }
+            var $numbering = $('<ul/>').addClass('pre-numbering ' + widther).attr("unselectable","on");
+            $(this).addClass('has-numbering ' + widther)
+                    .parent()
+                    .append($numbering);
+            for(var i=1;i<=lines;i++){
+                $numbering.append($('<li/>').text(i));
+            }
+        });
+        
+
+        /*访问数量*/
+        
+        $.getScript("//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js");
+        
+
+        /*代码高亮，行号对齐*/
+        $('.pre-numbering').css('line-height',$('.has-numbering').css('line-height'));
+
+        
+        
+    }
+
+    /*打赏页面隐藏与展示*/
+    
+
+</script>
+
+<!--加入行号的高亮代码块样式-->
+
+<style>
+    pre{
+        position: relative;
+        margin-bottom: 24px;
+        border-radius: 10px;
+        border: 1px solid #e2dede;
+        background: #FFF;
+        overflow: hidden;
+    }
+    code.has-numbering{
+        margin-left: 30px;
+    }
+    code.has-numbering.widther{
+        margin-left: 35px;
+    }
+    .pre-numbering{
+        margin: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 20px;
+        padding: 0.5em 3px 0.7em 5px;
+        border-right: 1px solid #C3CCD0;
+        text-align: right;
+        color: #AAA;
+        background-color: ;
+    }
+    .pre-numbering.widther {
+        width: 35px;
+    }
+</style>
+
+<!--自定义样式设置-->
+<style>
+    
+    
+    .nav {
+        width: 542px;
+    }
+    .nav.fullscreen {
+        margin-left: -542px;
+    }
+    .nav-left {
+        width: 120px;
+    }
+    
+    
+    @media screen and (max-width: 1468px) {
+        .nav {
+            width: 492px;
+        }
+        .nav.fullscreen {
+            margin-left: -492px;
+        }
+        .nav-left {
+            width: 100px;
+        }
+    }
+    
+    
+    @media screen and (max-width: 1024px) {
+        .nav {
+            width: 492px;
+            margin-left: -492px
+        }
+        .nav.fullscreen {
+            margin-left: 0;
+        }
+    }
+    
+    @media screen and (max-width: 426px) {
+        .nav {
+            width: 100%;
+        }
+        .nav-left {
+            width: 100%;
+        }
+    }
+    
+    
+    .nav-right .title-list nav a .post-title, .nav-right .title-list #local-search-result a .post-title {
+        color: #383636;
+    }
+    
+    
+    .nav-right .title-list nav a .post-date, .nav-right .title-list #local-search-result a .post-date {
+        color: #5e5e5f;
+    }
+    
+    
+    .nav-right nav a.hover, #local-search-result a.hover{
+        background-color: #e2e0e0;
+    }
+    
+    
+
+    /*列表样式*/
+    
+
+    /* 背景图样式 */
+    
+    
+
+
+    /*引用块样式*/
+    
+
+    /*文章列表背景图*/
+    
+
+    
+</style>
+
+
+
+
+
+
+
+</html>
