@@ -4,6 +4,101 @@
   
     
     <entry>
+      <title>OGNL表达式改造以使用索引</title>
+      <link href="/zjh/2022/07/15/OGNL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%94%B9%E9%80%A0%E4%BB%A5%E4%BD%BF%E7%94%A8%E7%B4%A2%E5%BC%95/"/>
+      <url>/zjh/2022/07/15/OGNL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%94%B9%E9%80%A0%E4%BB%A5%E4%BD%BF%E7%94%A8%E7%B4%A2%E5%BC%95/</url>
+      
+        <content type="html"><![CDATA[<p>一般在Mybatis中用#{}来防止sql注入，但是这种预编译的模式会导致无法调用java的方法，因此在<strong>系统安全性较高的情况下，或绑定的类型不是String</strong>时可以尝试使用${}来调用java方法进行数据处理</p><h1 id="场景"><a href="#场景" class="headerlink" title="场景"></a>场景</h1><p>一个表中关于时间有两个字段</p><ul><li><p>create_date是datetime类型<br>create_time是时间戳类型，但时间戳是13位的long型，这里是11位的int类型(int最大十进制长度)</p></li><li><p>前者没有索引，后者有索引（优势：字段短，索引更快，int比long占内存更小）</p></li><li><p>前者是给DBA看的，后者用于查询</p></li></ul><h1 id="使用OGNL表达式"><a href="#使用OGNL表达式" class="headerlink" title="使用OGNL表达式"></a>使用OGNL表达式</h1><p><a href="https://blog.csdn.net/huayu815/article/details/7446141">OGNL表达式参考</a></p><pre><code>  &lt;select id=&quot;mapper方法名&quot; resultType=&quot;Res对象&quot;&gt;    SELECT source, SUM(IF(type = 0, -amount, amount))    FROM 表    WHERE create_time &lt;![CDATA[ &lt;  ]]&gt; $&#123;endDateTime.toInstant(@java.time.ZoneOffset@of(&quot;+8&quot;)).toEpochMilli()/1000&#125;      AND create_time &lt;![CDATA[ &gt;= ]]&gt; $&#123;startDateTime.toInstant(@java.time.ZoneOffset@of(&quot;+8&quot;)).toEpochMilli()/1000&#125;    GROUP BY source  &lt;/select&gt;</code></pre><p>注：调静态方法时，类和方法都要加@；<br> /1000是为了让本身为long型的13位时间戳变成11位的int以便SELECT，<strong>且本身不是函数，不会导致索引失效</strong></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 工作笔记 </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>mvcc+按天缓存统计两个收益</title>
+      <link href="/zjh/2022/07/15/mvcc+%E6%8C%89%E5%A4%A9%E7%BC%93%E5%AD%98%E7%BB%9F%E8%AE%A1%E4%B8%A4%E4%B8%AA%E6%94%B6%E7%9B%8A/"/>
+      <url>/zjh/2022/07/15/mvcc+%E6%8C%89%E5%A4%A9%E7%BC%93%E5%AD%98%E7%BB%9F%E8%AE%A1%E4%B8%A4%E4%B8%AA%E6%94%B6%E7%9B%8A/</url>
+      
+        <content type="html"><![CDATA[<p>这是上一段电商实习时做的一个需求，也是我第一次实习时思考最多的一个需求，场景如下：</p><h1 id="1-场景"><a href="#1-场景" class="headerlink" title="1.场景"></a>1.场景</h1><p>用户实时收益表：存在虚拟收益、现金收益的<strong>当前值</strong><br>用户收益记录表：存在虚拟收益、现金收益的<strong>记录值</strong></p><p>要求：统计截止某天00:00时，用户的虚拟收益和现金收益</p><p>很显然，可以直接用 实时表的数据 减去 记录表的数据的总和</p><p>但是电商业务数据量很大，每次请求简单的都去查两次库然后相减合适吗？不合适。</p><h1 id="2-幂等方案设计——缓存"><a href="#2-幂等方案设计——缓存" class="headerlink" title="2.幂等方案设计——缓存"></a>2.幂等方案设计——缓存</h1><p>既然这个需求是“截止某天”，今天的“截止2号”和明天的“截止2号”查询的结果应该是幂等的，因此可以考虑在这个功能上添加缓存</p><p>但是这个缓存如何去加？直接加到xx天对应的数据存一个map？？很显然不合适，比如今天是7月15号，我连续查了7月1号~~7月14号的数据，<code>发现每次请求都花了我十几秒的时间</code>，<strong>因为这时候没有缓存，我查一下都会从完整的库中进行<code>SUM()</code></strong>,而在数据量大的情况下，SUM函数是特别耗费时间的，因此需要修改方案</p><h1 id="3-按天加缓存"><a href="#3-按天加缓存" class="headerlink" title="3.按天加缓存"></a>3.按天加缓存</h1><p>既然我们有两张表：实时、记录<br>那我们可以使用“记录表”，来统计<strong>7月1号00:00 到24:00的统计数据</strong><br>举个例子：</p><ul><li>我要查询“截止7月3号00:00的统计情况”</li><li>实时表：查询当前7月15号21:53:000的收益</li><li>记录表：<strong>依次通过SUM函数统计</strong> </br><br>7月3号00:00到7月3号24:00的收益统计</br><br>7月4号00:00到7月4号24:00的收益统计</br><br>7月5号00:00到7月5号24:00的收益统计</br><br>…..</br><br>7月14号00:00到7月14号24:00的收益统计</br></li><li><em><code>并加添加缓存</code>，这时的缓存是幂等的、连续的</em>*</li><li>然后用当前的收益 <code>连续地减去</code> 这12天的，<code>12条缓存数据</code>，再减去用SUM函数统计的今天的那部分数据（<code>今天还没过完，所以不能加缓存</code>）</li></ul><p>然后我再想查询“截止7月2号00:00的统计情况” “截止7月1号00:00的统计情况” ，我们就只有一两天的数据走MySQL，其他的所有统计数据都走的缓存，这一次我们调用接口花费了不到1秒种</p><h1 id="4-按天缓存解决的问题"><a href="#4-按天缓存解决的问题" class="headerlink" title="4.按天缓存解决的问题"></a>4.按天缓存解决的问题</h1><p>大大减少连续了<strong>查询紧挨着的</strong>几天所耗费的时间，也减少了对MySQL的性能消耗</p><p>但也出现的新的问题，我们不能简单的使用“当前收益”去<code>连续减去</code>“多天多条的缓存收益数据”。因为可能出现：获取“当前收益后”，此时<code>对于今天的记录数据变了</code>，今天的那部分走MySQL查询的记录数据变了，即使是过往的缓存正确，此时的数据也不正确了</p><h1 id="5-“今天数据”的一致性问题"><a href="#5-“今天数据”的一致性问题" class="headerlink" title="5.“今天数据”的一致性问题"></a>5.“今天数据”的一致性问题</h1><p>以前那些天数的缓存肯定是没问题的，是幂等的。问题就是出在“如何保证在不加锁的情况下实现<code>今天这部分数据的</code>一致性”</p><h2 id="5-1时间戳方案（pass）"><a href="#5-1时间戳方案（pass）" class="headerlink" title="5.1时间戳方案（pass）"></a>5.1时间戳方案（pass）</h2><ul><li>查询“实时表”后马上获取一个时间戳，带着这个时间戳去“记录表”查这之前的</li><li>Java的时间戳和MySQL时间戳不一致，因此时间戳需要从MySQL中查询</li></ul><p>不过这种方案虽然减少了不一致性的发生，但是也没有完全避免，并且两次查MySQL永远比只查一次更慢</p><h2 id="5-2利用UNION依托mvcc实现一致性"><a href="#5-2利用UNION依托mvcc实现一致性" class="headerlink" title="5.2利用UNION依托mvcc实现一致性"></a>5.2利用UNION依托mvcc实现一致性</h2><pre><code>SELECTSUM( profit_balance ) AS 今天的现金收益总和,SUM( profit_fictitious_balance ) AS 今天的虚拟收益总和 ,0 AS 今天的待减现金收益,0 AS 今天的待减虚拟收益FROM实时收益表UNION ALLSELECT 0 AS 今天的现金收益总和,0 AS 今天的虚拟收益总和,SUM(IF(type=1,profit_balance,-profit_balance)) AS 今天的待减现金收益,SUM(IF(type=1,amount,-amount)) AS 今天的待减虚拟收益FROM收益记录表</code></pre><p>然后这样就可以用一个Dto来装数据，这条SQL语句一共会产生两行，大概长这样</p><table><thead><tr><th>今天的现金收益总和</th><th>今天的虚拟收益总和</th><th>今天的待减现金收益</th><th>今天的待减虚拟收益</th></tr></thead><tbody><tr><td>9000</td><td>8000</td><td>0</td><td>0</td></tr><tr><td>0</td><td>0</td><td>1000</td><td>2000</td></tr></tbody></table><p>Mybatis对应会生成size=2的一个List，处理一下就得到了今天的数据了</p><h3 id="5-2-1不加锁一致性的实现机制"><a href="#5-2-1不加锁一致性的实现机制" class="headerlink" title="5.2.1不加锁一致性的实现机制"></a>5.2.1不加锁一致性的实现机制</h3><ul><li>因为是用UNION，所以这个数据一定是一致的</li><li>因为是RC（read comitted）级别，RC级别下是有MVCC（多版本并发控制）机制的，所以在SELECT的时候不会加锁，也不会受到当前其他现成读写操作的影响</li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> 工作笔记 </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>压缩打包但不归档，利用response</title>
+      <link href="/zjh/2022/07/15/%E5%8E%8B%E7%BC%A9%E6%89%93%E5%8C%85%E4%BD%86%E4%B8%8D%E5%BD%92%E6%A1%A3%EF%BC%8C%E5%88%A9%E7%94%A8response/"/>
+      <url>/zjh/2022/07/15/%E5%8E%8B%E7%BC%A9%E6%89%93%E5%8C%85%E4%BD%86%E4%B8%8D%E5%BD%92%E6%A1%A3%EF%BC%8C%E5%88%A9%E7%94%A8response/</url>
+      
+        <content type="html"><![CDATA[<p>把图片按自定义的层级关系及名称压缩打包，但不放入服务器<br>我的其他文章里有关于这个问题解决方案的小demo</p><h1 id="1-场景"><a href="#1-场景" class="headerlink" title="1.场景"></a>1.场景</h1><p>业务场景：学生提交作品中有很多图片，需要分层级按：活动名》班级》姓名》作品名》作品图片集合  压缩打包，并且<strong>因为这个作品是时常变化的，所以不能把压缩包放到服务器上</strong></p><p>要求：请求接口之后把压缩包发来，不准存服务器然后发url</p><h1 id="2-最终解决方案"><a href="#2-最终解决方案" class="headerlink" title="2.最终解决方案"></a>2.最终解决方案</h1><ul><li>把最终的zip流输出到response.getOutPutStream()中</li><li>在输出之前，先要设置请求头 <code>response.setHeader(&quot;Content-Disposition&quot;, &quot;attachment; filename=&quot; + URLEncoder.encode(activityName) + &quot;.zip&quot;)</code>; ————<strong>用于指定最终输出的zip压缩包的名字</strong>，这个<code>URLEncoder.encode()</code>十分重要，否则中文会乱码</li><li>公司内部框架直接获取图片的byte[] ，遍历写入<code>》》</code>缓冲流write() <code>《《</code> 压缩流<code> 《《</code> response.getOutPutStream()</li><li>SQL查询出来年级、班级、姓名、作品名字、图片url ， 然后putZipEntry(new Entry(<code>用//来分层级</code>))</li><li><strong>业务方面：有的学校的班级是中文，因此必须CONCAT拼接。而为了保证最终文件可排序，因此不用”一年级“ 而用 ”1年级“</strong>  形如：new ZipEntry(“活动测试//1年级1班//张三-开心假期”)</li></ul><br/><h1 id="3-浏览器适配问题"><a href="#3-浏览器适配问题" class="headerlink" title="3.浏览器适配问题"></a>3.浏览器适配问题</h1><br/><ul><li>该方案设置请求头.setHeader(“Content-Disposition”, “attachment; filename=” +）直接<strong>强制在文件的末尾加上zip，可以防止因为不同浏览器无法解析ContentType导致的文件格式错误</strong>（google可以不指定）</li><li>尝试给edge浏览器做适配，发现除了上面的方法，没有其他方法可以设置文件格式</li><li>测试后，无论什么浏览器，压缩包末尾强制 .zip 文件接收后可以直接打开<br><img src="https://img-blog.csdnimg.cn/0e2118dc06b945bca75963d954a89489.png"></li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> 工作笔记 </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>124个delete_flag的心酸</title>
+      <link href="/zjh/2022/07/15/124%E4%B8%AAdelete-flag%E7%9A%84%E5%BF%83%E9%85%B8/"/>
+      <url>/zjh/2022/07/15/124%E4%B8%AAdelete-flag%E7%9A%84%E5%BF%83%E9%85%B8/</url>
+      
+        <content type="html"><![CDATA[<p>解决delete_flag使用不规范造成的bug</p><h1 id="1-场景"><a href="#1-场景" class="headerlink" title="1.场景"></a>1.场景</h1><p>历史遗留BUG，场景：一共两个mapper，有一百多个sql，<strong>有90%以上的连表JOIN是没有加delete_flag=1条件，导致查询出来的结果会产生笛卡尔积。</strong> 还有一部分的delete_flag加了其中几个，放的位置也很耐人寻味~</p><br/><h1 id="2-解决方法"><a href="#2-解决方法" class="headerlink" title="2.解决方法"></a>2.解决方法</h1><p>先思考再动手，理清楚SELECT FROM JOIN WHERE之间的数量关系</p><ul><li><p>每次JOIN<strong>关联表</strong>必须带delete_flag = 1，WHERE中本应只写一个<strong>原表</strong>的delete_flag = 1 <img src="https://img-blog.csdnimg.cn/b1e55814fd264bf085e6c8752fd00170.png"></p></li><li><p>先ctrl + F 高亮，alt + J 框选，让JOIN更明显，挨个在JOIN之后加delete_flag = 1</p></li><li><p><strong>加完之后一定存在冗余</strong>，搜索每个WHERE条件，所以在WHERE条件下，一旦找到两个delete_flag = 1 那么一定有多余的<img src="https://img-blog.csdnimg.cn/27cd2b12a2e840f19bf6d24dae690ca1.png"></p></li><li><p>最后核对数量  ctrl + F 搜索数量  <code>JOIN + WHERE = delete_flag</code> </br><br>54 + 16 = 70 另一个个mapper的解决方法同理</p></li></ul><h1 id="3-小结"><a href="#3-小结" class="headerlink" title="3.小结"></a>3.小结</h1><ul><li>每次JOIN都应该<strong>紧随其后</strong>一个AND delete_flag = 1 </li><li>无论当时的业务有没有删除功能，只要是表中有，就应该加上，避免埋炸弹！</li><li>WHERE后跟的 delete_flag = 1 应只有一个，且是针对于原表</li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> 工作笔记 </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>非时序排序下的瀑布流分页</title>
+      <link href="/zjh/2022/07/15/%E9%9D%9E%E6%97%B6%E5%BA%8F%E6%8E%92%E5%BA%8F%E4%B8%8B%E7%9A%84%E7%80%91%E5%B8%83%E6%B5%81%E5%88%86%E9%A1%B5/"/>
+      <url>/zjh/2022/07/15/%E9%9D%9E%E6%97%B6%E5%BA%8F%E6%8E%92%E5%BA%8F%E4%B8%8B%E7%9A%84%E7%80%91%E5%B8%83%E6%B5%81%E5%88%86%E9%A1%B5/</url>
+      
+        <content type="html"><![CDATA[<p>设计非时序相关的排序功能</p><h1 id="1-引言"><a href="#1-引言" class="headerlink" title="1.引言"></a>1.引言</h1><p>分页查询很常见，在web网页端的分页，和移动端手机下滑的分页逻辑一般都不同</p><ul><li>web端是常规的是<strong>指定页码数</strong>使用`limit #{start} , #{end}</li><li>移动端一般不会指定页码数，而是<strong>根据上一次的最后一个id作为fromId（主键）</strong>，先WHERE xxxid &gt; fromId 然后limit #{size} <strong>这样既符合手机下滑业务场景，也避免了页码过大查询速度降低的问题</strong></li></ul><h1 id="2-移动端可能存在的问题"><a href="#2-移动端可能存在的问题" class="headerlink" title="2.移动端可能存在的问题"></a>2.移动端可能存在的问题</h1><ul><li>如果我们是按时间排序，那么这套逻辑毫无问题！但是如果我们按班级排序（非时序）：</li><li>如果按班级<strong>升序</strong>每次我们查3条数据（<strong>limit 3</strong> ），在<strong>如下表的作品<code>提交</code>顺序</strong>，可能出现的情况是:</li></ul><table><thead><tr><th>班级</th><th>作品id（fromId）（主键）</th></tr></thead><tbody><tr><td>1班</td><td>4 5 7 ， 8 9 10</td></tr><tr><td>2班</td><td>1号作品 2号  3号 ，6 12 13</td></tr></tbody></table><table><thead><tr><th>第n次下拉手机屏幕</th><th>作品id（fromId）（主键）</th></tr></thead><tbody><tr><td>1</td><td>7 （取出1班的4 5 7号作品）</td></tr><tr><td>2</td><td>10 （取出1班的8 9 10号作品）</td></tr><tr><td>3</td><td>12 13（<code>因为fromId &gt; 10，所以前面1 2 3 6数据丢失了</code>）</td></tr></tbody></table><p><img src="https://img-blog.csdnimg.cn/7fd67321bb1b4fe4aaa3002ee92d00c9.png"></p><p>我造的这个数据，无论是升序  还是降序，都会导致数据丢失，因此可以得出结论:</p><h1 id="3-结论"><a href="#3-结论" class="headerlink" title="3.结论"></a>3.结论</h1><p>像班级  年级   等等等 所有的 <strong><code>自增主键和排序依据不是时间线性相关</code>的，都不能使用fromId作为排序依据</strong></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 工作笔记 </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>常见排序</title>
       <link href="/zjh/2022/04/21/%E5%B8%B8%E8%A7%81%E6%8E%92%E5%BA%8F/"/>
       <url>/zjh/2022/04/21/%E5%B8%B8%E8%A7%81%E6%8E%92%E5%BA%8F/</url>
