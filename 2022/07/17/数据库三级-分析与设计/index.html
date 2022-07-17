@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>数据库三级-分析与设计 | ZJH&#39;blog</title>
+  <meta name="keywords" content="">
+  <meta name="description" content="数据库三级-分析与设计 | ZJH&#39;blog">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="description" content="请实现 copyRandomList 函数，复制一个复杂链表。在复杂链表中，每个节点除了有一个 next 指针指向下一个节点，还有一个 random 指针指向链表中的任意节点或者 null。   &#x2F;* &#x2F;&#x2F; Definition for a Node. class Node &amp;#123;     int val;     Node next;     Node random;      publi">
+<meta property="og:type" content="article">
+<meta property="og:title" content="复杂链表的复制">
+<meta property="og:url" content="https://zjhblog.gitee.io/2022/07/17/%E5%A4%8D%E6%9D%82%E9%93%BE%E8%A1%A8%E7%9A%84%E5%A4%8D%E5%88%B6/index.html">
+<meta property="og:site_name" content="ZJH&#39;blog">
+<meta property="og:description" content="请实现 copyRandomList 函数，复制一个复杂链表。在复杂链表中，每个节点除了有一个 next 指针指向下一个节点，还有一个 random 指针指向链表中的任意节点或者 null。   &#x2F;* &#x2F;&#x2F; Definition for a Node. class Node &amp;#123;     int val;     Node next;     Node random;      publi">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/684077f34afa495b91ed7add08e1e53e.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/dc54fe25f2a94db38c1b8e0f65063629.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/10eddcdb7b8a49cab0687f20789c01db.png">
+<meta property="article:published_time" content="2022-07-17T04:32:49.000Z">
+<meta property="article:modified_time" content="2022-07-17T04:35:37.261Z">
+<meta property="article:author" content="ZJH">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/684077f34afa495b91ed7add08e1e53e.png">
+
+
+<link rel="icon" href="/img/QQ图片20211224224200.jpg">
+
+<link href="/zjh/css/style.css?v=1.1.0" rel="stylesheet">
+
+<link href="/zjh/css/hl_theme/atom-dark.css?v=1.1.0" rel="stylesheet">
+
+<link href="//cdn.jsdelivr.net/npm/animate.css@4.1.0/animate.min.css" rel="stylesheet">
+
+<script src="//cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+<script src="/zjh/js/titleTip.js?v=1.1.0" ></script>
+
+<script src="//cdn.jsdelivr.net/npm/highlightjs@9.16.2/highlight.pack.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+<script src="//cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js"></script>
+
+
+
+<script src="//cdn.jsdelivr.net/npm/jquery.cookie@1.4.1/jquery.cookie.min.js" ></script>
+
+<script src="/zjh/js/iconfont.js?v=1.1.0" ></script>
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<div style="display: none">
+  <input class="theme_disqus_on" value="false">
+  <input class="theme_preload_comment" value="">
+  <input class="theme_blog_path" value="/zjh">
+  <input id="theme_shortcut" value="true" />
+  <input id="theme_highlight_on" value="true" />
+  <input id="theme_code_copy" value="true" />
+</div>
+
+
+
+<body>
+<aside class="nav">
+    <div class="nav-left">
+        <a href="/zjh/"
+   class="avatar_target">
+    <img class="avatar"
+         src="/zjh/img/QQ图片20211224224200.jpg"/>
+</a>
+<div class="author">
+    <span>ZJH</span>
+</div>
+
+<div class="icon">
+    
+        
+            <a title="github"
+               href="https://github.com/BetterZJH"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-github"></use>
+                    </svg>
+                
+            </a>
+        
+    
+        
+            <a title="csdn"
+               href="https://blog.csdn.net/m0_56079407"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-csdn"></use>
+                    </svg>
+                
+            </a>
+        
+    
+        
+            <a title="email"
+               href="mailto:847829122@qq.com"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-email"></use>
+                    </svg>
+                
+            </a>
+        
+    
+        
+            <a title="qq"
+               href="http://wpa.qq.com/msgrd?v=3&uin=847829122&site=qq&menu=yes"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-qq"></use>
+                    </svg>
+                
+            </a>
+        
+    
+</div>
+
+
+
+
+<ul>
+    <li>
+        <div class="all active" data-rel="全部文章">全部文章
+            
+                <small>(72)</small>
+            
+        </div>
+    </li>
+    
+        
+            
+                <li>
+                    <div data-rel="数据库">
+                        
+                        数据库
+                        <small>(5)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="数据结构算法">
+                        
+                        数据结构算法
+                        <small>(10)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="工作笔记">
+                        
+                        工作笔记
+                        <small>(5)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="机器学习">
+                        
+                        机器学习
+                        <small>(7)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="源码">
+                        
+                        源码
+                        <small>(4)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="Bug">
+                        
+                        Bug
+                        <small>(2)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="Java">
+                        
+                        Java
+                        <small>(13)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="Java后端">
+                        
+                        Java后端
+                        <small>(19)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+</ul>
+<div class="left-bottom">
+    <div class="menus">
+        
+            
+            
+            
+    </div>
+    <div>
+        
+        
+    </div>
+</div>
+<input type="hidden" id="yelog_site_posts_number" value="72">
+<input type="hidden" id="yelog_site_word_count" value="101.6k">
+<div style="display: none">
+    <span id="busuanzi_value_site_uv"></span>
+    <span id="busuanzi_value_site_pv"></span>
+</div>
+
+    </div>
+    <div class="nav-right">
+        <div class="friends-area">
+    <div class="friends-title">
+        友情链接
+        <i class="iconfont icon-left"></i>
+    </div>
+    <div class="friends-content">
+        <ul>
+            
+            <li><a target="_blank" href="http://yelog.org/">叶落阁</a></li>
+            
+        </ul>
+    </div>
+</div>
+        <div class="title-list">
+    <div class="right-top">
+        <div id="default-panel">
+            <i class="iconfont icon-search" data-title="搜索 快捷键 i"></i>
+            <div class="right-title">全部文章</div>
+            <i class="iconfont icon-file-tree" data-title="切换到大纲视图 快捷键 w"></i>
+        </div>
+        <div id="search-panel">
+            <i class="iconfont icon-left" data-title="返回"></i>
+            <input id="local-search-input" autocomplete="off"/>
+            <label class="border-line" for="input"></label>
+            <i class="iconfont icon-case-sensitive" data-title="大小写敏感"></i>
+            <i class="iconfont icon-tag" data-title="标签"></i>
+        </div>
+        <div id="outline-panel" style="display: none">
+            <div class="right-title">大纲</div>
+            <i class="iconfont icon-list" data-title="切换到文章列表"></i>
+        </div>
+    </div>
+
+    <div class="tags-list">
+    <input id="tag-search" />
+    <div class="tag-wrapper">
+        
+            <li class="article-tag-list-item">
+                <i class="iconfont icon-tag"></i><a>HashMap</a>
+            </li>
+        
+            <li class="article-tag-list-item">
+                <i class="iconfont icon-tag"></i><a>MVC</a>
+            </li>
+        
+    </div>
+
+</div>
+
+    
+    <nav id="title-list-nav">
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/07/17/%E5%A4%8D%E6%9D%82%E9%93%BE%E8%A1%A8%E7%9A%84%E5%A4%8D%E5%88%B6/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="复杂链表的复制">复杂链表的复制</span>
+            <span class="post-date" title="2022-07-17 12:32:49">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/07/17/%E6%9B%BF%E6%8D%A2%E7%A9%BA%E6%A0%BC/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="替换空格">替换空格</span>
+            <span class="post-date" title="2022-07-17 12:31:13">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/07/17/0-n-1%E7%BC%BA%E5%A4%B1%E6%95%B0%E5%AD%97/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="0~n-1缺失数字">0~n-1缺失数字</span>
+            <span class="post-date" title="2022-07-17 12:29:39">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/07/17/%E5%B7%A6%E6%97%8B%E8%BD%AC%E5%AD%97%E7%AC%A6%E4%B8%B2/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="左旋转字符串">左旋转字符串</span>
+            <span class="post-date" title="2022-07-17 12:26:18">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 数据库 "
+           href="/zjh/2022/07/17/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%89%E7%BA%A7-%E5%A4%A7%E8%A7%84%E6%A8%A1%E6%95%B0%E6%8D%AE%E6%9E%B6%E6%9E%84/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="数据库三级-大规模数据架构">数据库三级-大规模数据架构</span>
+            <span class="post-date" title="2022-07-17 12:10:03">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 数据库 "
+           href="/zjh/2022/07/17/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%89%E7%BA%A7-%E8%BF%90%E7%BB%B4%E4%BC%98%E5%8C%96%E3%80%81%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="数据库三级-运维优化、安全管理">数据库三级-运维优化、安全管理</span>
+            <span class="post-date" title="2022-07-17 12:09:08">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 数据库 "
+           href="/zjh/2022/07/17/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%89%E7%BA%A7-%E5%88%86%E6%9E%90%E4%B8%8E%E8%AE%BE%E8%AE%A1/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="数据库三级-分析与设计">数据库三级-分析与设计</span>
+            <span class="post-date" title="2022-07-17 12:08:19">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/zjh/2022/07/17/%E6%B0%94%E8%B1%A1cv-%E5%9C%B0%E5%9F%BA%E4%BA%91%E5%9B%BE%E4%BA%91%E7%B3%BB%E5%88%86%E5%89%B2/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="气象cv-地基云图云系分割">气象cv-地基云图云系分割</span>
+            <span class="post-date" title="2022-07-17 12:04:12">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/zjh/2022/07/17/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA%E6%9E%A3%E7%B1%BB%E9%81%97%E4%BC%A0%E7%9A%84%E5%9B%9E%E5%BD%92%E9%A2%84%E6%B5%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="支持向量机枣类遗传的回归预测">支持向量机枣类遗传的回归预测</span>
+            <span class="post-date" title="2022-07-17 11:47:04">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/zjh/2022/07/17/%E6%B0%94%E8%B1%A1%E5%A4%A7%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="气象大数据分析">气象大数据分析</span>
+            <span class="post-date" title="2022-07-17 11:44:44">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/zjh/2022/07/17/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%8D%95%E5%9B%BE%E8%B6%85%E5%88%86%E8%BE%A8%E7%8E%87%E7%9A%84%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="卷积神经网络单图超分辨率的深度学习方法">卷积神经网络单图超分辨率的深度学习方法</span>
+            <span class="post-date" title="2022-07-17 11:33:07">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/zjh/2022/07/17/%E7%96%AB%E6%83%85%E6%B8%AF%E5%8F%A3%E6%8C%82%E9%9D%A0%E6%95%B0ARIMA%E6%97%B6%E5%BA%8F%E5%88%86%E6%9E%90/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="疫情港口挂靠数ARIMA时序分析">疫情港口挂靠数ARIMA时序分析</span>
+            <span class="post-date" title="2022-07-17 11:21:13">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/07/15/OGNL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%94%B9%E9%80%A0%E4%BB%A5%E4%BD%BF%E7%94%A8%E7%B4%A2%E5%BC%95/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="OGNL表达式改造以使用索引">OGNL表达式改造以使用索引</span>
+            <span class="post-date" title="2022-07-15 22:27:54">2022/07/15</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/07/15/mvcc+%E6%8C%89%E5%A4%A9%E7%BC%93%E5%AD%98%E7%BB%9F%E8%AE%A1%E4%B8%A4%E4%B8%AA%E6%94%B6%E7%9B%8A/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="mvcc+按天缓存统计两个收益">mvcc+按天缓存统计两个收益</span>
+            <span class="post-date" title="2022-07-15 21:35:25">2022/07/15</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/07/15/%E5%8E%8B%E7%BC%A9%E6%89%93%E5%8C%85%E4%BD%86%E4%B8%8D%E5%BD%92%E6%A1%A3%EF%BC%8C%E5%88%A9%E7%94%A8response/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="压缩打包但不归档，利用response">压缩打包但不归档，利用response</span>
+            <span class="post-date" title="2022-07-15 21:26:51">2022/07/15</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/07/15/124%E4%B8%AAdelete-flag%E7%9A%84%E5%BF%83%E9%85%B8/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="124个delete_flag的心酸">124个delete_flag的心酸</span>
+            <span class="post-date" title="2022-07-15 21:19:19">2022/07/15</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/07/15/%E9%9D%9E%E6%97%B6%E5%BA%8F%E6%8E%92%E5%BA%8F%E4%B8%8B%E7%9A%84%E7%80%91%E5%B8%83%E6%B5%81%E5%88%86%E9%A1%B5/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="非时序排序下的瀑布流分页">非时序排序下的瀑布流分页</span>
+            <span class="post-date" title="2022-07-15 21:15:15">2022/07/15</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/04/21/%E5%B8%B8%E8%A7%81%E6%8E%92%E5%BA%8F/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="常见排序">常见排序</span>
+            <span class="post-date" title="2022-04-21 09:56:37">2022/04/21</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/04/21/Stream%E6%A1%88%E4%BE%8B%EF%BC%9A%E5%A4%9A%E5%A4%A9%E5%88%86%E7%BB%84%E7%BB%9F%E8%AE%A1%E7%9A%84%E6%B1%87%E6%80%BB/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Stream案例：多天分组统计的汇总">Stream案例：多天分组统计的汇总</span>
+            <span class="post-date" title="2022-04-21 09:53:59">2022/04/21</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/04/21/Filter%E7%9A%84%E5%B8%B8%E8%A7%81%E7%94%A8%E6%B3%95/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Filter的常见用法">Filter的常见用法</span>
+            <span class="post-date" title="2022-04-21 09:51:40">2022/04/21</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/04/21/Lambda%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%92%8C%E6%96%B9%E6%B3%95%E5%BC%95%E7%94%A8/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Lambda表达式和方法引用">Lambda表达式和方法引用</span>
+            <span class="post-date" title="2022-04-21 09:50:42">2022/04/21</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/04/21/AspectJ%E5%B0%8F%E6%A1%88%E4%BE%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="AspectJ小案例">AspectJ小案例</span>
+            <span class="post-date" title="2022-04-21 09:49:49">2022/04/21</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/04/21/Mybatis%E4%B8%ADxml%E4%B8%AD%E8%B0%83java%E6%96%B9%E6%B3%95OGNL%E8%A1%A8%E8%BE%BE%E5%BC%8F/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Mybatis中xml中调java方法OGNL表达式">Mybatis中xml中调java方法OGNL表达式</span>
+            <span class="post-date" title="2022-04-21 09:47:36">2022/04/21</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/04/21/Java%E6%B3%A8%E8%A7%A3%E5%92%8C%E5%8F%8D%E5%B0%84/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Java注解和反射">Java注解和反射</span>
+            <span class="post-date" title="2022-04-21 09:45:15">2022/04/21</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/03/21/Redis%E5%9F%BA%E7%A1%80/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Redis基础">Redis基础</span>
+            <span class="post-date" title="2022-03-21 00:20:03">2022/03/21</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/03/21/JavaWeb%E5%9F%BA%E7%A1%80/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="JavaWeb基础">JavaWeb基础</span>
+            <span class="post-date" title="2022-03-21 00:19:19">2022/03/21</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/03/21/SpringMVC%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3/"
+           data-tag="MVC"
+           data-author="" >
+            <span class="post-title" title="SpringMVC常用注解">SpringMVC常用注解</span>
+            <span class="post-date" title="2022-03-21 00:18:03">2022/03/21</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/03/21/HashMap%E4%B8%ADentrySet-%E8%AF%A6%E8%A7%A3/"
+           data-tag="HashMap"
+           data-author="" >
+            <span class="post-title" title="HashMap中entrySet()详解">HashMap中entrySet()详解</span>
+            <span class="post-date" title="2022-03-21 00:15:10">2022/03/21</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/03/21/HashMap/"
+           data-tag="HashMap"
+           data-author="" >
+            <span class="post-title" title="HashMap">HashMap</span>
+            <span class="post-date" title="2022-03-21 00:13:23">2022/03/21</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/03/07/%E6%89%8B%E5%86%99%E5%8F%8C%E5%90%91%E9%93%BE%E8%A1%A8-%E5%8F%8D%E8%BD%AC%E5%8D%95%E5%90%91%E9%93%BE%E8%A1%A8/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="手写双向链表+反转单向链表">手写双向链表+反转单向链表</span>
+            <span class="post-date" title="2022-03-07 22:14:38">2022/03/07</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/03/07/IOC%E6%8E%A7%E5%88%B6%E5%8F%8D%E8%BD%AC-DI/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="IOC控制反转+DI">IOC控制反转+DI</span>
+            <span class="post-date" title="2022-03-07 22:13:22">2022/03/07</span>
+        </a>
+        
+        <a  class="全部文章 数据库 "
+           href="/zjh/2022/03/07/Mysql%E4%BA%8B%E5%8A%A1%E5%92%8C%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Mysql事务和存储引擎">Mysql事务和存储引擎</span>
+            <span class="post-date" title="2022-03-07 22:11:06">2022/03/07</span>
+        </a>
+        
+        <a  class="全部文章 数据库 "
+           href="/zjh/2022/03/07/Mysql-InnoDB-%E7%B4%A2%E5%BC%95%E5%8E%9F%E7%90%86%E5%8F%8A%E7%9A%84%E4%BD%BF%E7%94%A8/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Mysql(InnoDB)索引原理及的使用">Mysql(InnoDB)索引原理及的使用</span>
+            <span class="post-date" title="2022-03-07 22:10:05">2022/03/07</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/03/07/%E7%B1%BB%E8%87%AA%E8%BA%AB%E5%B5%8C%E5%A5%97-%E4%BA%8C%E5%8F%89%E6%A0%91%E5%88%A0%E9%99%A4-%E6%A0%88%E5%A0%86%E5%88%86%E6%9E%90/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="类自身嵌套(二叉树删除)栈堆分析">类自身嵌套(二叉树删除)栈堆分析</span>
+            <span class="post-date" title="2022-03-07 22:09:09">2022/03/07</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/03/07/Java%E5%A0%86%E6%8E%92%E5%BA%8F%E7%9A%84%E8%BF%87%E7%A8%8B%E5%88%B0%E8%AE%BE%E8%AE%A1/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Java堆排序的过程到设计">Java堆排序的过程到设计</span>
+            <span class="post-date" title="2022-03-07 22:08:08">2022/03/07</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/03/07/Bean%E6%A0%87%E7%AD%BE%E5%88%B0Spring%E7%9A%84IOC%E6%B3%A8%E8%A7%A3/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Bean标签到Spring的IOC注解">Bean标签到Spring的IOC注解</span>
+            <span class="post-date" title="2022-03-07 22:07:07">2022/03/07</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/03/07/%E6%B3%A8%E8%A7%A3PropertySource%E8%87%AA%E5%AE%9A%E4%B9%89%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E4%B8%89%E7%A7%8D%E6%96%B9%E6%B3%95/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="注解PropertySource自定义配置文件的三种方法">注解PropertySource自定义配置文件的三种方法</span>
+            <span class="post-date" title="2022-03-07 22:05:56">2022/03/07</span>
+        </a>
+        
+        <a  class="全部文章 Bug "
+           href="/zjh/2022/03/07/Cannot-find-method-%E2%80%98value%E2%80%98-lombok%E5%86%B2%E7%AA%81/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Cannot find method ‘value‘(lombok冲突)">Cannot find method ‘value‘(lombok冲突)</span>
+            <span class="post-date" title="2022-03-07 22:02:56">2022/03/07</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/02/21/LinkedList%E6%BA%90%E7%A0%81%E4%B8%AD%E4%B8%BA%E4%BD%95%E5%A4%A7%E9%87%8F%E5%87%BA%E7%8E%B0final/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="LinkedList源码中为何大量出现final">LinkedList源码中为何大量出现final</span>
+            <span class="post-date" title="2022-02-21 09:57:35">2022/02/21</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/02/20/LinkedList%E4%B8%ADclear%E5%92%8Cunlink%E6%96%B9%E6%B3%95%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%A4%9A%E6%AC%A1%E7%BD%AE%E7%A9%BA/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="LinkedList中clear和unlink方法为什么要多次置空">LinkedList中clear和unlink方法为什么要多次置空</span>
+            <span class="post-date" title="2022-02-20 00:25:11">2022/02/20</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/02/20/gc%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%9C%BA%E5%88%B6/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="gc垃圾回收机制">gc垃圾回收机制</span>
+            <span class="post-date" title="2022-02-20 00:17:43">2022/02/20</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/02/15/%E5%A4%96%E9%83%A8jar%E5%8C%85%E7%9A%84%E5%BC%95%E5%85%A5%E5%92%8C%E6%89%93%E5%8C%85/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="外部jar包的引入和打包">外部jar包的引入和打包</span>
+            <span class="post-date" title="2022-02-15 15:47:39">2022/02/15</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/02/15/Bean%E7%9A%84%E9%85%8D%E7%BD%AE%EF%BC%8C%E6%B3%A8%E5%85%A5%EF%BC%8C%E6%93%8D%E4%BD%9C%EF%BC%8C%E6%A0%A1%E9%AA%8C/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Bean的配置，注入，操作，校验">Bean的配置，注入，操作，校验</span>
+            <span class="post-date" title="2022-02-15 15:33:42">2022/02/15</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/02/15/%E6%99%AE%E9%80%9A%E7%B1%BB%E4%B8%AD%E8%B0%83%E7%94%A8Bean/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="普通类中调用Bean">普通类中调用Bean</span>
+            <span class="post-date" title="2022-02-15 15:29:09">2022/02/15</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/02/15/%E8%BF%9E%E6%8E%A5%E9%98%BF%E9%87%8C%E4%BA%91OSS/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="连接阿里云OSS，url转存OSS">连接阿里云OSS，url转存OSS</span>
+            <span class="post-date" title="2022-02-15 15:12:00">2022/02/15</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/02/15/%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E6%B1%87%E6%80%BB/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="异常处理汇总">异常处理汇总</span>
+            <span class="post-date" title="2022-02-15 14:55:04">2022/02/15</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/02/15/%E6%B1%A0%E5%8C%96%E6%80%9D%E6%83%B3/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="池化思想">池化思想</span>
+            <span class="post-date" title="2022-02-15 14:53:32">2022/02/15</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/02/15/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E6%B1%87%E6%80%BB/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="面向对象汇总">面向对象汇总</span>
+            <span class="post-date" title="2022-02-15 14:52:05">2022/02/15</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/02/15/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%92%8C%E7%BA%BF%E7%A8%8B%E5%90%8C%E6%AD%A5%E6%B1%87%E6%80%BB/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="多线程和线程同步汇总">多线程和线程同步汇总</span>
+            <span class="post-date" title="2022-02-15 14:51:32">2022/02/15</span>
+        </a>
+        
+        <a  class="全部文章 "
+           href="/zjh/2022/02/09/%E5%AE%9E%E7%8E%B0%E6%9C%8B%E5%8F%8B%E5%9C%88%E4%B8%8B%E6%8B%89%E5%88%B7%E6%96%B0%E6%8B%BC%E6%8E%A5%E7%9A%84%E6%80%9D%E8%B7%AF/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="实现朋友圈下拉刷新拼接的思路">实现朋友圈下拉刷新拼接的思路</span>
+            <span class="post-date" title="2022-02-09 15:40:54">2022/02/09</span>
+        </a>
+        
+        <a  class="全部文章 Bug "
+           href="/zjh/2022/02/09/IO%E4%BC%A0%E8%BE%93%E5%9B%BE%E7%89%87%E8%83%BD%E6%89%93%E5%BC%80%E4%BD%86%E8%8A%B1%E5%B1%8F/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="IO传输图片能打开但花屏">IO传输图片能打开但花屏</span>
+            <span class="post-date" title="2022-02-09 15:39:11">2022/02/09</span>
+        </a>
+        
+        <a  class="全部文章 "
+           href="/zjh/2022/01/30/NXB%E6%88%90%E5%91%98%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F%E5%8D%95%E9%A1%B5crud/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="NXB成员管理系统单页crud">NXB成员管理系统单页crud</span>
+            <span class="post-date" title="2022-01-30 12:50:33">2022/01/30</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/01/28/springboot%E6%95%B4%E5%90%88SSM/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="springboot整合SSM">springboot整合SSM</span>
+            <span class="post-date" title="2022-01-28 21:08:03">2022/01/28</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/01/28/springboot%E6%B3%A8%E6%84%8F%E7%82%B91/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="springboot注意点1">springboot注意点1</span>
+            <span class="post-date" title="2022-01-28 21:06:38">2022/01/28</span>
+        </a>
+        
+        <a  class="全部文章 "
+           href="/zjh/2022/01/26/axios-element-vue%E7%9A%84%E5%89%8D%E7%AB%AF%E6%95%B0%E6%8D%AE%E4%BA%A4%E4%BA%92%E6%A1%86%E6%9E%B6/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="axios+element+vue的前端数据交互框架">axios+element+vue的前端数据交互框架</span>
+            <span class="post-date" title="2022-01-26 21:38:41">2022/01/26</span>
+        </a>
+        
+        <a  class="全部文章 "
+           href="/zjh/2022/01/25/File%E7%9A%84%E4%B8%80%E4%BA%9B%E7%BB%86%E8%8A%82/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="File的一些细节">File的一些细节</span>
+            <span class="post-date" title="2022-01-25 21:15:36">2022/01/25</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/01/25/IO-TCP-URL%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="IO:TCP URL网络编程">IO:TCP URL网络编程</span>
+            <span class="post-date" title="2022-01-25 21:12:23">2022/01/25</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/01/25/JDBC/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="JDBC">JDBC</span>
+            <span class="post-date" title="2022-01-25 21:10:07">2022/01/25</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/01/25/SSMp%E6%95%B4%E5%90%88%E6%A1%88%E4%BE%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="SSMp整合案例">SSMp整合案例</span>
+            <span class="post-date" title="2022-01-25 21:06:05">2022/01/25</span>
+        </a>
+        
+        <a  class="全部文章 Java后端 "
+           href="/zjh/2022/01/20/Springboot%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Springboot基本结构">Springboot基本结构</span>
+            <span class="post-date" title="2022-01-20 20:10:08">2022/01/20</span>
+        </a>
+        
+        <a  class="全部文章 "
+           href="/zjh/2022/01/16/%E6%96%87%E4%BB%B6%E5%8A%A0%E5%AF%86%E8%A7%A3%E5%AF%86%E5%99%A8/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="文件加密解密器">文件加密解密器</span>
+            <span class="post-date" title="2022-01-16 21:28:42">2022/01/16</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/01/16/IO%E6%B5%81/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="IO流">IO流</span>
+            <span class="post-date" title="2022-01-16 21:26:38">2022/01/16</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/01/13/File%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="File常用操作">File常用操作</span>
+            <span class="post-date" title="2022-01-13 11:36:05">2022/01/13</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/zjh/2022/01/11/%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E6%B3%B0%E5%9D%A6%E5%B0%BC%E5%85%8B%E5%8F%B7%E8%8E%B7%E6%95%91%E9%A2%84%E6%B5%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="随机森林——泰坦尼克号获救预测">随机森林——泰坦尼克号获救预测</span>
+            <span class="post-date" title="2022-01-11 03:06:10">2022/01/11</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/01/03/Java%E9%9B%86%E5%90%88/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Java集合">Java集合</span>
+            <span class="post-date" title="2022-01-03 10:02:27">2022/01/03</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/01/02/Java%E6%B3%9B%E5%9E%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Java泛型">Java泛型</span>
+            <span class="post-date" title="2022-01-02 19:51:37">2022/01/02</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/zjh/2022/01/01/%E5%86%B3%E7%AD%96%E6%A0%91-%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E7%94%A8%E6%88%B7%E6%B5%81%E5%A4%B1%E9%A2%84%E6%B5%8B%E7%9A%84%E6%A1%88%E4%BE%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="决策树/随机森林——用户流失预测的案例">决策树/随机森林——用户流失预测的案例</span>
+            <span class="post-date" title="2022-01-01 00:41:40">2022/01/01</span>
+        </a>
+        
+        <a  class="全部文章 "
+           href="/zjh/2021/12/25/IDEA%E5%B8%B8%E7%94%A8%E5%BF%AB%E6%8D%B7%E9%94%AE/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="IDEA常用快捷键">IDEA常用快捷键</span>
+            <span class="post-date" title="2021-12-25 21:55:46">2021/12/25</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2021/12/25/%E5%9B%9E%E5%BD%A2%E9%92%88%E6%95%B0%E5%AD%97%E7%9F%A9%E9%98%B5Java%E5%AE%9E%E7%8E%B0/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="回形针数字矩阵Java实现">回形针数字矩阵Java实现</span>
+            <span class="post-date" title="2021-12-25 02:07:12">2021/12/25</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2021/12/25/Java%E5%9B%9B%E7%A7%8Dnext%E7%94%A8%E6%B3%95/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Java四种next用法">Java四种next用法</span>
+            <span class="post-date" title="2021-12-25 01:59:30">2021/12/25</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2021/12/25/RLE%E7%AE%97%E6%B3%95%E7%9A%84Java%E5%AE%9E%E7%8E%B0/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="RLE算法的Java实现">RLE算法的Java实现</span>
+            <span class="post-date" title="2021-12-25 01:35:20">2021/12/25</span>
+        </a>
+        
+        <a  class="全部文章 "
+           href="/zjh/2021/12/24/MarkDown%E5%B8%B8%E7%94%A8%E8%AF%AD%E6%B3%95/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="MarkDown常用语法">MarkDown常用语法</span>
+            <span class="post-date" title="2021-12-24 23:33:22">2021/12/24</span>
+        </a>
+        
+        <div id="no-item-tips">
+
+        </div>
+    </nav>
+    <div id="outline-list">
+    </div>
+</div>
+
+    </div>
+    <div class="hide-list">
+        <div class="semicircle" data-title="切换全屏 快捷键 s">
+            <div class="brackets first"><</div>
+            <div class="brackets">&gt;</div>
+        </div>
+    </div>
+</aside>
+<div id="post">
+    <div class="pjax">
+        <article id="post-数据库三级-分析与设计" class="article article-type-post" itemscope itemprop="blogPost">
+    
+        <h1 class="article-title">数据库三级-分析与设计</h1>
+    
+    <div class="article-meta">
+        
+        
+        
+        <span class="book">
+            <i class="iconfont icon-category"></i>
+            
+            
+            <a  data-rel="数据库">数据库</a>
+            
+        </span>
+        
+        
+    </div>
+    <div class="article-meta">
+        
+            发布时间 : <time class="date" title='最后更新: 2022-07-17 12:08:44'>2022-07-17 12:08</time>
+        
+    </div>
+    <div class="article-meta">
+        
+        <span>字数:2.1k</span>
+        
+        
+        <span id="busuanzi_container_page_pv">
+            阅读 :<span id="busuanzi_value_page_pv">
+                <span class="count-comment">
+                    <span class="spinner">
+                      <div class="cube1"></div>
+                      <div class="cube2"></div>
+                    </span>
+                </span>
+            </span>
+        </span>
+        
+        
+    </div>
+    
+    <div class="toc-ref">
+    
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E6%95%B0%E6%8D%AE%E5%BA%93%E5%BA%94%E7%94%A8%E7%B3%BB%E7%BB%9FDBAS%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F"><span class="toc-text">1.    数据库应用系统DBAS生命周期</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1%E8%A7%84%E5%88%92%E5%88%86%E6%9E%90"><span class="toc-text">1.1规划分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B3%BB%E7%BB%9F%E8%A7%84%E5%88%92%E5%92%8C%E5%AE%9A%E4%B9%89"><span class="toc-text">系统规划和定义</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%AF%E8%A1%8C%E6%80%A7%E5%88%86%E6%9E%90"><span class="toc-text">可行性分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A1%B9%E7%9B%AE%E8%A7%84%E5%88%92"><span class="toc-text">项目规划</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2-%E9%9C%80%E6%B1%82%E5%88%86%E6%9E%90-%E5%81%9A%E4%BB%80%E4%B9%88-%EF%BC%88%E9%9C%80%E6%B1%82%E5%88%86%E6%9E%90%E5%BB%BA%E6%A8%A1%E6%96%B9%E6%B3%95%EF%BC%89"><span class="toc-text">1.2 需求分析(做什么)（需求分析建模方法）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#DFD%E7%BB%93%E6%9E%84%E5%8C%96%E5%88%86%E6%9E%90%E5%BB%BA%E6%A8%A1%E6%96%B9%E6%B3%95"><span class="toc-text">DFD结构化分析建模方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#IDEF%E7%BB%93%E6%9E%84%E5%8C%96%E5%88%86%E6%9E%90%E5%BB%BA%E6%A8%A1%E6%96%B9%E6%B3%95"><span class="toc-text">IDEF结构化分析建模方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#IDEF0"><span class="toc-text">IDEF0</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E5%88%86%E6%9E%90%E5%BB%BA%E6%A8%A1%E6%96%B9%E6%B3%95"><span class="toc-text">面向对象分析建模方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#IDEF1X%EF%BC%88%E6%95%B0%E6%8D%AE%E5%BB%BA%E6%A8%A1%E6%96%B9%E6%B3%95%EF%BC%89"><span class="toc-text">IDEF1X（数据建模方法）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#IDEF1X-%E6%A0%87%E5%AE%9A%E4%B8%8E%E7%A1%AE%E5%AE%9A"><span class="toc-text">IDEF1X 标定与确定</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-3%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1-%E6%80%8E%E4%B9%88%E5%81%9A"><span class="toc-text">1.3系统设计(怎么做)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A6%82%E5%BF%B5%E8%AE%BE%E8%AE%A1"><span class="toc-text">概念设计</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%BB%E8%BE%91%E8%AE%BE%E8%AE%A1-%E7%90%86%E8%AE%BA%E5%AD%98%E5%9C%A8-%E4%BE%A7%E9%87%8D%E8%AE%BE%E8%AE%A1%E8%A7%84%E8%8C%83"><span class="toc-text">逻辑设计(理论存在,侧重设计规范)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%89%A9%E7%90%86%E8%AE%BE%E8%AE%A1-%E7%9C%9F%E5%AE%9E%E5%AD%98%E5%9C%A8-%E4%BE%A7%E9%87%8D%E6%93%8D%E4%BD%9C%E8%A1%A8%E7%BB%93%E6%9E%84"><span class="toc-text">物理设计(真实存在,侧重操作表结构)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-4%E5%AE%9E%E7%8E%B0%E5%92%8C%E9%83%A8%E7%BD%B2"><span class="toc-text">1.4实现和部署</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E5%BB%BA%E7%AB%8B"><span class="toc-text">数据库建立</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%8A%A0%E8%BD%BD"><span class="toc-text">数据加载</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8B%E5%8A%A1%E5%92%8C%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E7%9A%84%E7%BC%96%E7%A0%81"><span class="toc-text">事务和应用程序的编码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B5%8B%E8%AF%95%E8%BF%90%E8%A1%8C"><span class="toc-text">测试运行</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B3%BB%E7%BB%9F%E9%83%A8%E7%BD%B2"><span class="toc-text">系统部署</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-5%E8%BF%90%E8%A1%8C%E7%AE%A1%E7%90%86%E5%92%8C%E7%BB%B4%E6%8A%A4"><span class="toc-text">1.5运行管理和维护</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%97%A5%E5%B8%B8%E7%BB%B4%E6%8A%A4"><span class="toc-text">日常维护</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B3%BB%E7%BB%9F%E7%9B%91%E6%8E%A7%E4%B8%8E%E5%88%86%E6%9E%90"><span class="toc-text">系统监控与分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96"><span class="toc-text">性能优化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E5%8D%87%E7%BA%A7"><span class="toc-text">数据库系统升级</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#1-6%E5%85%B8%E5%9E%8B%E4%BE%8B%E9%A2%98"><span class="toc-text">1.6典型例题</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1"><span class="toc-text">2.架构设计</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%89%E5%85%A8%E6%9E%B6%E6%9E%84"><span class="toc-text">安全架构</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E4%BA%8B%E5%8A%A1"><span class="toc-text">3.事务</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB"><span class="toc-text">隔离级别</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B8%E5%9E%8B%E4%BE%8B%E9%A2%98"><span class="toc-text">典型例题</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-%E7%B4%A2%E5%BC%95"><span class="toc-text">4.索引</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B8%E5%9E%8B%E4%BE%8B%E9%A2%98-1"><span class="toc-text">典型例题</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-UML"><span class="toc-text">5.UML</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#5-1UML%E5%BB%BA%E6%A8%A1%E6%A6%82%E5%BF%B5%E6%9E%B6%E6%9E%84"><span class="toc-text">5.1UML建模概念架构</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%83%E5%85%83%E6%A8%A1%E5%9E%8B-%E4%BA%8B%E5%8A%A1%E7%9A%84%E6%8A%BD%E8%B1%A1"><span class="toc-text">元元模型(事务的抽象)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%83%E6%A8%A1%E5%9E%8B-%E5%AE%9E%E4%BE%8B"><span class="toc-text">元模型(实例)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A8%A1%E5%9E%8B%E5%B1%82-%E5%AE%9E%E4%BE%8B%E7%9A%84%E5%AE%9E%E4%BE%8B"><span class="toc-text">模型层(实例的实例)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%A8%E6%88%B7%E6%A8%A1%E5%9E%8B%E5%B1%82-%E5%AE%9E%E4%BE%8B%E7%9A%84%E5%AE%9E%E4%BE%8B%E7%9A%84%E5%AE%9E%E4%BE%8B"><span class="toc-text">用户模型层(实例的实例的实例)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-2UML%E7%9A%84%E5%8D%81%E4%B8%89%E7%A7%8D%E5%9B%BE"><span class="toc-text">5.2UML的十三种图</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B4%BB%E5%8A%A8%E5%9B%BE-%E4%B8%9A%E5%8A%A1%E6%B5%81%E7%A8%8B-%EF%BC%9A%E6%B3%B3%E9%81%93"><span class="toc-text">活动图(业务流程)：泳道</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%A8%E4%BE%8B%E5%9B%BE"><span class="toc-text">用例图</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-3UML%E7%B3%BB%E7%BB%9F%E7%BB%93%E6%9E%84%E5%9B%BE"><span class="toc-text">5.3UML系统结构图</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B1%BB%E5%9B%BE%EF%BC%9A%E9%9D%99%E6%80%81%E7%BB%93%E6%9E%84"><span class="toc-text">类图：静态结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A1%BA%E5%BA%8F%E5%9B%BEand%E9%80%9A%E4%BF%A1%E5%9B%BE%EF%BC%9A%E5%8A%A8%E6%80%81%E7%BB%93%E6%9E%84"><span class="toc-text">顺序图and通信图：动态结构</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-4%E5%BE%AE%E8%A7%82%E8%AE%BE%E8%AE%A1"><span class="toc-text">5.4微观设计</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9%E8%B1%A1%E5%9B%BE"><span class="toc-text">对象图</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%8A%B6%E6%80%81%E5%9B%BE%EF%BC%9A%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8"><span class="toc-text">状态图：事件驱动</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%97%B6%E9%97%B4%E5%9B%BE%EF%BC%9A%E6%97%B6%E5%BA%8F%E5%9B%BE"><span class="toc-text">时间图：时序图</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-5%E5%AE%8F%E8%A7%82%E8%AE%BE%E8%AE%A1"><span class="toc-text">5.5宏观设计</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8C%85%E5%9B%BE"><span class="toc-text">包图</span></a></li></ol></li></ol></li></ol>
+    
+<style>
+    .left-col .switch-btn,
+    .left-col .switch-area {
+        display: none;
+    }
+    .toc-level-3 i,
+    .toc-level-3 ol {
+        display: none !important;
+    }
+</style>
+</div>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="1-数据库应用系统DBAS生命周期"><a href="#1-数据库应用系统DBAS生命周期" class="headerlink" title="1.    数据库应用系统DBAS生命周期"></a>1.    数据库应用系统DBAS生命周期</h1><p>DBAS的生命周期由<code>项目规划、需求分析、系统设计、实现和部署、运行管理与维护</code>5个基本活动组成</p>
+<h2 id="1-1规划分析"><a href="#1-1规划分析" class="headerlink" title="1.1规划分析"></a>1.1规划分析</h2><h3 id="系统规划和定义"><a href="#系统规划和定义" class="headerlink" title="系统规划和定义"></a>系统规划和定义</h3><ul>
+<li>确定任务陈述</li>
+<li><strong>确定任务目标：</strong></li>
+<li><strong>确定范围和边界：</strong></li>
+<li><strong>确定用户视图</strong></li>
+</ul>
+<h3 id="可行性分析"><a href="#可行性分析" class="headerlink" title="可行性分析"></a>可行性分析</h3><ul>
+<li>技术上：</li>
+<li>经济上：</li>
+<li>操作上： 论证**是否具备数据库应用系统开发所需的<code>人力资源</code>**，这属于数据库应用系统的操作可行性分析。</li>
+<li>开发方案选择</li>
+</ul>
+<h3 id="项目规划"><a href="#项目规划" class="headerlink" title="项目规划"></a>项目规划</h3><ul>
+<li>项目团队：</li>
+<li>环境、活动</li>
+<li><strong>成本 预算</strong></li>
+<li>进度计划</li>
+<li><strong>根据软件开发模型，<code>分解和定义</code>项目所包括的任务和活动</strong></li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/134b144f4b9f48b6a37f2740f0ddac99.png" alt="事务是实现和部署阶段的"></p>
+<h2 id="1-2-需求分析-做什么-（需求分析建模方法）"><a href="#1-2-需求分析-做什么-（需求分析建模方法）" class="headerlink" title="1.2 需求分析(做什么)（需求分析建模方法）"></a>1.2 需求分析(做什么)（需求分析建模方法）</h2><ul>
+<li>数据需求：</li>
+<li>功能分析：业务</li>
+<li>性能分析：吞吐量、响应时间、硬件资源：：DBAS的性能指标主要包括：数据操作响应时间、系统吞吐量、允许并发访问的最大用户数、<strong>每TPS代价值</strong>。</li>
+<li>其他需求：存储、安全性、备份恢复</li>
+</ul>
+<h3 id="DFD结构化分析建模方法"><a href="#DFD结构化分析建模方法" class="headerlink" title="DFD结构化分析建模方法"></a>DFD结构化分析建模方法</h3><ul>
+<li>DFD建模：最常用：<code>数据流程图</code>：<code>分解思想</code> DFD方法由四种基本元素组成：<strong>数据流、处理、数据存储和外部项。</strong><br>此案例把在线书城系统——分解为核销+采购——还可以继续分解为各个业务流程继续扩充，一般是用三层</li>
+<li>一个处理<code>至少</code>有一个输入流和一个输出流。</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/2e6c9674aeac45d19a171be9fb69ebb1.png"></p>
+<h3 id="IDEF结构化分析建模方法"><a href="#IDEF结构化分析建模方法" class="headerlink" title="IDEF结构化分析建模方法"></a>IDEF结构化分析建模方法</h3><p>●最常使用的是IDEFO~IDEF4.:<br>IDEF0:描述系统功能及其相互关系<br>IDEF1:系统信息及其数据之间联系；<br>IDEF2:系统模拟，动态建模<br>IDEF3:过程描述及获取方法<br>IDEF4:面向对象设计；</p>
+<h3 id="IDEF0"><a href="#IDEF0" class="headerlink" title="IDEF0"></a>IDEF0</h3><p><img src="https://img-blog.csdnimg.cn/fbf123da6c154dc791c5260ff334d73b.png"></p>
+<h3 id="面向对象分析建模方法"><a href="#面向对象分析建模方法" class="headerlink" title="面向对象分析建模方法"></a>面向对象分析建模方法</h3><p>UML用例建模</p>
+<h3 id="IDEF1X（数据建模方法）"><a href="#IDEF1X（数据建模方法）" class="headerlink" title="IDEF1X（数据建模方法）"></a>IDEF1X（数据建模方法）</h3><p> IDEF1X侧重<code>分析、抽象和概括</code>应用领域中的<code>数据需求</code>，被称为<code>数据建模方法</code>，<br> 不是上面的需求分析建模方法</p>
+<h3 id="IDEF1X-标定与确定"><a href="#IDEF1X-标定与确定" class="headerlink" title="IDEF1X 标定与确定"></a>IDEF1X 标定与确定</h3><ul>
+<li>在IDEF1X中一个<code>非确定联系</code>又称为多对多关系或<code>m:n 联系</code></li>
+<li><code>非标定型联系</code>是<code>1:n</code> 如果子女实体集中的<strong>每一个实例都能被唯一的确认而无需了解与之相联系的双亲实体集的实例，该联系就被称为”非标定型联系”。</strong></li>
+<li>本科生和研究生都是学生类分类。在IDEF1X模型中，可以通过一个<code>分类联系</code>来表达这类事务。</li>
+<li>一对一是<code>标定</code> </li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/3b9f4e1b1e1f490f94e12960465a56fa.png"><img src="https://img-blog.csdnimg.cn/df3cd4d164114f02824830f119fe5b70.png" alt="两个一对多转化为一对一： 标定"></p>
+<h2 id="1-3系统设计-怎么做"><a href="#1-3系统设计-怎么做" class="headerlink" title="1.3系统设计(怎么做)"></a>1.3系统设计(怎么做)</h2><h3 id="概念设计"><a href="#概念设计" class="headerlink" title="概念设计"></a>概念设计</h3><p>系统的<code>总体</code>设计</p>
+<h3 id="逻辑设计-理论存在-侧重设计规范"><a href="#逻辑设计-理论存在-侧重设计规范" class="headerlink" title="逻辑设计(理论存在,侧重设计规范)"></a>逻辑设计(理论存在,侧重设计规范)</h3><ul>
+<li>应用程序<code>概要</code>设计</li>
+<li>数据库事务<code>概要</code>设计</li>
+<li> <strong><code>关系模式</code>的设计、规范化处理</strong>属于数据库逻辑结构设计的内容。</li>
+<li>ER（实体关系图）建模方法　<a target="_blank" rel="noopener" href="https://blog.csdn.net/Edraw_Max/article/details/110244759">参考画法：其中主键用下划线</a><br>为了减少数据冗余而将一个2NF的<code>关系模式</code>分解为若干个3NF的<code>关系模式</code></li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/7cce4f313af649a2a6c6b1dd51d74eaf.png"></p>
+<h3 id="物理设计-真实存在-侧重操作表结构"><a href="#物理设计-真实存在-侧重操作表结构" class="headerlink" title="物理设计(真实存在,侧重操作表结构)"></a>物理设计(真实存在,侧重操作表结构)</h3><ul>
+<li>应用程序<code>详细</code>设计</li>
+<li>数据库事务<code>详细</code>设计</li>
+<li>数据库物理设计内容包括：数据库逻辑模式描述、文件组织与存取设计、<strong>数据分布设计</strong>、确定系统配置、物理模式评估</li>
+<li><strong>对关系模式进行去规范化处理</strong>   </li>
+<li>数据库物理结构设计的目标是<strong>得到存储空间占用少、数据访问效率高和维护代价低</strong>的数据库物理模式<br><img src="https://img-blog.csdnimg.cn/3779d0d424bd42ada6d032b34dcb0613.png"><br><img src="https://img-blog.csdnimg.cn/69da12810dc7455a991b670924ba35f1.png"><br><img src="https://img-blog.csdnimg.cn/a3e45b67c3f54dfc8b3c20de258bd39a.png"><br><img src="https://img-blog.csdnimg.cn/343f81516283482a8aa79a338b4c73ee.png"></li>
+</ul>
+<h2 id="1-4实现和部署"><a href="#1-4实现和部署" class="headerlink" title="1.4实现和部署"></a>1.4实现和部署</h2><h3 id="数据库建立"><a href="#数据库建立" class="headerlink" title="数据库建立"></a>数据库建立</h3><h3 id="数据加载"><a href="#数据加载" class="headerlink" title="数据加载"></a>数据加载</h3><h3 id="事务和应用程序的编码"><a href="#事务和应用程序的编码" class="headerlink" title="事务和应用程序的编码"></a>事务和应用程序的编码</h3><p><img src="https://img-blog.csdnimg.cn/dbaef3628edb4629a0bb70ceae93d5b0.png"></p>
+<h3 id="测试运行"><a href="#测试运行" class="headerlink" title="测试运行"></a>测试运行</h3><h3 id="系统部署"><a href="#系统部署" class="headerlink" title="系统部署"></a>系统部署</h3><p> <img src="https://img-blog.csdnimg.cn/755504cb71914111b85ce53505755595.png"></p>
+<h2 id="1-5运行管理和维护"><a href="#1-5运行管理和维护" class="headerlink" title="1.5运行管理和维护"></a>1.5运行管理和维护</h2><h3 id="日常维护"><a href="#日常维护" class="headerlink" title="日常维护"></a>日常维护</h3><p> 数据库应用系统日常维护包括：<code>备份与恢复、完整性维护、安全性维护、存储空间管理和并发控制。</code>模式调整属于数据库应用系统的性能优化调整的范围。</p>
+<h3 id="系统监控与分析"><a href="#系统监控与分析" class="headerlink" title="系统监控与分析"></a>系统监控与分析</h3><p> 监控与分析包括：数据采集与统计、操作分析、<strong>基准程序评估</strong>。</p>
+<h3 id="性能优化"><a href="#性能优化" class="headerlink" title="性能优化"></a>性能优化</h3><p>查询调整与优化、索引调整、<strong>事务调整</strong>、<strong>模式调整</strong>、参数调整、硬件调整与升级、应用程序优化。</p>
+<h3 id="数据库系统升级"><a href="#数据库系统升级" class="headerlink" title="数据库系统升级"></a>数据库系统升级</h3><p>应用程序升级、数据库<strong>重组</strong>、DBMS和OS升级。</p>
+<h1 id="1-6典型例题"><a href="#1-6典型例题" class="headerlink" title="1.6典型例题"></a>1.6典型例题</h1><p><img src="https://img-blog.csdnimg.cn/310c79e78bc84a808440c076dc63c2ea.png"></p>
+<h1 id="2-架构设计"><a href="#2-架构设计" class="headerlink" title="2.架构设计"></a>2.架构设计</h1><h2 id="安全架构"><a href="#安全架构" class="headerlink" title="安全架构"></a>安全架构</h2><ul>
+<li><p><code>数据安全设计</code>主要有五个方面：<strong>安全性保护</strong>（防止非法用户对数据库非法的使用，其中一种主要方式即是用户权限设计）、<strong>完整性保护</strong>、<strong>并发控制</strong>、<strong>数据库的备份与恢复、数据加密传输</strong>。（考点：不包括病毒）</p>
+</li>
+<li><p><code>环境安全设计</code>包括漏洞与补丁、计算机病毒防护、网络环境安全、物理环境安全。</p>
+</li>
+</ul>
+<h1 id="3-事务"><a href="#3-事务" class="headerlink" title="3.事务"></a>3.事务</h1><ul>
+<li><p>多个小事务合并成大事务，会增加占有锁的时间，可能会造成大量阻塞事务，甚至会产生死锁。</p>
+</li>
+<li><p>事务规范包括事务名称、事务描述、事务所访问的数据项、事务用户，<strong>不包括事务隔离级别</strong></p>
+</li>
+<li><p>DB文件组织与存取设计的步骤是：使用<strong>事物-基本表交叉引用矩阵</strong>，分析系统内数据库事务对各个基本表的访问情况；估计各事务的执行频率；对每张基本表，汇总所有作用于该表上的各事物的操作频率信息；根据分析结果，对基本表设计成更为有效地文件组织和<strong>索引方式</strong></p>
+<h2 id="隔离级别"><a href="#隔离级别" class="headerlink" title="隔离级别"></a>隔离级别</h2></li>
+</ul>
+<p> 数据库事务详细设计是根据事务概要设计得到的事务流程，采用高级语言或DBMS提供的事务实现机制，设计数据库事务，即数据库事务的相关设计是在数据库事务详细设计（属于<strong>物理设计</strong>阶段）进行的。</p>
+<h2 id="典型例题"><a href="#典型例题" class="headerlink" title="典型例题"></a>典型例题</h2><p><img src="https://img-blog.csdnimg.cn/aab12f81a0b245eba00d96003f982743.png"><br><img src="https://img-blog.csdnimg.cn/6e8b3a4326e84b4c91523d1732566abf.png" alt="架构分层"><br><img src="https://img-blog.csdnimg.cn/98f5be2713124d8cac83f949dadf72d6.png"></p>
+<h1 id="4-索引"><a href="#4-索引" class="headerlink" title="4.索引"></a>4.索引</h1><h2 id="典型例题-1"><a href="#典型例题-1" class="headerlink" title="典型例题"></a>典型例题</h2><p><img src="https://img-blog.csdnimg.cn/5bba82f85e4c47d28db112b6f58904ee.png"><br><img src="https://img-blog.csdnimg.cn/68f7e72e32a14878b663b9d2f27c2e08.png"></p>
+<h1 id="5-UML"><a href="#5-UML" class="headerlink" title="5.UML"></a>5.UML</h1><h2 id="5-1UML建模概念架构"><a href="#5-1UML建模概念架构" class="headerlink" title="5.1UML建模概念架构"></a>5.1UML建模概念架构</h2><h3 id="元元模型-事务的抽象"><a href="#元元模型-事务的抽象" class="headerlink" title="元元模型(事务的抽象)"></a>元元模型(事务的抽象)</h3><p>元元模型层组成了UML的最基本的元素”事物”，代表要定义的所有事物。</p>
+<h3 id="元模型-实例"><a href="#元模型-实例" class="headerlink" title="元模型(实例)"></a>元模型(实例)</h3><p>元模型层中的每个概念都是元元模型层”事物”概念的一个实例    </p>
+<h3 id="模型层-实例的实例"><a href="#模型层-实例的实例" class="headerlink" title="模型层(实例的实例)"></a>模型层(实例的实例)</h3><p>模型层中的每个概念都是元模型层中概念的一个实例    </p>
+<h3 id="用户模型层-实例的实例的实例"><a href="#用户模型层-实例的实例的实例" class="headerlink" title="用户模型层(实例的实例的实例)"></a>用户模型层(实例的实例的实例)</h3><p>用户模型层中的每个概念都是模型层的一个实例</p>
+<h2 id="5-2UML的十三种图"><a href="#5-2UML的十三种图" class="headerlink" title="5.2UML的十三种图"></a>5.2UML的十三种图</h2><h3 id="活动图-业务流程-：泳道"><a href="#活动图-业务流程-：泳道" class="headerlink" title="活动图(业务流程)：泳道"></a>活动图(业务流程)：泳道</h3><h3 id="用例图"><a href="#用例图" class="headerlink" title="用例图"></a>用例图</h3><p>用例模型：系统+角色+用例<br><img src="https://img-blog.csdnimg.cn/fa11a5d99a1c49d78732444dd5b67a72.png"></p>
+<ul>
+<li><p>一个角色可以执行多个用例，反过来，一个用例也可以被多个角色使用。</p>
+</li>
+<li><p>系统是在边界线以内的区域（即用例的活动区域）抽象地表示能够实现的所有<strong>基本功能。</strong></p>
+</li>
+<li><p>用例用于描述从系统用户的角度来观察，系统应该具有哪些功能，帮助分析人员理解系统的行为。</p>
+</li>
+<li><p>角色是与系统进行交互的<strong>外部实体</strong>，可以是系统用户也可以是其他系统或者硬件设备。</p>
+</li>
+</ul>
+<h2 id="5-3UML系统结构图"><a href="#5-3UML系统结构图" class="headerlink" title="5.3UML系统结构图"></a>5.3UML系统结构图</h2><h3 id="类图：静态结构"><a href="#类图：静态结构" class="headerlink" title="类图：静态结构"></a>类图：静态结构</h3><p>类图用于描述系统内部的静态结构，表达问题领域的概念模型</p>
+<h3 id="顺序图and通信图：动态结构"><a href="#顺序图and通信图：动态结构" class="headerlink" title="顺序图and通信图：动态结构"></a>顺序图and通信图：动态结构</h3><ul>
+<li>通信图用于描述系统内部的动态结构，也称为<strong>协作图</strong>，用于展示对象之间的联系以及对象间发送和接收的消息</li>
+<li>顺序图用于描述系统内部的动态结构，主要用于描述系统内对象之间的<strong>消息发送与接收序列</strong>    </li>
+</ul>
+<h2 id="5-4微观设计"><a href="#5-4微观设计" class="headerlink" title="5.4微观设计"></a>5.4微观设计</h2><h3 id="对象图"><a href="#对象图" class="headerlink" title="对象图"></a>对象图</h3><p>对象图主要用于解释类图以及验证所设计的类图是否符合实际状况，也可用于协助程序设计人员理解复杂的类图结构</p>
+<h3 id="状态图：事件驱动"><a href="#状态图：事件驱动" class="headerlink" title="状态图：事件驱动"></a>状态图：事件驱动</h3><p> 状态图中只能有一个起始状态，可以有多个结束状态。</p>
+<h3 id="时间图：时序图"><a href="#时间图：时序图" class="headerlink" title="时间图：时序图"></a>时间图：时序图</h3><p>一般情况下，时间图作为状态机图的<strong>辅助说明</strong>工具，一张时间图通常会对应至少一张状态图        </p>
+<h2 id="5-5宏观设计"><a href="#5-5宏观设计" class="headerlink" title="5.5宏观设计"></a>5.5宏观设计</h2><h3 id="包图"><a href="#包图" class="headerlink" title="包图"></a>包图</h3><p><img src="https://img-blog.csdnimg.cn/df0bd3f199254383bc919c2e066dcfda.png"></p>
+
+      
+       <hr><span style="font-style: italic;color: gray;"> 生命以负熵为食，归整以抵抗熵增； </span>
+    </div>
+</article>
+
+
+
+
+
+
+
+    
+        <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="//cdn.jsdelivr.net/npm/mathjax@2.7.8/unpacked/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+<input type="hidden" id="MathJax-js"
+        value="//cdn.jsdelivr.net/npm/mathjax@2.7.8/unpacked/MathJax.js?config=TeX-MML-AM_CHTML">
+</input>
+    
+
+
+
+
+    </div>
+    <div class="copyright">
+        <p class="footer-entry">
+    ©2021 ZJH
+</p>
+<p class="footer-entry">"生命以负熵为食"
+
+    </div>
+    <div class="full-toc">
+        <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
+<a class="" id="rocket" ></a>
+
+    </div>
+</div>
+
+</body>
+<script src="/zjh/js/jquery.pjax.js?v=1.1.0" ></script>
+
+<script src="/zjh/js/script.js?v=1.1.0" ></script>
+<script>
+    var img_resize = 'default';
+    function initArticle() {
+        /*渲染对应的表格样式*/
+        
+            $("#post .pjax table").addClass("green_title");
+        
+
+        /*渲染打赏样式*/
+        
+
+        /*高亮代码块行号*/
+        
+        $('pre code').each(function(){
+            var lines = $(this).text().trim().split('\n').length, widther='';
+            if (lines>99) {
+                widther = 'widther'
+            }
+            var $numbering = $('<ul/>').addClass('pre-numbering ' + widther).attr("unselectable","on");
+            $(this).addClass('has-numbering ' + widther)
+                    .parent()
+                    .append($numbering);
+            for(var i=1;i<=lines;i++){
+                $numbering.append($('<li/>').text(i));
+            }
+        });
+        
+
+        /*访问数量*/
+        
+        $.getScript("//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js");
+        
+
+        /*代码高亮，行号对齐*/
+        $('.pre-numbering').css('line-height',$('.has-numbering').css('line-height'));
+
+        
+        
+    }
+
+    /*打赏页面隐藏与展示*/
+    
+
+</script>
+
+<!--加入行号的高亮代码块样式-->
+
+<style>
+    pre{
+        position: relative;
+        margin-bottom: 24px;
+        border-radius: 10px;
+        border: 1px solid #e2dede;
+        background: #FFF;
+        overflow: hidden;
+    }
+    code.has-numbering{
+        margin-left: 30px;
+    }
+    code.has-numbering.widther{
+        margin-left: 35px;
+    }
+    .pre-numbering{
+        margin: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 20px;
+        padding: 0.5em 3px 0.7em 5px;
+        border-right: 1px solid #C3CCD0;
+        text-align: right;
+        color: #AAA;
+        background-color: ;
+    }
+    .pre-numbering.widther {
+        width: 35px;
+    }
+</style>
+
+<!--自定义样式设置-->
+<style>
+    
+    
+    .nav {
+        width: 542px;
+    }
+    .nav.fullscreen {
+        margin-left: -542px;
+    }
+    .nav-left {
+        width: 120px;
+    }
+    
+    
+    @media screen and (max-width: 1468px) {
+        .nav {
+            width: 492px;
+        }
+        .nav.fullscreen {
+            margin-left: -492px;
+        }
+        .nav-left {
+            width: 100px;
+        }
+    }
+    
+    
+    @media screen and (max-width: 1024px) {
+        .nav {
+            width: 492px;
+            margin-left: -492px
+        }
+        .nav.fullscreen {
+            margin-left: 0;
+        }
+    }
+    
+    @media screen and (max-width: 426px) {
+        .nav {
+            width: 100%;
+        }
+        .nav-left {
+            width: 100%;
+        }
+    }
+    
+    
+    .nav-right .title-list nav a .post-title, .nav-right .title-list #local-search-result a .post-title {
+        color: #383636;
+    }
+    
+    
+    .nav-right .title-list nav a .post-date, .nav-right .title-list #local-search-result a .post-date {
+        color: #5e5e5f;
+    }
+    
+    
+    .nav-right nav a.hover, #local-search-result a.hover{
+        background-color: #e2e0e0;
+    }
+    
+    
+
+    /*列表样式*/
+    
+
+    /* 背景图样式 */
+    
+    
+
+
+    /*引用块样式*/
+    
+
+    /*文章列表背景图*/
+    
+
+    
+</style>
+
+
+
+
+
+
+
+</html>
