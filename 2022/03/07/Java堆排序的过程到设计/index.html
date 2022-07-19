@@ -6,17 +6,23 @@
   <meta name="keywords" content="">
   <meta name="description" content="Java堆排序的过程到设计 | ZJH&#39;blog">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="到现在经过了两段实习，也因为喜欢网上冲浪，认识了不少大厂的朋友。反正大家的一致意见都是Restful利大于弊。我查了几天资料，稍微总结一下 为什么不用Restful1.浏览器方面 浏览器普遍对GET和POST的支持最好 浏览器表单form提交只支持GET和POST  2.SpringMVC方面 SpringMVC解析POST请求可以自动解析param和body，不需要加注解，而PUT DELETE">
+<meta name="description" content="0.JVM和字节码 JVM实际上现在已经成为了跨语言平台，只要按字节码生成规则，都可以在JVM上运行 JVM规范中最具含金量的虚拟机实现是HotSpot也是JDK1.3至今的默认虚拟机，其他的还有JRockit、IBM J9等 JDK9之后 G1垃圾回收器完全替代了CMS 编译成规范的字节码的好处是：一次编译，到处运行  0.1JVM和传统虚拟机 传统意义上的虚拟机如VMware，它是在硬件层面模">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Restful风格真的有必要吗？">
-<meta property="og:url" content="https://zjhblog.gitee.io/2022/07/19/Restful%E9%A3%8E%E6%A0%BC%E7%9C%9F%E7%9A%84%E6%9C%89%E5%BF%85%E8%A6%81%E5%90%97/index.html">
+<meta property="og:title" content="内存区域、类的加载">
+<meta property="og:url" content="https://zjhblog.gitee.io/2022/07/19/%E5%86%85%E5%AD%98%E5%8C%BA%E5%9F%9F%E3%80%81%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD/index.html">
 <meta property="og:site_name" content="ZJH&#39;blog">
-<meta property="og:description" content="到现在经过了两段实习，也因为喜欢网上冲浪，认识了不少大厂的朋友。反正大家的一致意见都是Restful利大于弊。我查了几天资料，稍微总结一下 为什么不用Restful1.浏览器方面 浏览器普遍对GET和POST的支持最好 浏览器表单form提交只支持GET和POST  2.SpringMVC方面 SpringMVC解析POST请求可以自动解析param和body，不需要加注解，而PUT DELETE">
+<meta property="og:description" content="0.JVM和字节码 JVM实际上现在已经成为了跨语言平台，只要按字节码生成规则，都可以在JVM上运行 JVM规范中最具含金量的虚拟机实现是HotSpot也是JDK1.3至今的默认虚拟机，其他的还有JRockit、IBM J9等 JDK9之后 G1垃圾回收器完全替代了CMS 编译成规范的字节码的好处是：一次编译，到处运行  0.1JVM和传统虚拟机 传统意义上的虚拟机如VMware，它是在硬件层面模">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-07-19T12:19:57.000Z">
-<meta property="article:modified_time" content="2022-07-19T12:22:15.140Z">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b4d3c3fb6a394e389c92832eb6adbe28.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4b6c72d00e104b0d8fe71bdeeb8d8692.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/860d9efd535c422ca9c6c693a7d75946.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d66f7775a3224bba8821b9b060fe650e.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/33f7c62d082d4f19bdc62bd846934edc.png">
+<meta property="article:published_time" content="2022-07-19T14:29:21.000Z">
+<meta property="article:modified_time" content="2022-07-19T14:29:39.688Z">
 <meta property="article:author" content="ZJH">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/b4d3c3fb6a394e389c92832eb6adbe28.png">
 
 
 <link rel="icon" href="/img/QQ图片20211224224200.jpg">
@@ -126,7 +132,7 @@
     <li>
         <div class="all active" data-rel="全部文章">全部文章
             
-                <small>(73)</small>
+                <small>(74)</small>
             
         </div>
     </li>
@@ -243,6 +249,20 @@
             
         
     
+        
+            
+                <li>
+                    <div data-rel="JVM">
+                        
+                        JVM
+                        <small>(1)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
 </ul>
 <div class="left-bottom">
     <div class="menus">
@@ -256,8 +276,8 @@
         
     </div>
 </div>
-<input type="hidden" id="yelog_site_posts_number" value="73">
-<input type="hidden" id="yelog_site_word_count" value="103k">
+<input type="hidden" id="yelog_site_posts_number" value="74">
+<input type="hidden" id="yelog_site_word_count" value="104.6k">
 <div style="display: none">
     <span id="busuanzi_value_site_uv"></span>
     <span id="busuanzi_value_site_pv"></span>
@@ -316,6 +336,14 @@
 
     
     <nav id="title-list-nav">
+        
+        <a  class="全部文章 JVM "
+           href="/zjh/2022/07/19/%E5%86%85%E5%AD%98%E5%8C%BA%E5%9F%9F%E3%80%81%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="内存区域、类的加载">内存区域、类的加载</span>
+            <span class="post-date" title="2022-07-19 22:29:21">2022/07/19</span>
+        </a>
         
         <a  class="全部文章 工作笔记 "
            href="/zjh/2022/07/19/Restful%E9%A3%8E%E6%A0%BC%E7%9C%9F%E7%9A%84%E6%9C%89%E5%BF%85%E8%A6%81%E5%90%97/"
