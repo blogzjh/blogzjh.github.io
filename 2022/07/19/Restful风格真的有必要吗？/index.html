@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>LinkedList中clear和unlink方法为什么要多次置空 | ZJH&#39;blog</title>
+  <title>Restful风格真的有必要吗？ | ZJH&#39;blog</title>
   <meta name="keywords" content="">
-  <meta name="description" content="LinkedList中clear和unlink方法为什么要多次置空 | ZJH&#39;blog">
+  <meta name="description" content="Restful风格真的有必要吗？ | ZJH&#39;blog">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="description" content="到现在经过了两段实习，也因为喜欢网上冲浪，认识了不少大厂的朋友。反正大家的一致意见都是Restful利大于弊。我查了几天资料，稍微总结一下 为什么不用Restful1.浏览器方面 浏览器普遍对GET和POST的支持最好 浏览器表单form提交只支持GET和POST  2.SpringMVC方面 SpringMVC解析POST请求可以自动解析param和body，不需要加注解，而PUT DELETE">
 <meta property="og:type" content="article">
@@ -919,9 +919,9 @@
 </aside>
 <div id="post">
     <div class="pjax">
-        <article id="post-LinkedList中clear和unlink方法为什么要多次置空" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-Restful风格真的有必要吗？" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">LinkedList中clear和unlink方法为什么要多次置空</h1>
+        <h1 class="article-title">Restful风格真的有必要吗？</h1>
     
     <div class="article-meta">
         
@@ -931,7 +931,7 @@
             <i class="iconfont icon-category"></i>
             
             
-            <a  data-rel="源码">源码</a>
+            <a  data-rel="工作笔记">工作笔记</a>
             
         </span>
         
@@ -939,12 +939,12 @@
     </div>
     <div class="article-meta">
         
-            发布时间 : <time class="date" title='最后更新: 2022-02-20 14:28:11'>2022-02-20 00:25</time>
+            发布时间 : <time class="date" title='最后更新: 2022-07-19 20:22:15'>2022-07-19 20:19</time>
         
     </div>
     <div class="article-meta">
         
-        <span>字数:700</span>
+        <span>字数:593</span>
         
         
         <span id="busuanzi_container_page_pv">
@@ -963,7 +963,7 @@
     
     <div class="toc-ref">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BE%8B%E5%A6%82clear%E7%9A%84%E6%BA%90%E7%A0%81"><span class="toc-text">例如clear的源码</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%B3%A8%E9%87%8A%E7%BF%BB%E8%AF%91%EF%BC%9A"><span class="toc-text">注释翻译：</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B3%A8%E8%A7%A3%E8%A7%A3%E8%AF%BB%EF%BC%9A"><span class="toc-text">注解解读：</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E4%B8%AA"><span class="toc-text">第一个</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E4%B8%AA"><span class="toc-text">第二个</span></a></li></ol></li></ol></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E7%94%A8Restful"><span class="toc-text">为什么不用Restful</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E6%B5%8F%E8%A7%88%E5%99%A8%E6%96%B9%E9%9D%A2"><span class="toc-text">1.浏览器方面</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-SpringMVC%E6%96%B9%E9%9D%A2"><span class="toc-text">2.SpringMVC方面</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E4%B8%9A%E5%8A%A1%E6%96%B9%E9%9D%A2"><span class="toc-text">3.业务方面</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-Http%E5%8D%8F%E8%AE%AE%E6%96%B9%E9%9D%A2"><span class="toc-text">4.Http协议方面</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E8%83%BD%E7%94%A8Restful"><span class="toc-text">什么时候能用Restful</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Get%E5%92%8CPost%E7%9A%84%E4%B8%80%E4%BA%9B%E5%8C%BA%E5%88%AB"><span class="toc-text">Get和Post的一些区别</span></a></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -979,27 +979,35 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>今天在看LinkedList源码的时候发现clear和unlink源码都对Node的前后和itme进行了<strong>分别置空</strong>，我之前的想法是直接把所有的Node本身直接置空，x.prev=null和x.next=null，直接x = null也可以使得所有节点为空啊</p>
-<p>但在参考了很多资料后发现，如果单纯的x=null而不x.prev=null和x.next=null，可能不会正常触发GC，事情远远没有那么简单……</p>
-<p>阅读本文需要有JVM垃圾回收机制的知识储备</p>
-<p>参考资料：<br><a target="_blank" rel="noopener" href="https://www.iteye.com/problems/71569">https://www.iteye.com/problems/71569</a><br><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1AE411E7uj?p=1">https://www.bilibili.com/video/BV1AE411E7uj?p=1</a><br><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1yE411Z7AP?spm_id_from=333.999.0.0">https://www.bilibili.com/video/BV1yE411Z7AP?spm_id_from=333.999.0.0</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/chenpt/p/9803298.html">https://www.cnblogs.com/chenpt/p/9803298.html</a><br><a target="_blank" rel="noopener" href="https://www.iteye.com/problems/71569">https://www.iteye.com/problems/71569</a><br><a target="_blank" rel="noopener" href="https://codingdict.com/questions/113892">https://codingdict.com/questions/113892</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/dmzna/archive/2020/05/18/12913458.html">https://www.cnblogs.com/dmzna/archive/2020/05/18/12913458.html</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/shouyaya/p/13524476.html">https://www.cnblogs.com/shouyaya/p/13524476.html</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/mccand1234/article/details/52078645">https://blog.csdn.net/mccand1234/article/details/52078645</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_41701956/article/details/81664921">https://blog.csdn.net/qq_41701956/article/details/81664921</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/yubujian_l/article/details/80804708">https://blog.csdn.net/yubujian_l/article/details/80804708</a></p>
-<h1 id="例如clear的源码"><a href="#例如clear的源码" class="headerlink" title="例如clear的源码"></a>例如clear的源码</h1><p><img src="https://img-blog.csdnimg.cn/2569150ae8b14450b59c58678e2c33d1.png"><br>x.next = null，即表示下一个节点对象=null，为什么还要分成3步写来把属性=null呢？为什么不仅仅是把首尾节点=null让链表找不到入口呢？</p>
-<h1 id="注释翻译："><a href="#注释翻译：" class="headerlink" title="注释翻译："></a>注释翻译：</h1><ul>
-<li><pre><code>is sure to free memory even if there is a reachable Iterator 即便是有迭代器指针此时正在访问中间的节点，也会置空。
-</code></pre>
-</li>
-<li>helps a generational GC if the discarded nodes inhabit more than one generation有多个节点时，这样做有助于GC垃圾回收</li>
+        <p>到现在经过了两段实习，也因为喜欢网上冲浪，认识了不少大厂的朋友。反正大家的一致意见都是Restful利大于弊。我查了几天资料，稍微总结一下</p>
+<h1 id="为什么不用Restful"><a href="#为什么不用Restful" class="headerlink" title="为什么不用Restful"></a>为什么不用Restful</h1><h2 id="1-浏览器方面"><a href="#1-浏览器方面" class="headerlink" title="1.浏览器方面"></a>1.浏览器方面</h2><ul>
+<li>浏览器普遍对GET和POST的支持最好</li>
+<li>浏览器表单form提交只支持GET和POST</li>
 </ul>
-<h2 id="注解解读："><a href="#注解解读：" class="headerlink" title="注解解读："></a>注解解读：</h2><h3 id="第一个"><a href="#第一个" class="headerlink" title="第一个"></a>第一个</h3><p>如果仅仅是把首尾置空，中间的链表虽然找不到首尾入口，但若此时：</p>
+<h2 id="2-SpringMVC方面"><a href="#2-SpringMVC方面" class="headerlink" title="2.SpringMVC方面"></a>2.SpringMVC方面</h2><ul>
+<li><strong>SpringMVC解析POST请求可以自动解析param和body，不需要加注解，而PUT DELETE请求必须加@RequestParam、@PathVariable、@RequestBody注解</strong>，虽然Spring3支持对PUT请求体的映射，但是需要在web.xml或者WebMvcConfigurerAdapter中进行配置————————这一点确实很好用，我现在维护的这个项目时间长了觉得真的很方便，很多没必要去字段匹配的直接写就好了</li>
+</ul>
+<h2 id="3-业务方面"><a href="#3-业务方面" class="headerlink" title="3.业务方面"></a>3.业务方面</h2><ul>
+<li>一个“删”“改”操作不一定会那么干净，里面可能会夹杂很多的“查”“增”操作，但用一个PUT连基本RESTful的优势都成了劣势</li>
+<li>增删改查的不同操作可以通过url的最后一项来区分：例如 */deleteXxxx或editXxxx</li>
+<li>Restful只是一种风格，不是规范，对业务没有帮助</li>
+</ul>
+<h2 id="4-Http协议方面"><a href="#4-Http协议方面" class="headerlink" title="4.Http协议方面"></a>4.Http协议方面</h2><ul>
+<li>同时，<strong>POST请求在大多数浏览器中默认提交两次tcp包，在网络环境差的情况下更保险</strong></li>
+<li><strong>PUT和DELETE在http协议中本质和POST一样，没有任何优势</strong>，反而在SpringMVC中容易出现一些问题</li>
+</ul>
+<h1 id="什么时候能用Restful"><a href="#什么时候能用Restful" class="headerlink" title="什么时候能用Restful"></a>什么时候能用Restful</h1><p>当且仅当</p>
 <ul>
-<li>有迭代器正好访问到中间，取到了中间的node对象</li>
-<li>中间的某个node已被<strong>强引用</strong></li>
+<li><strong>幂等修改删除</strong>可以用put，delete；不幂等用post</li>
+<li>删除就是删除，修改就是修改，不会影响其他的业务数据</li>
+<li>培训机构忽悠小白时</li>
 </ul>
-<h3 id="第二个"><a href="#第二个" class="headerlink" title="第二个"></a>第二个</h3><p>倘若JDK版本在8以上，可以忽略这一条，但老版本的gc机制，所用的垃圾收集器可能使用的算法是<strong>引用计数器算法</strong>，该算法不能解决相互引用情况下的垃圾回收</p>
-<p>例如：没有迭代器访问，中间节点对象也没有被强引用，但是他们之间是互相调用的，引用计数器算法不能回收这样的对象，即便是他们没有入口</p>
-<p>而在JDK的流行高版本中一般不使用引用计数器算法，而使用可达性分析算法，当他们都没有被强引用时，便没有了GC Roots根对象，因此会被垃圾回收，但引用计数器算法也并未被淘汰，在著名的单进程高并发缓存Redis中依然采用这种算法来进行内存回收</p>
-<p>综上：第二个注释“<strong>help GC</strong>”所表达的含义是防止因为JDK版本低，垃圾回收算法所导致的“无法回收循环引用”的情况</p>
-<p>同样 对于remove方法调用了unlink，注解也说了help GC<br><img src="https://img-blog.csdnimg.cn/b8137bccbd6943c69eaa21c3a5343348.png"></p>
+<h1 id="Get和Post的一些区别"><a href="#Get和Post的一些区别" class="headerlink" title="Get和Post的一些区别"></a>Get和Post的一些区别</h1><ul>
+<li>“是否提交大量数据”的功能可以直接由POST和GET来区分，GET不能放body参数，数据只能裸露放在url上，但浏览器url的长度大多限制为2kb，可以用POST来放body参数。</li>
+<li>GET请求的请求数据可能被浏览器缓存</li>
+<li>如果非幂等请求用GET，结果如果被缓存就会出错，可以通过请求<strong>参数带时间戳等不重复无关参数</strong>来强制防止缓存</li>
+<li>如果敏感信息用GET，那你的敏感信息就可能被完整的保存在了本地浏览器。当然，可以通过加密手段解决</li>
+</ul>
 
       
        <hr><span style="font-style: italic;color: gray;"> 生命以负熵为食，归整以抵抗熵增； </span>

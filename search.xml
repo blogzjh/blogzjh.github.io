@@ -4,6 +4,25 @@
   
     
     <entry>
+      <title>Restful风格真的有必要吗？</title>
+      <link href="/zjh/2022/07/19/Restful%E9%A3%8E%E6%A0%BC%E7%9C%9F%E7%9A%84%E6%9C%89%E5%BF%85%E8%A6%81%E5%90%97%EF%BC%9F/"/>
+      <url>/zjh/2022/07/19/Restful%E9%A3%8E%E6%A0%BC%E7%9C%9F%E7%9A%84%E6%9C%89%E5%BF%85%E8%A6%81%E5%90%97%EF%BC%9F/</url>
+      
+        <content type="html"><![CDATA[<p>到现在经过了两段实习，也因为喜欢网上冲浪，认识了不少大厂的朋友。反正大家的一致意见都是Restful利大于弊。我查了几天资料，稍微总结一下</p><h1 id="为什么不用Restful"><a href="#为什么不用Restful" class="headerlink" title="为什么不用Restful"></a>为什么不用Restful</h1><h2 id="1-浏览器方面"><a href="#1-浏览器方面" class="headerlink" title="1.浏览器方面"></a>1.浏览器方面</h2><ul><li>浏览器普遍对GET和POST的支持最好</li><li>浏览器表单form提交只支持GET和POST</li></ul><h2 id="2-SpringMVC方面"><a href="#2-SpringMVC方面" class="headerlink" title="2.SpringMVC方面"></a>2.SpringMVC方面</h2><ul><li><strong>SpringMVC解析POST请求可以自动解析param和body，不需要加注解，而PUT DELETE请求必须加@RequestParam、@PathVariable、@RequestBody注解</strong>，虽然Spring3支持对PUT请求体的映射，但是需要在web.xml或者WebMvcConfigurerAdapter中进行配置————————这一点确实很好用，我现在维护的这个项目时间长了觉得真的很方便，很多没必要去字段匹配的直接写就好了</li></ul><h2 id="3-业务方面"><a href="#3-业务方面" class="headerlink" title="3.业务方面"></a>3.业务方面</h2><ul><li>一个“删”“改”操作不一定会那么干净，里面可能会夹杂很多的“查”“增”操作，但用一个PUT连基本RESTful的优势都成了劣势</li><li>增删改查的不同操作可以通过url的最后一项来区分：例如 */deleteXxxx或editXxxx</li><li>Restful只是一种风格，不是规范，对业务没有帮助</li></ul><h2 id="4-Http协议方面"><a href="#4-Http协议方面" class="headerlink" title="4.Http协议方面"></a>4.Http协议方面</h2><ul><li>同时，<strong>POST请求在大多数浏览器中默认提交两次tcp包，在网络环境差的情况下更保险</strong></li><li><strong>PUT和DELETE在http协议中本质和POST一样，没有任何优势</strong>，反而在SpringMVC中容易出现一些问题</li></ul><h1 id="什么时候能用Restful"><a href="#什么时候能用Restful" class="headerlink" title="什么时候能用Restful"></a>什么时候能用Restful</h1><p>当且仅当</p><ul><li><strong>幂等修改删除</strong>可以用put，delete；不幂等用post</li><li>删除就是删除，修改就是修改，不会影响其他的业务数据</li><li>培训机构忽悠小白时</li></ul><h1 id="Get和Post的一些区别"><a href="#Get和Post的一些区别" class="headerlink" title="Get和Post的一些区别"></a>Get和Post的一些区别</h1><ul><li>“是否提交大量数据”的功能可以直接由POST和GET来区分，GET不能放body参数，数据只能裸露放在url上，但浏览器url的长度大多限制为2kb，可以用POST来放body参数。</li><li>GET请求的请求数据可能被浏览器缓存</li><li>如果非幂等请求用GET，结果如果被缓存就会出错，可以通过请求<strong>参数带时间戳等不重复无关参数</strong>来强制防止缓存</li><li>如果敏感信息用GET，那你的敏感信息就可能被完整的保存在了本地浏览器。当然，可以通过加密手段解决</li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> 工作笔记 </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>复杂链表的复制</title>
       <link href="/zjh/2022/07/17/%E5%A4%8D%E6%9D%82%E9%93%BE%E8%A1%A8%E7%9A%84%E5%A4%8D%E5%88%B6/"/>
       <url>/zjh/2022/07/17/%E5%A4%8D%E6%9D%82%E9%93%BE%E8%A1%A8%E7%9A%84%E5%A4%8D%E5%88%B6/</url>
