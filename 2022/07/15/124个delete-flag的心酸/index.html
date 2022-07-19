@@ -257,7 +257,7 @@
     </div>
 </div>
 <input type="hidden" id="yelog_site_posts_number" value="73">
-<input type="hidden" id="yelog_site_word_count" value="102.2k">
+<input type="hidden" id="yelog_site_word_count" value="102.9k">
 <div style="display: none">
     <span id="busuanzi_value_site_uv"></span>
     <span id="busuanzi_value_site_pv"></span>
@@ -939,12 +939,12 @@
     </div>
     <div class="article-meta">
         
-            发布时间 : <time class="date" title='最后更新: 2022-07-15 21:24:14'>2022-07-15 21:19</time>
+            发布时间 : <time class="date" title='最后更新: 2022-07-19 22:01:33'>2022-07-15 21:19</time>
         
     </div>
     <div class="article-meta">
         
-        <span>字数:290</span>
+        <span>字数:549</span>
         
         
         <span id="busuanzi_container_page_pv">
@@ -963,7 +963,7 @@
     
     <div class="toc-ref">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E5%9C%BA%E6%99%AF"><span class="toc-text">1.场景</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95"><span class="toc-text">2.解决方法</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E5%B0%8F%E7%BB%93"><span class="toc-text">3.小结</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E5%9C%BA%E6%99%AF"><span class="toc-text">1.场景</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95"><span class="toc-text">2.解决方法</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E5%B0%8F%E7%BB%93"><span class="toc-text">3.小结</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-%E6%A0%B9%E6%8D%AE%E6%8F%90%E4%BA%A4%E8%AE%B0%E5%BD%95%E5%86%8D%E6%AC%A1%E4%BC%98%E5%8C%96"><span class="toc-text">4.根据提交记录再次优化</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-%E5%90%8E%E7%BB%AD%E9%97%AE%E9%A2%98"><span class="toc-text">4.后续问题</span></a></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -981,15 +981,16 @@
       
         <p>解决delete_flag使用不规范造成的bug</p>
 <h1 id="1-场景"><a href="#1-场景" class="headerlink" title="1.场景"></a>1.场景</h1><p>历史遗留BUG，场景：一共两个mapper，有一百多个sql，<strong>有90%以上的连表JOIN是没有加delete_flag=1条件，导致查询出来的结果会产生笛卡尔积。</strong> 还有一部分的delete_flag加了其中几个，放的位置也很耐人寻味~</p>
+<p>————》由于最开始的业务没有做“删除”功能，导致这么长时间数据一直没有出错</p>
 <br/>
 
 <h1 id="2-解决方法"><a href="#2-解决方法" class="headerlink" title="2.解决方法"></a>2.解决方法</h1><p>先思考再动手，理清楚SELECT FROM JOIN WHERE之间的数量关系</p>
 <ul>
-<li><p>每次JOIN<strong>关联表</strong>必须带delete_flag = 1，WHERE中本应只写一个<strong>原表</strong>的delete_flag = 1 <img src="https://img-blog.csdnimg.cn/b1e55814fd264bf085e6c8752fd00170.png"></p>
+<li><p>每次JOIN<strong>关联表</strong>必须带delete_flag = 1，WHERE中本应只写一个<strong>原表</strong>的delete_flag = 1 <img src="https://img-blog.csdnimg.cn/1776a41b5ada4e9a90c798096be771cd.png"></p>
 </li>
 <li><p>先ctrl + F 高亮，alt + J 框选，让JOIN更明显，挨个在JOIN之后加delete_flag = 1</p>
 </li>
-<li><p><strong>加完之后一定存在冗余</strong>，搜索每个WHERE条件，所以在WHERE条件下，一旦找到两个delete_flag = 1 那么一定有多余的<img src="https://img-blog.csdnimg.cn/27cd2b12a2e840f19bf6d24dae690ca1.png"></p>
+<li><p><strong>加完之后一定存在冗余</strong>，搜索每个WHERE条件，所以在WHERE条件下，一旦找到两个delete_flag = 1 那么一定有多余的<img src="https://img-blog.csdnimg.cn/593eb16d4fc94b859e835bcb42caa367.png"></p>
 </li>
 <li><p>最后核对数量  ctrl + F 搜索数量  <code>JOIN + WHERE = delete_flag</code> </br><br>54 + 16 = 70 另一个个mapper的解决方法同理</p>
 </li>
@@ -998,6 +999,17 @@
 <li>每次JOIN都应该<strong>紧随其后</strong>一个AND delete_flag = 1 </li>
 <li>无论当时的业务有没有删除功能，只要是表中有，就应该加上，避免埋炸弹！</li>
 <li>WHERE后跟的 delete_flag = 1 应只有一个，且是针对于原表</li>
+</ul>
+<h1 id="4-根据提交记录再次优化"><a href="#4-根据提交记录再次优化" class="headerlink" title="4.根据提交记录再次优化"></a>4.根据提交记录再次优化</h1><ul>
+<li>打开提交记录发现在21年3月（已经离最开始写过了半年）的时候冷不丁的JOIN了一张表</li>
+<li>但是我又发现，这张表只JOIN了，但是没有做条件筛选（恰好不会影响最终结果）</li>
+<li></li>
+</ul>
+<h1 id="4-后续问题"><a href="#4-后续问题" class="headerlink" title="4.后续问题"></a>4.后续问题</h1><p>这些都修改完了之后按理说统计的数据是没有问题的，但是测试在查库的时候发现还是有错误的数据。<br>我看了下日期是7月15号下午5点，联想到当时吃饭时听到leader打电话说了个谁谁谁在压测。<br>——————————</p>
+<ul>
+<li>这张表的业务本来只有tpye = 2，多的数据是tpye = 3 </li>
+<li>type = 3是以前的业务，压测的时候用了以前的接口，导致多出来了6W多调 type=3 的数据</li>
+<li>删掉就好了，业务代码写的没问题了~ </li>
 </ul>
 
       

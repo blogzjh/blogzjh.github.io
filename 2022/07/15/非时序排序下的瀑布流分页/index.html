@@ -257,7 +257,7 @@
     </div>
 </div>
 <input type="hidden" id="yelog_site_posts_number" value="73">
-<input type="hidden" id="yelog_site_word_count" value="102.2k">
+<input type="hidden" id="yelog_site_word_count" value="102.9k">
 <div style="display: none">
     <span id="busuanzi_value_site_uv"></span>
     <span id="busuanzi_value_site_pv"></span>
@@ -939,12 +939,12 @@
     </div>
     <div class="article-meta">
         
-            发布时间 : <time class="date" title='最后更新: 2022-07-15 21:16:51'>2022-07-15 21:15</time>
+            发布时间 : <time class="date" title='最后更新: 2022-07-19 22:03:49'>2022-07-15 21:15</time>
         
     </div>
     <div class="article-meta">
         
-        <span>字数:380</span>
+        <span>字数:844</span>
         
         
         <span id="busuanzi_container_page_pv">
@@ -963,7 +963,7 @@
     
     <div class="toc-ref">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E5%BC%95%E8%A8%80"><span class="toc-text">1.引言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E7%A7%BB%E5%8A%A8%E7%AB%AF%E5%8F%AF%E8%83%BD%E5%AD%98%E5%9C%A8%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-text">2.移动端可能存在的问题</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E7%BB%93%E8%AE%BA"><span class="toc-text">3.结论</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E5%BC%95%E8%A8%80"><span class="toc-text">1.引言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E7%A7%BB%E5%8A%A8%E7%AB%AF%E5%8F%AF%E8%83%BD%E5%AD%98%E5%9C%A8%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-text">2.移动端可能存在的问题</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E7%BB%93%E8%AE%BA"><span class="toc-text">3.结论</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-%E8%A1%A5%E5%85%85%EF%BC%9A%EF%BC%9A%E5%85%B6%E4%BB%96%E4%B8%9A%E5%8A%A1%E4%B8%8A%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-text">4.补充：：其他业务上的问题</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1%E5%8F%AF%E8%83%BD%E5%87%BA%E7%8E%B0%E7%9A%84%E4%B8%AD%E6%96%87%E6%8E%92%E5%BA%8F"><span class="toc-text">4.1可能出现的中文排序</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2pass%E6%8E%89%E7%9A%84fromId%E6%8B%BC%E6%8E%A5%E6%8E%92%E5%BA%8F%E6%96%B9%E6%A1%88"><span class="toc-text">4.2pass掉的fromId拼接排序方案</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-3pass%E6%8E%89%E7%9A%84rownum%E6%96%B9%E6%A1%88"><span class="toc-text">4.3pass掉的rownum方案</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-4%E8%80%A6%E5%90%88%E4%B8%9A%E5%8A%A1"><span class="toc-text">4.4耦合业务</span></a></li></ol></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -1028,6 +1028,31 @@
 <p><img src="https://img-blog.csdnimg.cn/7fd67321bb1b4fe4aaa3002ee92d00c9.png"></p>
 <p>我造的这个数据，无论是升序  还是降序，都会导致数据丢失，因此可以得出结论:</p>
 <h1 id="3-结论"><a href="#3-结论" class="headerlink" title="3.结论"></a>3.结论</h1><p>像班级  年级   等等等 所有的 <strong><code>自增主键和排序依据不是时间线性相关</code>的，都不能使用fromId作为排序依据</strong></p>
+<h1 id="4-补充：：其他业务上的问题"><a href="#4-补充：：其他业务上的问题" class="headerlink" title="4.补充：：其他业务上的问题"></a>4.补充：：其他业务上的问题</h1><h2 id="4-1可能出现的中文排序"><a href="#4-1可能出现的中文排序" class="headerlink" title="4.1可能出现的中文排序"></a>4.1可能出现的中文排序</h2><p>班级字段是VARCHAR，有的学校的班级是中文，因此需要用 <code>正则 + CONCAT拼接</code></p>
+<pre><code>   ORDER BY cg.`grade_no` DESC ,  --grade_no是INTEGER类型
+    CASE                         --class_no是VARCHAR类型，需要用正则匹配
+    WHEN cc.`class_no` REGEXP &#39;^[0-9]+$&#39; THEN CONVERT(cc.`class_no`,UNSIGNED INTEGER)
+    ELSE cc.`class_no` END
+    ASC;
+</code></pre>
+<h2 id="4-2pass掉的fromId拼接排序方案"><a href="#4-2pass掉的fromId拼接排序方案" class="headerlink" title="4.2pass掉的fromId拼接排序方案"></a>4.2pass掉的fromId拼接排序方案</h2><p><code>SELECT CONCAT(grade_no , class_no , 作品id) ..........ORDER BY CONCAT(grade_no , class_no , 作品id) </code>这个作品id就是fromId，如果把这个fromId拼在后面，理论上可以实现无遗漏排序，但是</p>
+<ul>
+<li>考虑到grade_no 和 class_no被拼接为字符串后比较 ， 2&gt;11 导致乱序，必须扩充补0；</li>
+<li>考虑到有的班级是中文，更不容易确定这个补0到底补几个</li>
+<li>无法预知未来是否会对按班级排序加索引</li>
+</ul>
+<h2 id="4-3pass掉的rownum方案"><a href="#4-3pass掉的rownum方案" class="headerlink" title="4.3pass掉的rownum方案"></a>4.3pass掉的rownum方案</h2><p>以上的“拼接方案”被pass了，那么是否可以自己实现一个Oracle的<code>rownum</code>来保存当前的行号呢？<br>可行，但是涉及子查询 、存储变量 ，很麻烦，效率低，大概长这样</p>
+<pre><code>set @rownum=0;
+
+SELECT
+
+    @rownum:=@rownum+1 AS rownum
+</code></pre>
+<h2 id="4-4耦合业务"><a href="#4-4耦合业务" class="headerlink" title="4.4耦合业务"></a>4.4耦合业务</h2><ul>
+<li>这个service层经过很多次的改动，有些改动后没有改注释，有的地方没注释，包括了管理员鉴权、班主任鉴权、创建者鉴权等等耦合业务，还包括了另一个模块的按投票排序功能</li>
+<li>个人认为既然逻辑不同，就应该把web端和移动端的业务完全隔离，互不影响，投票排序也可以单拎出去，没有必要为了复用而复用，为了减少代码量而减少代码量。<strong>一个优秀的设计不是完全的隔离无耦合，但也更不是把完全不同逻辑的业务揉在一起！</strong></li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/6c92d5451c724003acb19ec5b1cd8bab.png"></p>
 
       
        <hr><span style="font-style: italic;color: gray;"> 生命以负熵为食，归整以抵抗熵增； </span>
