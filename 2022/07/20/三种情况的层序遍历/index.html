@@ -2,27 +2,21 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>左旋转字符串 | ZJH&#39;blog</title>
+  <title>三种情况的层序遍历 | ZJH&#39;blog</title>
   <meta name="keywords" content="">
-  <meta name="description" content="左旋转字符串 | ZJH&#39;blog">
+  <meta name="description" content="三种情况的层序遍历 | ZJH&#39;blog">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="0.JVM和字节码 JVM实际上现在已经成为了跨语言平台，只要按字节码生成规则，都可以在JVM上运行 JVM规范中最具含金量的虚拟机实现是HotSpot也是JDK1.3至今的默认虚拟机，其他的还有JRockit、IBM J9等 JDK9之后 G1垃圾回收器完全替代了CMS 编译成规范的字节码的好处是：一次编译，到处运行  0.1JVM和传统虚拟机 传统意义上的虚拟机如VMware，它是在硬件层面模">
+<meta name="description" content="1.替换空格请实现一个函数，把字符串 s 中的每个空格替换成&quot;%20&quot;。    示例 1：  输入：s &#x3D; &quot;We are happy.&quot; 输出：&quot;We%20are%20happy.&quot;    限制：  0 &lt;&#x3D; s 的长度 &lt;&#x3D; 10000  题解class Solution &amp;#123;     public String">
 <meta property="og:type" content="article">
-<meta property="og:title" content="内存区域、类的加载">
-<meta property="og:url" content="https://zjhblog.gitee.io/2022/07/19/%E5%86%85%E5%AD%98%E5%8C%BA%E5%9F%9F%E3%80%81%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD/index.html">
+<meta property="og:title" content="字符串：替换、左旋、缺失">
+<meta property="og:url" content="https://zjhblog.gitee.io/2022/07/20/%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%9A%E6%9B%BF%E6%8D%A2%E3%80%81%E5%B7%A6%E6%97%8B%E3%80%81%E7%BC%BA%E5%A4%B1/index.html">
 <meta property="og:site_name" content="ZJH&#39;blog">
-<meta property="og:description" content="0.JVM和字节码 JVM实际上现在已经成为了跨语言平台，只要按字节码生成规则，都可以在JVM上运行 JVM规范中最具含金量的虚拟机实现是HotSpot也是JDK1.3至今的默认虚拟机，其他的还有JRockit、IBM J9等 JDK9之后 G1垃圾回收器完全替代了CMS 编译成规范的字节码的好处是：一次编译，到处运行  0.1JVM和传统虚拟机 传统意义上的虚拟机如VMware，它是在硬件层面模">
+<meta property="og:description" content="1.替换空格请实现一个函数，把字符串 s 中的每个空格替换成&quot;%20&quot;。    示例 1：  输入：s &#x3D; &quot;We are happy.&quot; 输出：&quot;We%20are%20happy.&quot;    限制：  0 &lt;&#x3D; s 的长度 &lt;&#x3D; 10000  题解class Solution &amp;#123;     public String">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/b4d3c3fb6a394e389c92832eb6adbe28.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/4b6c72d00e104b0d8fe71bdeeb8d8692.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/860d9efd535c422ca9c6c693a7d75946.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/d66f7775a3224bba8821b9b060fe650e.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/33f7c62d082d4f19bdc62bd846934edc.png">
-<meta property="article:published_time" content="2022-07-19T14:29:21.000Z">
-<meta property="article:modified_time" content="2022-07-19T14:29:39.688Z">
+<meta property="article:published_time" content="2022-07-20T13:59:41.000Z">
+<meta property="article:modified_time" content="2022-07-20T14:01:26.718Z">
 <meta property="article:author" content="ZJH">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://img-blog.csdnimg.cn/b4d3c3fb6a394e389c92832eb6adbe28.png">
 
 
 <link rel="icon" href="/img/QQ图片20211224224200.jpg">
@@ -132,7 +126,7 @@
     <li>
         <div class="all active" data-rel="全部文章">全部文章
             
-                <small>(74)</small>
+                <small>(73)</small>
             
         </div>
     </li>
@@ -157,7 +151,7 @@
                     <div data-rel="数据结构算法">
                         
                         数据结构算法
-                        <small>(10)</small>
+                        <small>(9)</small>
                         
                     </div>
                     
@@ -241,7 +235,7 @@
                     <div data-rel="Java后端">
                         
                         Java后端
-                        <small>(19)</small>
+                        <small>(18)</small>
                         
                     </div>
                     
@@ -255,7 +249,7 @@
                     <div data-rel="JVM">
                         
                         JVM
-                        <small>(1)</small>
+                        <small>(2)</small>
                         
                     </div>
                     
@@ -276,8 +270,8 @@
         
     </div>
 </div>
-<input type="hidden" id="yelog_site_posts_number" value="74">
-<input type="hidden" id="yelog_site_word_count" value="104.6k">
+<input type="hidden" id="yelog_site_posts_number" value="73">
+<input type="hidden" id="yelog_site_word_count" value="105.9k">
 <div style="display: none">
     <span id="busuanzi_value_site_uv"></span>
     <span id="busuanzi_value_site_pv"></span>
@@ -337,6 +331,22 @@
     
     <nav id="title-list-nav">
         
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/07/20/%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%9A%E6%9B%BF%E6%8D%A2%E3%80%81%E5%B7%A6%E6%97%8B%E3%80%81%E7%BC%BA%E5%A4%B1/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="字符串：替换、左旋、缺失">字符串：替换、左旋、缺失</span>
+            <span class="post-date" title="2022-07-20 21:59:41">2022/07/20</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/07/20/%E4%B8%89%E7%A7%8D%E6%83%85%E5%86%B5%E7%9A%84%E5%B1%82%E5%BA%8F%E9%81%8D%E5%8E%86/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="三种情况的层序遍历">三种情况的层序遍历</span>
+            <span class="post-date" title="2022-07-20 21:58:33">2022/07/20</span>
+        </a>
+        
         <a  class="全部文章 JVM "
            href="/zjh/2022/07/19/%E5%86%85%E5%AD%98%E5%8C%BA%E5%9F%9F%E3%80%81%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD/"
            data-tag=""
@@ -359,30 +369,6 @@
            data-author="" >
             <span class="post-title" title="复杂链表的复制">复杂链表的复制</span>
             <span class="post-date" title="2022-07-17 12:32:49">2022/07/17</span>
-        </a>
-        
-        <a  class="全部文章 数据结构算法 "
-           href="/zjh/2022/07/17/%E6%9B%BF%E6%8D%A2%E7%A9%BA%E6%A0%BC/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="替换空格">替换空格</span>
-            <span class="post-date" title="2022-07-17 12:31:13">2022/07/17</span>
-        </a>
-        
-        <a  class="全部文章 数据结构算法 "
-           href="/zjh/2022/07/17/0-n-1%E7%BC%BA%E5%A4%B1%E6%95%B0%E5%AD%97/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="0~n-1缺失数字">0~n-1缺失数字</span>
-            <span class="post-date" title="2022-07-17 12:29:39">2022/07/17</span>
-        </a>
-        
-        <a  class="全部文章 数据结构算法 "
-           href="/zjh/2022/07/17/%E5%B7%A6%E6%97%8B%E8%BD%AC%E5%AD%97%E7%AC%A6%E4%B8%B2/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="左旋转字符串">左旋转字符串</span>
-            <span class="post-date" title="2022-07-17 12:26:18">2022/07/17</span>
         </a>
         
         <a  class="全部文章 数据库 "
@@ -673,7 +659,7 @@
             <span class="post-date" title="2022-02-20 00:25:11">2022/02/20</span>
         </a>
         
-        <a  class="全部文章 Java后端 "
+        <a  class="全部文章 JVM "
            href="/zjh/2022/02/20/gc%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%9C%BA%E5%88%B6/"
            data-tag=""
            data-author="" >
@@ -947,9 +933,9 @@
 </aside>
 <div id="post">
     <div class="pjax">
-        <article id="post-左旋转字符串" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-三种情况的层序遍历" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">左旋转字符串</h1>
+        <h1 class="article-title">三种情况的层序遍历</h1>
     
     <div class="article-meta">
         
@@ -967,12 +953,12 @@
     </div>
     <div class="article-meta">
         
-            发布时间 : <time class="date" title='最后更新: 2022-07-17 12:28:57'>2022-07-17 12:26</time>
+            发布时间 : <time class="date" title='最后更新: 2022-07-20 21:58:47'>2022-07-20 21:58</time>
         
     </div>
     <div class="article-meta">
         
-        <span>字数:222</span>
+        <span>字数:1.3k</span>
         
         
         <span id="busuanzi_container_page_pv">
@@ -991,7 +977,7 @@
     
     <div class="toc-ref">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E6%9A%B4%E5%8A%9Bsplit"><span class="toc-text">1.暴力split</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%EF%BC%88%E8%80%97%E6%97%B6%E7%9F%AD%EF%BC%89%E4%B8%A4%E6%AC%A1for%EF%BC%8C%E4%B8%8D%E7%94%A8split"><span class="toc-text">2.（耗时短）两次for，不用split</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E8%BF%9E%E7%BB%AD%E9%81%8D%E5%8E%86"><span class="toc-text">1.连续遍历</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0"><span class="toc-text">1.1题目描述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF"><span class="toc-text">1.2解题思路</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-1%E5%88%9B%E5%BB%BAQueue%E7%9A%84%E6%8A%80%E5%B7%A7"><span class="toc-text">1.2.1创建Queue的技巧</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-2%E9%9C%80%E8%A6%81%E6%B3%A8%E6%84%8F%E7%9A%84%E7%82%B9"><span class="toc-text">1.2.2需要注意的点</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E5%88%86%E5%B1%82%E9%81%8D%E5%8E%86"><span class="toc-text">2.分层遍历</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0"><span class="toc-text">2.1题目描述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF"><span class="toc-text">2.2解题思路</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-1%E5%88%86%E6%9E%90%E5%92%8C%E7%AC%AC%E4%B8%80%E9%A2%98%E7%9A%84%E5%B7%AE%E5%BC%82"><span class="toc-text">2.2.1分析和第一题的差异</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-2%E9%9C%80%E8%A6%81%E6%B3%A8%E6%84%8F%E7%9A%84%E7%82%B9%EF%BC%88%E9%9B%86%E5%90%88for%E5%BE%AA%E7%8E%AF%E7%9A%84%E5%BC%80%E5%A7%8B%E6%9D%A1%E4%BB%B6%EF%BC%89"><span class="toc-text">2.2.2需要注意的点（集合for循环的开始条件）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-3%E6%9C%80%E7%BB%88%E7%BB%93%E6%9E%9C"><span class="toc-text">2.2.3最终结果</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E5%88%86%E5%B1%82%E4%BA%A4%E5%8F%89%E9%81%8D%E5%8E%86"><span class="toc-text">3.分层交叉遍历</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1%E7%AE%80%E5%8D%95%E7%B2%97%E6%9A%B4%E7%9B%B4%E6%8E%A5reverse"><span class="toc-text">3.1简单粗暴直接reverse()</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-1%E5%8F%96%E4%BD%99%E4%BD%8D%E8%BF%90%E7%AE%97"><span class="toc-text">3.1.1取余位运算</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-2Collections-reverse"><span class="toc-text">3.1.2Collections.reverse()</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2%E6%9C%80%E7%BB%88%E5%86%99%E6%B3%95-%E9%93%BE%E8%A1%A8%EF%BC%88%E5%8F%8C%E7%AB%AF%E9%98%9F%E5%88%97%EF%BC%89"><span class="toc-text">3.2最终写法:链表（双端队列）</span></a></li></ol></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -1007,44 +993,191 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <pre><code>字符串的左旋转操作是把字符串前面的若干个字符转移到字符串的尾部。请定义一个函数实现字符串左旋转操作的功能。比如，输入字符串&quot;abcdefg&quot;和数字2，该函数将返回左旋转两位得到的结果&quot;cdefgab&quot;。
+        <h1 id="1-连续遍历"><a href="#1-连续遍历" class="headerlink" title="1.连续遍历"></a>1.连续遍历</h1><h2 id="1-1题目描述"><a href="#1-1题目描述" class="headerlink" title="1.1题目描述"></a>1.1题目描述</h2><p><img src="https://img-blog.csdnimg.cn/4161f56620434b5bae127fdcd7fde2cf.png"></p>
+<p><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/cong-shang-dao-xia-da-yin-er-cha-shu-lcof/solution/mian-shi-ti-32-i-cong-shang-dao-xia-da-yin-er-ch-4/">参考答案</a></p>
+<h2 id="1-2解题思路"><a href="#1-2解题思路" class="headerlink" title="1.2解题思路"></a>1.2解题思路</h2><ul>
+<li><p><strong>层序遍历BFS一般都是需要用<code>队列</code>来辅助实现</strong>，不同于深度优先DFS，BFS一般是不用递归的。递归会导致越来越深入，不符合广度优先</p>
+</li>
+<li><p>第一行入队————》pop取queue中的node——》取值——》node的left  right 入队</p>
+</li>
+<li><p>此时队列中的顺序符合BFS</p>
+</li>
+<li><p>循环，queue继续pop取node——》取值——》该node的left right继续入队</p>
+</li>
+<li><p>如此循环pop并入队，队列中的顺序一直符合BFS</p>
+</li>
+</ul>
+<h3 id="1-2-1创建Queue的技巧"><a href="#1-2-1创建Queue的技巧" class="headerlink" title="1.2.1创建Queue的技巧"></a>1.2.1创建Queue的技巧</h3><ul>
+<li>Queue是一个接口，不能直接实例化</li>
+<li>因为LinkedList实现了Queue接口，可以用其实例化</li>
+<li>{<code>外部这个大括号表示匿名对象,可以在这一层进行@Overide</code>  {<code>内部这个大括号相当于在外面调用this.add()</code>}   }</li>
+</ul>
+<pre><code>    LinkedList&lt;Integer&gt; integers = new LinkedList&lt;Integer&gt;() &#123;//匿名对象
 
-
-
-示例 1：
-
-输入: s = &quot;abcdefg&quot;, k = 2
-输出: &quot;cdefgab&quot;
-
-示例 2：
-
-输入: s = &quot;lrloseumgh&quot;, k = 6
-输出: &quot;umghlrlose&quot;
-</code></pre>
-<h1 id="1-暴力split"><a href="#1-暴力split" class="headerlink" title="1.暴力split"></a>1.暴力split</h1><pre><code>class Solution &#123;
-    public String reverseLeftWords(String s, int n) &#123;
-        StringBuffer rep = new StringBuffer();
-        for(int i = 0 ; i &lt; n ; i++)&#123;
-            rep.append(s.charAt(i));
+        @Override public boolean add(Integer integer) &#123;
+            return super.add(66666);//这会导致所有的add都是添加66666
         &#125;
-        return rep.insert(0,s.split(rep.toString(),2)[1]).toString();
+
+        &#123;//这一层的&#123;&#125;相当于在外层写add
+            add(1);
+            add(2);
+            add(3);
+        &#125;
+    &#125;;
+    integers.add(4);
+    integers.add(5);
+    integers.add(6);
+    integers.add(7);
+    System.out.println(integers);//一共有3+4=7条
+    //[66666, 66666, 66666, 66666, 66666, 66666, 66666]
+</code></pre>
+<p>因此我们可以直接</p>
+<pre><code>    Queue&lt;TreeNode&gt; queue = new LinkedList&lt;&gt;()&#123;
+        &#123;
+            add(root);
+        &#125;
+    &#125;;
+</code></pre>
+<h3 id="1-2-2需要注意的点"><a href="#1-2-2需要注意的点" class="headerlink" title="1.2.2需要注意的点"></a>1.2.2需要注意的点</h3><ul>
+<li>返回一个空int[ ] 是直接<code>return new int[]&#123;&#125;</code>；</li>
+<li>队列的弹出API是 queue.<code>poll()</code></li>
+</ul>
+<p>最终代码</p>
+<pre><code>/**
+ * Definition for a binary tree node.
+ * public class TreeNode &#123;
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) &#123; val = x; &#125;
+ * &#125;
+ */
+class Solution &#123;
+    public int[] levelOrder(TreeNode root) &#123;
+        //第一步永远是判断是否空
+        if(root == null) return new int[]&#123;&#125;;
+        //ArrayList方便添加元素，最后转int[]即可
+        ArrayList&lt;Integer&gt; list = new ArrayList&lt;Integer&gt;();
+        //用Queue来存储BFS的节点,利用匿名对象内部&#123;&#125;初始化
+        Queue&lt;TreeNode&gt; queue = new LinkedList&lt;TreeNode&gt;()&#123;
+            &#123;
+                add(root);
+            &#125;
+        &#125;;
+        //因为最开始 每次循环只pop一次，但是可能会添加多次
+        //最后一次pop时早已没有添加的
+        //所以可以用!queue.isEmpty()作为判断条件
+        while(!queue.isEmpty())&#123;
+            TreeNode now = queue.poll();//当前节点
+            list.add(now.val);
+            //添加完成当前节点值后，往queue增加节点
+            if(now.left != null) queue.add(now.left);
+            if(now.right != null) queue.add(now.right);
+        &#125;
+        int[] dest = new int[list.size()];
+        for(int i = 0 ; i &lt; list.size() ; i++)&#123;
+            dest[i] = list.get(i);
+        &#125;
+        return dest;
+
     &#125;
 &#125;
 </code></pre>
-<h1 id="2-（耗时短）两次for，不用split"><a href="#2-（耗时短）两次for，不用split" class="headerlink" title="2.（耗时短）两次for，不用split"></a>2.（耗时短）两次for，不用split</h1><pre><code>class Solution &#123;
-    public String reverseLeftWords(String s, int n) &#123;
-        StringBuffer rep = new StringBuffer();
-        for(int i = n ; i &lt; s.length() ; i++)&#123;
-            rep.append(s.charAt(i));
+<h1 id="2-分层遍历"><a href="#2-分层遍历" class="headerlink" title="2.分层遍历"></a>2.分层遍历</h1><h2 id="2-1题目描述"><a href="#2-1题目描述" class="headerlink" title="2.1题目描述"></a>2.1题目描述</h2><p><img src="https://img-blog.csdnimg.cn/120db7e3decd449d88728c5146bfc183.png"></p>
+<p>与上一题不同，这一题需要一层一行，最终返回一个二维list<br><img src="https://img-blog.csdnimg.cn/c75421394cdb445dad9d613a44ec8f0b.png"><br>其内层的每个List，都是二叉树的一整层</p>
+<p><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/cong-shang-dao-xia-da-yin-er-cha-shu-ii-lcof/solution/mian-shi-ti-32-ii-cong-shang-dao-xia-da-yin-er-c-5/">参考答案</a></p>
+<h2 id="2-2解题思路"><a href="#2-2解题思路" class="headerlink" title="2.2解题思路"></a>2.2解题思路</h2><ul>
+<li><p>while每次循环都必须要new一个内层List</p>
+</li>
+<li><p>while每次循环都要把这个new出来的内层List填满</p>
+<h3 id="2-2-1分析和第一题的差异"><a href="#2-2-1分析和第一题的差异" class="headerlink" title="2.2.1分析和第一题的差异"></a>2.2.1分析和第一题的差异</h3></li>
+<li><p>第一题中，while中没有new 一个List</p>
+<pre><code>      while(!queue.isEmpty())&#123;
+          TreeNode now = queue.poll();//当前节点
+          list.add(now.val);
+          //添加完成当前节点值后，往queue增加节点
+          if(now.left != null) queue.add(now.left);
+          if(now.right != null) queue.add(now.right);
+      &#125;
+</code></pre>
+</li>
+<li><p>第一次改造，发现每次while循环只往temp中添加了一个元素</p>
+<pre><code>      while(!queue.isEmpty())&#123;
+  ——————————》    ArrayList&lt;Integer&gt; temp = new ArrayList&lt;Integer&gt;();
+          TreeNode now = queue.poll();//当前节点
+   ——————————》       temp.add(now.val);
+          if(now.left != null) queue.add(now.left);
+          if(now.right != null) queue.add(now.right);
+      &#125;
+</code></pre>
+</li>
+<li><p>第二次改造，每次把<strong>当前queue</strong>中的元素全部poll到temp中<code>要先固定for循环的次数</code></p>
+<pre><code>      while(!queue.isEmpty())&#123;
+          ArrayList&lt;Integer&gt; temp = new ArrayList&lt;Integer&gt;();
+     ————》 for(int i = 0 ; i &lt; queue.size() ; i++)&#123;//因为for循环的内部会往queue添加元素，所以要先固定for循环的次数
+          TreeNode now = queue.poll();//当前节点
+            temp.add(now.val);
+          if(now.left != null) queue.add(now.left);
+          if(now.right != null) queue.add(now.right);
+     ————》     &#125;
+      &#125;
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/7cc91d44855f43f3983541ac049ae43e.png"></p>
+</li>
+</ul>
+<h3 id="2-2-2需要注意的点（集合for循环的开始条件）"><a href="#2-2-2需要注意的点（集合for循环的开始条件）" class="headerlink" title="2.2.2需要注意的点（集合for循环的开始条件）"></a>2.2.2需要注意的点（集合for循环的开始条件）</h3><p><img src="https://img-blog.csdnimg.cn/e1adac2f5dcd47b78bfdf4d368ec20cc.png"></p>
+<p>所有跟集合相关的for循环开始条件，都必须先<code>int i = size()</code>，因为size可能会在for循环的过程中变动</p>
+<h3 id="2-2-3最终结果"><a href="#2-2-3最终结果" class="headerlink" title="2.2.3最终结果"></a>2.2.3最终结果</h3><pre><code>/**
+ * Definition for a binary tree node.
+ * public class TreeNode &#123;
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) &#123; val = x; &#125;
+ * &#125;
+ */
+class Solution &#123;
+    public List&lt;List&lt;Integer&gt;&gt; levelOrder(TreeNode root) &#123;
+
+        List&lt;List&lt;Integer&gt;&gt; destList =  new ArrayList&lt;List&lt;Integer&gt;&gt;();
+        //先判断root==null的情况
+        if(root == null) return destList;
+
+        //创建TreeNode的队列
+        Queue&lt;TreeNode&gt; queue = new LinkedList&lt;TreeNode&gt;()&#123;
+            &#123;
+                add(root);//初始化
+            &#125;
+        &#125;;
+
+        //while循环 内层for循环填满每个temp
+        while(!queue.isEmpty())&#123;
+            ArrayList&lt;Integer&gt; temp = new ArrayList&lt;Integer&gt;();
+
+          //  for(int i = 0 ; i &lt; queue.size() ; i++)&#123;queue.size()在随元素弹出的过程中动态变化
+            for(int i = queue.size() ; i &gt; 0 ; i--)&#123;//固定for循环的次数,保证循环的是本层
+            TreeNode now = queue.poll();
+            temp.add(now.val);
+
+            //往queue中添加下一层的元素（完整的for循环之后，queue中刚好只有下一层的所有元素）
+            if(now.left != null) queue.add(now.left);//防止被这两条影响temp长度
+            if(now.right != null) queue.add(now.right);//防止被这两条影响temp长度
+            &#125;
+
+            destList.add(temp);
         &#125;
-        for(int i = 0 ; i &lt; n ; i++)&#123;
-            rep.append(s.charAt(i));
-        &#125;
-        return rep.toString();
-        
+        return destList;
+
     &#125;
 &#125;
 </code></pre>
+<p><img src="https://img-blog.csdnimg.cn/7d43a9c2faed4360a0c2d4cfb11a5571.png"></p>
+<h1 id="3-分层交叉遍历"><a href="#3-分层交叉遍历" class="headerlink" title="3.分层交叉遍历"></a>3.分层交叉遍历</h1><p><img src="https://img-blog.csdnimg.cn/7adcfa2252c0464992ef60c07d002163.png"></p>
+<h2 id="3-1简单粗暴直接reverse"><a href="#3-1简单粗暴直接reverse" class="headerlink" title="3.1简单粗暴直接reverse()"></a>3.1简单粗暴直接reverse()</h2><h3 id="3-1-1取余位运算"><a href="#3-1-1取余位运算" class="headerlink" title="3.1.1取余位运算"></a>3.1.1取余位运算</h3><p><code>当x=2^n(n为自然数)时，</code></p>
+<p><code>a % x = a &amp; (x  - 1 )</code></p>
+<h3 id="3-1-2Collections-reverse"><a href="#3-1-2Collections-reverse" class="headerlink" title="3.1.2Collections.reverse()"></a>3.1.2Collections.reverse()</h3><p><img src="https://img-blog.csdnimg.cn/e3ac409d55fa4ff3a6120ce9c2eed88d.png"></p>
+<p>但是leetcode中用不了Collections工具包</p>
+<h2 id="3-2最终写法-链表（双端队列）"><a href="#3-2最终写法-链表（双端队列）" class="headerlink" title="3.2最终写法:链表（双端队列）"></a>3.2最终写法:链表（双端队列）</h2><p><img src="https://img-blog.csdnimg.cn/70470ac93bbf4ae89b65aa2c87c04029.png"></p>
 
       
        <hr><span style="font-style: italic;color: gray;"> 生命以负熵为食，归整以抵抗熵增； </span>
