@@ -6,51 +6,45 @@
   <meta name="keywords" content="">
   <meta name="description" content="Java泛型 | ZJH&#39;blog">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="先说个大概的结构：  RestTemlate的所有方法最终调用的是doExecute()，层层向外封装 其中exchange()适合用来封装成工具类，他的返回值是ResponseEntity postForObject()  和  postForEntity本质上一样，只是后者对运行结果进行了封装，返回的也是ResponseEntity，类似于lambda表达式中的Option类  1.本文的源码">
+<meta name="description" content="其实，原生的API是不行的。（不过文章末尾我在通读源码之后用反射写了一个Session共享的方式，需要的可以直接使用）  虽然说前端可以通过伪造Cookie中的JESESSIONID来模拟劫持 而后端并不能直接通过原生API成功修改JESSIONID获取指定session。  本案例一共12000字，源码分析部分10000字左右  0.Session域的大体流程先大概了解一下为了创建Session">
 <meta property="og:type" content="article">
-<meta property="og:title" content="RestTemplate源码分析及可扩展工具类">
-<meta property="og:url" content="https://zjhblog.gitee.io/2022/07/30/RestTemplate%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%8F%8A%E5%8F%AF%E6%89%A9%E5%B1%95%E5%B7%A5%E5%85%B7%E7%B1%BB/index.html">
+<meta property="og:title" content="反射修改jsessionid实现session共享">
+<meta property="og:url" content="https://zjhblog.gitee.io/2022/08/03/%E5%8F%8D%E5%B0%84%E4%BF%AE%E6%94%B9jsessionid%E5%AE%9E%E7%8E%B0session%E5%85%B1%E4%BA%AB/index.html">
 <meta property="og:site_name" content="ZJH&#39;blog">
-<meta property="og:description" content="先说个大概的结构：  RestTemlate的所有方法最终调用的是doExecute()，层层向外封装 其中exchange()适合用来封装成工具类，他的返回值是ResponseEntity postForObject()  和  postForEntity本质上一样，只是后者对运行结果进行了封装，返回的也是ResponseEntity，类似于lambda表达式中的Option类  1.本文的源码">
+<meta property="og:description" content="其实，原生的API是不行的。（不过文章末尾我在通读源码之后用反射写了一个Session共享的方式，需要的可以直接使用）  虽然说前端可以通过伪造Cookie中的JESESSIONID来模拟劫持 而后端并不能直接通过原生API成功修改JESSIONID获取指定session。  本案例一共12000字，源码分析部分10000字左右  0.Session域的大体流程先大概了解一下为了创建Session">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/ff77b26b03a846c0a63c5ab067ca1c2a.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/1134d9e8c5ba48ca8c789762e64b3932.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/cbb84d0aeee54c4a8d206a7ca16c84d2.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/d5474ff09bc943b5afb10948902e1965.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/f65367f397be4f47aa015251311c2ac0.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/cd139059659d4120a31725ab5fd0f4af.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/4617c2b5c4f342e8b090be01ea87b37e.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/8b3bff8efafa410ca33c7e9971af2d95.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/e3d76f4b94734da3919f2f0ba4cceef4.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/0bb36eb745b948838436c3474fe09222.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/365add9267e14f11bcf45c145c8f4c1f.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/2692bd692fd5477994460bb07621cbd1.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/805cd29b3f874c5db1447b8403cc378b.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/4b0a8113b4814064af683d591efa2f3e.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/466841ea1eb54688a58f13f5a91da1c6.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/2aaa7850f1574bdaaa2e86b11e302dc2.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/f4d74fc424e2449ab72a25e7dd853729.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/cd8896e0622c45e48e6e2b73d9a86778.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/5e4711f12bab4fc5971de022cbf8a823.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/ec598eb6550f4dc2a2cc44e9a2a37423.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/c966fb07a8c34b6685ce62f58bc03d81.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/6fef8e3477fc4c51a64dba0f2ea602ad.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/bc1f4bfe85644f90a190de7c7b214726.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/1e0853997c16464c8753fd8b296bd15d.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/f226121a4b514ef7afcc5be894fa83f9.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/717c0b61574448ee96c3aa0bf051d3aa.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/d072a85dd9694ea59111d2f50aa6a542.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/ea860a58bf7d43f5bf0ae992610ed1c7.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/e6927c9c1bc443c6b02d6352e3399664.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/0d970c9b6b524a30b58c069d25b7831f.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/0883ff19327b418291e7fe957edbaeba.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/4696156abb0744b7a0fd8accd3786a96.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/9aae1ca4f8df43b1aee39106e1e3707b.png">
-<meta property="article:published_time" content="2022-07-30T14:18:01.000Z">
-<meta property="article:modified_time" content="2022-07-30T14:25:12.975Z">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/86b981f85bbc4d16928a4e3024abe45a.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8f1447491cd441078be3d676f634f0ce.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/be0458c3d1734ee299440cb92417d948.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/bdec123319b34d33981f784b870d853c.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/01c148e0a43c489a9d8bf98b3a1ee927.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/69bf55cd80154168915c009b5a073f31.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/1d7b6a71d3354fedbba9620e2b6b1902.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c8aaf611bb7a430f94a93b6679d2a4f1.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/fc468410164b41f4a1210402ecaee7fb.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4eb868bee6044898a091b6c8e735733a.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c8aaf611bb7a430f94a93b6679d2a4f1.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4eb868bee6044898a091b6c8e735733a.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2746e2619eb44a768dcdacfbcb7d80dc.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/6da00f7266564ef7bf140eb410ad467a.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c179c9130bad4363bd620dc2b7b1a5e9.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b983e5fc6e604f77ac91f7fd9912d635.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/1f290a3fa994429e84ddcf929a9a6664.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8702cbfecc3e41aeba2cecf49bf00b18.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f364b20a9b954a528804993d35ae5d89.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f480e850673347b1baf6cbbdd0358b4e.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d04db5de9fd442ddb3d27fd66fa4c311.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/9928f158ef324b9480bcdaeb859e2e3a.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/6caefbb14071416ead6e94a34b481e55.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e5e8d921dca746e69eee08b1646f01a0.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c23451ee616b4bdaba411117939b2c77.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/251b2b5c84b8424583c463d2f36aad76.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/acdd4d91d81f4aa9ad6f7232257df7fa.png">
+<meta property="article:published_time" content="2022-08-03T13:53:21.000Z">
+<meta property="article:modified_time" content="2022-08-03T14:05:05.534Z">
 <meta property="article:author" content="ZJH">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://img-blog.csdnimg.cn/ff77b26b03a846c0a63c5ab067ca1c2a.png">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/86b981f85bbc4d16928a4e3024abe45a.png">
 
 
 <link rel="icon" href="/img/QQ图片20211224224200.jpg">
@@ -160,7 +154,7 @@
     <li>
         <div class="all active" data-rel="全部文章">全部文章
             
-                <small>(74)</small>
+                <small>(76)</small>
             
         </div>
     </li>
@@ -199,7 +193,7 @@
                     <div data-rel="工作笔记">
                         
                         工作笔记
-                        <small>(6)</small>
+                        <small>(8)</small>
                         
                     </div>
                     
@@ -227,21 +221,7 @@
                     <div data-rel="源码">
                         
                         源码
-                        <small>(5)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="Bug">
-                        
-                        Bug
-                        <small>(2)</small>
+                        <small>(6)</small>
                         
                     </div>
                     
@@ -269,7 +249,7 @@
                     <div data-rel="Java后端">
                         
                         Java后端
-                        <small>(18)</small>
+                        <small>(19)</small>
                         
                     </div>
                     
@@ -304,8 +284,8 @@
         
     </div>
 </div>
-<input type="hidden" id="yelog_site_posts_number" value="74">
-<input type="hidden" id="yelog_site_word_count" value="110.1k">
+<input type="hidden" id="yelog_site_posts_number" value="76">
+<input type="hidden" id="yelog_site_word_count" value="115.1k">
 <div style="display: none">
     <span id="busuanzi_value_site_uv"></span>
     <span id="busuanzi_value_site_pv"></span>
@@ -366,18 +346,42 @@
     <nav id="title-list-nav">
         
         <a  class="全部文章 源码 "
-           href="/zjh/2022/07/30/RestTemplate%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%8F%8A%E5%8F%AF%E6%89%A9%E5%B1%95%E5%B7%A5%E5%85%B7%E7%B1%BB/"
+           href="/zjh/2022/08/03/%E5%8F%8D%E5%B0%84%E4%BF%AE%E6%94%B9jsessionid%E5%AE%9E%E7%8E%B0session%E5%85%B1%E4%BA%AB/"
            data-tag=""
            data-author="" >
-            <span class="post-title" title="RestTemplate源码分析及可扩展工具类">RestTemplate源码分析及可扩展工具类</span>
-            <span class="post-date" title="2022-07-30 22:18:01">2022/07/30</span>
+            <span class="post-title" title="反射修改jsessionid实现session共享">反射修改jsessionid实现session共享</span>
+            <span class="post-date" title="2022-08-03 21:53:21">2022/08/03</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/08/03/RestTemlate%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%8F%8A%E5%B7%A5%E5%85%B7%E7%B1%BB%E8%AE%BE%E8%AE%A1/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="RestTemlate源码分析及工具类设计">RestTemlate源码分析及工具类设计</span>
+            <span class="post-date" title="2022-08-03 21:51:57">2022/08/03</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/08/03/XSS%E5%AF%BC%E8%87%B4%E7%9A%84%E7%9F%AD%E4%BF%A1%E6%9C%8D%E5%8A%A1%E8%A2%AB%E6%94%BB%E5%87%BB%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="XSS导致的短信服务被攻击解决方案">XSS导致的短信服务被攻击解决方案</span>
+            <span class="post-date" title="2022-08-03 21:51:16">2022/08/03</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/08/03/%E5%9B%9B%E7%A7%8D%E6%96%B9%E6%B3%95Servlet%E5%AE%B9%E5%99%A8%E4%BD%BF%E7%94%A8Spring%E7%9A%84Bean%E5%AF%B9%E8%B1%A1/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="四种方法Servlet容器使用Spring的Bean对象">四种方法Servlet容器使用Spring的Bean对象</span>
+            <span class="post-date" title="2022-08-03 21:47:54">2022/08/03</span>
         </a>
         
         <a  class="全部文章 数据结构算法 "
-           href="/zjh/2022/07/29/(%E8%94%9A%E6%9D%A5%E6%8F%90%E5%89%8D%E6%89%B9)%E5%A4%8D%E6%9D%82%E9%93%BE%E8%A1%A8%E7%9A%84%E5%A4%8D%E5%88%B6/"
+           href="/zjh/2022/07/29/(%E8%94%9A%E6%9D%A5)%E5%A4%8D%E6%9D%82%E9%93%BE%E8%A1%A8%E7%9A%84%E5%A4%8D%E5%88%B6/"
            data-tag=""
            data-author="" >
-            <span class="post-title" title="(蔚来提前批)复杂链表的复制">(蔚来提前批)复杂链表的复制</span>
+            <span class="post-title" title="(蔚来)复杂链表的复制">(蔚来)复杂链表的复制</span>
             <span class="post-date" title="2022-07-29 12:32:49">2022/07/29</span>
         </a>
         
@@ -677,14 +681,6 @@
             <span class="post-date" title="2022-03-07 22:05:56">2022/03/07</span>
         </a>
         
-        <a  class="全部文章 Bug "
-           href="/zjh/2022/03/07/Cannot-find-method-%E2%80%98value%E2%80%98-lombok%E5%86%B2%E7%AA%81/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Cannot find method ‘value‘(lombok冲突)">Cannot find method ‘value‘(lombok冲突)</span>
-            <span class="post-date" title="2022-03-07 22:02:56">2022/03/07</span>
-        </a>
-        
         <a  class="全部文章 源码 "
            href="/zjh/2022/02/21/LinkedList%E6%BA%90%E7%A0%81%E4%B8%AD%E4%B8%BA%E4%BD%95%E5%A4%A7%E9%87%8F%E5%87%BA%E7%8E%B0final/"
            data-tag=""
@@ -781,7 +777,7 @@
             <span class="post-date" title="2022-02-09 15:40:54">2022/02/09</span>
         </a>
         
-        <a  class="全部文章 Bug "
+        <a  class="全部文章 Java后端 "
            href="/zjh/2022/02/09/IO%E4%BC%A0%E8%BE%93%E5%9B%BE%E7%89%87%E8%83%BD%E6%89%93%E5%BC%80%E4%BD%86%E8%8A%B1%E5%B1%8F/"
            data-tag=""
            data-author="" >
