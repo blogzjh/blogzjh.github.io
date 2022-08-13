@@ -693,12 +693,12 @@
     </div>
     <div class="article-meta">
         
-            发布时间 : <time class="date" title='最后更新: 2022-08-12 23:15:50'>2022-08-12 22:51</time>
+            发布时间 : <time class="date" title='最后更新: 2022-08-13 17:55:16'>2022-08-12 22:51</time>
         
     </div>
     <div class="article-meta">
         
-        <span>字数:821</span>
+        <span>字数:865</span>
         
         
         <span id="busuanzi_container_page_pv">
@@ -717,7 +717,7 @@
     
     <div class="toc-ref">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E5%AE%9E%E7%8E%B0%E6%80%9D%E8%B7%AF"><span class="toc-text">1.实现思路</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E4%BD%BF%E7%94%A8%E5%AE%9E%E4%BE%8B"><span class="toc-text">2.使用实例</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1%E5%AE%9E%E4%BD%93%E7%B1%BBDto"><span class="toc-text">2.1实体类Dto</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2%E8%B0%83%E7%94%A8%E8%A7%A3%E5%AF%86%E6%96%B9%E6%B3%95"><span class="toc-text">2.2调用解密方法</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0"><span class="toc-text">3.具体实现</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1%E5%8A%A0%E5%AF%86%E8%A7%A3%E5%AF%86%E6%B3%A8%E8%A7%A3"><span class="toc-text">3.1加密解密注解</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2%E5%8A%A0%E5%AF%86%E8%A7%A3%E5%AF%86%E5%B7%A5%E5%85%B7%E7%B1%BB"><span class="toc-text">3.2加密解密工具类</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-%E5%B0%8F%E7%BB%93"><span class="toc-text">4.小结</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E5%AE%9E%E7%8E%B0%E6%80%9D%E8%B7%AF"><span class="toc-text">1.实现思路</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E4%BD%BF%E7%94%A8%E5%AE%9E%E4%BE%8B"><span class="toc-text">2.使用实例</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1%E5%85%A5%E5%8F%82%E5%AE%9E%E4%BD%93%E7%B1%BBDto"><span class="toc-text">2.1入参实体类Dto</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2%E8%B0%83%E7%94%A8%E8%A7%A3%E5%AF%86%E6%96%B9%E6%B3%95"><span class="toc-text">2.2调用解密方法</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0"><span class="toc-text">3.具体实现</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1%E5%8A%A0%E5%AF%86%E8%A7%A3%E5%AF%86%E6%B3%A8%E8%A7%A3"><span class="toc-text">3.1加密解密注解</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-1%E5%8A%A0%E5%AF%86%E6%B3%A8%E8%A7%A3"><span class="toc-text">3.1.1加密注解</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-2%E8%A7%A3%E5%AF%86%E6%B3%A8%E8%A7%A3"><span class="toc-text">3.1.2解密注解</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2%E5%8A%A0%E5%AF%86%E8%A7%A3%E5%AF%86%E5%B7%A5%E5%85%B7%E7%B1%BB"><span class="toc-text">3.2加密解密工具类</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-%E5%B0%8F%E7%BB%93"><span class="toc-text">4.小结</span></a></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -738,15 +738,15 @@
 <li>入参必须封装为一个dto用@RequestBody接收；</li>
 <li>出参也必须封装为一个Dto然后转JSON</li>
 </ul>
-<p>但对于某些属性的加密解密，只是机械的直接对某个属性进行set</p>
-<p>距离第一份实习已经好几个月了，最近有空想起来这个地方其实是可以进行优化的</p>
+<p>但对于某些属性的加密解密，只是机械的直接对某个属性进行set。这个方法可以一键对dto指定属性加密解密<br>虽然已经过了几个月了，但是还是来复盘一下吧</p>
 <h1 id="1-实现思路"><a href="#1-实现思路" class="headerlink" title="1.实现思路"></a>1.实现思路</h1><ul>
 <li>用<code>CodecUtils.encodeDtoField(xxxDto)</code>对dto里面的指定属性进行加密</li>
-<li>用<code>@DtoEncoder</code>标注在属性上，决定是否被加密</li>
+<li>用<code>@DtoEncoder</code>标注在属性上，决定是否被加密  </li>
 <li>用<code>@DtoEncoder(Boolean force)</code>注解的参数来决定是否强制加密  </li>
 </ul>
-<p>对于解密也同理</p>
-<h1 id="2-使用实例"><a href="#2-使用实例" class="headerlink" title="2.使用实例"></a>2.使用实例</h1><h2 id="2-1实体类Dto"><a href="#2-1实体类Dto" class="headerlink" title="2.1实体类Dto"></a>2.1实体类Dto</h2><pre><code>public class LoginDto &#123;
+<p>以上decoder和encoder同理（解密）</p>
+<h1 id="2-使用实例"><a href="#2-使用实例" class="headerlink" title="2.使用实例"></a>2.使用实例</h1><h2 id="2-1入参实体类Dto"><a href="#2-1入参实体类Dto" class="headerlink" title="2.1入参实体类Dto"></a>2.1入参实体类Dto</h2><p>这里只展示入参，需要加密的属性，如果是出参可以使用@DtoEncoder</p>
+<pre><code>public class LoginDto &#123;
 
 String name;
 
@@ -762,7 +762,7 @@ String test;
 <h2 id="2-2调用解密方法"><a href="#2-2调用解密方法" class="headerlink" title="2.2调用解密方法"></a>2.2调用解密方法</h2><pre><code>//这将会对passWord进行解密
 LoginDto destLoginDto = CodecUtils.decodeDtoField(loginDto);
 </code></pre>
-<h1 id="3-具体实现"><a href="#3-具体实现" class="headerlink" title="3.具体实现"></a>3.具体实现</h1><h2 id="3-1加密解密注解"><a href="#3-1加密解密注解" class="headerlink" title="3.1加密解密注解"></a>3.1加密解密注解</h2><pre><code>@Documented
+<h1 id="3-具体实现"><a href="#3-具体实现" class="headerlink" title="3.具体实现"></a>3.具体实现</h1><h2 id="3-1加密解密注解"><a href="#3-1加密解密注解" class="headerlink" title="3.1加密解密注解"></a>3.1加密解密注解</h2><h3 id="3-1-1加密注解"><a href="#3-1-1加密注解" class="headerlink" title="3.1.1加密注解"></a>3.1.1加密注解</h3><pre><code>@Documented
 @Target(&#123;ElementType.FIELD&#125;)
 @Retention(RUNTIME)
 public @interface DtoEncoder &#123;
@@ -771,10 +771,8 @@ public @interface DtoEncoder &#123;
 */
 boolean force() default true;
 &#125;
-
-
-
-@Documented
+</code></pre>
+<h3 id="3-1-2解密注解"><a href="#3-1-2解密注解" class="headerlink" title="3.1.2解密注解"></a>3.1.2解密注解</h3><pre><code>@Documented
 @Target(&#123;ElementType.FIELD&#125;)
 @Retention(RUNTIME)
 public @interface DtoDecoder &#123;
