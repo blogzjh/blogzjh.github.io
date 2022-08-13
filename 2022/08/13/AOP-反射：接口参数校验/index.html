@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Java堆排序的过程到设计 | ZJH&#39;blog</title>
+  <title>AOP+反射：接口参数校验 | ZJH&#39;blog</title>
   <meta name="keywords" content="">
-  <meta name="description" content="Java堆排序的过程到设计 | ZJH&#39;blog">
+  <meta name="description" content="AOP+反射：接口参数校验 | ZJH&#39;blog">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="description" content="本案例包括4个核心类：AopUtils：抽取出来的公共方法@ValidateGroup@ValidateFieldValidateAspectJHandler 功能包括：长度、值范围、正则匹配、非空校验 以下是设计思路、最终代码、测试结果 后续扩展只需要修改@ValidateField 和 ValidateAspectJHandler；例如如果是按照我第一份实习时候的代码架构，可以在Aspect">
 <meta property="og:type" content="article">
@@ -673,9 +673,9 @@
 </aside>
 <div id="post">
     <div class="pjax">
-        <article id="post-Java堆排序的过程到设计" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-AOP-反射：接口参数校验" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">Java堆排序的过程到设计</h1>
+        <h1 class="article-title">AOP+反射：接口参数校验</h1>
     
     <div class="article-meta">
         
@@ -685,7 +685,7 @@
             <i class="iconfont icon-category"></i>
             
             
-            <a  data-rel="数据结构算法">数据结构算法</a>
+            <a  data-rel="工作笔记">工作笔记</a>
             
         </span>
         
@@ -693,12 +693,12 @@
     </div>
     <div class="article-meta">
         
-            发布时间 : <time class="date" title='最后更新: 2022-03-07 22:08:45'>2022-03-07 22:08</time>
+            发布时间 : <time class="date" title='最后更新: 2022-08-13 17:30:37'>2022-08-13 17:12</time>
         
     </div>
     <div class="article-meta">
         
-        <span>字数:1.1k</span>
+        <span>字数:2.7k</span>
         
         
         <span id="busuanzi_container_page_pv">
@@ -717,7 +717,7 @@
     
     <div class="toc-ref">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%BF%87%E7%A8%8B"><span class="toc-text">过程</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#API%E8%AE%BE%E8%AE%A1"><span class="toc-text">API设计</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#heapMaker%E6%9E%84%E9%80%A0%E5%A4%A7%E9%A1%B6%E5%A0%86"><span class="toc-text">heapMaker构造大顶堆</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%A4%E6%8D%A2%E5%9B%BA%E5%AE%9A"><span class="toc-text">交换固定</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%8B%E6%B2%89%E7%AE%97%E6%B3%95%EF%BC%9A%E4%BF%AE%E6%AD%A3%E5%A4%A7%E9%A1%B6%E5%A0%86"><span class="toc-text">下沉算法：修正大顶堆</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B5%8B%E8%AF%95"><span class="toc-text">测试</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%BA%90%E7%A0%81"><span class="toc-text">源码</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E6%BC%94%E7%A4%BA-%E6%9C%80%E7%BB%88%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95"><span class="toc-text">1.演示: 最终使用方法</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90"><span class="toc-text">2.流程分析</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E5%85%AC%E5%85%B1%E6%96%B9%E6%B3%95%E6%8A%BD%E5%8F%96AopUtils"><span class="toc-text">3.公共方法抽取AopUtils</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-%E6%B3%A8%E8%A7%A3%E5%8F%8A%E8%AE%BE%E8%AE%A1%E5%8E%9F%E7%90%86"><span class="toc-text">4.注解及设计原理</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1ValidateGroup"><span class="toc-text">4.1ValidateGroup</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2ValidateField"><span class="toc-text">4.2ValidateField</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-ValidateAspectJHandler"><span class="toc-text">5.ValidateAspectJHandler</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#5-1%E5%A4%A7%E4%BD%93%E7%BB%93%E6%9E%84"><span class="toc-text">5.1大体结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-2%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0"><span class="toc-text">5.2具体实现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-3%E6%8E%A5%E5%8F%A3%E6%B5%8B%E8%AF%95"><span class="toc-text">5.3接口测试</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#6-%E5%8F%AF%E6%89%A9%E5%B1%95%E7%9A%84%E7%82%B9"><span class="toc-text">6.可扩展的点</span></a></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -733,202 +733,372 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="过程"><a href="#过程" class="headerlink" title="过程"></a>过程</h1><ul>
-<li>堆的原理是顺序二叉树，但底层实现是数组</li>
-<li>arr[i]是父节点，那么arr[2<em>i+1]是其左子节点，arr[2</em>i+2]是其右子节点</li>
-<li>arr[i]的父节点是arr[ (i-1)/2 ]</li>
-<li>arr[0]是根节点，并频繁用于和尾节点交换<br><img src="https://img-blog.csdn.net/20180908013007479?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM2MTg2Njkw/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70#pic_center" alt="过程动图"></li>
+        <ul>
+<li>本案例包括4个核心类：<br>AopUtils：抽取出来的公共方法<br>@ValidateGroup<br>@ValidateField<br>ValidateAspectJHandler</li>
+<li>功能包括：长度、值范围、正则匹配、非空校验</li>
+<li>以下是设计思路、最终代码、测试结果</li>
+<li>后续扩展只需要修改@ValidateField 和 ValidateAspectJHandler；例如如果是按照我第一份实习时候的代码架构，可以在AspectJ中添加<a href="https://zjhblog.gitee.io/zjh/2022/08/12/%E5%AF%B9dto%E6%8C%87%E5%AE%9A%E5%B1%9E%E6%80%A7%E4%B8%80%E9%94%AE%E5%8A%A0%E8%A7%A3%E5%AF%86/">对dto指定属性一键加解密</a>的逻辑。</li>
 </ul>
-<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/u010452388/article/details/81283998?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522164646575616781685311492%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=164646575616781685311492&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~top_positive~default-1-81283998.pc_search_result_control_group&utm_term=%E5%A0%86%E6%8E%92%E5%BA%8F&spm=1018.2226.3001.4187">参考1</a></p>
-<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_36186690/article/details/82505569?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522164647017516780271519582%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=164647017516780271519582&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~top_positive~default-1-82505569.pc_search_result_control_group&utm_term=%E5%A0%86%E6%8E%92%E5%BA%8Fjava&spm=1018.2226.3001.4187">参考2</a></p>
-<ol>
-<li>调用heapMaker方法，把arr变成大顶堆的顺序（会判断每个元素）</li>
-<li>此时已有大顶堆，把根节点（大顶）和末尾交换并固定，size-1</li>
-<li>再从新的根节点（之前的小节点）调用<strong>下沉算法</strong>sink，再把arr变为大顶堆的顺序（这次只操作部分元素）</li>
-<li>循环，直至size = 1</li>
-</ol>
-<h1 id="API设计"><a href="#API设计" class="headerlink" title="API设计"></a>API设计</h1><h2 id="heapMaker构造大顶堆"><a href="#heapMaker构造大顶堆" class="headerlink" title="heapMaker构造大顶堆"></a>heapMaker构造大顶堆</h2><p>将无序数组构造成一个大根堆（升序用大根堆，降序就用小根堆）</p>
-<pre><code>//创建堆：从arr[0]开始，每添加一个元素都和其父元素进行对比
-public static void heapMaker(int[] arr) &#123;
-    for (int i = 0; i &lt; arr.length; i++) &#123;
-        int currentIndex = i;
-        int fatherIndex = (i - 1) / 2;
+<h1 id="1-演示-最终使用方法"><a href="#1-演示-最终使用方法" class="headerlink" title="1.演示: 最终使用方法"></a>1.演示: 最终使用方法</h1><p>以注册功能为例</p>
+<pre><code>@RestController
+@RequestMapping(&quot;validater&quot;)
+public class ValidateController &#123;
 
-        //因为此逻辑并未判断左右子节点之间的大小关系，所以在sink方法中需要进行判断
-        while (arr[currentIndex] &gt; arr[fatherIndex]) &#123;
-            //1.交换
-            swap(arr, currentIndex, fatherIndex);
-            //2.子索引变父索引，继续向上判断
-            currentIndex = fatherIndex;
-            fatherIndex = (fatherIndex - 1) / 2;
-        &#125;
+  @ValidateGroup(fields = &#123;
+    //index默认=0，即对第一个参数param1校验，其他参数是校验规则、报错日志记录的内容
+      @ValidateField(index = 0,notNull = true,maxLen = 10,code = &quot;param1-error&quot;,message = &quot;param1校验错误&quot;),
+      @ValidateField(index = 1,notNull = true,fieldName = &quot;passWord&quot;,minLen = 6,code = &quot;passWord-erro&quot;,message = &quot;密码校验错误&quot;),
+      @ValidateField(index = 1,notNull = true,fieldName = &quot;age&quot;,minVal = 0,code = &quot;age-error&quot;,message = &quot;年龄不能小于0&quot;),
+      @ValidateField(index = 1,notNull = true,fieldName = &quot;tall&quot;,minVal = 0,maxVal = 250.9,code =&quot;tall-error&quot;,message = &quot;身高范围出错&quot;),
+      @ValidateField(index = 1,notNull = true,fieldName = &quot;phone&quot;,regStr = &quot;^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\\d&#123;8&#125;$&quot;,code = &quot;phone-error&quot;,message = &quot;手机号错误&quot;)
+  &#125;)
+  @PostMapping(&quot;post&quot;)
+  public String postValidater(@RequestParam String param1,  RegisterDto dto)&#123;
 
-    &#125;
+    System.out.println(&quot;成功通过校验&quot;);
+    System.out.println(&quot;第一个参数是：&quot; + param1);
+
+    System.out.println(&quot;第二个参数是&quot;+dto.toString());
+
+    return &quot;succeed&quot;;
+  &#125;    
 &#125;
 </code></pre>
-<h2 id="交换固定"><a href="#交换固定" class="headerlink" title="交换固定"></a>交换固定</h2><pre><code>//交换
-public static void swap(int[] arr, int i, int j) &#123;
-    int temp = arr[i];
-    arr[i] = arr[j];
-    arr[j] = temp;
+<p>其中：请求Dto包含name、passWord、phone等字段；<br>利用AspectJ对接口方法直接进行代理校验</p>
+<h1 id="2-流程分析"><a href="#2-流程分析" class="headerlink" title="2.流程分析"></a>2.流程分析</h1><ul>
+<li>AspectJ代理注解<code>@ValidateGroup</code>标注的方法，而这个Group注解中的属性就是<code>@ValidateField []</code></li>
+<li>获取到<code>@ValidateField</code>数组后，遍历。通过比对注解的参数 与 dto或者param中对应名字的参数来进行校验</li>
+<li>如果校验成功就放行，校验失败就抛异常终止</li>
+</ul>
+<h1 id="3-公共方法抽取AopUtils"><a href="#3-公共方法抽取AopUtils" class="headerlink" title="3.公共方法抽取AopUtils"></a>3.公共方法抽取AopUtils</h1><p>经过流程分析可知：至少需要以下几个方法（并可以抽取为公共组件）</p>
+<ul>
+<li> <code>public Method getMethod(ProceedingJoinPoint pjp)</code>：获取被AOP拦截的方法Method对象</li>
+<li> <code> public Annotation getAnnotationByMethod(Method method, Class annoClass)</code>：获取目标方法对象的指定注解对象</li>
+<li><code>public Object getFieldFromDtoByFieldName(Object dto , String fieldName) </code>从dto中，获取指定属性名的属性值</li>
+</ul>
+<p>如下工具类也可以做成全静态方法</p>
+<pre><code>public class AopUtils &#123;
+
+private volatile static AopUtils aopUtils;
+
+
+private AopUtils() &#123;
+&#125;
+
+public static AopUtils getInstance() &#123;
+    if (aopUtils == null) &#123;
+        synchronized (AopUtils.class) &#123;
+            if (aopUtils == null) &#123;
+                aopUtils = new AopUtils();
+            &#125;
+        &#125;
+    &#125;
+    return aopUtils;
+&#125;
+
+/**
+ * 获取目标类的指定方法
+ */
+public Method getMethodByClassAndName(Class c, String methodName) &#123;
+    Method[] methods = c.getDeclaredMethods();
+    for (Method method : methods) &#123;
+        if (method.getName().equals(methodName)) &#123;
+            return method;
+        &#125;
+    &#125;
+    return null;
+&#125;
+
+/**
+ * 获取目标方法的指定注解
+ * 相当于 method.getAnnotation(xxxx.class);
+ */
+public Annotation getAnnotationByMethod(Method method, Class annoClass) &#123;
+    Annotation all[] = method.getAnnotations();
+    for (Annotation annotation : all) &#123;
+        if (annotation.annotationType() == annoClass) &#123;
+            return annotation;
+        &#125;
+    &#125;
+    return null;
+&#125;
+
+/**
+ * 获取被拦截方法的对象
+ * 配合使用，最终用于在Aspectj中获取被拦截方法上的注解
+ * 例如：AopUtils.getMethod(pjp).getDeclaredAnnotation(被aop拦截的注解.class)
+ */
+public Method getMethod(ProceedingJoinPoint pjp) &#123;
+    //获取参数的签名
+    MethodSignature msig = (MethodSignature) pjp.getSignature();
+    // MethodSignature.getMethod() 获取的是顶层接口或者父类的方法对象 如果在实现类的方法上，应该使用反射获取当前对象的方法对象
+    Object target = pjp.getTarget();//获取连接点所在的目标对象（被代理的对象）而不是父类or接口
+    //方法名 + 方法形参 ————》获取指定的方法对象(重载)
+    String methodName = msig.getName();
+    Class[] parameterTypes = msig.getParameterTypes();
+    Method method = null;
+    try &#123;
+        method = target.getClass().getMethod(methodName, parameterTypes);
+    &#125; catch (NoSuchMethodException e) &#123;
+        //log.error(...);
+    &#125;
+    return method;
+&#125;
+
+/**
+ * 从dto中，获取指定属性名的属性值；
+ */
+public Object getFieldFromDtoByFieldName(Object dto , String fieldName) throws NoSuchFieldException, IllegalAccessException &#123;
+    Class&lt;?&gt; dtoClazz = dto.getClass();
+    Field field = dtoClazz.getDeclaredField(fieldName);
+    field.setAccessible(true);
+    return field.get(dto);
+&#125;
+
+//  这个其实还有另一种写法
+//  private Method getMethod(ProceedingJoinPoint joinPoint) &#123;
+//    try &#123;
+//      Class[] parameterTypes = ((MethodSignature) joinPoint.getSignature()).getMethod().getParameterTypes();
+//      return joinPoint.getTarget().getClass().getMethod(joinPoint.getSignature().getName(), parameterTypes);
+//    &#125; catch (NoSuchMethodException e) &#123;
+//      e.printStackTrace();
+//    &#125;
+//    return null;
+//  &#125;
 &#125;
 </code></pre>
-<h2 id="下沉算法：修正大顶堆"><a href="#下沉算法：修正大顶堆" class="headerlink" title="下沉算法：修正大顶堆"></a>下沉算法：修正大顶堆</h2><pre><code>//大顶堆的修正(下沉算法)
-public static void sink(int[] arr, int index, int size) &#123;//size:最大范围
-    //1.左右子节点大小对比，
-    int left = index * 2 + 1;
-    int right = index * 2 + 2;
+<h1 id="4-注解及设计原理"><a href="#4-注解及设计原理" class="headerlink" title="4.注解及设计原理"></a>4.注解及设计原理</h1><h2 id="4-1ValidateGroup"><a href="#4-1ValidateGroup" class="headerlink" title="4.1ValidateGroup"></a>4.1ValidateGroup</h2><p>这个注解用于被AspectJ拦截，其属性是一个数组，用于参数校验</p>
+<pre><code>@Retention(RetentionPolicy.RUNTIME)
+@Target(&#123;ElementType.METHOD, ElementType.FIELD&#125;)
+public @interface ValidateGroup &#123;
 
-    int maxValueIndex = 0;//父、左、右的最大值对应的索引
-
-    //2.right&lt;size即可保证指针不越界
-    while (left &lt; size) &#123;
-        //2.1找出最大值的索引
-        if (right &lt; size &amp;&amp; arr[right] &gt; arr[left]) &#123;
-            maxValueIndex = right;
-        &#125; else &#123;
-            maxValueIndex = left;
-        &#125;
-
-
-        if (arr[index] &gt; arr[maxValueIndex]) &#123;
-            maxValueIndex = index;
-        &#125;
-
-
-        //2.2判断是否大顶堆
-        if (index == maxValueIndex) &#123;
-            break;
-        &#125;
-
-        //2.3交换arr中的值
-        swap(arr, index, maxValueIndex);
-
-        //2.4下一轮
-        index = maxValueIndex;//一定是左or右
-        left = index * 2 + 1;
-        right = index * 2 + 2;
-
-    &#125;
-&#125;
-</code></pre>
-<h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><pre><code>public static void main(String[] args) &#123;
-    int[] arr = new int[]&#123;1, 2, 4, 5, 1, 2, 4, 3, 2, 54, 23452, 543, 12, 4&#125;;
-    System.out.println(&quot;最初&quot;);
-    System.out.println(Arrays.toString(arr));
-    System.out.println(&quot;生成大顶堆&quot;);
-
-    heapMaker(arr);//生成大顶堆
-
-    System.out.println(Arrays.toString(arr));
-
-    System.out.println(&quot;循环固定，排序后&quot;);
-    int size = arr.length;
-    while (size &gt; 1) &#123;
-        //1,固定最大值
-        swap(arr, 0, size - 1);
-        size--;
-        //2,下沉：修正大顶堆
-        sink(arr, 0, size);
-    &#125;
-
-
-    System.out.println(Arrays.toString(arr));
-&#125;
-&#125;
-</code></pre>
-<p><img src="https://img-blog.csdnimg.cn/9ff6ff7f01284cafbc5222d7a9dc7481.png"></p>
-<h1 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h1><pre><code>public class heapSort &#123;
-public static void main(String[] args) &#123;
-    int[] arr = new int[]&#123;1, 2, 4, 5, 1, 2, 4, 3, 2, 54, 23452, 543, 12, 4&#125;;
-    System.out.println(&quot;最初&quot;);
-    System.out.println(Arrays.toString(arr));
-    System.out.println(&quot;生成大顶堆&quot;);
-
-    heapMaker(arr);//生成大顶堆
-
-    System.out.println(Arrays.toString(arr));
-
-    System.out.println(&quot;循环固定，排序后&quot;);
-    int size = arr.length;
-    while (size &gt; 1) &#123;
-        //1,固定最大值
-        swap(arr, 0, size - 1);
-        size--;
-        //2,下沉：修正大顶堆
-        sink(arr, 0, size);
-    &#125;
-
-
-    System.out.println(Arrays.toString(arr));
-&#125;
-
-//交换
-public static void swap(int[] arr, int i, int j) &#123;
-    int temp = arr[i];
-    arr[i] = arr[j];
-    arr[j] = temp;
-&#125;
-
-//创建堆：从arr[0]开始，每添加一个元素都和其父元素进行对比
-public static void heapMaker(int[] arr) &#123;
-    for (int i = 0; i &lt; arr.length; i++) &#123;
-        int currentIndex = i;
-        int fatherIndex = (i - 1) / 2;
-
-        //因为此逻辑并未判断左右子节点之间的大小关系，所以在sink方法中需要进行判断
-        while (arr[currentIndex] &gt; arr[fatherIndex]) &#123;
-            //1.交换
-            swap(arr, currentIndex, fatherIndex);
-            //2.子索引变父索引，继续向上判断
-            currentIndex = fatherIndex;
-            fatherIndex = (fatherIndex - 1) / 2;
-        &#125;
-
-    &#125;
-&#125;
-
-//大顶堆的修正(下沉算法)
-public static void sink(int[] arr, int index, int size) &#123;//size:最大范围
-    //1.左右子节点大小对比，
-    int left = index * 2 + 1;
-    int right = index * 2 + 2;
-
-    int maxValueIndex = 0;//父、左、右的最大值对应的索引
-
-    //2.right&lt;size即可保证指针不越界
-    while (left &lt; size) &#123;
-        //2.1找出最大值的索引
-        if (right &lt; size &amp;&amp; arr[right] &gt; arr[left]) &#123;
-            maxValueIndex = right;
-        &#125; else &#123;
-            maxValueIndex = left;
-        &#125;
-
-
-        if (arr[index] &gt; arr[maxValueIndex]) &#123;
-            maxValueIndex = index;
-        &#125;
-
-
-        //2.2判断是否大顶堆
-        if (index == maxValueIndex) &#123;
-            break;
-        &#125;
-
-        //2.3交换arr中的值
-        swap(arr, index, maxValueIndex);
-
-        //2.4下一轮
-        index = maxValueIndex;//一定是左or右
-        left = index * 2 + 1;
-        right = index * 2 + 2;
-
-    &#125;
-&#125;
+  ValidateFiled[] fields();
 
 &#125;
 </code></pre>
+<h2 id="4-2ValidateField"><a href="#4-2ValidateField" class="headerlink" title="4.2ValidateField"></a>4.2ValidateField</h2><ul>
+<li>当且仅当只有一个参数的时候可以不用指定index</li>
+<li>index默认为0，例如<code>public void register(@RequestParam String param1 , @RequestBody Dto dto)&#123;&#125;</code>中应该设置index = 1 ，这是由于<code>joinPoint.getArgs()</code>获取的形参是一个数组，需要用index指定位置</li>
+<li>所有参数都有默认值（不进行校验）</li>
+</ul>
+<p>如下：</p>
+<pre><code>@Retention(RetentionPolicy.RUNTIME)
+@Target(&#123;ElementType.METHOD, ElementType.FIELD&#125;)
+public @interface ValidateField &#123;
+
+  /**
+   * 参数索引位置：接口中有多个参数时用index指定需要校验的参数
+   * 默认：0号索引，当且仅当接口方法只有一个参数
+   */
+  int index() default 0;
+
+  /**
+   * 默认：如果参数是基本数据类型或String，就不用指定该参数
+   * 如果参数是对象，要验证对象里面某个属性，就用该参数指定属性名
+   */
+  String fieldName() default &quot;&quot;;
+
+  /**
+   * 错误码，用于日志记录
+   */
+  String code() default &quot;&quot;;
+
+  /**
+   * 错误提示语，用于日志记录
+   */
+  String message() default &quot;&quot;;
+
+  /**
+   * 正则验证
+   */
+  String regStr() default &quot;&quot;;
+
+  /**
+   * 非空校验，为true表示不能为空，false表示能够为空
+   */
+  boolean notNull() default false;
+
+  /**
+   * 字符串最大长度
+   */
+  int maxLen() default 0x7fffffff;
+
+  /**
+   * 字符串最小长度
+   */
+  int minLen() default 0;
+
+  /**
+   * 最大值，用于验证数值类型数据
+   */
+  double maxVal() default 0x1.fffffffffffffP+1023;
+
+  /**
+   * 最小值，用于验证数值类型数据
+   */
+  double minVal() default 0x0.0000000000001P-1022;
+
+&#125;
+</code></pre>
+<h1 id="5-ValidateAspectJHandler"><a href="#5-ValidateAspectJHandler" class="headerlink" title="5.ValidateAspectJHandler"></a>5.ValidateAspectJHandler</h1><h2 id="5-1大体结构"><a href="#5-1大体结构" class="headerlink" title="5.1大体结构"></a>5.1大体结构</h2><pre><code>@Component
+@Aspect
+public class ValidateAspectHandler &#123;
+
+  private AopUtils aopUtils = AopUtils.getInstance();
+  /**
+   * 使用AOP对使用了ValidateGroup的方法进行代理校验
+   */
+  @Around(&quot;@annotation(ValidateGroup)&quot;)
+  public Object validateAround(ProceedingJoinPoint joinPoint) throws Throwable &#123;
+//1.获取当前方法对象method
+//2.根据method对象获取对应的ValidateGroup对象
+//3.调用封装方法，将validateGroup.fields() 与 joinPoint.getArgs()形参数组传入，进行校验
+//4.如果为true，则执行下一步
+    return joinPoint.proceed();
+  &#125;
+
+
+  /**
+   * 封装方法：验证参数是否合法
+   */
+  private boolean validateField(ValidateFiled[] validateFields, Object[] args) &#123;
+    for (ValidateFiled validateFiled : validateFields) &#123;
+        //1.每次循环都是一个校验逻辑
+        //2.index仍然是指定对第几号元素进行校验
+        //3.fieldName如果不指定，那就是对基本数据类型即@RequestParam进行校验；如果指定，则对Dto即@RequestBody进行校验
+
+&#125;
+</code></pre>
+<h2 id="5-2具体实现"><a href="#5-2具体实现" class="headerlink" title="5.2具体实现"></a>5.2具体实现</h2><pre><code>@Component
+@Aspect
+public class ValidateAspctJHandler &#123;
+
+//    private static org.slf4j.Logger logger = LoggerFactory.getLogger(&quot;ValidateAspctJHandler&quot;);
+    private AopUtils aopUtils = AopUtils.getInstance();
+
+  /**
+   * 使用AOP对使用了ValidateGroup的方法进行代理校验
+   */
+  //相当于用@Around + return joinPoint.proceed(); 
+  //使用@Before的时候不能用ProceedingJoinPoint 只能用JoinPoint
+    @Before(&quot;@annotation(ValidateGroup)&quot;)
+    public void validateAround(JoinPoint joinPoint) throws Throwable &#123;
+        //获取被代理的方法对象
+        Method method = aopUtils.getMethod(joinPoint);
+        //获取被代理的方法对象对应的@ValidateGroup对象
+        ValidateGroup validateGroup = (ValidateGroup)aopUtils.getAnnotationByMethod(method, ValidateGroup.class);
+        //获取被代理方法的参数数组(这是参数值，而不是 method.getParameterTypes()返回的是Class[]  )
+        Object[] args = joinPoint.getArgs();
+        /*
+         * args和validateGroup中包含了全部需要校验的信息，因此可以封装为一个方法
+         * 在这个方法中，如果校验失败则用throws抛异常的方式终止
+         */
+        validateAllFields(validateGroup.fields(), args);
+    &#125;
+
+    /**
+     * 验证参数是否合法
+     * ValidateField[]中每一条都是一个校验规则，每一条都对应一个属性
+     * Object[] args中是所有的请求参数值，需要从args[validateFiled.index()中确定是对谁进行校验
+     */
+  private void validateAllFields(ValidateField[] validateFields, Object[] args) throws NoSuchFieldException, IllegalAccessException &#123;
+      //遍历：对每个@ValidateField进行校验
+    for (ValidateField validateFiled : validateFields) &#123;
+      Object arg;
+      //1.当fieldName为默认值&quot;&quot;的时候，此时是对@RequestParam即基本数据类型orString进行校验
+      if (&quot;&quot;.equals(validateFiled.fieldName())) &#123;
+          //arg是基本数据类型orString
+        arg = args[validateFiled.index()];
+        //2.如果fieldName设置了，那就是对dto中的某个属性进行校验
+      &#125; else &#123;
+          //获取第index号参数dto指定的属性值
+        arg = aopUtils.getFieldFromDtoByFieldName(args[validateFiled.index()], validateFiled.fieldName());
+      &#125;
+
+      //3.以下是校验流程，需要同时考虑是对dto属性or基本数据类型orString
+      //3.1判断参数是否为空
+      if (validateFiled.notNull()) &#123;
+        if (arg == null || arg.equals(&quot;&quot;)) &#123;
+//            logger.error(validateFiled.code() + &quot;:&quot; + validateFiled.message());
+          throw new RuntimeException(validateFiled.code()  + &quot;:&quot; + validateFiled.message());
+        //如果该参数能够为空，并且当参数为空时，就不用判断后面的了 ，直接返回
+        &#125; &#125;else &#123;
+        if (arg == null || arg.equals(&quot;&quot;)) &#123;
+          return;
+        &#125;
+      &#125;
+
+      //3.2判断字符串最大长度  如果设置为一个负数则不校验  默认为最大int值
+      if (validateFiled.maxLen() &gt;= 0) &#123;
+        if (arg.toString().length() &gt; validateFiled.maxLen()) &#123;
+//          logger.error(validateFiled.code() + &quot;:&quot; + validateFiled.message());
+          throw new RuntimeException(validateFiled.code()  + &quot;:&quot; + validateFiled.message());
+        &#125;
+      &#125;
+      //3.3判断字符串最小长度  如果设置为一个负数则不校验  默认为0
+      if (validateFiled.minLen() &gt;= 0) &#123;
+        if (arg.toString().length() &lt; validateFiled.minLen()) &#123;
+//          logger.error(validateFiled.code() + &quot;:&quot; + validateFiled.message());
+          throw new RuntimeException(validateFiled.code()  + &quot;:&quot; + validateFiled.message());
+        &#125;
+      &#125;
+      //3.4判断数值最大值  当不是默认值0x1.fffffffffffffP+1023的时候进行判断
+      if (validateFiled.maxVal() != 0x1.fffffffffffffP+1023) &#123;
+        if (Double.parseDouble(arg.toString()) &gt; validateFiled.maxVal()) &#123;
+//          logger.error(validateFiled.code() + &quot;:&quot; + validateFiled.message());
+          throw new RuntimeException(validateFiled.code()  + &quot;:&quot; + validateFiled.message());
+        &#125;
+      &#125;
+      //3.5判断数值最小值   当不是默认值0x0.0000000000001P-1022的时候进行判断
+      if (validateFiled.minVal() != 0x0.0000000000001P-1022) &#123;
+        if (Double.parseDouble(arg.toString()) &lt; validateFiled.minVal()) &#123;
+//          logger.error(validateFiled.code() + &quot;:&quot; + validateFiled.message());
+          throw new RuntimeException(validateFiled.code()  + &quot;:&quot; + validateFiled.message());
+        &#125;
+      &#125;
+
+      //3.6判断正则 若未设置正则校验则跳过
+      if (!&quot;&quot;.equals(validateFiled.regStr())) &#123;
+        if (arg instanceof String || arg instanceof Integer || arg instanceof BigDecimal || arg instanceof Double) &#123;
+          if (!(arg.toString()).matches(validateFiled.regStr())) &#123;
+//            logger.error(validateFiled.code() + &quot;:&quot; + validateFiled.message());
+            throw new RuntimeException(validateFiled.code()  + &quot;:&quot; + validateFiled.message());
+          &#125;
+        &#125;
+      &#125;
+    &#125;
+    return;
+  &#125;
+&#125;
+</code></pre>
+<h2 id="5-3接口测试"><a href="#5-3接口测试" class="headerlink" title="5.3接口测试"></a>5.3接口测试</h2><pre><code>@RestController
+@RequestMapping(&quot;validater&quot;)
+public class ValidateController &#123;
+
+  @ValidateGroup(fields = &#123;
+      //如果是index=0也可以省略不写
+      @ValidateField(index = 0,notNull = true,maxLen = 10,code = &quot;param1-error&quot;,message = &quot;param1校验错误&quot;),
+      @ValidateField(index = 1,notNull = true,fieldName = &quot;passWord&quot;,minLen = 6,code = &quot;passWord-erro&quot;,message = &quot;密码校验错误&quot;),
+      @ValidateField(index = 1,notNull = true,fieldName = &quot;age&quot;,minVal = 0,code = &quot;age-error&quot;,message = &quot;年龄不能小于0&quot;),
+      @ValidateField(index = 1,notNull = true,fieldName = &quot;tall&quot;,minVal = 0,maxVal = 250.9,code =&quot;tall-error&quot;,message = &quot;身高范围出错&quot;),
+      @ValidateField(index = 1,notNull = true,fieldName = &quot;phone&quot;,regStr = &quot;^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\\d&#123;8&#125;$&quot;,code = &quot;phone-error&quot;,message = &quot;手机号错误&quot;)
+  &#125;)
+  @PostMapping(&quot;post&quot;)
+  public String postValidater(@RequestParam String param1,  RegisterDto dto)&#123;
+
+    System.out.println(&quot;成功通过校验&quot;);
+    System.out.println(&quot;第一个参数是：&quot; + param1);
+
+    System.out.println(&quot;第二个参数是&quot;+dto.toString());
+
+    return &quot;succeed&quot;;
+  &#125;
+&#125;
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/e5f4ac9d44474348ba35f74fc9263209.png"><br>如果参数错误，则会直接抛异常终止请求<br><img src="https://img-blog.csdnimg.cn/09ae76ac260b4970a236069c7e020fa6.png"></p>
+<p>如果参数都正确就可以通过校验，如下：<br><img src="https://img-blog.csdnimg.cn/1f5e188fef6142eca85c1074208832ee.png"></p>
+<h1 id="6-可扩展的点"><a href="#6-可扩展的点" class="headerlink" title="6.可扩展的点"></a>6.可扩展的点</h1><p>传入的参数是加密后的，那么可以再写一个拦截器对入参dto中的属性进行解密，这里可以参考<br><a href="https://zjhblog.gitee.io/zjh/2022/08/12/%E5%AF%B9dto%E6%8C%87%E5%AE%9A%E5%B1%9E%E6%80%A7%E4%B8%80%E9%94%AE%E5%8A%A0%E8%A7%A3%E5%AF%86/">对dto指定属性一键加解密</a></p>
+<p>也可以调用这个工具类直接写在这个AspectJ里面</p>
 
       
        <hr><span style="font-style: italic;color: gray;"> 生命以负熵为食，归整以抵抗熵增； </span>
