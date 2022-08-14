@@ -6,21 +6,27 @@
   <meta name="keywords" content="">
   <meta name="description" content="反射修改jsessionid实现session共享 | ZJH&#39;blog">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="本案例包括4个核心类：AopUtils：抽取出来的公共方法@ValidateGroup@ValidateFieldValidateAspectJHandler 功能包括：长度、值范围、正则匹配、非空校验 以下是设计思路、最终代码、测试结果 后续扩展只需要修改@ValidateField 和 ValidateAspectJHandler；例如如果是按照我第一份实习时候的代码架构，可以在Aspect">
+<meta name="description" content="1.Servlet监听器 ServletContext、HttpSession、ServletRequest的监听都是通过javax.servlet 包下定义的，他们都是servlet的特性，换句话说，他们不依赖于Spring，而依赖于web容器（tomcat容器），他们的加载优先于Spring容器 Servlet监听器有用处，但是没有Spring监听器用的多，用的方便；并且通常可以用HttpSe">
 <meta property="og:type" content="article">
-<meta property="og:title" content="AOP+反射：接口参数校验">
-<meta property="og:url" content="https://zjhblog.gitee.io/2022/08/13/AOP-%E5%8F%8D%E5%B0%84%EF%BC%9A%E6%8E%A5%E5%8F%A3%E5%8F%82%E6%95%B0%E6%A0%A1%E9%AA%8C/index.html">
+<meta property="og:title" content="Spring、Servlet监听器">
+<meta property="og:url" content="https://zjhblog.gitee.io/2022/08/14/Spring%E3%80%81Servlet%E7%9B%91%E5%90%AC%E5%99%A8/index.html">
 <meta property="og:site_name" content="ZJH&#39;blog">
-<meta property="og:description" content="本案例包括4个核心类：AopUtils：抽取出来的公共方法@ValidateGroup@ValidateFieldValidateAspectJHandler 功能包括：长度、值范围、正则匹配、非空校验 以下是设计思路、最终代码、测试结果 后续扩展只需要修改@ValidateField 和 ValidateAspectJHandler；例如如果是按照我第一份实习时候的代码架构，可以在Aspect">
+<meta property="og:description" content="1.Servlet监听器 ServletContext、HttpSession、ServletRequest的监听都是通过javax.servlet 包下定义的，他们都是servlet的特性，换句话说，他们不依赖于Spring，而依赖于web容器（tomcat容器），他们的加载优先于Spring容器 Servlet监听器有用处，但是没有Spring监听器用的多，用的方便；并且通常可以用HttpSe">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/e5f4ac9d44474348ba35f74fc9263209.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/09ae76ac260b4970a236069c7e020fa6.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/1f5e188fef6142eca85c1074208832ee.png">
-<meta property="article:published_time" content="2022-08-13T09:12:17.000Z">
-<meta property="article:modified_time" content="2022-08-13T09:30:37.332Z">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/12e25b4e04b048b8be588db230769b26.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b1c3fa9dfe8f42e1b7ea48967e353f25.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/1ba92b971a804d79823eeef5f62e9733.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/19d04361b5834e95bbe60f7f96c00c4d.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/97a00ec1378f4e7f835f8d0448de819d.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b7c8f3983c3d4b4789c11a10eca876cc.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/077b51c0573f4111a6102f7a618838b0.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e1e200007df2422d9279852fde1274ac.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/15a94ae683a14c4b83a6104f1fba77a6.png">
+<meta property="article:published_time" content="2022-08-14T13:01:46.000Z">
+<meta property="article:modified_time" content="2022-08-14T13:04:28.052Z">
 <meta property="article:author" content="ZJH">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://img-blog.csdnimg.cn/e5f4ac9d44474348ba35f74fc9263209.png">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/12e25b4e04b048b8be588db230769b26.png">
 
 
 <link rel="icon" href="/img/QQ图片20211224224200.jpg">
@@ -130,7 +136,7 @@
     <li>
         <div class="all active" data-rel="全部文章">全部文章
             
-                <small>(44)</small>
+                <small>(42)</small>
             
         </div>
     </li>
@@ -211,7 +217,7 @@
                     <div data-rel="Java">
                         
                         Java
-                        <small>(8)</small>
+                        <small>(6)</small>
                         
                     </div>
                     
@@ -246,8 +252,8 @@
         
     </div>
 </div>
-<input type="hidden" id="yelog_site_posts_number" value="44">
-<input type="hidden" id="yelog_site_word_count" value="72.7k">
+<input type="hidden" id="yelog_site_posts_number" value="42">
+<input type="hidden" id="yelog_site_word_count" value="73.8k">
 <div style="display: none">
     <span id="busuanzi_value_site_uv"></span>
     <span id="busuanzi_value_site_pv"></span>
@@ -302,6 +308,14 @@
 
     
     <nav id="title-list-nav">
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/08/14/Spring%E3%80%81Servlet%E7%9B%91%E5%90%AC%E5%99%A8/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Spring、Servlet监听器">Spring、Servlet监听器</span>
+            <span class="post-date" title="2022-08-14 21:01:46">2022/08/14</span>
+        </a>
         
         <a  class="全部文章 工作笔记 "
            href="/zjh/2022/08/13/AOP-%E5%8F%8D%E5%B0%84%EF%BC%9A%E6%8E%A5%E5%8F%A3%E5%8F%82%E6%95%B0%E6%A0%A1%E9%AA%8C/"
@@ -472,19 +486,19 @@
         </a>
         
         <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/06/25/%E8%A1%8C%E7%A8%8B%E7%BC%96%E7%A0%81%E5%8E%8B%E7%BC%A9%E5%9B%BE%E7%89%87/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="行程编码压缩图片">行程编码压缩图片</span>
+            <span class="post-date" title="2022-06-25 01:35:20">2022/06/25</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
            href="/zjh/2022/04/21/%E5%B8%B8%E8%A7%81%E6%8E%92%E5%BA%8F/"
            data-tag=""
            data-author="" >
             <span class="post-title" title="常见排序">常见排序</span>
             <span class="post-date" title="2022-04-21 09:56:37">2022/04/21</span>
-        </a>
-        
-        <a  class="全部文章 Java "
-           href="/zjh/2022/04/21/Stream%E6%A1%88%E4%BE%8B%EF%BC%9A%E5%A4%9A%E5%A4%A9%E5%88%86%E7%BB%84%E7%BB%9F%E8%AE%A1%E7%9A%84%E6%B1%87%E6%80%BB/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Stream案例：多天分组统计的汇总">Stream案例：多天分组统计的汇总</span>
-            <span class="post-date" title="2022-04-21 09:53:59">2022/04/21</span>
         </a>
         
         <a  class="全部文章 Java "
@@ -501,14 +515,6 @@
            data-author="" >
             <span class="post-title" title="Lambda表达式和方法引用">Lambda表达式和方法引用</span>
             <span class="post-date" title="2022-04-21 09:50:42">2022/04/21</span>
-        </a>
-        
-        <a  class="全部文章 Java "
-           href="/zjh/2022/04/21/AspectJ%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="AspectJ简单使用">AspectJ简单使用</span>
-            <span class="post-date" title="2022-04-21 09:49:49">2022/04/21</span>
         </a>
         
         <a  class="全部文章 Java "
@@ -599,14 +605,6 @@
             <span class="post-date" title="2022-02-20 00:17:43">2022/02/20</span>
         </a>
         
-        <a  class="全部文章 Java "
-           href="/zjh/2022/02/09/IO%E4%BC%A0%E8%BE%93%E5%9B%BE%E7%89%87%E8%83%BD%E6%89%93%E5%BC%80%E4%BD%86%E8%8A%B1%E5%B1%8F/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="IO传输图片能打开但花屏">IO传输图片能打开但花屏</span>
-            <span class="post-date" title="2022-02-09 15:39:11">2022/02/09</span>
-        </a>
-        
         <a  class="全部文章 机器学习 "
            href="/zjh/2022/01/11/%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E6%B3%B0%E5%9D%A6%E5%B0%BC%E5%85%8B%E5%8F%B7%E8%8E%B7%E6%95%91%E9%A2%84%E6%B5%8B/"
            data-tag=""
@@ -647,14 +645,6 @@
             <span class="post-date" title="2021-12-25 01:59:30">2021/12/25</span>
         </a>
         
-        <a  class="全部文章 数据结构算法 "
-           href="/zjh/2021/12/25/RLE%E7%AE%97%E6%B3%95%E7%9A%84Java%E5%AE%9E%E7%8E%B0/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="RLE算法的Java实现">RLE算法的Java实现</span>
-            <span class="post-date" title="2021-12-25 01:35:20">2021/12/25</span>
-        </a>
-        
         <div id="no-item-tips">
 
         </div>
@@ -693,12 +683,12 @@
     </div>
     <div class="article-meta">
         
-            发布时间 : <time class="date" title='最后更新: 2022-08-03 22:05:05'>2022-08-03 21:53</time>
+            发布时间 : <time class="date" title='最后更新: 2022-08-14 20:46:17'>2022-08-03 21:53</time>
         
     </div>
     <div class="article-meta">
         
-        <span>字数:3.1k</span>
+        <span>字数:3.2k</span>
         
         
         <span id="busuanzi_container_page_pv">
@@ -717,7 +707,7 @@
     
     <div class="toc-ref">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#0-Session%E5%9F%9F%E7%9A%84%E5%A4%A7%E4%BD%93%E6%B5%81%E7%A8%8B"><span class="toc-text">0.Session域的大体流程</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#0-1%E7%AC%AC%E4%B8%80%E6%AC%A1%EF%BC%9A%E5%88%9B%E5%BB%BASession"><span class="toc-text">0.1第一次：创建Session</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0-2%E7%AC%AC%E4%BA%8C%E6%AC%A1%EF%BC%9A%E8%8E%B7%E5%8F%96Session"><span class="toc-text">0.2第二次：获取Session</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E5%89%8D%E7%AB%AF%E8%AE%BE%E7%BD%AECookie%E5%86%8D%E5%8F%91%E9%80%81"><span class="toc-text">1.前端设置Cookie再发送</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E5%90%8E%E7%AB%AF%E8%AE%BE%E7%BD%AECookie%E5%80%BC"><span class="toc-text">2.后端设置Cookie值</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1%E8%BE%93%E5%87%BAJSESSIONID"><span class="toc-text">2.1输出JSESSIONID</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2%E4%BF%AE%E6%94%B9JSESSIONID"><span class="toc-text">2.2修改JSESSIONID</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3getSession-%E4%B8%8D%E5%8F%98"><span class="toc-text">2.3getSession()不变</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E5%90%8E%E7%AB%AF%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E8%83%BD%E4%BF%AE%E6%94%B9Session"><span class="toc-text">3.后端为什么不能修改Session</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1%E8%99%BD%E7%84%B6%E5%90%8E%E7%AB%AF%E6%98%AF%E5%8F%AF%E4%BB%A5%E4%BF%AE%E6%94%B9Cookie%E7%9A%84"><span class="toc-text">3.1虽然后端是可以修改Cookie的</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2%E4%BF%AE%E6%94%B9JSESSIONID%E4%BD%86%E6%97%A0%E6%95%88"><span class="toc-text">3.2修改JSESSIONID但无效</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-1debug%EF%BC%9AgetSession"><span class="toc-text">3.2.1debug：getSession()</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-session%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B-%E5%A4%9A%E6%AC%A1%E8%AF%B7%E6%B1%82%E7%9A%84%E8%A7%92%E5%BA%A6"><span class="toc-text">4.session初始化过程(多次请求的角度)</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1%E5%88%A9%E7%94%A8debug%E6%8A%80%E5%B7%A7%E5%AE%9A%E4%BD%8D"><span class="toc-text">4.1利用debug技巧定位</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2%E6%A8%A1%E6%8B%9F%E5%88%9B%E5%BB%BASession"><span class="toc-text">4.2模拟创建Session</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-1%E5%88%9B%E5%BB%BASession"><span class="toc-text">4.2.1创建Session</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-2%E5%AF%BB%E6%89%BESession"><span class="toc-text">4.2.2寻找Session</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-3%E9%87%8A%E6%94%BE"><span class="toc-text">4.2.3释放</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-3%E6%A8%A1%E6%8B%9F%E7%AC%AC%E4%BA%8C%E6%AC%A1%E8%AF%B7%E6%B1%82Session"><span class="toc-text">4.3模拟第二次请求Session</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-1%E7%9B%B4%E6%8E%A5%E5%AF%BB%E6%89%BESession"><span class="toc-text">4.3.1直接寻找Session</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-2%E9%87%8A%E6%94%BE"><span class="toc-text">4.3.2释放</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-4%E5%B0%8F%E7%BB%93"><span class="toc-text">4.4小结</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-getSession%E7%9A%84%E5%AE%9E%E7%8E%B0-%E5%A4%9A%E6%AC%A1%E8%B0%83%E7%94%A8%E7%9A%84%E8%A7%92%E5%BA%A6"><span class="toc-text">5.getSession的实现(多次调用的角度)</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#5-1%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84"><span class="toc-text">5.1基本结构</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-1%E5%A4%96%E8%A7%82%E6%A8%A1%E5%BC%8FFacade"><span class="toc-text">5.1.1外观模式Facade</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-2Request%E4%B8%AD%E7%9A%84getSession-create"><span class="toc-text">5.1.2Request中的getSession(create)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-2%E4%B8%80%E6%AC%A1%E8%AF%B7%E6%B1%82%EF%BC%8C%E5%A4%9A%E6%AC%A1getSession"><span class="toc-text">5.2一次请求，多次getSession()</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-3%E5%B0%8F%E7%BB%93"><span class="toc-text">5.3小结</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#6-Session%E6%B5%81%E7%A8%8B%E6%80%BB%E7%BB%93"><span class="toc-text">6.Session流程总结</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#6-1%E5%88%9B%E5%BB%BA%E5%92%8C%E8%8E%B7%E5%8F%96%E9%83%BD%E6%98%AF%E6%87%92%E6%B1%89%E5%BC%8F%E7%9A%84"><span class="toc-text">6.1创建和获取都是懒汉式的</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-1-1%E5%88%9B%E5%BB%BA%E6%87%92%E6%B1%89%E5%BC%8F"><span class="toc-text">6.1.1创建懒汉式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-1-2%E8%8E%B7%E5%8F%96%E6%87%92%E6%B1%89%E5%BC%8F"><span class="toc-text">6.1.2获取懒汉式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-2%E8%B7%AF%E5%BE%84%E5%8F%98%E9%87%8F%E5%8E%86%E5%8F%B2%E9%81%97%E7%95%99%E9%97%AE%E9%A2%98"><span class="toc-text">6.2路径变量历史遗留问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-3%E5%88%9B%E5%BB%BA%E3%80%81%E6%95%B0%E6%8D%AE%E9%A2%84%E7%BD%AE%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="toc-text">6.3创建、数据预置的关系</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#7-CoyoteAdapter-%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B"><span class="toc-text">7.CoyoteAdapter(初始化过程)</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#7-1postParseRequest"><span class="toc-text">7.1postParseRequest()</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#7-1-1request%E5%AF%B9%E8%B1%A1%E8%B5%8B%E5%80%BC"><span class="toc-text">7.1.1request对象赋值</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-1-2%E5%85%88parsePathParameters%E8%A7%A3%E6%9E%90%E8%B7%AF%E5%BE%84%E5%8F%98%E9%87%8F"><span class="toc-text">7.1.2先parsePathParameters解析路径变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-1-3%E7%84%B6%E5%90%8EparseSessionCookiesId"><span class="toc-text">7.1.3然后parseSessionCookiesId</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-1-3%E8%A2%AB%E8%A6%86%E7%9B%96%E7%9A%84%E8%B7%AF%E5%BE%84%E5%8F%98%E9%87%8Fjsessionid-%E5%8E%86%E5%8F%B2%E9%81%97%E7%95%99%E9%97%AE%E9%A2%98"><span class="toc-text">7.1.3被覆盖的路径变量jsessionid(历史遗留问题)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-2%E5%B0%8F%E7%BB%93"><span class="toc-text">7.2小结</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#7-2-1%E5%90%8E%E7%AB%AF%E4%BF%AE%E6%94%B9%E4%B8%BA%E4%BD%95%E6%B2%A1%E7%94%A8"><span class="toc-text">7.2.1后端修改为何没用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-2-2Cookie%E5%92%8CServerCookie"><span class="toc-text">7.2.2Cookie和ServerCookie</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#8-%E5%8F%8D%E5%B0%84"><span class="toc-text">8.反射</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#8-0%E6%92%B8%E7%BB%84%E4%BB%B6%E7%9A%84%E5%89%8D%E6%8F%90%E7%9F%A5%E8%AF%86"><span class="toc-text">8.0撸组件的前提知识</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-1%E6%A0%B9%E6%8D%AEJSESSIONID%E7%9B%B4%E6%8E%A5%E8%BF%94%E5%9B%9ESession%E5%AF%B9%E8%B1%A1"><span class="toc-text">8.1根据JSESSIONID直接返回Session对象</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-2%E5%B0%86%E6%8C%87%E5%AE%9A%E7%9A%84Session%E5%92%8CJSESSIONID%E8%B5%8B%E5%80%BC%E7%BB%99request"><span class="toc-text">8.2将指定的Session和JSESSIONID赋值给request</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-3%E6%9C%80%E7%BB%88%E5%B7%A5%E5%85%B7%E7%B1%BB"><span class="toc-text">8.3最终工具类</span></a></li></ol></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#0-Session%E5%9F%9F%E7%9A%84%E5%A4%A7%E4%BD%93%E6%B5%81%E7%A8%8B"><span class="toc-text">0.Session域的大体流程</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#0-1%E7%AC%AC%E4%B8%80%E6%AC%A1%EF%BC%9A%E5%88%9B%E5%BB%BASession"><span class="toc-text">0.1第一次：创建Session</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0-2%E7%AC%AC%E4%BA%8C%E6%AC%A1%EF%BC%9A%E8%8E%B7%E5%8F%96Session"><span class="toc-text">0.2第二次：获取Session</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E5%89%8D%E7%AB%AF%E8%AE%BE%E7%BD%AECookie%E5%86%8D%E5%8F%91%E9%80%81"><span class="toc-text">1.前端设置Cookie再发送</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E5%90%8E%E7%AB%AF%E8%AE%BE%E7%BD%AECookie%E5%80%BC"><span class="toc-text">2.后端设置Cookie值</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1%E8%BE%93%E5%87%BAJSESSIONID"><span class="toc-text">2.1输出JSESSIONID</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2%E4%BF%AE%E6%94%B9JSESSIONID"><span class="toc-text">2.2修改JSESSIONID</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3getSession-%E4%B8%8D%E5%8F%98"><span class="toc-text">2.3getSession()不变</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E5%90%8E%E7%AB%AF%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E8%83%BD%E4%BF%AE%E6%94%B9Session"><span class="toc-text">3.后端为什么不能修改Session</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1%E8%99%BD%E7%84%B6%E5%90%8E%E7%AB%AF%E6%98%AF%E5%8F%AF%E4%BB%A5%E4%BF%AE%E6%94%B9Cookie%E7%9A%84"><span class="toc-text">3.1虽然后端是可以修改Cookie的</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2%E4%BF%AE%E6%94%B9JSESSIONID%E4%BD%86%E6%97%A0%E6%95%88"><span class="toc-text">3.2修改JSESSIONID但无效</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-1debug%EF%BC%9AgetSession"><span class="toc-text">3.2.1debug：getSession()</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-session%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B-%E5%A4%9A%E6%AC%A1%E8%AF%B7%E6%B1%82%E7%9A%84%E8%A7%92%E5%BA%A6"><span class="toc-text">4.session初始化过程(多次请求的角度)</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1%E5%88%A9%E7%94%A8debug%E6%8A%80%E5%B7%A7%E5%AE%9A%E4%BD%8D"><span class="toc-text">4.1利用debug技巧定位</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2%E6%A8%A1%E6%8B%9F%E5%88%9B%E5%BB%BASession"><span class="toc-text">4.2模拟创建Session</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-1%E5%88%9B%E5%BB%BASession"><span class="toc-text">4.2.1创建Session</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-2%E5%AF%BB%E6%89%BESession"><span class="toc-text">4.2.2寻找Session</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-3%E9%87%8A%E6%94%BE"><span class="toc-text">4.2.3释放</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-3%E6%A8%A1%E6%8B%9F%E7%AC%AC%E4%BA%8C%E6%AC%A1%E8%AF%B7%E6%B1%82Session"><span class="toc-text">4.3模拟第二次请求Session</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-1%E7%9B%B4%E6%8E%A5%E5%AF%BB%E6%89%BESession"><span class="toc-text">4.3.1直接寻找Session</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-2%E9%87%8A%E6%94%BE"><span class="toc-text">4.3.2释放</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-4%E5%B0%8F%E7%BB%93"><span class="toc-text">4.4小结</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-getSession%E7%9A%84%E5%AE%9E%E7%8E%B0-%E5%A4%9A%E6%AC%A1%E8%B0%83%E7%94%A8%E7%9A%84%E8%A7%92%E5%BA%A6"><span class="toc-text">5.getSession的实现(多次调用的角度)</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#5-1%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84"><span class="toc-text">5.1基本结构</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-1%E5%A4%96%E8%A7%82%E6%A8%A1%E5%BC%8FFacade"><span class="toc-text">5.1.1外观模式Facade</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-2Request%E4%B8%AD%E7%9A%84getSession-create"><span class="toc-text">5.1.2Request中的getSession(create)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-2%E4%B8%80%E6%AC%A1%E8%AF%B7%E6%B1%82%EF%BC%8C%E5%A4%9A%E6%AC%A1getSession"><span class="toc-text">5.2一次请求，多次getSession()</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-3%E5%B0%8F%E7%BB%93"><span class="toc-text">5.3小结</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#6-Session%E6%B5%81%E7%A8%8B%E6%80%BB%E7%BB%93"><span class="toc-text">6.Session流程总结</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#6-1%E5%88%9B%E5%BB%BA%E5%92%8C%E8%8E%B7%E5%8F%96%E9%83%BD%E6%98%AF%E6%87%92%E6%B1%89%E5%BC%8F%E7%9A%84"><span class="toc-text">6.1创建和获取都是懒汉式的</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-1-1%E5%88%9B%E5%BB%BA%E6%87%92%E6%B1%89%E5%BC%8F"><span class="toc-text">6.1.1创建懒汉式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-1-2%E8%8E%B7%E5%8F%96%E6%87%92%E6%B1%89%E5%BC%8F"><span class="toc-text">6.1.2获取懒汉式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-2%E8%B7%AF%E5%BE%84%E5%8F%98%E9%87%8F%E5%8E%86%E5%8F%B2%E9%81%97%E7%95%99%E9%97%AE%E9%A2%98"><span class="toc-text">6.2路径变量历史遗留问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-3%E5%88%9B%E5%BB%BA%E3%80%81%E6%95%B0%E6%8D%AE%E9%A2%84%E7%BD%AE%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="toc-text">6.3创建、数据预置的关系</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#7-CoyoteAdapter-%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B"><span class="toc-text">7.CoyoteAdapter(初始化过程)</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#7-1postParseRequest"><span class="toc-text">7.1postParseRequest()</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#7-1-1request%E5%AF%B9%E8%B1%A1%E8%B5%8B%E5%80%BC"><span class="toc-text">7.1.1request对象赋值</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-1-2%E5%85%88parsePathParameters%E8%A7%A3%E6%9E%90%E8%B7%AF%E5%BE%84%E5%8F%98%E9%87%8F"><span class="toc-text">7.1.2先parsePathParameters解析路径变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-1-3%E7%84%B6%E5%90%8EparseSessionCookiesId"><span class="toc-text">7.1.3然后parseSessionCookiesId</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-1-3%E8%A2%AB%E8%A6%86%E7%9B%96%E7%9A%84%E8%B7%AF%E5%BE%84%E5%8F%98%E9%87%8Fjsessionid-%E5%8E%86%E5%8F%B2%E9%81%97%E7%95%99%E9%97%AE%E9%A2%98"><span class="toc-text">7.1.3被覆盖的路径变量jsessionid(历史遗留问题)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-2%E5%B0%8F%E7%BB%93"><span class="toc-text">7.2小结</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#7-2-1%E5%90%8E%E7%AB%AF%E4%BF%AE%E6%94%B9%E4%B8%BA%E4%BD%95%E6%B2%A1%E7%94%A8"><span class="toc-text">7.2.1后端修改为何没用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-2-2Cookie%E5%92%8CServerCookie"><span class="toc-text">7.2.2Cookie和ServerCookie</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#8-%E5%8F%8D%E5%B0%84"><span class="toc-text">8.反射</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#8-0%E6%92%B8%E5%B7%A5%E5%85%B7%E7%B1%BB%E7%9A%84%E5%89%8D%E6%8F%90%E7%9F%A5%E8%AF%86"><span class="toc-text">8.0撸工具类的前提知识</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-1%E6%A0%B9%E6%8D%AEJSESSIONID%E7%9B%B4%E6%8E%A5%E8%BF%94%E5%9B%9ESession%E5%AF%B9%E8%B1%A1"><span class="toc-text">8.1根据JSESSIONID直接返回Session对象</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-2%E5%B0%86%E6%8C%87%E5%AE%9A%E7%9A%84Session%E5%92%8CJSESSIONID%E8%B5%8B%E5%80%BC%E7%BB%99request"><span class="toc-text">8.2将指定的Session和JSESSIONID赋值给request</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-3%E6%9C%80%E7%BB%88%E5%B7%A5%E5%85%B7%E7%B1%BB"><span class="toc-text">8.3最终工具类</span></a></li></ol></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -733,10 +723,10 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>其实，原生的API是不行的。（<strong>不过文章末尾我在通读源码之后用反射写了一个Session共享的方式，需要的可以直接使用</strong>）</p>
+        <p>1~7为源码分析，8为最终改造代码（工具类）</p>
 <ul>
 <li>虽然说前端可以通过伪造Cookie中的JESESSIONID来模拟劫持</li>
-<li>而后端<strong>并不能直接通过原生API</strong>成功修改JESSIONID获取指定session。</li>
+<li>而后端<strong>并不能直接通过原生API</strong>成功修改JESSIONID获取指定session。我在阅读源码后推测很多年前支持直接指定jsessionid，但现在只能通过反射修改session获取逻辑</li>
 <li> 本案例一共12000字，源码分析部分10000字左右</li>
 </ul>
 <h1 id="0-Session域的大体流程"><a href="#0-Session域的大体流程" class="headerlink" title="0.Session域的大体流程"></a>0.Session域的大体流程</h1><p>先大概了解一下为了创建Session会话域，原生API做了什么</p>
@@ -872,7 +862,7 @@ HttpSession sessio2n = request.getSession();
 <p>ServerCookie来自于coyoteRequest，即tomcat的底层实现，因此不能针对其Cookie进行修改从而达到模拟session的效果<br><img src="https://img-blog.csdnimg.cn/c23451ee616b4bdaba411117939b2c77.png"><br><img src="https://img-blog.csdnimg.cn/251b2b5c84b8424583c463d2f36aad76.png"></p>
 <h1 id="8-反射"><a href="#8-反射" class="headerlink" title="8.反射"></a>8.反射</h1><p>因为<code>request.getSession()</code>调用的是Reuqest类下的<code>doGetSession()</code>，<code>requestedSessionId</code>又是Request下的属性，那么能不能通过反射修改requestedSessionId的值来修改<code>findSession()</code>的结果呢？答案是可以</p>
 <p><img src="https://img-blog.csdnimg.cn/acdd4d91d81f4aa9ad6f7232257df7fa.png"></p>
-<h2 id="8-0撸组件的前提知识"><a href="#8-0撸组件的前提知识" class="headerlink" title="8.0撸组件的前提知识"></a>8.0撸组件的前提知识</h2><ul>
+<h2 id="8-0撸工具类的前提知识"><a href="#8-0撸工具类的前提知识" class="headerlink" title="8.0撸工具类的前提知识"></a>8.0撸工具类的前提知识</h2><ul>
 <li>通常作为形参进行传递的<code>HttpServletRequest</code>是一个接口，实际上传递是是其实现类<code>RequestFacade</code>，在涉及到反射操作的时候需要再开辟一个<code>RequestFacade</code>的栈空间指向<code>HttpServletRequest</code>堆空间</li>
 <li>外观模式：<code>RequestFacade</code>实际上大部分调用的是<code>Request</code></li>
 <li>Request下的<code>doGetSession(Boolean craete)</code>是最终获取Session对象的方法，包括初始化时session的生成、httpServletRequest.getSeesion()获取。区别是<strong>前者形参create=true、后者形参create=false</strong></li>
@@ -886,9 +876,9 @@ HttpSession sessio2n = request.getSession();
 <h2 id="8-1根据JSESSIONID直接返回Session对象"><a href="#8-1根据JSESSIONID直接返回Session对象" class="headerlink" title="8.1根据JSESSIONID直接返回Session对象"></a>8.1根据JSESSIONID直接返回Session对象</h2><pre><code>   /**
      * @param httpServletRequest 多态性，本质是requestFacade
      * @param jsessionid 指定的jsessionid
-     * @return org.apache.catalina.Session 指定的Session对象
+     * @return javax.servlet.http.HttpSession 指定的Session对象
      **/
-    public static Session getSession(HttpServletRequest httpServletRequest,String jsessionid) throws  Exception&#123;
+    public static HttpSession getSession(HttpServletRequest httpServletRequest,String jsessionid) throws  Exception&#123;
         RequestFacade requestFacade = (RequestFacade)httpServletRequest;
         Class&lt;? extends RequestFacade&gt; facadeClazz = requestFacade.getClass();
         Field requestField = facadeClazz.getDeclaredField(&quot;request&quot;);
@@ -897,7 +887,7 @@ HttpSession sessio2n = request.getSession();
         Context context = request.getContext();
         Manager manager = context.getManager();
         Session session = manager.findSession(jsessionid);
-        return session;
+        return session.getSession();
     &#125;
 </code></pre>
 <h2 id="8-2将指定的Session和JSESSIONID赋值给request"><a href="#8-2将指定的Session和JSESSIONID赋值给request" class="headerlink" title="8.2将指定的Session和JSESSIONID赋值给request"></a>8.2将指定的Session和JSESSIONID赋值给request</h2><pre><code>/**
@@ -932,6 +922,7 @@ public static void setSession2Request(HttpServletRequest httpServletRequest,Stri
 <pre><code>import java.io.IOException;
 import java.lang.reflect.Field;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import org.apache.catalina.Context;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
@@ -939,6 +930,7 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.RequestFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 /**
  * @Description Session共享的工具类，用于Session共享，可实现传入JSESSIONID返回对应Session对象，也可实现传入JSESSIONID永久修改request
@@ -952,7 +944,7 @@ public class SessionShareUtils &#123;
      * @param jsessionid 指定的jsessionid
      * @return org.apache.catalina.Session 指定的Session对象
      **/
-    public static Session getSession(HttpServletRequest httpServletRequest,String jsessionid) &#123;
+    public static HttpSession getSession(HttpServletRequest httpServletRequest,String jsessionid) &#123;
 
         Session session = null;
         try &#123;
@@ -975,7 +967,7 @@ public class SessionShareUtils &#123;
         catch (IOException e) &#123;
             logger.error(&quot;HttpServletRequest的IO异常&#123;&#125;&quot;,e);
         &#125;
-        return session;
+        return session.getSession();
     &#125;
 
     /**

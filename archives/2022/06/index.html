@@ -2,25 +2,31 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Stream案例：多天分组统计的汇总 | ZJH&#39;blog</title>
+  <title>ZJH&#39;blog</title>
   <meta name="keywords" content="">
-  <meta name="description" content="Stream案例：多天分组统计的汇总 | ZJH&#39;blog">
+  <meta name="description" content="ZJH&#39;blog">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="本案例包括4个核心类：AopUtils：抽取出来的公共方法@ValidateGroup@ValidateFieldValidateAspectJHandler 功能包括：长度、值范围、正则匹配、非空校验 以下是设计思路、最终代码、测试结果 后续扩展只需要修改@ValidateField 和 ValidateAspectJHandler；例如如果是按照我第一份实习时候的代码架构，可以在Aspect">
+<meta name="description" content="1.Servlet监听器 ServletContext、HttpSession、ServletRequest的监听都是通过javax.servlet 包下定义的，他们都是servlet的特性，换句话说，他们不依赖于Spring，而依赖于web容器（tomcat容器），他们的加载优先于Spring容器 Servlet监听器有用处，但是没有Spring监听器用的多，用的方便；并且通常可以用HttpSe">
 <meta property="og:type" content="article">
-<meta property="og:title" content="AOP+反射：接口参数校验">
-<meta property="og:url" content="https://zjhblog.gitee.io/2022/08/13/AOP-%E5%8F%8D%E5%B0%84%EF%BC%9A%E6%8E%A5%E5%8F%A3%E5%8F%82%E6%95%B0%E6%A0%A1%E9%AA%8C/index.html">
+<meta property="og:title" content="Spring、Servlet监听器">
+<meta property="og:url" content="https://zjhblog.gitee.io/2022/08/14/Spring%E3%80%81Servlet%E7%9B%91%E5%90%AC%E5%99%A8/index.html">
 <meta property="og:site_name" content="ZJH&#39;blog">
-<meta property="og:description" content="本案例包括4个核心类：AopUtils：抽取出来的公共方法@ValidateGroup@ValidateFieldValidateAspectJHandler 功能包括：长度、值范围、正则匹配、非空校验 以下是设计思路、最终代码、测试结果 后续扩展只需要修改@ValidateField 和 ValidateAspectJHandler；例如如果是按照我第一份实习时候的代码架构，可以在Aspect">
+<meta property="og:description" content="1.Servlet监听器 ServletContext、HttpSession、ServletRequest的监听都是通过javax.servlet 包下定义的，他们都是servlet的特性，换句话说，他们不依赖于Spring，而依赖于web容器（tomcat容器），他们的加载优先于Spring容器 Servlet监听器有用处，但是没有Spring监听器用的多，用的方便；并且通常可以用HttpSe">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/e5f4ac9d44474348ba35f74fc9263209.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/09ae76ac260b4970a236069c7e020fa6.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/1f5e188fef6142eca85c1074208832ee.png">
-<meta property="article:published_time" content="2022-08-13T09:12:17.000Z">
-<meta property="article:modified_time" content="2022-08-13T09:30:37.332Z">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/12e25b4e04b048b8be588db230769b26.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b1c3fa9dfe8f42e1b7ea48967e353f25.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/1ba92b971a804d79823eeef5f62e9733.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/19d04361b5834e95bbe60f7f96c00c4d.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/97a00ec1378f4e7f835f8d0448de819d.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b7c8f3983c3d4b4789c11a10eca876cc.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/077b51c0573f4111a6102f7a618838b0.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e1e200007df2422d9279852fde1274ac.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/15a94ae683a14c4b83a6104f1fba77a6.png">
+<meta property="article:published_time" content="2022-08-14T13:01:46.000Z">
+<meta property="article:modified_time" content="2022-08-14T13:04:28.052Z">
 <meta property="article:author" content="ZJH">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://img-blog.csdnimg.cn/e5f4ac9d44474348ba35f74fc9263209.png">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/12e25b4e04b048b8be588db230769b26.png">
 
 
 <link rel="icon" href="/img/QQ图片20211224224200.jpg">
@@ -60,7 +66,7 @@
 
 
 <body>
-<aside class="nav">
+<aside class="nav mobile">
     <div class="nav-left">
         <a href="/zjh/"
    class="avatar_target">
@@ -130,7 +136,7 @@
     <li>
         <div class="all active" data-rel="全部文章">全部文章
             
-                <small>(44)</small>
+                <small>(42)</small>
             
         </div>
     </li>
@@ -211,7 +217,7 @@
                     <div data-rel="Java">
                         
                         Java
-                        <small>(8)</small>
+                        <small>(6)</small>
                         
                     </div>
                     
@@ -246,8 +252,8 @@
         
     </div>
 </div>
-<input type="hidden" id="yelog_site_posts_number" value="44">
-<input type="hidden" id="yelog_site_word_count" value="72.7k">
+<input type="hidden" id="yelog_site_posts_number" value="42">
+<input type="hidden" id="yelog_site_word_count" value="73.8k">
 <div style="display: none">
     <span id="busuanzi_value_site_uv"></span>
     <span id="busuanzi_value_site_pv"></span>
@@ -302,6 +308,14 @@
 
     
     <nav id="title-list-nav">
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/08/14/Spring%E3%80%81Servlet%E7%9B%91%E5%90%AC%E5%99%A8/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Spring、Servlet监听器">Spring、Servlet监听器</span>
+            <span class="post-date" title="2022-08-14 21:01:46">2022/08/14</span>
+        </a>
         
         <a  class="全部文章 工作笔记 "
            href="/zjh/2022/08/13/AOP-%E5%8F%8D%E5%B0%84%EF%BC%9A%E6%8E%A5%E5%8F%A3%E5%8F%82%E6%95%B0%E6%A0%A1%E9%AA%8C/"
@@ -472,19 +486,19 @@
         </a>
         
         <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/06/25/%E8%A1%8C%E7%A8%8B%E7%BC%96%E7%A0%81%E5%8E%8B%E7%BC%A9%E5%9B%BE%E7%89%87/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="行程编码压缩图片">行程编码压缩图片</span>
+            <span class="post-date" title="2022-06-25 01:35:20">2022/06/25</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
            href="/zjh/2022/04/21/%E5%B8%B8%E8%A7%81%E6%8E%92%E5%BA%8F/"
            data-tag=""
            data-author="" >
             <span class="post-title" title="常见排序">常见排序</span>
             <span class="post-date" title="2022-04-21 09:56:37">2022/04/21</span>
-        </a>
-        
-        <a  class="全部文章 Java "
-           href="/zjh/2022/04/21/Stream%E6%A1%88%E4%BE%8B%EF%BC%9A%E5%A4%9A%E5%A4%A9%E5%88%86%E7%BB%84%E7%BB%9F%E8%AE%A1%E7%9A%84%E6%B1%87%E6%80%BB/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Stream案例：多天分组统计的汇总">Stream案例：多天分组统计的汇总</span>
-            <span class="post-date" title="2022-04-21 09:53:59">2022/04/21</span>
         </a>
         
         <a  class="全部文章 Java "
@@ -501,14 +515,6 @@
            data-author="" >
             <span class="post-title" title="Lambda表达式和方法引用">Lambda表达式和方法引用</span>
             <span class="post-date" title="2022-04-21 09:50:42">2022/04/21</span>
-        </a>
-        
-        <a  class="全部文章 Java "
-           href="/zjh/2022/04/21/AspectJ%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="AspectJ简单使用">AspectJ简单使用</span>
-            <span class="post-date" title="2022-04-21 09:49:49">2022/04/21</span>
         </a>
         
         <a  class="全部文章 Java "
@@ -599,14 +605,6 @@
             <span class="post-date" title="2022-02-20 00:17:43">2022/02/20</span>
         </a>
         
-        <a  class="全部文章 Java "
-           href="/zjh/2022/02/09/IO%E4%BC%A0%E8%BE%93%E5%9B%BE%E7%89%87%E8%83%BD%E6%89%93%E5%BC%80%E4%BD%86%E8%8A%B1%E5%B1%8F/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="IO传输图片能打开但花屏">IO传输图片能打开但花屏</span>
-            <span class="post-date" title="2022-02-09 15:39:11">2022/02/09</span>
-        </a>
-        
         <a  class="全部文章 机器学习 "
            href="/zjh/2022/01/11/%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E6%B3%B0%E5%9D%A6%E5%B0%BC%E5%85%8B%E5%8F%B7%E8%8E%B7%E6%95%91%E9%A2%84%E6%B5%8B/"
            data-tag=""
@@ -647,14 +645,6 @@
             <span class="post-date" title="2021-12-25 01:59:30">2021/12/25</span>
         </a>
         
-        <a  class="全部文章 数据结构算法 "
-           href="/zjh/2021/12/25/RLE%E7%AE%97%E6%B3%95%E7%9A%84Java%E5%AE%9E%E7%8E%B0/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="RLE算法的Java实现">RLE算法的Java实现</span>
-            <span class="post-date" title="2021-12-25 01:35:20">2021/12/25</span>
-        </a>
-        
         <div id="no-item-tips">
 
         </div>
@@ -671,53 +661,12 @@
         </div>
     </div>
 </aside>
-<div id="post">
+<div id="post" class="index">
     <div class="pjax">
-        <article id="post-Stream案例：多天分组统计的汇总" class="article article-type-post" itemscope itemprop="blogPost">
+        <article class="index">
+            <div class="toc-ref">
     
-        <h1 class="article-title">Stream案例：多天分组统计的汇总</h1>
-    
-    <div class="article-meta">
-        
-        
-        
-        <span class="book">
-            <i class="iconfont icon-category"></i>
-            
-            
-            <a  data-rel="Java">Java</a>
-            
-        </span>
-        
-        
-    </div>
-    <div class="article-meta">
-        
-            发布时间 : <time class="date" title='最后更新: 2022-08-13 17:32:48'>2022-04-21 09:53</time>
-        
-    </div>
-    <div class="article-meta">
-        
-        <span>字数:420</span>
-        
-        
-        <span id="busuanzi_container_page_pv">
-            阅读 :<span id="busuanzi_value_page_pv">
-                <span class="count-comment">
-                    <span class="spinner">
-                      <div class="cube1"></div>
-                      <div class="cube2"></div>
-                    </span>
-                </span>
-            </span>
-        </span>
-        
-        
-    </div>
-    
-    <div class="toc-ref">
-    
-        
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BC%95%E5%AF%BC"><span class="toc-text">引导</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%A5%E5%8D%9A%E5%AE%A2%E4%B8%8B%E7%9A%84%E5%BF%AB%E6%8D%B7%E9%94%AE"><span class="toc-text">该博客下的快捷键</span></a></li></ol></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -730,100 +679,64 @@
     }
 </style>
 </div>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>场景：查询任意天数的分组数据，业务层调一次只能查某一天，这一天的数据就是已经分组过了的。<br>查询多天会有多次重复的分组，先对其进行flatMap调用业务层方法，然后groupingBy分组，最后reduce归约统计</p>
-<pre><code>  @PostMapping(&#123;&quot;          &quot;&#125;)
-  @ApiOperation(&quot;根据来源统计收益&quot;)
-  public  Result&lt;List&lt;VoRes&gt;&gt; amountBySource(@RequestBody VoReq req)&#123;
-    /**
-     * 因为VoReq的参数是LocalDate，传入的参数就是当天的00:00:00
-     */
-    //1.参数校验
-    CheckHandler.check(req.getEndDateTime().isAfter(LocalDate.now()),&quot;date-time-error&quot;,&quot;结束时间不能大于今天&quot;);
-    CheckHandler.check(req.getEndDateTime().isBefore(req.getStartDateTime()),&quot;choose-date-error&quot;,&quot;起始时间不能大于结束时间&quot;);
-    //2.统计天数：由于调用的业务层方法只针对某一天，且加入了缓存，统计天数以便合查询并并数据
-    long days = DAYS.between(req.getStartDateTime(),req.getEndDateTime()) + 1;
-    CheckHandler.check(days&gt;31 , &quot;date-time-overflow&quot;,&quot;日期跨度超过31天&quot;);
-    ZoneId zoneId = ZoneId.systemDefault();
-    //3.1 根据天数创建流,拿到LocalDate的流
-    ArrayList&lt;VoRes&gt; list = Lists.newArrayList();
+            <h1 id="引导"><a href="#引导" class="headerlink" title="引导"></a>引导</h1><h2 id="该博客下的快捷键"><a href="#该博客下的快捷键" class="headerlink" title="该博客下的快捷键"></a>该博客下的快捷键</h2><table>
+<thead>
+<tr>
+<th align="center">快捷键</th>
+<th align="center">功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">s/S</td>
+<td align="center">全屏/取消全屏</td>
+</tr>
+<tr>
+<td align="center">w/W</td>
+<td align="center">打开/关闭文章目录</td>
+</tr>
+<tr>
+<td align="center">i/I</td>
+<td align="center">获取搜索框焦点</td>
+</tr>
+<tr>
+<td align="center">j/J</td>
+<td align="center">向下滑动</td>
+</tr>
+<tr>
+<td align="center">k/K</td>
+<td align="center">向上滑动</td>
+</tr>
+<tr>
+<td align="center">gg/GG</td>
+<td align="center">到最顶端</td>
+</tr>
+<tr>
+<td align="center">shift+G/g</td>
+<td align="center">到最下端</td>
+</tr>
+<tr>
+<td align="center">ESC</td>
+<td align="center">1.如果输入框有内容，清除内容<br>2.如果输入框无内容，失去焦点</td>
+</tr>
+<tr>
+<td align="center">下</td>
+<td align="center">向下选择文章</td>
+</tr>
+<tr>
+<td align="center">上</td>
+<td align="center">向上选择文章</td>
+</tr>
+<tr>
+<td align="center">回车</td>
+<td align="center">打开当前选中的文章，若没有，则默认打开第一个</td>
+</tr>
+</tbody></table>
+<p>到目前为止已经写了<code class="article_number"></code>篇文章， 共<code class="site_word_count"></code>字。</p>
+<p>本站访问人数：<code class="site_uv"></code>人次 ， 访问量：<code class="site_pv"></code>次</p>
 
-    Stream.iterate(req.getStartDateTime(), e -&gt; e.plusDays(1)).limit(days)
-        //3.2 调用本地接口（本地接口间接调用远程接口）,并将返回的多个list整合为一个Stream&lt;VoRes&gt;
-        .flatMap(e-&gt;adminFundProfitStatisticsService.bySource(e).stream())
-        //3.3 收集，调用gourpingBy 将重复的source合并 ， 得到一个Map&lt;Integer, List&lt;VoRes&gt;&gt;
-        .collect(Collectors.groupingBy(VoRes::getSource))
-        //3.4 forEach 把每个List&lt;VoRes&gt;中的amount值统计出来，返回一个值
-        .forEach((k,v)-&gt;&#123;
-          VoRes one = new VoRes();
-          one.setSource(k);
-          one.setSumAmount(
-              v.stream()
-               .map(VoRes::getSumAmount)
-               .collect(Collectors.reducing(BigDecimal.ZERO,BigDecimal::add)));
-          list.add(one);
-        &#125;);
-    return Result.of(Type.SUCCESS_ZH,list);
-</code></pre>
-
-      
-       <hr><span style="font-style: italic;color: gray;"> 生命以负熵为食，归整以抵抗熵增； </span>
-    </div>
-</article>
-
-
-
-
-
-
-
-    
-        <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-    "HTML-CSS": {
-        preferredFont: "TeX",
-        availableFonts: ["STIX","TeX"],
-        linebreaks: { automatic:true },
-        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
-    },
-    tex2jax: {
-        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
-        processEscapes: true,
-        ignoreClass: "tex2jax_ignore|dno",
-        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-    },
-    TeX: {
-        equationNumbers: { autoNumber: "AMS" },
-        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
-        Macros: { href: "{}" }
-    },
-    messageStyle: "none"
-    });
-</script>
-<!-- 给MathJax元素添加has-jax class -->
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax(), i;
-        for(i=0; i < all.length; i += 1) {
-            all[i].SourceElement().parentNode.className += ' has-jax';
-        }
-    });
-</script>
-<!-- 通过连接CDN加载MathJax的js代码 -->
-<script type="text/javascript" async
-        src="//cdn.jsdelivr.net/npm/mathjax@2.7.8/unpacked/MathJax.js?config=TeX-MML-AM_CHTML">
-</script>
-<input type="hidden" id="MathJax-js"
-        value="//cdn.jsdelivr.net/npm/mathjax@2.7.8/unpacked/MathJax.js?config=TeX-MML-AM_CHTML">
-</input>
-    
-
-
-
-
+        </article>
+        
+        
     </div>
     <div class="copyright">
         <p class="footer-entry">
@@ -832,11 +745,11 @@
 <p class="footer-entry">"生命以负熵为食"
 
     </div>
-    <div class="full-toc">
-        <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
+</div>
+<div class="full-toc">
+    <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
 <a class="" id="rocket" ></a>
 
-    </div>
 </div>
 
 </body>
