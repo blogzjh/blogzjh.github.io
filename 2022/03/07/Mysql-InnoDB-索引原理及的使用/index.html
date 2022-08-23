@@ -6,27 +6,42 @@
   <meta name="keywords" content="">
   <meta name="description" content="Mysql(InnoDB)索引原理及的使用 | ZJH&#39;blog">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="1.Servlet监听器 ServletContext、HttpSession、ServletRequest的监听都是通过javax.servlet 包下定义的，他们都是servlet的特性，换句话说，他们不依赖于Spring，而依赖于web容器（tomcat容器），他们的加载优先于Spring容器 Servlet监听器有用处，但是没有Spring监听器用的多，用的方便；并且通常可以用HttpSe">
+<meta name="description" content="事务的4大特性分别由：事务日志、锁机制实现，0~4标题是事务日志，5之后是锁机制 每个阶段的小结放在最前面  0.事务日志：总结 redo log保证持久性，在innodb_flush_log_at_trx_commit&#x3D;1（默认）的情况下，保证了事务的安全可靠 undo log保证原子性、一致性，且undo log自身的持久化也依赖于redo log。undo log通过回滚指针形成链路，保证">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Spring、Servlet监听器">
-<meta property="og:url" content="https://zjhblog.gitee.io/2022/08/14/Spring%E3%80%81Servlet%E7%9B%91%E5%90%AC%E5%99%A8/index.html">
+<meta property="og:title" content="MySQL事务与锁">
+<meta property="og:url" content="https://zjhblog.gitee.io/2022/08/23/MySQL%E4%BA%8B%E5%8A%A1%E4%B8%8E%E9%94%81/index.html">
 <meta property="og:site_name" content="ZJH&#39;blog">
-<meta property="og:description" content="1.Servlet监听器 ServletContext、HttpSession、ServletRequest的监听都是通过javax.servlet 包下定义的，他们都是servlet的特性，换句话说，他们不依赖于Spring，而依赖于web容器（tomcat容器），他们的加载优先于Spring容器 Servlet监听器有用处，但是没有Spring监听器用的多，用的方便；并且通常可以用HttpSe">
+<meta property="og:description" content="事务的4大特性分别由：事务日志、锁机制实现，0~4标题是事务日志，5之后是锁机制 每个阶段的小结放在最前面  0.事务日志：总结 redo log保证持久性，在innodb_flush_log_at_trx_commit&#x3D;1（默认）的情况下，保证了事务的安全可靠 undo log保证原子性、一致性，且undo log自身的持久化也依赖于redo log。undo log通过回滚指针形成链路，保证">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/12e25b4e04b048b8be588db230769b26.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/b1c3fa9dfe8f42e1b7ea48967e353f25.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/1ba92b971a804d79823eeef5f62e9733.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/19d04361b5834e95bbe60f7f96c00c4d.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/97a00ec1378f4e7f835f8d0448de819d.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/b7c8f3983c3d4b4789c11a10eca876cc.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/077b51c0573f4111a6102f7a618838b0.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/e1e200007df2422d9279852fde1274ac.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/15a94ae683a14c4b83a6104f1fba77a6.png">
-<meta property="article:published_time" content="2022-08-14T13:01:46.000Z">
-<meta property="article:modified_time" content="2022-08-14T13:04:28.052Z">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/15768b7c08c14eec9fae8e77459f1d04.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/63a03ebe859341208c8d8c6ed631c457.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/632b7b30e4fc498392ec41e1db4c2c4a.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ecfaae3fedf94c03a401683f5ba73d38.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a3142b47e0964d91b5c8c3e008e17589.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5db385f9d8d645d68273214e751b6ffa.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/77bb4e2b7ea34215943f2f71e1535af6.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/377617355b2c4c268ad3faa83b5edbad.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/399dbcd17e0a4a5a971abc9d497c21b2.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/fb551713969e4aeca3fa14b689e04ecd.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/94af8e0a0407413db3ce008bfe79b54f.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/37629e64af5d4b0a85047941f4737e3e.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f38c426a765e45818115c2040e01e1f9.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/61d05a11722a4cd39639cbcd9d275798.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8fd568b351e3472f8ade4bf64fc9c8b5.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/19b3af1633fc4eb8b06fa5e9ca660a05.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/910c2321bfbc4c3eae19989bd882f3d1.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/81d18400a69c40c2b8c231afab322b9c.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/848e9bb938f74a488cd5e76484c4a6fd.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/aba4d84e165a4c17b741561cb154a39c.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c90f31a47bda43408606a4be6c4ca21d.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ebf094ebf632406892dbbc4a085e3b39.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5804adb358f34b83bf6f767daeb3b479.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c62ecd17a1f5460aa0e115c238963a31.png">
+<meta property="article:published_time" content="2022-08-23T04:49:38.000Z">
+<meta property="article:modified_time" content="2022-08-23T04:50:31.157Z">
 <meta property="article:author" content="ZJH">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://img-blog.csdnimg.cn/12e25b4e04b048b8be588db230769b26.png">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/15768b7c08c14eec9fae8e77459f1d04.png">
 
 
 <link rel="icon" href="/img/QQ图片20211224224200.jpg">
@@ -136,7 +151,7 @@
     <li>
         <div class="all active" data-rel="全部文章">全部文章
             
-                <small>(42)</small>
+                <small>(46)</small>
             
         </div>
     </li>
@@ -147,7 +162,7 @@
                     <div data-rel="数据库">
                         
                         数据库
-                        <small>(2)</small>
+                        <small>(3)</small>
                         
                     </div>
                     
@@ -175,7 +190,7 @@
                     <div data-rel="工作笔记">
                         
                         工作笔记
-                        <small>(10)</small>
+                        <small>(11)</small>
                         
                     </div>
                     
@@ -203,7 +218,7 @@
                     <div data-rel="源码">
                         
                         源码
-                        <small>(6)</small>
+                        <small>(8)</small>
                         
                     </div>
                     
@@ -252,8 +267,8 @@
         
     </div>
 </div>
-<input type="hidden" id="yelog_site_posts_number" value="42">
-<input type="hidden" id="yelog_site_word_count" value="73.8k">
+<input type="hidden" id="yelog_site_posts_number" value="46">
+<input type="hidden" id="yelog_site_word_count" value="82.7k">
 <div style="display: none">
     <span id="busuanzi_value_site_uv"></span>
     <span id="busuanzi_value_site_pv"></span>
@@ -308,6 +323,38 @@
 
     
     <nav id="title-list-nav">
+        
+        <a  class="全部文章 数据库 "
+           href="/zjh/2022/08/23/MySQL%E4%BA%8B%E5%8A%A1%E4%B8%8E%E9%94%81/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="MySQL事务与锁">MySQL事务与锁</span>
+            <span class="post-date" title="2022-08-23 12:49:38">2022/08/23</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/08/23/AOP%E5%AE%9E%E7%8E%B0%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="AOP实现分布式锁">AOP实现分布式锁</span>
+            <span class="post-date" title="2022-08-23 12:48:25">2022/08/23</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/08/23/ReentrantLock%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="ReentrantLock源码剖析">ReentrantLock源码剖析</span>
+            <span class="post-date" title="2022-08-23 12:34:15">2022/08/23</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/08/23/%E5%8F%8D%E5%B0%84%E8%8E%B7%E5%8F%96AQS%E4%B8%AD%E5%90%8C%E6%AD%A5%E9%98%9F%E5%88%97%E4%B8%8E%E7%AD%89%E5%BE%85%E9%98%9F%E5%88%97%E7%9A%84%E9%95%BF%E5%BA%A6/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="反射获取AQS中同步队列与等待队列的长度">反射获取AQS中同步队列与等待队列的长度</span>
+            <span class="post-date" title="2022-08-23 12:32:58">2022/08/23</span>
+        </a>
         
         <a  class="全部文章 Java "
            href="/zjh/2022/08/14/Spring%E3%80%81Servlet%E7%9B%91%E5%90%AC%E5%99%A8/"

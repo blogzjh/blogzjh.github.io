@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>MySQL事务与锁 | ZJH&#39;blog</title>
+  <meta name="keywords" content="">
+  <meta name="description" content="MySQL事务与锁 | ZJH&#39;blog">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="description" content="事务的4大特性分别由：事务日志、锁机制实现，0~4标题是事务日志，5之后是锁机制 每个阶段的小结放在最前面  0.事务日志：总结 redo log保证持久性，在innodb_flush_log_at_trx_commit&#x3D;1（默认）的情况下，保证了事务的安全可靠 undo log保证原子性、一致性，且undo log自身的持久化也依赖于redo log。undo log通过回滚指针形成链路，保证">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL事务与锁">
+<meta property="og:url" content="https://zjhblog.gitee.io/2022/08/23/MySQL%E4%BA%8B%E5%8A%A1%E4%B8%8E%E9%94%81/index.html">
+<meta property="og:site_name" content="ZJH&#39;blog">
+<meta property="og:description" content="事务的4大特性分别由：事务日志、锁机制实现，0~4标题是事务日志，5之后是锁机制 每个阶段的小结放在最前面  0.事务日志：总结 redo log保证持久性，在innodb_flush_log_at_trx_commit&#x3D;1（默认）的情况下，保证了事务的安全可靠 undo log保证原子性、一致性，且undo log自身的持久化也依赖于redo log。undo log通过回滚指针形成链路，保证">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/15768b7c08c14eec9fae8e77459f1d04.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/63a03ebe859341208c8d8c6ed631c457.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/632b7b30e4fc498392ec41e1db4c2c4a.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ecfaae3fedf94c03a401683f5ba73d38.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a3142b47e0964d91b5c8c3e008e17589.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5db385f9d8d645d68273214e751b6ffa.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/77bb4e2b7ea34215943f2f71e1535af6.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/377617355b2c4c268ad3faa83b5edbad.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/399dbcd17e0a4a5a971abc9d497c21b2.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/fb551713969e4aeca3fa14b689e04ecd.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/94af8e0a0407413db3ce008bfe79b54f.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/37629e64af5d4b0a85047941f4737e3e.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f38c426a765e45818115c2040e01e1f9.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/61d05a11722a4cd39639cbcd9d275798.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8fd568b351e3472f8ade4bf64fc9c8b5.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/19b3af1633fc4eb8b06fa5e9ca660a05.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/910c2321bfbc4c3eae19989bd882f3d1.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/81d18400a69c40c2b8c231afab322b9c.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/848e9bb938f74a488cd5e76484c4a6fd.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/aba4d84e165a4c17b741561cb154a39c.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c90f31a47bda43408606a4be6c4ca21d.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ebf094ebf632406892dbbc4a085e3b39.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5804adb358f34b83bf6f767daeb3b479.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c62ecd17a1f5460aa0e115c238963a31.png">
+<meta property="article:published_time" content="2022-08-23T04:49:38.000Z">
+<meta property="article:modified_time" content="2022-08-23T04:50:31.157Z">
+<meta property="article:author" content="ZJH">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/15768b7c08c14eec9fae8e77459f1d04.png">
+
+
+<link rel="icon" href="/img/QQ图片20211224224200.jpg">
+
+<link href="/zjh/css/style.css?v=1.1.0" rel="stylesheet">
+
+<link href="/zjh/css/hl_theme/atom-dark.css?v=1.1.0" rel="stylesheet">
+
+<link href="//cdn.jsdelivr.net/npm/animate.css@4.1.0/animate.min.css" rel="stylesheet">
+
+<script src="//cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+<script src="/zjh/js/titleTip.js?v=1.1.0" ></script>
+
+<script src="//cdn.jsdelivr.net/npm/highlightjs@9.16.2/highlight.pack.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+<script src="//cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js"></script>
+
+
+
+<script src="//cdn.jsdelivr.net/npm/jquery.cookie@1.4.1/jquery.cookie.min.js" ></script>
+
+<script src="/zjh/js/iconfont.js?v=1.1.0" ></script>
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<div style="display: none">
+  <input class="theme_disqus_on" value="false">
+  <input class="theme_preload_comment" value="">
+  <input class="theme_blog_path" value="/zjh">
+  <input id="theme_shortcut" value="true" />
+  <input id="theme_highlight_on" value="true" />
+  <input id="theme_code_copy" value="true" />
+</div>
+
+
+
+<body>
+<aside class="nav">
+    <div class="nav-left">
+        <a href="/zjh/"
+   class="avatar_target">
+    <img class="avatar"
+         src="/zjh/img/QQ图片20211224224200.jpg"/>
+</a>
+<div class="author">
+    <span>ZJH</span>
+</div>
+
+<div class="icon">
+    
+        
+            <a title="github"
+               href="https://github.com/BetterZJH"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-github"></use>
+                    </svg>
+                
+            </a>
+        
+    
+        
+            <a title="csdn"
+               href="https://blog.csdn.net/m0_56079407"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-csdn"></use>
+                    </svg>
+                
+            </a>
+        
+    
+        
+            <a title="email"
+               href="mailto:847829122@qq.com"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-email"></use>
+                    </svg>
+                
+            </a>
+        
+    
+        
+            <a title="qq"
+               href="http://wpa.qq.com/msgrd?v=3&uin=847829122&site=qq&menu=yes"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-qq"></use>
+                    </svg>
+                
+            </a>
+        
+    
+</div>
+
+
+
+
+<ul>
+    <li>
+        <div class="all active" data-rel="全部文章">全部文章
+            
+                <small>(46)</small>
+            
+        </div>
+    </li>
+    
+        
+            
+                <li>
+                    <div data-rel="数据库">
+                        
+                        数据库
+                        <small>(3)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="数据结构算法">
+                        
+                        数据结构算法
+                        <small>(8)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="工作笔记">
+                        
+                        工作笔记
+                        <small>(11)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="机器学习">
+                        
+                        机器学习
+                        <small>(7)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="源码">
+                        
+                        源码
+                        <small>(8)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="Java">
+                        
+                        Java
+                        <small>(6)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="JVM">
+                        
+                        JVM
+                        <small>(2)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+</ul>
+<div class="left-bottom">
+    <div class="menus">
+        
+            
+            
+            
+    </div>
+    <div>
+        
+        
+    </div>
+</div>
+<input type="hidden" id="yelog_site_posts_number" value="46">
+<input type="hidden" id="yelog_site_word_count" value="82.7k">
+<div style="display: none">
+    <span id="busuanzi_value_site_uv"></span>
+    <span id="busuanzi_value_site_pv"></span>
+</div>
+
+    </div>
+    <div class="nav-right">
+        <div class="friends-area">
+    <div class="friends-title">
+        友情链接
+        <i class="iconfont icon-left"></i>
+    </div>
+    <div class="friends-content">
+        <ul>
+            
+            <li><a target="_blank" href="http://yelog.org/">叶落阁</a></li>
+            
+        </ul>
+    </div>
+</div>
+        <div class="title-list">
+    <div class="right-top">
+        <div id="default-panel">
+            <i class="iconfont icon-search" data-title="搜索 快捷键 i"></i>
+            <div class="right-title">全部文章</div>
+            <i class="iconfont icon-file-tree" data-title="切换到大纲视图 快捷键 w"></i>
+        </div>
+        <div id="search-panel">
+            <i class="iconfont icon-left" data-title="返回"></i>
+            <input id="local-search-input" autocomplete="off"/>
+            <label class="border-line" for="input"></label>
+            <i class="iconfont icon-case-sensitive" data-title="大小写敏感"></i>
+            <i class="iconfont icon-tag" data-title="标签"></i>
+        </div>
+        <div id="outline-panel" style="display: none">
+            <div class="right-title">大纲</div>
+            <i class="iconfont icon-list" data-title="切换到文章列表"></i>
+        </div>
+    </div>
+
+    <div class="tags-list">
+    <input id="tag-search" />
+    <div class="tag-wrapper">
+        
+            <li class="article-tag-list-item">
+                <i class="iconfont icon-tag"></i><a>HashMap</a>
+            </li>
+        
+    </div>
+
+</div>
+
+    
+    <nav id="title-list-nav">
+        
+        <a  class="全部文章 数据库 "
+           href="/zjh/2022/08/23/MySQL%E4%BA%8B%E5%8A%A1%E4%B8%8E%E9%94%81/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="MySQL事务与锁">MySQL事务与锁</span>
+            <span class="post-date" title="2022-08-23 12:49:38">2022/08/23</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/08/23/AOP%E5%AE%9E%E7%8E%B0%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="AOP实现分布式锁">AOP实现分布式锁</span>
+            <span class="post-date" title="2022-08-23 12:48:25">2022/08/23</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/08/23/ReentrantLock%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="ReentrantLock源码剖析">ReentrantLock源码剖析</span>
+            <span class="post-date" title="2022-08-23 12:34:15">2022/08/23</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/08/23/%E5%8F%8D%E5%B0%84%E8%8E%B7%E5%8F%96AQS%E4%B8%AD%E5%90%8C%E6%AD%A5%E9%98%9F%E5%88%97%E4%B8%8E%E7%AD%89%E5%BE%85%E9%98%9F%E5%88%97%E7%9A%84%E9%95%BF%E5%BA%A6/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="反射获取AQS中同步队列与等待队列的长度">反射获取AQS中同步队列与等待队列的长度</span>
+            <span class="post-date" title="2022-08-23 12:32:58">2022/08/23</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/08/14/Spring%E3%80%81Servlet%E7%9B%91%E5%90%AC%E5%99%A8/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Spring、Servlet监听器">Spring、Servlet监听器</span>
+            <span class="post-date" title="2022-08-14 21:01:46">2022/08/14</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/08/13/AOP-%E5%8F%8D%E5%B0%84%EF%BC%9A%E6%8E%A5%E5%8F%A3%E5%8F%82%E6%95%B0%E6%A0%A1%E9%AA%8C/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="AOP+反射：接口参数校验">AOP+反射：接口参数校验</span>
+            <span class="post-date" title="2022-08-13 17:12:17">2022/08/13</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/08/12/%E5%AF%B9dto%E6%8C%87%E5%AE%9A%E5%B1%9E%E6%80%A7%E4%B8%80%E9%94%AE%E5%8A%A0%E8%A7%A3%E5%AF%86/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="对dto指定属性一键加解密">对dto指定属性一键加解密</span>
+            <span class="post-date" title="2022-08-12 22:51:17">2022/08/12</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/08/03/%E5%8F%8D%E5%B0%84%E4%BF%AE%E6%94%B9jsessionid%E5%AE%9E%E7%8E%B0session%E5%85%B1%E4%BA%AB/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="反射修改jsessionid实现session共享">反射修改jsessionid实现session共享</span>
+            <span class="post-date" title="2022-08-03 21:53:21">2022/08/03</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/08/03/RestTemlate%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%8F%8A%E5%B7%A5%E5%85%B7%E7%B1%BB%E8%AE%BE%E8%AE%A1/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="RestTemlate源码分析及工具类设计">RestTemlate源码分析及工具类设计</span>
+            <span class="post-date" title="2022-08-03 21:51:57">2022/08/03</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/08/03/%E7%9F%AD%E4%BF%A1%E6%9C%8D%E5%8A%A1%E8%A2%AB%E6%94%BB%E5%87%BB%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="短信服务被攻击解决方案">短信服务被攻击解决方案</span>
+            <span class="post-date" title="2022-08-03 21:51:16">2022/08/03</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/08/03/%E5%9B%9B%E7%A7%8D%E6%96%B9%E6%B3%95Servlet%E5%AE%B9%E5%99%A8%E4%BD%BF%E7%94%A8Spring%E7%9A%84Bean%E5%AF%B9%E8%B1%A1/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="四种方法Servlet容器使用Spring的Bean对象">四种方法Servlet容器使用Spring的Bean对象</span>
+            <span class="post-date" title="2022-08-03 21:47:54">2022/08/03</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/07/29/(%E8%94%9A%E6%9D%A5)%E5%A4%8D%E6%9D%82%E9%93%BE%E8%A1%A8%E7%9A%84%E5%A4%8D%E5%88%B6/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="(蔚来)复杂链表的复制">(蔚来)复杂链表的复制</span>
+            <span class="post-date" title="2022-07-29 12:32:49">2022/07/29</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/07/20/%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%9A%E6%9B%BF%E6%8D%A2%E3%80%81%E5%B7%A6%E6%97%8B%E3%80%81%E7%BC%BA%E5%A4%B1/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="字符串：替换、左旋、缺失">字符串：替换、左旋、缺失</span>
+            <span class="post-date" title="2022-07-20 21:59:41">2022/07/20</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/07/20/%E4%B8%89%E7%A7%8D%E6%83%85%E5%86%B5%E7%9A%84%E5%B1%82%E5%BA%8F%E9%81%8D%E5%8E%86/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="三种情况的层序遍历">三种情况的层序遍历</span>
+            <span class="post-date" title="2022-07-20 21:58:33">2022/07/20</span>
+        </a>
+        
+        <a  class="全部文章 JVM "
+           href="/zjh/2022/07/19/%E5%86%85%E5%AD%98%E5%8C%BA%E5%9F%9F%E3%80%81%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="内存区域、类的加载">内存区域、类的加载</span>
+            <span class="post-date" title="2022-07-19 22:29:21">2022/07/19</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/07/19/Restful%E9%A3%8E%E6%A0%BC%E7%9C%9F%E7%9A%84%E6%9C%89%E5%BF%85%E8%A6%81%E5%90%97/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Restful风格真的有必要吗？">Restful风格真的有必要吗？</span>
+            <span class="post-date" title="2022-07-19 20:19:57">2022/07/19</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/zjh/2022/07/17/%E6%B0%94%E8%B1%A1cv-%E5%9C%B0%E5%9F%BA%E4%BA%91%E5%9B%BE%E4%BA%91%E7%B3%BB%E5%88%86%E5%89%B2/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="气象cv-地基云图云系分割">气象cv-地基云图云系分割</span>
+            <span class="post-date" title="2022-07-17 12:04:12">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/zjh/2022/07/17/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA%E6%9E%A3%E7%B1%BB%E9%81%97%E4%BC%A0%E7%9A%84%E5%9B%9E%E5%BD%92%E9%A2%84%E6%B5%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="支持向量机枣类遗传的回归预测">支持向量机枣类遗传的回归预测</span>
+            <span class="post-date" title="2022-07-17 11:47:04">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/zjh/2022/07/17/%E6%B0%94%E8%B1%A1%E5%A4%A7%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="气象大数据分析">气象大数据分析</span>
+            <span class="post-date" title="2022-07-17 11:44:44">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/zjh/2022/07/17/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%8D%95%E5%9B%BE%E8%B6%85%E5%88%86%E8%BE%A8%E7%8E%87%E7%9A%84%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="卷积神经网络单图超分辨率的深度学习方法">卷积神经网络单图超分辨率的深度学习方法</span>
+            <span class="post-date" title="2022-07-17 11:33:07">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/zjh/2022/07/17/%E7%96%AB%E6%83%85%E6%B8%AF%E5%8F%A3%E6%8C%82%E9%9D%A0%E6%95%B0ARIMA%E6%97%B6%E5%BA%8F%E5%88%86%E6%9E%90/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="疫情港口挂靠数ARIMA时序分析">疫情港口挂靠数ARIMA时序分析</span>
+            <span class="post-date" title="2022-07-17 11:21:13">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/07/15/OGNL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%94%B9%E9%80%A0%E4%BB%A5%E4%BD%BF%E7%94%A8%E7%B4%A2%E5%BC%95/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="OGNL表达式改造以使用索引">OGNL表达式改造以使用索引</span>
+            <span class="post-date" title="2022-07-15 22:27:54">2022/07/15</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/07/15/mvcc+%E6%8C%89%E5%A4%A9%E7%BC%93%E5%AD%98%E7%BB%9F%E8%AE%A1%E4%B8%A4%E4%B8%AA%E6%94%B6%E7%9B%8A/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="mvcc+按天缓存统计两个收益">mvcc+按天缓存统计两个收益</span>
+            <span class="post-date" title="2022-07-15 21:35:25">2022/07/15</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/07/15/%E5%8E%8B%E7%BC%A9%E6%89%93%E5%8C%85%E4%BD%86%E4%B8%8D%E5%BD%92%E6%A1%A3%EF%BC%8C%E5%88%A9%E7%94%A8response/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="压缩打包但不归档，利用response">压缩打包但不归档，利用response</span>
+            <span class="post-date" title="2022-07-15 21:26:51">2022/07/15</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/07/15/124%E4%B8%AAdelete-flag%E7%9A%84%E5%BF%83%E9%85%B8/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="124个delete_flag的心酸">124个delete_flag的心酸</span>
+            <span class="post-date" title="2022-07-15 21:19:19">2022/07/15</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/07/15/%E9%9D%9E%E6%97%B6%E5%BA%8F%E6%8E%92%E5%BA%8F%E4%B8%8B%E7%9A%84%E7%80%91%E5%B8%83%E6%B5%81%E5%88%86%E9%A1%B5/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="非时序排序下的瀑布流分页">非时序排序下的瀑布流分页</span>
+            <span class="post-date" title="2022-07-15 21:15:15">2022/07/15</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/06/25/%E8%A1%8C%E7%A8%8B%E7%BC%96%E7%A0%81%E5%8E%8B%E7%BC%A9%E5%9B%BE%E7%89%87/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="行程编码压缩图片">行程编码压缩图片</span>
+            <span class="post-date" title="2022-06-25 01:35:20">2022/06/25</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/04/21/%E5%B8%B8%E8%A7%81%E6%8E%92%E5%BA%8F/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="常见排序">常见排序</span>
+            <span class="post-date" title="2022-04-21 09:56:37">2022/04/21</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/04/21/Filter%E7%9A%84%E5%B8%B8%E8%A7%81%E7%94%A8%E6%B3%95/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Filter的常见用法">Filter的常见用法</span>
+            <span class="post-date" title="2022-04-21 09:51:40">2022/04/21</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/04/21/Lambda%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%92%8C%E6%96%B9%E6%B3%95%E5%BC%95%E7%94%A8/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Lambda表达式和方法引用">Lambda表达式和方法引用</span>
+            <span class="post-date" title="2022-04-21 09:50:42">2022/04/21</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/04/21/Mybatis%E4%B8%ADxml%E4%B8%AD%E8%B0%83java%E6%96%B9%E6%B3%95OGNL%E8%A1%A8%E8%BE%BE%E5%BC%8F/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Mybatis中xml中调java方法OGNL表达式">Mybatis中xml中调java方法OGNL表达式</span>
+            <span class="post-date" title="2022-04-21 09:47:36">2022/04/21</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/04/21/Java%E6%B3%A8%E8%A7%A3%E5%92%8C%E5%8F%8D%E5%B0%84/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Java注解和反射">Java注解和反射</span>
+            <span class="post-date" title="2022-04-21 09:45:15">2022/04/21</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/03/21/HashMap%E4%B8%ADentrySet-%E8%AF%A6%E8%A7%A3/"
+           data-tag="HashMap"
+           data-author="" >
+            <span class="post-title" title="HashMap中entrySet()详解">HashMap中entrySet()详解</span>
+            <span class="post-date" title="2022-03-21 00:15:10">2022/03/21</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/03/21/HashMap/"
+           data-tag="HashMap"
+           data-author="" >
+            <span class="post-title" title="HashMap">HashMap</span>
+            <span class="post-date" title="2022-03-21 00:13:23">2022/03/21</span>
+        </a>
+        
+        <a  class="全部文章 数据库 "
+           href="/zjh/2022/03/07/Mysql%E4%BA%8B%E5%8A%A1%E5%92%8C%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Mysql事务和存储引擎">Mysql事务和存储引擎</span>
+            <span class="post-date" title="2022-03-07 22:11:06">2022/03/07</span>
+        </a>
+        
+        <a  class="全部文章 数据库 "
+           href="/zjh/2022/03/07/Mysql-InnoDB-%E7%B4%A2%E5%BC%95%E5%8E%9F%E7%90%86%E5%8F%8A%E7%9A%84%E4%BD%BF%E7%94%A8/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Mysql(InnoDB)索引原理及的使用">Mysql(InnoDB)索引原理及的使用</span>
+            <span class="post-date" title="2022-03-07 22:10:05">2022/03/07</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/03/07/%E7%B1%BB%E8%87%AA%E8%BA%AB%E5%B5%8C%E5%A5%97-%E4%BA%8C%E5%8F%89%E6%A0%91%E5%88%A0%E9%99%A4-%E6%A0%88%E5%A0%86%E5%88%86%E6%9E%90/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="类自身嵌套(二叉树删除)栈堆分析">类自身嵌套(二叉树删除)栈堆分析</span>
+            <span class="post-date" title="2022-03-07 22:09:09">2022/03/07</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/03/07/Java%E5%A0%86%E6%8E%92%E5%BA%8F%E7%9A%84%E8%BF%87%E7%A8%8B%E5%88%B0%E8%AE%BE%E8%AE%A1/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Java堆排序的过程到设计">Java堆排序的过程到设计</span>
+            <span class="post-date" title="2022-03-07 22:08:08">2022/03/07</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/02/21/LinkedList%E6%BA%90%E7%A0%81%E4%B8%AD%E4%B8%BA%E4%BD%95%E5%A4%A7%E9%87%8F%E5%87%BA%E7%8E%B0final/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="LinkedList源码中为何大量出现final">LinkedList源码中为何大量出现final</span>
+            <span class="post-date" title="2022-02-21 09:57:35">2022/02/21</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/02/20/LinkedList%E4%B8%ADclear%E5%92%8Cunlink%E6%96%B9%E6%B3%95%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%A4%9A%E6%AC%A1%E7%BD%AE%E7%A9%BA/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="LinkedList中clear和unlink方法为什么要多次置空">LinkedList中clear和unlink方法为什么要多次置空</span>
+            <span class="post-date" title="2022-02-20 00:25:11">2022/02/20</span>
+        </a>
+        
+        <a  class="全部文章 JVM "
+           href="/zjh/2022/02/20/gc%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%9C%BA%E5%88%B6/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="gc垃圾回收机制">gc垃圾回收机制</span>
+            <span class="post-date" title="2022-02-20 00:17:43">2022/02/20</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/zjh/2022/01/11/%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E6%B3%B0%E5%9D%A6%E5%B0%BC%E5%85%8B%E5%8F%B7%E8%8E%B7%E6%95%91%E9%A2%84%E6%B5%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="随机森林——泰坦尼克号获救预测">随机森林——泰坦尼克号获救预测</span>
+            <span class="post-date" title="2022-01-11 03:06:10">2022/01/11</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/zjh/2022/01/01/%E5%86%B3%E7%AD%96%E6%A0%91-%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E7%94%A8%E6%88%B7%E6%B5%81%E5%A4%B1%E9%A2%84%E6%B5%8B%E7%9A%84%E6%A1%88%E4%BE%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="决策树/随机森林——用户流失预测的案例">决策树/随机森林——用户流失预测的案例</span>
+            <span class="post-date" title="2022-01-01 00:41:40">2022/01/01</span>
+        </a>
+        
+        <a  class="全部文章 "
+           href="/zjh/2021/12/25/IDEA%E5%B8%B8%E7%94%A8%E5%BF%AB%E6%8D%B7%E9%94%AE/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="IDEA常用快捷键">IDEA常用快捷键</span>
+            <span class="post-date" title="2021-12-25 21:55:46">2021/12/25</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2021/12/25/%E5%9B%9E%E5%BD%A2%E9%92%88%E6%95%B0%E5%AD%97%E7%9F%A9%E9%98%B5Java%E5%AE%9E%E7%8E%B0/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="回形针数字矩阵Java实现">回形针数字矩阵Java实现</span>
+            <span class="post-date" title="2021-12-25 02:07:12">2021/12/25</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2021/12/25/Java%E5%9B%9B%E7%A7%8Dnext%E7%94%A8%E6%B3%95/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Java四种next用法">Java四种next用法</span>
+            <span class="post-date" title="2021-12-25 01:59:30">2021/12/25</span>
+        </a>
+        
+        <div id="no-item-tips">
+
+        </div>
+    </nav>
+    <div id="outline-list">
+    </div>
+</div>
+
+    </div>
+    <div class="hide-list">
+        <div class="semicircle" data-title="切换全屏 快捷键 s">
+            <div class="brackets first"><</div>
+            <div class="brackets">&gt;</div>
+        </div>
+    </div>
+</aside>
+<div id="post">
+    <div class="pjax">
+        <article id="post-MySQL事务与锁" class="article article-type-post" itemscope itemprop="blogPost">
+    
+        <h1 class="article-title">MySQL事务与锁</h1>
+    
+    <div class="article-meta">
+        
+        
+        
+        <span class="book">
+            <i class="iconfont icon-category"></i>
+            
+            
+            <a  data-rel="数据库">数据库</a>
+            
+        </span>
+        
+        
+    </div>
+    <div class="article-meta">
+        
+            发布时间 : <time class="date" title='最后更新: 2022-08-23 12:50:31'>2022-08-23 12:49</time>
+        
+    </div>
+    <div class="article-meta">
+        
+        <span>字数:4k</span>
+        
+        
+        <span id="busuanzi_container_page_pv">
+            阅读 :<span id="busuanzi_value_page_pv">
+                <span class="count-comment">
+                    <span class="spinner">
+                      <div class="cube1"></div>
+                      <div class="cube2"></div>
+                    </span>
+                </span>
+            </span>
+        </span>
+        
+        
+    </div>
+    
+    <div class="toc-ref">
+    
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#0-%E4%BA%8B%E5%8A%A1%E6%97%A5%E5%BF%97%EF%BC%9A%E6%80%BB%E7%BB%93"><span class="toc-text">0.事务日志：总结</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E4%BA%8B%E5%8A%A1%E7%9A%844%E7%A7%8D%E7%89%B9%E6%80%A7"><span class="toc-text">1.事务的4种特性</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E4%BA%8B%E5%8A%A1%E6%97%A5%E5%BF%97%E6%A6%82%E8%BF%B0"><span class="toc-text">2.事务日志概述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-redo-log%E4%B8%8E%E6%8C%81%E4%B9%85%E6%80%A7-D"><span class="toc-text">3.redo log与持久性(D)</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1Buffer-Pool"><span class="toc-text">3.1Buffer Pool</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2%E5%88%B7%E7%9B%98%E9%A2%91%E7%8E%87"><span class="toc-text">3.2刷盘频率</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-3redo%E6%97%A5%E5%BF%97%E8%A7%A3%E5%86%B3%E5%88%B7%E7%9B%98%E9%A2%91%E7%8E%87%E9%97%AE%E9%A2%98"><span class="toc-text">3.3redo日志解决刷盘频率问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-4redo-log-buffer%E5%92%8Credo-log-file"><span class="toc-text">3.4redo log buffer和redo log file</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-1%E5%88%B7%E7%9B%98%E7%AD%96%E7%95%A5innodb-flush-log-at-trx-commit"><span class="toc-text">3.4.1刷盘策略innodb_flush_log_at_trx_commit&#x3D;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-2%E5%BB%BA%E8%AE%AE%E4%BD%BF%E7%94%A8%E9%BB%98%E8%AE%A4"><span class="toc-text">3.4.2建议使用默认</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-undo-log%E4%B8%8E%E5%8E%9F%E5%AD%90%E6%80%A7-A"><span class="toc-text">4.undo log与原子性(A)</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1undo-log%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="toc-text">4.1undo log应用场景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2undo-log%E5%9B%9E%E6%BB%9A%E7%9A%84%E7%90%86%E8%A7%A3"><span class="toc-text">4.2undo log回滚的理解</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-3%E6%AF%8F%E4%B8%80%E8%A1%8C%E6%95%B0%E6%8D%AE%E7%9A%84%E7%BB%93%E6%9E%84"><span class="toc-text">4.3每一行数据的结构</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-1undo-log%E5%BA%8F%E5%8F%B7"><span class="toc-text">4.3.1undo log序号</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-4%E6%9B%B4%E6%96%B0%E4%B8%BB%E9%94%AE%EF%BC%9Adeletemark"><span class="toc-text">4.4更新主键：deletemark</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-5undo-log%E4%BD%95%E6%97%B6%E5%88%A0%E9%99%A4"><span class="toc-text">4.5undo log何时删除</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-5-1%E5%AF%B9%E4%BA%8Einsert%E6%93%8D%E4%BD%9C"><span class="toc-text">4.5.1对于insert操作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-5-2%E5%AF%B9%E4%BA%8Eupdate%E6%93%8D%E4%BD%9C"><span class="toc-text">4.5.2对于update操作</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-%E4%BA%8B%E5%8A%A1%E7%9A%84%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB%E4%B8%8E%E8%A7%A3%E5%86%B3%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-text">5.事务的隔离级别与解决的问题</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#5-1RU%E7%BA%A7%E5%88%AB"><span class="toc-text">5.1RU级别</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-2RC%E7%BA%A7%E5%88%AB"><span class="toc-text">5.2RC级别</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-3RR%E7%BA%A7%E5%88%AB"><span class="toc-text">5.3RR级别</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-4Serializable"><span class="toc-text">5.4Serializable</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#6-%E9%94%81%EF%BC%9A%E6%80%BB%E7%BB%93"><span class="toc-text">6.锁：总结</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#7-%E9%94%81%E7%9A%84%E6%A6%82%E8%BF%B0"><span class="toc-text">7.锁的概述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#8-%E8%A1%A5%EF%BC%9AInnoDB%E7%9A%84%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84"><span class="toc-text">8.补：InnoDB的内存结构</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#9-%E6%8C%89%E6%93%8D%E4%BD%9C%E7%B1%BB%E5%9E%8B-%E5%85%BC%E5%AE%B9%E6%80%A7-%E5%88%92%E5%88%86"><span class="toc-text">9.按操作类型(兼容性)划分</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#9-1%E8%AF%BB"><span class="toc-text">9.1读</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-2%E5%86%99"><span class="toc-text">9.2写</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#9-2-1-insert"><span class="toc-text">9.2.1 insert</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-2-2-delete"><span class="toc-text">9.2.2 delete</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-2-3-update"><span class="toc-text">9.2.3 update</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#10-%E6%8C%89%E7%B2%92%E5%BA%A6%E5%88%92%E5%88%86"><span class="toc-text">10.按粒度划分</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#10-1%E8%A1%A8%E9%94%81"><span class="toc-text">10.1表锁</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#10-1-1%E8%A1%A8%E7%BA%A7S%E9%94%81%E4%B8%8EX%E9%94%81"><span class="toc-text">10.1.1表级S锁与X锁</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-1-2%E6%84%8F%E5%90%91%E9%94%81intention-lock-%E5%A4%9A%E7%B2%92%E5%BA%A6%E9%94%81%E6%94%AF%E6%8C%81-%E5%8A%A0%E8%A1%8C%E9%94%81%E6%97%B6%E8%87%AA%E5%8A%A8%E6%B7%BB%E5%8A%A0%E8%A1%A8%E7%BA%A7%E6%84%8F%E5%90%91%E9%94%81"><span class="toc-text">10.1.2意向锁intention lock(多粒度锁支持)(加行锁时自动添加表级意向锁)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-1-3%E8%87%AA%E5%A2%9E%E9%94%81AUTO-INC"><span class="toc-text">10.1.3自增锁AUTO-INC</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-1-4%E5%85%83%E6%95%B0%E6%8D%AE%E9%94%81meta-data-lock"><span class="toc-text">10.1.4元数据锁meta data lock</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-2%E8%A1%8C%E9%94%81"><span class="toc-text">10.2行锁</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#10-2-1%E8%AE%B0%E5%BD%95%E9%94%81record-locks"><span class="toc-text">10.2.1记录锁record locks</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-2-2%E9%97%B4%E9%9A%99%E9%94%81gap-lock"><span class="toc-text">10.2.2间隙锁gap lock</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-2-3%E4%B8%B4%E9%94%AE%E9%94%81next-key-locks"><span class="toc-text">10.2.3临键锁next_key locks</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-2-4%E6%8F%92%E5%85%A5%E6%84%8F%E5%90%91%E9%94%81insert-intention-locks"><span class="toc-text">10.2.4插入意向锁insert intention locks</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-3%E9%A1%B5%E9%94%81"><span class="toc-text">10.3页锁</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#11-%E6%8C%89%E6%80%81%E5%BA%A6%E5%88%92%E5%88%86"><span class="toc-text">11.按态度划分</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#11-1%E4%B9%90%E8%A7%82%E9%94%81"><span class="toc-text">11.1乐观锁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11-2%E6%82%B2%E8%A7%82%E9%94%81"><span class="toc-text">11.2悲观锁</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#12-%E5%8A%A0%E9%94%81%E6%96%B9%E5%BC%8F"><span class="toc-text">12.加锁方式</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#12-1%E9%9A%90%E5%BC%8F%E9%94%81"><span class="toc-text">12.1隐式锁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12-2%E6%98%BE%E7%A4%BA%E9%94%81"><span class="toc-text">12.2显示锁</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#13-%E5%85%B6%E4%BB%96"><span class="toc-text">13.其他</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#13-1%E5%85%A8%E5%B1%80%E9%94%81"><span class="toc-text">13.1全局锁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#13-2%E6%AD%BB%E9%94%81"><span class="toc-text">13.2死锁</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#13-2-1%E4%BA%A7%E7%94%9F%E6%9D%A1%E4%BB%B6"><span class="toc-text">13.2.1产生条件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#13-2-2%E5%A6%82%E4%BD%95%E5%A4%84%E7%90%86%E6%AD%BB%E9%94%81"><span class="toc-text">13.2.2如何处理死锁</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#14-MVCC"><span class="toc-text">14.MVCC</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#14-1%E5%BD%93%E5%89%8D%E8%AF%BB%E3%80%81%E5%BF%AB%E7%85%A7%E8%AF%BB"><span class="toc-text">14.1当前读、快照读</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#14-2MVCC%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86"><span class="toc-text">14.2MVCC实现原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#14-2-1undo-log%E7%89%88%E6%9C%AC%E9%93%BE"><span class="toc-text">14.2.1undo log版本链</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#14-2-2readView"><span class="toc-text">14.2.2readView</span></a></li></ol></li></ol></li></ol>
+    
+<style>
+    .left-col .switch-btn,
+    .left-col .switch-area {
+        display: none;
+    }
+    .toc-level-3 i,
+    .toc-level-3 ol {
+        display: none !important;
+    }
+</style>
+</div>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <ul>
+<li>事务的4大特性分别由：事务日志、锁机制实现，0~4标题是事务日志，5之后是锁机制</li>
+<li>每个阶段的小结放在最前面</li>
+</ul>
+<h1 id="0-事务日志：总结"><a href="#0-事务日志：总结" class="headerlink" title="0.事务日志：总结"></a>0.事务日志：总结</h1><ul>
+<li>redo log保证持久性，在<code>innodb_flush_log_at_trx_commit=1</code>（默认）的情况下，保证了事务的安全可靠</li>
+<li>undo log保证原子性、一致性，且undo log自身的持久化也依赖于redo log。undo log通过<strong>回滚指针形成链路</strong>，保证了回滚与MVCC。如果undo log被MVCC占用，则一直不会被删除。</li>
+<li>刷盘持久化对于：页中数据(脏页)持久化、redo log持久化都有着相似的策略：（另外的线程）</li>
+<li>delete和对<strong>主键</strong>update，实际上进行的软删除（修改deletemark隐藏字段），由purge线程来进行真实的删除。<h1 id="1-事务的4种特性"><a href="#1-事务的4种特性" class="headerlink" title="1.事务的4种特性"></a>1.事务的4种特性</h1></li>
+<li>事务有4种特性：原子性、一致性、持久性、隔离性</li>
+<li><code>隔离性</code>：由锁机制 or  MVCC实现</li>
+<li><code>原子性、一致性、持久性</code>：由事务的redo日志和undo日志保证<br><img src="https://img-blog.csdnimg.cn/15768b7c08c14eec9fae8e77459f1d04.png"></li>
+</ul>
+<h1 id="2-事务日志概述"><a href="#2-事务日志概述" class="headerlink" title="2.事务日志概述"></a>2.事务日志概述</h1><ul>
+<li>redo log ：<code>重做日志</code>，记录<strong>物理级别</strong>上的修改(在页上的修改)的日志，提供再写入操作，恢复提交事务修改页的操作，保证事务<code>持久性</code>；主要保证数据可靠性</li>
+<li>undo log：<code>回滚日志</code>，记录<strong>逻辑操作</strong>的日志(每个改动操作的逆过程)，回滚到某一个特定版本，保证事务的<code>原子性、一致性</code>；主要用于回滚和MVCC</li>
+<li><strong>二者都是一种恢复操作</strong>，只是场景不同</li>
+<li>都是存储引擎生成的日志（而bin log则是数据层产生的）</li>
+</ul>
+<h1 id="3-redo-log与持久性-D"><a href="#3-redo-log与持久性-D" class="headerlink" title="3.redo log与持久性(D)"></a>3.redo log与持久性(D)</h1><h2 id="3-1Buffer-Pool"><a href="#3-1Buffer-Pool" class="headerlink" title="3.1Buffer Pool"></a>3.1Buffer Pool</h2><ul>
+<li>在InnoDB中数据是存储在16k的页中的，在访问页中数据之前，会先将数据从磁盘读到内存中的Buffer Pool中</li>
+<li>每次变更都需要先修改Buffer Pool，然后master线程以一定频率刷入磁盘。从而优化整体性能</li>
+</ul>
+<h2 id="3-2刷盘频率"><a href="#3-2刷盘频率" class="headerlink" title="3.2刷盘频率"></a>3.2刷盘频率</h2><ul>
+<li>如果每次事务提交都进行刷盘，那么效率就很低下（因为每次刷盘都是对一整个页进行刷盘，每次IO都是16kb）</li>
+<li> 当一个事务影响了多个页，刷盘时可能进行很多的随机IO（页可能不连续，而随机IO比顺序IO更慢，尤其对于传统机械硬盘）</li>
+</ul>
+<h2 id="3-3redo日志解决刷盘频率问题"><a href="#3-3redo日志解决刷盘频率问题" class="headerlink" title="3.3redo日志解决刷盘频率问题"></a>3.3redo日志解决刷盘频率问题</h2><ul>
+<li>redo log也是写在磁盘中的，但占用的空间很小，也减少了刷盘的频率（<strong>16kb带来的性能开销远高于写一条日志</strong>）</li>
+<li>redo log是<strong>顺序写入磁盘</strong>的，比随机IO速度更快</li>
+<li><strong>此刷盘（redo log）非彼刷盘（页中数据）</strong></li>
+</ul>
+<h2 id="3-4redo-log-buffer和redo-log-file"><a href="#3-4redo-log-buffer和redo-log-file" class="headerlink" title="3.4redo log buffer和redo log file"></a>3.4redo log buffer和redo log file</h2><p>buffer：在内存中，默认16M，内部的block块是512kb<br>file：在磁盘中</p>
+<p><strong>只要保证redo log从buffer持久化到file不出错，那么MySQL宕机也能恢复数据</strong><br><img src="https://img-blog.csdnimg.cn/63a03ebe859341208c8d8c6ed631c457.png"></p>
+<h3 id="3-4-1刷盘策略innodb-flush-log-at-trx-commit"><a href="#3-4-1刷盘策略innodb-flush-log-at-trx-commit" class="headerlink" title="3.4.1刷盘策略innodb_flush_log_at_trx_commit="></a>3.4.1刷盘策略innodb_flush_log_at_trx_commit=</h3><ul>
+<li>innodb_flush_log_at_trx_commit=1：每次commit就刷盘，redo log 一定在磁盘中，安全，不存在数据丢失问题，效率最差</li>
+<li>innodb_flush_log_at_trx_commit=2：每次commit只写入文件系统缓存(page cache)，由后台线程进行刷盘，效率高，但不安全</li>
+<li>innodb_flush_log_at_trx_commit=0：1、2的折中做法，后台线程刷盘频率为1s</li>
+</ul>
+<h3 id="3-4-2建议使用默认"><a href="#3-4-2建议使用默认" class="headerlink" title="3.4.2建议使用默认"></a>3.4.2建议使用默认</h3><p>默认值为1，虽然效率差，但安全。使用事务本来考虑的就是安全性优先</p>
+<h1 id="4-undo-log与原子性-A"><a href="#4-undo-log与原子性-A" class="headerlink" title="4.undo log与原子性(A)"></a>4.undo log与原子性(A)</h1><ul>
+<li>第3点的redo log保证的是持久性，事务过程中每次操作<code>之后</code>都会产生一条redo log</li>
+<li>而undo log保证的是原子性，要保留之前的数据则需要在每次操作<code>之前</code></li>
+</ul>
+<h2 id="4-1undo-log应用场景"><a href="#4-1undo-log应用场景" class="headerlink" title="4.1undo log应用场景"></a>4.1undo log应用场景</h2><ul>
+<li>服务器出错、断电需要回滚</li>
+<li>事务手动roll back回滚</li>
+<li>MVCC</li>
+<li>注：<strong>SELECT不产生undo log，但在MVCC机制中会用到undo log</strong></li>
+<li><strong>undo log产生的同时也会产生保护自身的redo log</strong>，而redo log默认刷盘策略innodb_flush_log_at_trx_commit=1又能保证回滚日志的安全(持久化)</li>
+</ul>
+<h2 id="4-2undo-log回滚的理解"><a href="#4-2undo-log回滚的理解" class="headerlink" title="4.2undo log回滚的理解"></a>4.2undo log回滚的理解</h2><ul>
+<li>undo log是逻辑日志，回滚只是表面上恢复之前的物理状态，但实际上是反向操作</li>
+<li>InnoDB支持的<strong>并发事务数量</strong>是由<code>回滚段roll back segment</code>决定的，默认是128*1024</li>
+</ul>
+<h2 id="4-3每一行数据的结构"><a href="#4-3每一行数据的结构" class="headerlink" title="4.3每一行数据的结构"></a>4.3每一行数据的结构</h2><p>对于InnoDB来说，每一行都有3个隐藏列</p>
+<ul>
+<li>DB_ROW_ID: 没有指定主键时的隐藏主键</li>
+<li>DB_TRX_ID：事务ID</li>
+<li>DB_ROLL_PTR：回滚指针，指向undo log，<strong>相当于记录了修改该行之前的值</strong>，而undo log本身的数据结构也有一个undo log指针，指向上一个undo log（通过序号链式指向，在回滚和MVCC中用处很大）<img src="https://img-blog.csdnimg.cn/632b7b30e4fc498392ec41e1db4c2c4a.png"><h3 id="4-3-1undo-log序号"><a href="#4-3-1undo-log序号" class="headerlink" title="4.3.1undo log序号"></a>4.3.1undo log序号</h3>这个序号是按顺序写入日志的，因此在回滚的时候直接倒叙回滚就好</li>
+</ul>
+<h2 id="4-4更新主键：deletemark"><a href="#4-4更新主键：deletemark" class="headerlink" title="4.4更新主键：deletemark"></a>4.4更新主键：deletemark</h2><p>4.3这种更新非主键是通过直接修改undo log指针指向来实现的。而如果修改主键id则需要利用<code>deletemark</code>（一个软删除标志，=1则软删，真实的删除由<code>purge线程</code>删除线程实现）<br><img src="https://img-blog.csdnimg.cn/ecfaae3fedf94c03a401683f5ba73d38.png"></p>
+<h2 id="4-5undo-log何时删除"><a href="#4-5undo-log何时删除" class="headerlink" title="4.5undo log何时删除"></a>4.5undo log何时删除</h2><h3 id="4-5-1对于insert操作"><a href="#4-5-1对于insert操作" class="headerlink" title="4.5.1对于insert操作"></a>4.5.1对于insert操作</h3><p>在RR(可重复读)的隔离级别下，insert操作只对本事务可见（RR级别的MVCC解决了幻读），因此insert操作的 undo log可以在commit之后直接删除</p>
+<h3 id="4-5-2对于update操作"><a href="#4-5-2对于update操作" class="headerlink" title="4.5.2对于update操作"></a>4.5.2对于update操作</h3><p>由于MVCC机制中的日志数组可能仍持有这条undo log记录，因此update操作commit后不能直接删除，而是存入undo log的一个链表中</p>
+<h1 id="5-事务的隔离级别与解决的问题"><a href="#5-事务的隔离级别与解决的问题" class="headerlink" title="5.事务的隔离级别与解决的问题"></a>5.事务的隔离级别与解决的问题</h1><p>问题一般是：脏读、不可重复读、幻读</p>
+<ul>
+<li>脏读：B读取了A<strong>回滚前</strong>的数据</li>
+<li>不可重复读：<strong>B两次读取</strong>，分别读了A修改前和修改后的数据</li>
+<li>幻读：一般是B事务<strong>SELECT一个WHERE范围</strong>，在这个范围中读到了<strong>A没提交的insert数据</strong></li>
+<li><code> SELECT @@transaction_isolation;</code>查看隔离级别<h2 id="5-1RU级别"><a href="#5-1RU级别" class="headerlink" title="5.1RU级别"></a>5.1RU级别</h2>RU：Read Uncommitted <strong>读未提交</strong>，最低的隔离级别，<strong>任何情况都不加锁</strong>，在这个隔离级别下可能出现所有的问题</li>
+</ul>
+<h2 id="5-2RC级别"><a href="#5-2RC级别" class="headerlink" title="5.2RC级别"></a>5.2RC级别</h2><p>RC：Read Committed <strong>读已提交</strong>，MVCC支持的最低隔离级别</p>
+<ul>
+<li>如果有InnoDB的MVCC机制，则解决了：脏读、不可重复读</li>
+<li>如果没有MVCC机制，则只解决了：脏读</li>
+</ul>
+<h2 id="5-3RR级别"><a href="#5-3RR级别" class="headerlink" title="5.3RR级别"></a>5.3RR级别</h2><p>RR：Read Repeatable <strong>可重复读</strong>，<strong>在MVCC机制下可避免幻读</strong></p>
+<h2 id="5-4Serializable"><a href="#5-4Serializable" class="headerlink" title="5.4Serializable"></a>5.4Serializable</h2><p>Serializable：<strong>串行化</strong>，最高的隔离级别，由加锁实现，最安全，性能最差<br>如果每条crud都加x锁，那么即便是不设置隔离级别为串行化，也是串行的</p>
+<h1 id="6-锁：总结"><a href="#6-锁：总结" class="headerlink" title="6.锁：总结"></a>6.锁：总结</h1><ul>
+<li>事务的<code>隔离性</code>是由锁实现的 （也可由MVCC）</li>
+<li><strong>锁的互斥性需要相同类型的锁</strong>，比如间隙锁与插入意向锁同为gap锁，同类型的冲突保证了间隙不出现幻读；而真正表级的意向锁互相都是兼容的，不会相互阻塞，他仅作为一个提示</li>
+<li></li>
+</ul>
+<h1 id="7-锁的概述"><a href="#7-锁的概述" class="headerlink" title="7.锁的概述"></a>7.锁的概述</h1><p>锁机制用于多个线程or进程并发访问某一个资源，保证数据的一致性和完整性。<br>锁机制保证了各个事务的隔离级别<br>锁机制一般不针对读-读，只针对读-写 、写-读 、写-写</p>
+<h1 id="8-补：InnoDB的内存结构"><a href="#8-补：InnoDB的内存结构" class="headerlink" title="8.补：InnoDB的内存结构"></a>8.补：InnoDB的内存结构</h1><p><img src="https://img-blog.csdnimg.cn/a3142b47e0964d91b5c8c3e008e17589.png"></p>
+<p><img src="https://img-blog.csdnimg.cn/5db385f9d8d645d68273214e751b6ffa.png"><img src="https://img-blog.csdnimg.cn/77bb4e2b7ea34215943f2f71e1535af6.png"></p>
+<p><img src="https://img-blog.csdnimg.cn/377617355b2c4c268ad3faa83b5edbad.png"><img src="https://img-blog.csdnimg.cn/399dbcd17e0a4a5a971abc9d497c21b2.png"></p>
+<h1 id="9-按操作类型-兼容性-划分"><a href="#9-按操作类型-兼容性-划分" class="headerlink" title="9.按操作类型(兼容性)划分"></a>9.按操作类型(兼容性)划分</h1><p>共享锁（读锁）（S锁）：<code>SELECT ... LOCK IN SHARE MODE</code>或<code>SELECT .. FOR SHARE</code><br>排他锁（写锁）（X锁）：<code>SELECT .. FOR UPDATE</code></p>
+<ul>
+<li>锁可以手动加，也可以自动加</li>
+<li>这两种锁主要体现在兼容性（是否会相互阻塞）上，无论是行锁表锁、意向锁等等都存在兼容性问题<br><img src="https://img-blog.csdnimg.cn/fb551713969e4aeca3fa14b689e04ecd.png"></li>
+<li>兼容性不是一成不变的，<strong>表锁的兼容性与行锁的就不同</strong>。</li>
+<li><em>同一个事务中</em>*<br>行锁：不会互相影响，即同一事务可以同时SELECT 又 UPDATE<br>表锁：独占的，本事务加S表锁，则不能在本事务中UPDATE</li>
+</ul>
+<h2 id="9-1读"><a href="#9-1读" class="headerlink" title="9.1读"></a>9.1读</h2><p>读没什么好说的</p>
+<h2 id="9-2写"><a href="#9-2写" class="headerlink" title="9.2写"></a>9.2写</h2><h3 id="9-2-1-insert"><a href="#9-2-1-insert" class="headerlink" title="9.2.1 insert"></a>9.2.1 insert</h3><p>由<code>隐式锁</code>保护，<strong>保证新数据在commit之前不会被其他事务访问</strong></p>
+<h3 id="9-2-2-delete"><a href="#9-2-2-delete" class="headerlink" title="9.2.2 delete"></a>9.2.2 delete</h3><p>从B+树找到该条记录的位置，获取这条记录的X锁，执行delete mark软删。真正的删除是purge线程删除</p>
+<h3 id="9-2-3-update"><a href="#9-2-3-update" class="headerlink" title="9.2.3 update"></a>9.2.3 update</h3><p>分为3种情况</p>
+<ul>
+<li>情况1：未修改主键，且更新后存储空间<strong>不变</strong>：定位——获取X锁——在原记录的位置上修改</li>
+<li>情况2：未修改主键，但更新后存储空间<strong>改变</strong>：定位——获取X锁——删除原数据，<strong>再insert（隐式锁）</strong></li>
+<li>情况3：修改了主键：类似情况2，先delete再insert</li>
+</ul>
+<h1 id="10-按粒度划分"><a href="#10-按粒度划分" class="headerlink" title="10.按粒度划分"></a>10.按粒度划分</h1><ul>
+<li>锁粒度越小（锁定的少），并发性越好，但资源消耗更大</li>
+</ul>
+<h2 id="10-1表锁"><a href="#10-1表锁" class="headerlink" title="10.1表锁"></a>10.1表锁</h2><h3 id="10-1-1表级S锁与X锁"><a href="#10-1-1表级S锁与X锁" class="headerlink" title="10.1.1表级S锁与X锁"></a>10.1.1表级S锁与X锁</h3><ul>
+<li><p>没有死锁问题</p>
+</li>
+<li><p>表锁也有S锁和X锁，但是兼容性与行锁不同：具体体现在如下两点<br><img src="https://img-blog.csdnimg.cn/94af8e0a0407413db3ce008bfe79b54f.png"></p>
+</li>
+<li><p>语法演示：</p>
+<pre><code>  begin;
+  lock tables xxx read; #也可以加write锁
+  show open tables where in_use &gt; 0; #查看加锁的表
+  SELECT * FROM xxx ; # 正常可以查
+  UPDATE xxx SET s1 = 111  WHERE ... ;#阻塞，因为加了S表锁，所以同一事务也不能写当前表
+  unlock tables;#也可以直接commit; 都是释放表锁
+</code></pre>
+</li>
+</ul>
+<h3 id="10-1-2意向锁intention-lock-多粒度锁支持-加行锁时自动添加表级意向锁"><a href="#10-1-2意向锁intention-lock-多粒度锁支持-加行锁时自动添加表级意向锁" class="headerlink" title="10.1.2意向锁intention lock(多粒度锁支持)(加行锁时自动添加表级意向锁)"></a>10.1.2意向锁intention lock(多粒度锁支持)(加行锁时自动添加表级意向锁)</h3><ul>
+<li>InnoDB支持多粒度锁（允许行锁表锁共存）。而<strong>意向锁就是一种表锁</strong></li>
+<li>意向锁由存储引擎自己维护，用户无法操作。当添加<strong>行锁</strong>的时候，自动生成这个<strong>表级别的意向锁</strong></li>
+<li><strong>意向锁不会锁住这个表</strong>，他只是告诉其他表“<strong>有其他事务锁住了表中的某些记录</strong>”</li>
+</ul>
+<p>如果事务想要获得数据表中<strong>某些记录</strong>的<strong>共享S锁</strong>，就需要在数据<strong>表</strong>上添加<strong>意向共享S锁</strong>。<br>如果事务想要获得数据表中<strong>某些记录</strong>的<strong>排他X锁</strong>，就需要在数据<strong>表</strong>上添加<strong>意向排他X锁</strong>。</p>
+<ul>
+<li>意向锁互相兼容（也可以看作意向锁与行锁相互兼容）<br><img src="https://img-blog.csdnimg.cn/37629e64af5d4b0a85047941f4737e3e.png"></li>
+<li>意向锁与<strong>表锁</strong>存在不兼容情况<br><img src="https://img-blog.csdnimg.cn/f38c426a765e45818115c2040e01e1f9.png"><img src="https://img-blog.csdnimg.cn/61d05a11722a4cd39639cbcd9d275798.png"></li>
+</ul>
+<h3 id="10-1-3自增锁AUTO-INC"><a href="#10-1-3自增锁AUTO-INC" class="headerlink" title="10.1.3自增锁AUTO-INC"></a>10.1.3自增锁AUTO-INC</h3><p>如果主键设置的是auto_increment，那么就有这个自增锁，<strong>当一个事务持有自增锁的时候，其他事务的insert语句都会被阻塞。</strong>如果innoDB知道要插入多少条数据则不会上自增锁</p>
+<ul>
+<li>能明确知道插入的行数：例如insert into xx ..value(),(),()</li>
+<li>不能明确知道插入的行数：例如从其他表查<code>insert...select</code> 或 <code>replace...select</code>  或<code>load data</code>或混合模式</li>
+</ul>
+<h3 id="10-1-4元数据锁meta-data-lock"><a href="#10-1-4元数据锁meta-data-lock" class="headerlink" title="10.1.4元数据锁meta data lock"></a>10.1.4元数据锁meta data lock</h3><ul>
+<li>这个锁是表级别的，是为了防止crud DML的途中<strong>其他事务修改表结构</strong></li>
+<li> crud DML的时候加MDL读锁，修改表结构DDL的时候加MDL写锁。读-读不互斥</li>
+<li>对用户透明，自动添加</li>
+</ul>
+<h2 id="10-2行锁"><a href="#10-2行锁" class="headerlink" title="10.2行锁"></a>10.2行锁</h2><p>行锁在存储引擎层实现，粒度小，开销大，更容易出现死锁，并发度高<br>对于行锁的监控方法如下</p>
+<p><img src="https://img-blog.csdnimg.cn/8fd568b351e3472f8ade4bf64fc9c8b5.png"><br><img src="https://img-blog.csdnimg.cn/19b3af1633fc4eb8b06fa5e9ca660a05.png"><img src="https://img-blog.csdnimg.cn/910c2321bfbc4c3eae19989bd882f3d1.png"></p>
+<h3 id="10-2-1记录锁record-locks"><a href="#10-2-1记录锁record-locks" class="headerlink" title="10.2.1记录锁record locks"></a>10.2.1记录锁record locks</h3><p>这个就是可以自行添加，或在非RU级别下自动添加的锁，是狭义上的行锁</p>
+<h3 id="10-2-2间隙锁gap-lock"><a href="#10-2-2间隙锁gap-lock" class="headerlink" title="10.2.2间隙锁gap lock"></a>10.2.2间隙锁gap lock</h3><ul>
+<li>gap lock的提出仅仅是为了防止<strong>幻读</strong>，防止在间隙写入数据</li>
+<li>gap lock可能是由next_key locks退化而来</li>
+<li>我个人更倾向于：间隙锁是临键锁的组成成分，而保证间隙锁的必要条件是<code>索引</code>，因为只有索引才能保证确定这个间隙锁的范围</li>
+<li>如何触发间隙锁？：<strong>有索引</strong>，<code>范围查询or查不存在的值</code></li>
+</ul>
+<h3 id="10-2-3临键锁next-key-locks"><a href="#10-2-3临键锁next-key-locks" class="headerlink" title="10.2.3临键锁next_key locks"></a>10.2.3临键锁next_key locks</h3><ul>
+<li>默认情况下，InnoDB在REPEATABLE READ事务隔离级别运行，InnoDB使用next-key锁进行<strong>搜索和索引扫描，以防止幻读。</strong></li>
+<li><code>临键锁 =  gap锁 + 记录锁  </code></li>
+<li>例如 SELCT * FROM xxx WHERE age &lt;= 10 and age &gt; 5 （for update）这样加S锁（或X锁），因为有索引存在，（5,10]上的数据是不允许被其他事务插入的，从而防止了幻读</li>
+</ul>
+<h3 id="10-2-4插入意向锁insert-intention-locks"><a href="#10-2-4插入意向锁insert-intention-locks" class="headerlink" title="10.2.4插入意向锁insert intention locks"></a>10.2.4插入意向锁insert intention locks</h3><ul>
+<li>这个锁是一个gap锁，而不是意向锁。</li>
+<li>因为其他事务需要保证间隙锁生效，<strong>因此需要一个同类型的锁来进行判断，所以引出了插入意向锁用于判断是否冲突</strong></li>
+</ul>
+<h2 id="10-3页锁"><a href="#10-3页锁" class="headerlink" title="10.3页锁"></a>10.3页锁</h2><ul>
+<li>行锁与表锁的折中粒度锁，并发度一般，也会出现死锁</li>
+<li>InnoDB一般用不到页锁</li>
+<li><strong>锁空间占满了，自动进行了锁升级</strong>，比如delete太多数据会导致锁表</li>
+</ul>
+<h1 id="11-按态度划分"><a href="#11-按态度划分" class="headerlink" title="11.按态度划分"></a>11.按态度划分</h1><h2 id="11-1乐观锁"><a href="#11-1乐观锁" class="headerlink" title="11.1乐观锁"></a>11.1乐观锁</h2><ul>
+<li>通过程序代码实现，而不采用数据库的锁机制</li>
+<li>例如CAS机制、版本号机制（如where xxx = #{xxx}比如对update_time的时间戳进行校验）</li>
+</ul>
+<h2 id="11-2悲观锁"><a href="#11-2悲观锁" class="headerlink" title="11.2悲观锁"></a>11.2悲观锁</h2><ul>
+<li>像Java中的<code>synchronized和ReentantLock</code>等等<code>独占锁</code>都是悲观锁实现</li>
+<li>在MySQL中使用悲观锁<strong>一定需要索引</strong>，否则会导致锁表（全表扫描）</li>
+<li>如果事务太长（锁开销过高），推荐使用乐观锁</li>
+</ul>
+<h1 id="12-加锁方式"><a href="#12-加锁方式" class="headerlink" title="12.加锁方式"></a>12.加锁方式</h1><h2 id="12-1隐式锁"><a href="#12-1隐式锁" class="headerlink" title="12.1隐式锁"></a>12.1隐式锁</h2><p>隐式锁是没有指令可以查看的，当且仅当产生锁等待的时候转为显示锁</p>
+<p><img src="https://img-blog.csdnimg.cn/81d18400a69c40c2b8c231afab322b9c.png"></p>
+<h2 id="12-2显示锁"><a href="#12-2显示锁" class="headerlink" title="12.2显示锁"></a>12.2显示锁</h2><p>上面能查看的锁都是显示锁</p>
+<h1 id="13-其他"><a href="#13-其他" class="headerlink" title="13.其他"></a>13.其他</h1><h2 id="13-1全局锁"><a href="#13-1全局锁" class="headerlink" title="13.1全局锁"></a>13.1全局锁</h2><ul>
+<li>对整个数据加锁：例如在全库逻辑备份的时候，整个数据库都是只读状态</li>
+<li>粒度最大的锁</li>
+</ul>
+<h2 id="13-2死锁"><a href="#13-2死锁" class="headerlink" title="13.2死锁"></a>13.2死锁</h2><h3 id="13-2-1产生条件"><a href="#13-2-1产生条件" class="headerlink" title="13.2.1产生条件"></a>13.2.1产生条件</h3><ul>
+<li>两个or以上的事务</li>
+<li>每个事务都已经持有锁，并且正在申请新的锁</li>
+<li>锁在不同的事务间不兼容</li>
+<li>关键在于：<strong>加锁的顺序不一致</strong></li>
+</ul>
+<h3 id="13-2-2如何处理死锁"><a href="#13-2-2如何处理死锁" class="headerlink" title="13.2.2如何处理死锁"></a>13.2.2如何处理死锁</h3><p>存储引擎层面：</p>
+<ul>
+<li>等待，直到超时：默认的innodb_lock_wait_timeout=50s，这个时间可以自己设置，如果太短也会误伤正常锁等待</li>
+<li>死锁检测：存储引擎自动检查事务是否产生回路（死锁），回滚undo量最小的事务。<strong>但是这个方法每次遇到阻塞都去检测，并发量高的情况下检测回路的开销特别大</strong>，也可以自行关闭</li>
+</ul>
+<p>业务设计层面：</p>
+<ul>
+<li>控制并发量：例如使用MQ</li>
+<li>调整SQL业务顺序，避免update和delete在事务的开头占据太长时间</li>
+<li>将大事务拆分为小事务</li>
+</ul>
+<p>数据库设计层面：</p>
+<ul>
+<li>合理设计索引，减少锁竞争</li>
+<li>降低隔离级别，且尽量不要显示加锁。（例如有MVCC的存在，可以将RR调整为RC，避免gap lock造成的死锁）</li>
+</ul>
+<h1 id="14-MVCC"><a href="#14-MVCC" class="headerlink" title="14.MVCC"></a>14.MVCC</h1><ul>
+<li>MVCC:多版本并发控制，与锁机制共同保证了事务的隔离性</li>
+<li>依赖于数据库每行记录中的<code>三个隐藏字段</code>、<code>undo log</code>、<code>readView</code></li>
+<li>在MySQL的InnoDB中，依赖于MVCC，<code>RR(REPEATABLE READ)</code>隔离级别下解决了幻读问题（如果没有MVCC机制则需要串行化or全加X锁才能解决幻读）</li>
+<li>MVCC在RR级别和RC级别都是有效的，区别在于<code>ReadView</code>对于undo log的判断规则。只是后者不能解决幻读问题。<strong>MVCC保证的是读，锁保证的是写，因为写永远是针对最新的版本。</strong></li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/848e9bb938f74a488cd5e76484c4a6fd.png"></p>
+<h2 id="14-1当前读、快照读"><a href="#14-1当前读、快照读" class="headerlink" title="14.1当前读、快照读"></a>14.1当前读、快照读</h2><p>快照读的前提是<strong>不能是串行化</strong>，串行化下快照读退化为当前读<br><img src="https://img-blog.csdnimg.cn/aba4d84e165a4c17b741561cb154a39c.png"></p>
+<h2 id="14-2MVCC实现原理"><a href="#14-2MVCC实现原理" class="headerlink" title="14.2MVCC实现原理"></a>14.2MVCC实现原理</h2><h3 id="14-2-1undo-log版本链"><a href="#14-2-1undo-log版本链" class="headerlink" title="14.2.1undo log版本链"></a>14.2.1undo log版本链</h3><p>每次事务修改这条记录，都会产生一个版本，版本中的隐藏列DB_ROLL_PTR指针又形成了undo log版本链<br><img src="https://img-blog.csdnimg.cn/c90f31a47bda43408606a4be6c4ca21d.png"></p>
+<h3 id="14-2-2readView"><a href="#14-2-2readView" class="headerlink" title="14.2.2readView"></a>14.2.2readView</h3><p>这里面包含的四个字段，都是事务id相关的，他们共同决定了在读取undo log版本链的时候究竟是读哪个版本的数据。并且跟隔离级别也有关系</p>
+<p><img src="https://img-blog.csdnimg.cn/ebf094ebf632406892dbbc4a085e3b39.png"><br><img src="https://img-blog.csdnimg.cn/5804adb358f34b83bf6f767daeb3b479.png"><br><img src="https://img-blog.csdnimg.cn/c62ecd17a1f5460aa0e115c238963a31.png"></p>
+
+      
+       <hr><span style="font-style: italic;color: gray;"> 生命以负熵为食，归整以抵抗熵增； </span>
+    </div>
+</article>
+
+
+
+
+
+
+
+    
+        <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="//cdn.jsdelivr.net/npm/mathjax@2.7.8/unpacked/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+<input type="hidden" id="MathJax-js"
+        value="//cdn.jsdelivr.net/npm/mathjax@2.7.8/unpacked/MathJax.js?config=TeX-MML-AM_CHTML">
+</input>
+    
+
+
+
+
+    </div>
+    <div class="copyright">
+        <p class="footer-entry">
+    ©2021 ZJH
+</p>
+<p class="footer-entry">"生命以负熵为食"
+
+    </div>
+    <div class="full-toc">
+        <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
+<a class="" id="rocket" ></a>
+
+    </div>
+</div>
+
+</body>
+<script src="/zjh/js/jquery.pjax.js?v=1.1.0" ></script>
+
+<script src="/zjh/js/script.js?v=1.1.0" ></script>
+<script>
+    var img_resize = 'default';
+    function initArticle() {
+        /*渲染对应的表格样式*/
+        
+            $("#post .pjax table").addClass("green_title");
+        
+
+        /*渲染打赏样式*/
+        
+
+        /*高亮代码块行号*/
+        
+        $('pre code').each(function(){
+            var lines = $(this).text().trim().split('\n').length, widther='';
+            if (lines>99) {
+                widther = 'widther'
+            }
+            var $numbering = $('<ul/>').addClass('pre-numbering ' + widther).attr("unselectable","on");
+            $(this).addClass('has-numbering ' + widther)
+                    .parent()
+                    .append($numbering);
+            for(var i=1;i<=lines;i++){
+                $numbering.append($('<li/>').text(i));
+            }
+        });
+        
+
+        /*访问数量*/
+        
+        $.getScript("//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js");
+        
+
+        /*代码高亮，行号对齐*/
+        $('.pre-numbering').css('line-height',$('.has-numbering').css('line-height'));
+
+        
+        
+    }
+
+    /*打赏页面隐藏与展示*/
+    
+
+</script>
+
+<!--加入行号的高亮代码块样式-->
+
+<style>
+    pre{
+        position: relative;
+        margin-bottom: 24px;
+        border-radius: 10px;
+        border: 1px solid #e2dede;
+        background: #FFF;
+        overflow: hidden;
+    }
+    code.has-numbering{
+        margin-left: 30px;
+    }
+    code.has-numbering.widther{
+        margin-left: 35px;
+    }
+    .pre-numbering{
+        margin: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 20px;
+        padding: 0.5em 3px 0.7em 5px;
+        border-right: 1px solid #C3CCD0;
+        text-align: right;
+        color: #AAA;
+        background-color: ;
+    }
+    .pre-numbering.widther {
+        width: 35px;
+    }
+</style>
+
+<!--自定义样式设置-->
+<style>
+    
+    
+    .nav {
+        width: 542px;
+    }
+    .nav.fullscreen {
+        margin-left: -542px;
+    }
+    .nav-left {
+        width: 120px;
+    }
+    
+    
+    @media screen and (max-width: 1468px) {
+        .nav {
+            width: 492px;
+        }
+        .nav.fullscreen {
+            margin-left: -492px;
+        }
+        .nav-left {
+            width: 100px;
+        }
+    }
+    
+    
+    @media screen and (max-width: 1024px) {
+        .nav {
+            width: 492px;
+            margin-left: -492px
+        }
+        .nav.fullscreen {
+            margin-left: 0;
+        }
+    }
+    
+    @media screen and (max-width: 426px) {
+        .nav {
+            width: 100%;
+        }
+        .nav-left {
+            width: 100%;
+        }
+    }
+    
+    
+    .nav-right .title-list nav a .post-title, .nav-right .title-list #local-search-result a .post-title {
+        color: #383636;
+    }
+    
+    
+    .nav-right .title-list nav a .post-date, .nav-right .title-list #local-search-result a .post-date {
+        color: #5e5e5f;
+    }
+    
+    
+    .nav-right nav a.hover, #local-search-result a.hover{
+        background-color: #e2e0e0;
+    }
+    
+    
+
+    /*列表样式*/
+    
+
+    /* 背景图样式 */
+    
+    
+
+
+    /*引用块样式*/
+    
+
+    /*文章列表背景图*/
+    
+
+    
+</style>
+
+
+
+
+
+
+
+</html>
