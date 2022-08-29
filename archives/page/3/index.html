@@ -6,42 +6,20 @@
   <meta name="keywords" content="">
   <meta name="description" content="ZJH&#39;blog">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="事务的4大特性分别由：事务日志、锁机制实现，0~4标题是事务日志，5之后是锁机制 每个阶段的小结放在最前面  0.事务日志：总结 redo log保证持久性，在innodb_flush_log_at_trx_commit&#x3D;1（默认）的情况下，保证了事务的安全可靠 undo log保证原子性、一致性，且undo log自身的持久化也依赖于redo log。undo log通过回滚指针形成链路，保证">
+<meta name="description" content="这里讨论Mysql（redolog）、Redis（AOF）、RabbitMQ（消息持久化） 三者的共同点都是：先在内存缓冲池中追加记录、以一定的频率刷盘持久化、批量刷盘都存在数据丢失的风险 刷盘（从内存到磁盘）的过程中可能出现问题，因此中间件需要提供其他的辅助安全方案 redolog和AOF的刷盘都是同步的（master线程），但RabbitMQ是异步的且不能指定刷盘频率，参考官网文档 中间件重">
 <meta property="og:type" content="article">
-<meta property="og:title" content="MySQL事务与锁">
-<meta property="og:url" content="https://zjhblog.gitee.io/2022/08/23/MySQL%E4%BA%8B%E5%8A%A1%E4%B8%8E%E9%94%81/index.html">
+<meta property="og:title" content="三种中间件的刷盘(持久化)策略">
+<meta property="og:url" content="https://zjhblog.gitee.io/2022/08/28/%E4%B8%89%E7%A7%8D%E4%B8%AD%E9%97%B4%E4%BB%B6%E7%9A%84%E5%88%B7%E7%9B%98-%E6%8C%81%E4%B9%85%E5%8C%96-%E7%AD%96%E7%95%A5/index.html">
 <meta property="og:site_name" content="ZJH&#39;blog">
-<meta property="og:description" content="事务的4大特性分别由：事务日志、锁机制实现，0~4标题是事务日志，5之后是锁机制 每个阶段的小结放在最前面  0.事务日志：总结 redo log保证持久性，在innodb_flush_log_at_trx_commit&#x3D;1（默认）的情况下，保证了事务的安全可靠 undo log保证原子性、一致性，且undo log自身的持久化也依赖于redo log。undo log通过回滚指针形成链路，保证">
+<meta property="og:description" content="这里讨论Mysql（redolog）、Redis（AOF）、RabbitMQ（消息持久化） 三者的共同点都是：先在内存缓冲池中追加记录、以一定的频率刷盘持久化、批量刷盘都存在数据丢失的风险 刷盘（从内存到磁盘）的过程中可能出现问题，因此中间件需要提供其他的辅助安全方案 redolog和AOF的刷盘都是同步的（master线程），但RabbitMQ是异步的且不能指定刷盘频率，参考官网文档 中间件重">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/15768b7c08c14eec9fae8e77459f1d04.png">
 <meta property="og:image" content="https://img-blog.csdnimg.cn/63a03ebe859341208c8d8c6ed631c457.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/632b7b30e4fc498392ec41e1db4c2c4a.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/ecfaae3fedf94c03a401683f5ba73d38.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/a3142b47e0964d91b5c8c3e008e17589.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/5db385f9d8d645d68273214e751b6ffa.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/77bb4e2b7ea34215943f2f71e1535af6.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/377617355b2c4c268ad3faa83b5edbad.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/399dbcd17e0a4a5a971abc9d497c21b2.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/fb551713969e4aeca3fa14b689e04ecd.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/94af8e0a0407413db3ce008bfe79b54f.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/37629e64af5d4b0a85047941f4737e3e.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/f38c426a765e45818115c2040e01e1f9.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/61d05a11722a4cd39639cbcd9d275798.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/8fd568b351e3472f8ade4bf64fc9c8b5.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/19b3af1633fc4eb8b06fa5e9ca660a05.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/910c2321bfbc4c3eae19989bd882f3d1.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/81d18400a69c40c2b8c231afab322b9c.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/848e9bb938f74a488cd5e76484c4a6fd.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/aba4d84e165a4c17b741561cb154a39c.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/c90f31a47bda43408606a4be6c4ca21d.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/ebf094ebf632406892dbbc4a085e3b39.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/5804adb358f34b83bf6f767daeb3b479.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/c62ecd17a1f5460aa0e115c238963a31.png">
-<meta property="article:published_time" content="2022-08-23T04:49:38.000Z">
-<meta property="article:modified_time" content="2022-08-23T04:50:31.157Z">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/0b463077bdad46bea54169917cbaa8c9.png">
+<meta property="article:published_time" content="2022-08-28T05:34:20.000Z">
+<meta property="article:modified_time" content="2022-08-28T05:34:38.213Z">
 <meta property="article:author" content="ZJH">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://img-blog.csdnimg.cn/15768b7c08c14eec9fae8e77459f1d04.png">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/63a03ebe859341208c8d8c6ed631c457.png">
 
 
 <link rel="icon" href="/img/QQ图片20211224224200.jpg">
@@ -151,7 +129,7 @@
     <li>
         <div class="all active" data-rel="全部文章">全部文章
             
-                <small>(46)</small>
+                <small>(51)</small>
             
         </div>
     </li>
@@ -232,7 +210,7 @@
                     <div data-rel="Java">
                         
                         Java
-                        <small>(8)</small>
+                        <small>(13)</small>
                         
                     </div>
                     
@@ -253,8 +231,8 @@
         
     </div>
 </div>
-<input type="hidden" id="yelog_site_posts_number" value="46">
-<input type="hidden" id="yelog_site_word_count" value="82.7k">
+<input type="hidden" id="yelog_site_posts_number" value="51">
+<input type="hidden" id="yelog_site_word_count" value="96.5k">
 <div style="display: none">
     <span id="busuanzi_value_site_uv"></span>
     <span id="busuanzi_value_site_pv"></span>
@@ -309,6 +287,46 @@
 
     
     <nav id="title-list-nav">
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/08/28/%E4%B8%89%E7%A7%8D%E4%B8%AD%E9%97%B4%E4%BB%B6%E7%9A%84%E5%88%B7%E7%9B%98-%E6%8C%81%E4%B9%85%E5%8C%96-%E7%AD%96%E7%95%A5/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="三种中间件的刷盘(持久化)策略">三种中间件的刷盘(持久化)策略</span>
+            <span class="post-date" title="2022-08-28 13:34:20">2022/08/28</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/08/28/redis%E5%9F%BA%E7%A1%80/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="redis基础">redis基础</span>
+            <span class="post-date" title="2022-08-28 12:21:22">2022/08/28</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/08/27/RabbitMQ%E5%9F%BA%E7%A1%80/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="RabbitMQ基础">RabbitMQ基础</span>
+            <span class="post-date" title="2022-08-27 16:26:14">2022/08/27</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/08/27/RabbitMQ%E5%8F%AF%E9%9D%A0%E6%80%A7-Spring/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="RabbitMQ可靠性-Spring">RabbitMQ可靠性-Spring</span>
+            <span class="post-date" title="2022-08-27 16:02:25">2022/08/27</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/08/27/RabbitMQ%E6%AD%BB%E4%BF%A1%E9%98%9F%E5%88%97%E3%80%81%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97-Spring/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="RabbitMQ死信队列、延迟队列-Spring">RabbitMQ死信队列、延迟队列-Spring</span>
+            <span class="post-date" title="2022-08-27 01:05:35">2022/08/27</span>
+        </a>
         
         <a  class="全部文章 数据库 "
            href="/zjh/2022/08/23/MySQL%E4%BA%8B%E5%8A%A1%E4%B8%8E%E9%94%81/"
@@ -503,10 +521,10 @@
         </a>
         
         <a  class="全部文章 工作笔记 "
-           href="/zjh/2022/07/15/124%E4%B8%AAdelete-flag%E7%9A%84%E5%BF%83%E9%85%B8/"
+           href="/zjh/2022/07/15/%E4%B8%9A%E5%8A%A1%E4%B8%ADdelete_flag%E5%AD%97%E6%AE%B5%E5%AE%B9%E6%98%93%E8%B8%A9%E7%9A%84%E5%9D%91/"
            data-tag=""
            data-author="" >
-            <span class="post-title" title="124个delete_flag的心酸">124个delete_flag的心酸</span>
+            <span class="post-title" title="业务中delete_flag字段容易踩的坑">业务中delete_flag字段容易踩的坑</span>
             <span class="post-date" title="2022-07-15 21:19:19">2022/07/15</span>
         </a>
         

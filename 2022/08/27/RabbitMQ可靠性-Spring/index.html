@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>RabbitMQ可靠性-Spring | ZJH&#39;blog</title>
+  <meta name="keywords" content="">
+  <meta name="description" content="RabbitMQ可靠性-Spring | ZJH&#39;blog">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="description" content="这里讨论Mysql（redolog）、Redis（AOF）、RabbitMQ（消息持久化） 三者的共同点都是：先在内存缓冲池中追加记录、以一定的频率刷盘持久化、批量刷盘都存在数据丢失的风险 刷盘（从内存到磁盘）的过程中可能出现问题，因此中间件需要提供其他的辅助安全方案 redolog和AOF的刷盘都是同步的（master线程），但RabbitMQ是异步的且不能指定刷盘频率，参考官网文档 中间件重">
+<meta property="og:type" content="article">
+<meta property="og:title" content="三种中间件的刷盘(持久化)策略">
+<meta property="og:url" content="https://zjhblog.gitee.io/2022/08/28/%E4%B8%89%E7%A7%8D%E4%B8%AD%E9%97%B4%E4%BB%B6%E7%9A%84%E5%88%B7%E7%9B%98-%E6%8C%81%E4%B9%85%E5%8C%96-%E7%AD%96%E7%95%A5/index.html">
+<meta property="og:site_name" content="ZJH&#39;blog">
+<meta property="og:description" content="这里讨论Mysql（redolog）、Redis（AOF）、RabbitMQ（消息持久化） 三者的共同点都是：先在内存缓冲池中追加记录、以一定的频率刷盘持久化、批量刷盘都存在数据丢失的风险 刷盘（从内存到磁盘）的过程中可能出现问题，因此中间件需要提供其他的辅助安全方案 redolog和AOF的刷盘都是同步的（master线程），但RabbitMQ是异步的且不能指定刷盘频率，参考官网文档 中间件重">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/63a03ebe859341208c8d8c6ed631c457.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/0b463077bdad46bea54169917cbaa8c9.png">
+<meta property="article:published_time" content="2022-08-28T05:34:20.000Z">
+<meta property="article:modified_time" content="2022-08-28T05:34:38.213Z">
+<meta property="article:author" content="ZJH">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/63a03ebe859341208c8d8c6ed631c457.png">
+
+
+<link rel="icon" href="/img/QQ图片20211224224200.jpg">
+
+<link href="/zjh/css/style.css?v=1.1.0" rel="stylesheet">
+
+<link href="/zjh/css/hl_theme/rainbow.css?v=1.1.0" rel="stylesheet">
+
+<link href="//cdn.jsdelivr.net/npm/animate.css@4.1.0/animate.min.css" rel="stylesheet">
+
+<script src="//cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+<script src="/zjh/js/titleTip.js?v=1.1.0" ></script>
+
+<script src="//cdn.jsdelivr.net/npm/highlightjs@9.16.2/highlight.pack.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+<script src="//cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js"></script>
+
+
+
+<script src="//cdn.jsdelivr.net/npm/jquery.cookie@1.4.1/jquery.cookie.min.js" ></script>
+
+<script src="/zjh/js/iconfont.js?v=1.1.0" ></script>
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<div style="display: none">
+  <input class="theme_disqus_on" value="false">
+  <input class="theme_preload_comment" value="">
+  <input class="theme_blog_path" value="/zjh">
+  <input id="theme_shortcut" value="true" />
+  <input id="theme_highlight_on" value="true" />
+  <input id="theme_code_copy" value="true" />
+</div>
+
+
+
+<body>
+<aside class="nav">
+    <div class="nav-left">
+        <a href="/zjh/"
+   class="avatar_target">
+    <img class="avatar"
+         src="/zjh/img/QQ图片20211224224200.jpg"/>
+</a>
+<div class="author">
+    <span>ZJH</span>
+</div>
+
+<div class="icon">
+    
+        
+            <a title="github"
+               href="https://github.com/BetterZJH"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-github"></use>
+                    </svg>
+                
+            </a>
+        
+    
+        
+            <a title="csdn"
+               href="https://blog.csdn.net/m0_56079407"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-csdn"></use>
+                    </svg>
+                
+            </a>
+        
+    
+        
+            <a title="email"
+               href="mailto:847829122@qq.com"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-email"></use>
+                    </svg>
+                
+            </a>
+        
+    
+        
+            <a title="qq"
+               href="http://wpa.qq.com/msgrd?v=3&uin=847829122&site=qq&menu=yes"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-qq"></use>
+                    </svg>
+                
+            </a>
+        
+    
+</div>
+
+
+
+
+<ul>
+    <li>
+        <div class="all active" data-rel="全部文章">全部文章
+            
+                <small>(51)</small>
+            
+        </div>
+    </li>
+    
+        
+            
+                <li>
+                    <div data-rel="数据库">
+                        
+                        数据库
+                        <small>(3)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="数据结构算法">
+                        
+                        数据结构算法
+                        <small>(8)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="工作笔记">
+                        
+                        工作笔记
+                        <small>(11)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="机器学习">
+                        
+                        机器学习
+                        <small>(7)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="源码">
+                        
+                        源码
+                        <small>(8)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="Java">
+                        
+                        Java
+                        <small>(13)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+</ul>
+<div class="left-bottom">
+    <div class="menus">
+        
+            
+            
+            
+    </div>
+    <div>
+        
+        
+    </div>
+</div>
+<input type="hidden" id="yelog_site_posts_number" value="51">
+<input type="hidden" id="yelog_site_word_count" value="96.5k">
+<div style="display: none">
+    <span id="busuanzi_value_site_uv"></span>
+    <span id="busuanzi_value_site_pv"></span>
+</div>
+
+    </div>
+    <div class="nav-right">
+        <div class="friends-area">
+    <div class="friends-title">
+        友情链接
+        <i class="iconfont icon-left"></i>
+    </div>
+    <div class="friends-content">
+        <ul>
+            
+            <li><a target="_blank" href="http://yelog.org/">叶落阁</a></li>
+            
+        </ul>
+    </div>
+</div>
+        <div class="title-list">
+    <div class="right-top">
+        <div id="default-panel">
+            <i class="iconfont icon-search" data-title="搜索 快捷键 i"></i>
+            <div class="right-title">全部文章</div>
+            <i class="iconfont icon-file-tree" data-title="切换到大纲视图 快捷键 w"></i>
+        </div>
+        <div id="search-panel">
+            <i class="iconfont icon-left" data-title="返回"></i>
+            <input id="local-search-input" autocomplete="off"/>
+            <label class="border-line" for="input"></label>
+            <i class="iconfont icon-case-sensitive" data-title="大小写敏感"></i>
+            <i class="iconfont icon-tag" data-title="标签"></i>
+        </div>
+        <div id="outline-panel" style="display: none">
+            <div class="right-title">大纲</div>
+            <i class="iconfont icon-list" data-title="切换到文章列表"></i>
+        </div>
+    </div>
+
+    <div class="tags-list">
+    <input id="tag-search" />
+    <div class="tag-wrapper">
+        
+            <li class="article-tag-list-item">
+                <i class="iconfont icon-tag"></i><a>HashMap</a>
+            </li>
+        
+    </div>
+
+</div>
+
+    
+    <nav id="title-list-nav">
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/08/28/%E4%B8%89%E7%A7%8D%E4%B8%AD%E9%97%B4%E4%BB%B6%E7%9A%84%E5%88%B7%E7%9B%98-%E6%8C%81%E4%B9%85%E5%8C%96-%E7%AD%96%E7%95%A5/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="三种中间件的刷盘(持久化)策略">三种中间件的刷盘(持久化)策略</span>
+            <span class="post-date" title="2022-08-28 13:34:20">2022/08/28</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/08/28/redis%E5%9F%BA%E7%A1%80/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="redis基础">redis基础</span>
+            <span class="post-date" title="2022-08-28 12:21:22">2022/08/28</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/08/27/RabbitMQ%E5%9F%BA%E7%A1%80/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="RabbitMQ基础">RabbitMQ基础</span>
+            <span class="post-date" title="2022-08-27 16:26:14">2022/08/27</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/08/27/RabbitMQ%E5%8F%AF%E9%9D%A0%E6%80%A7-Spring/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="RabbitMQ可靠性-Spring">RabbitMQ可靠性-Spring</span>
+            <span class="post-date" title="2022-08-27 16:02:25">2022/08/27</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/08/27/RabbitMQ%E6%AD%BB%E4%BF%A1%E9%98%9F%E5%88%97%E3%80%81%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97-Spring/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="RabbitMQ死信队列、延迟队列-Spring">RabbitMQ死信队列、延迟队列-Spring</span>
+            <span class="post-date" title="2022-08-27 01:05:35">2022/08/27</span>
+        </a>
+        
+        <a  class="全部文章 数据库 "
+           href="/zjh/2022/08/23/MySQL%E4%BA%8B%E5%8A%A1%E4%B8%8E%E9%94%81/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="MySQL事务与锁">MySQL事务与锁</span>
+            <span class="post-date" title="2022-08-23 12:49:38">2022/08/23</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/08/23/AOP%E5%AE%9E%E7%8E%B0%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="AOP实现分布式锁">AOP实现分布式锁</span>
+            <span class="post-date" title="2022-08-23 12:48:25">2022/08/23</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/08/23/ReentrantLock%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="ReentrantLock源码剖析">ReentrantLock源码剖析</span>
+            <span class="post-date" title="2022-08-23 12:34:15">2022/08/23</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/08/23/%E5%8F%8D%E5%B0%84%E8%8E%B7%E5%8F%96AQS%E4%B8%AD%E5%90%8C%E6%AD%A5%E9%98%9F%E5%88%97%E4%B8%8E%E7%AD%89%E5%BE%85%E9%98%9F%E5%88%97%E7%9A%84%E9%95%BF%E5%BA%A6/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="反射获取AQS中同步队列与等待队列的长度">反射获取AQS中同步队列与等待队列的长度</span>
+            <span class="post-date" title="2022-08-23 12:32:58">2022/08/23</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/08/14/Spring%E3%80%81Servlet%E7%9B%91%E5%90%AC%E5%99%A8/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Spring、Servlet监听器">Spring、Servlet监听器</span>
+            <span class="post-date" title="2022-08-14 21:01:46">2022/08/14</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/08/13/AOP-%E5%8F%8D%E5%B0%84%EF%BC%9A%E6%8E%A5%E5%8F%A3%E5%8F%82%E6%95%B0%E6%A0%A1%E9%AA%8C/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="AOP+反射：接口参数校验">AOP+反射：接口参数校验</span>
+            <span class="post-date" title="2022-08-13 17:12:17">2022/08/13</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/08/12/%E5%AF%B9dto%E6%8C%87%E5%AE%9A%E5%B1%9E%E6%80%A7%E4%B8%80%E9%94%AE%E5%8A%A0%E8%A7%A3%E5%AF%86/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="对dto指定属性一键加解密">对dto指定属性一键加解密</span>
+            <span class="post-date" title="2022-08-12 22:51:17">2022/08/12</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/08/03/%E5%8F%8D%E5%B0%84%E4%BF%AE%E6%94%B9jsessionid%E5%AE%9E%E7%8E%B0session%E5%85%B1%E4%BA%AB/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="反射修改jsessionid实现session共享">反射修改jsessionid实现session共享</span>
+            <span class="post-date" title="2022-08-03 21:53:21">2022/08/03</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/08/03/RestTemlate%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%8F%8A%E5%B7%A5%E5%85%B7%E7%B1%BB%E8%AE%BE%E8%AE%A1/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="RestTemlate源码分析及工具类设计">RestTemlate源码分析及工具类设计</span>
+            <span class="post-date" title="2022-08-03 21:51:57">2022/08/03</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/08/03/%E7%9F%AD%E4%BF%A1%E6%9C%8D%E5%8A%A1%E8%A2%AB%E6%94%BB%E5%87%BB%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="短信服务被攻击解决方案">短信服务被攻击解决方案</span>
+            <span class="post-date" title="2022-08-03 21:51:16">2022/08/03</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/08/03/%E5%9B%9B%E7%A7%8D%E6%96%B9%E6%B3%95Servlet%E5%AE%B9%E5%99%A8%E4%BD%BF%E7%94%A8Spring%E7%9A%84Bean%E5%AF%B9%E8%B1%A1/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="四种方法Servlet容器使用Spring的Bean对象">四种方法Servlet容器使用Spring的Bean对象</span>
+            <span class="post-date" title="2022-08-03 21:47:54">2022/08/03</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/07/29/(%E8%94%9A%E6%9D%A5)%E5%A4%8D%E6%9D%82%E9%93%BE%E8%A1%A8%E7%9A%84%E5%A4%8D%E5%88%B6/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="(蔚来)复杂链表的复制">(蔚来)复杂链表的复制</span>
+            <span class="post-date" title="2022-07-29 12:32:49">2022/07/29</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/07/20/%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%9A%E6%9B%BF%E6%8D%A2%E3%80%81%E5%B7%A6%E6%97%8B%E3%80%81%E7%BC%BA%E5%A4%B1/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="字符串：替换、左旋、缺失">字符串：替换、左旋、缺失</span>
+            <span class="post-date" title="2022-07-20 21:59:41">2022/07/20</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/07/20/%E4%B8%89%E7%A7%8D%E6%83%85%E5%86%B5%E7%9A%84%E5%B1%82%E5%BA%8F%E9%81%8D%E5%8E%86/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="三种情况的层序遍历">三种情况的层序遍历</span>
+            <span class="post-date" title="2022-07-20 21:58:33">2022/07/20</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/07/19/%E5%86%85%E5%AD%98%E5%8C%BA%E5%9F%9F%E3%80%81%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="内存区域、类的加载">内存区域、类的加载</span>
+            <span class="post-date" title="2022-07-19 22:29:21">2022/07/19</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/07/19/Restful%E9%A3%8E%E6%A0%BC%E7%9C%9F%E7%9A%84%E6%9C%89%E5%BF%85%E8%A6%81%E5%90%97/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Restful风格真的有必要吗？">Restful风格真的有必要吗？</span>
+            <span class="post-date" title="2022-07-19 20:19:57">2022/07/19</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/zjh/2022/07/17/%E6%B0%94%E8%B1%A1cv-%E5%9C%B0%E5%9F%BA%E4%BA%91%E5%9B%BE%E4%BA%91%E7%B3%BB%E5%88%86%E5%89%B2/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="气象cv-地基云图云系分割">气象cv-地基云图云系分割</span>
+            <span class="post-date" title="2022-07-17 12:04:12">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/zjh/2022/07/17/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA%E6%9E%A3%E7%B1%BB%E9%81%97%E4%BC%A0%E7%9A%84%E5%9B%9E%E5%BD%92%E9%A2%84%E6%B5%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="支持向量机枣类遗传的回归预测">支持向量机枣类遗传的回归预测</span>
+            <span class="post-date" title="2022-07-17 11:47:04">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/zjh/2022/07/17/%E6%B0%94%E8%B1%A1%E5%A4%A7%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="气象大数据分析">气象大数据分析</span>
+            <span class="post-date" title="2022-07-17 11:44:44">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/zjh/2022/07/17/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%8D%95%E5%9B%BE%E8%B6%85%E5%88%86%E8%BE%A8%E7%8E%87%E7%9A%84%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="卷积神经网络单图超分辨率的深度学习方法">卷积神经网络单图超分辨率的深度学习方法</span>
+            <span class="post-date" title="2022-07-17 11:33:07">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/zjh/2022/07/17/%E7%96%AB%E6%83%85%E6%B8%AF%E5%8F%A3%E6%8C%82%E9%9D%A0%E6%95%B0ARIMA%E6%97%B6%E5%BA%8F%E5%88%86%E6%9E%90/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="疫情港口挂靠数ARIMA时序分析">疫情港口挂靠数ARIMA时序分析</span>
+            <span class="post-date" title="2022-07-17 11:21:13">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/07/15/OGNL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%94%B9%E9%80%A0%E4%BB%A5%E4%BD%BF%E7%94%A8%E7%B4%A2%E5%BC%95/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="OGNL表达式改造以使用索引">OGNL表达式改造以使用索引</span>
+            <span class="post-date" title="2022-07-15 22:27:54">2022/07/15</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/07/15/mvcc+%E6%8C%89%E5%A4%A9%E7%BC%93%E5%AD%98%E7%BB%9F%E8%AE%A1%E4%B8%A4%E4%B8%AA%E6%94%B6%E7%9B%8A/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="mvcc+按天缓存统计两个收益">mvcc+按天缓存统计两个收益</span>
+            <span class="post-date" title="2022-07-15 21:35:25">2022/07/15</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/07/15/%E5%8E%8B%E7%BC%A9%E6%89%93%E5%8C%85%E4%BD%86%E4%B8%8D%E5%BD%92%E6%A1%A3%EF%BC%8C%E5%88%A9%E7%94%A8response/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="压缩打包但不归档，利用response">压缩打包但不归档，利用response</span>
+            <span class="post-date" title="2022-07-15 21:26:51">2022/07/15</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/07/15/%E4%B8%9A%E5%8A%A1%E4%B8%ADdelete_flag%E5%AD%97%E6%AE%B5%E5%AE%B9%E6%98%93%E8%B8%A9%E7%9A%84%E5%9D%91/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="业务中delete_flag字段容易踩的坑">业务中delete_flag字段容易踩的坑</span>
+            <span class="post-date" title="2022-07-15 21:19:19">2022/07/15</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/07/15/%E9%9D%9E%E6%97%B6%E5%BA%8F%E6%8E%92%E5%BA%8F%E4%B8%8B%E7%9A%84%E7%80%91%E5%B8%83%E6%B5%81%E5%88%86%E9%A1%B5/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="非时序排序下的瀑布流分页">非时序排序下的瀑布流分页</span>
+            <span class="post-date" title="2022-07-15 21:15:15">2022/07/15</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/06/25/%E8%A1%8C%E7%A8%8B%E7%BC%96%E7%A0%81%E5%8E%8B%E7%BC%A9%E5%9B%BE%E7%89%87/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="行程编码压缩图片">行程编码压缩图片</span>
+            <span class="post-date" title="2022-06-25 01:35:20">2022/06/25</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/04/21/%E5%B8%B8%E8%A7%81%E6%8E%92%E5%BA%8F/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="常见排序">常见排序</span>
+            <span class="post-date" title="2022-04-21 09:56:37">2022/04/21</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/04/21/Filter%E7%9A%84%E5%B8%B8%E8%A7%81%E7%94%A8%E6%B3%95/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Filter的常见用法">Filter的常见用法</span>
+            <span class="post-date" title="2022-04-21 09:51:40">2022/04/21</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/04/21/Lambda%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%92%8C%E6%96%B9%E6%B3%95%E5%BC%95%E7%94%A8/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Lambda表达式和方法引用">Lambda表达式和方法引用</span>
+            <span class="post-date" title="2022-04-21 09:50:42">2022/04/21</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/04/21/Mybatis%E4%B8%ADxml%E4%B8%AD%E8%B0%83java%E6%96%B9%E6%B3%95OGNL%E8%A1%A8%E8%BE%BE%E5%BC%8F/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Mybatis中xml中调java方法OGNL表达式">Mybatis中xml中调java方法OGNL表达式</span>
+            <span class="post-date" title="2022-04-21 09:47:36">2022/04/21</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/04/21/Java%E6%B3%A8%E8%A7%A3%E5%92%8C%E5%8F%8D%E5%B0%84/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Java注解和反射">Java注解和反射</span>
+            <span class="post-date" title="2022-04-21 09:45:15">2022/04/21</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/03/21/HashMap%E4%B8%ADentrySet-%E8%AF%A6%E8%A7%A3/"
+           data-tag="HashMap"
+           data-author="" >
+            <span class="post-title" title="HashMap中entrySet()详解">HashMap中entrySet()详解</span>
+            <span class="post-date" title="2022-03-21 00:15:10">2022/03/21</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/03/21/HashMap/"
+           data-tag="HashMap"
+           data-author="" >
+            <span class="post-title" title="HashMap">HashMap</span>
+            <span class="post-date" title="2022-03-21 00:13:23">2022/03/21</span>
+        </a>
+        
+        <a  class="全部文章 数据库 "
+           href="/zjh/2022/03/07/Mysql%E4%BA%8B%E5%8A%A1%E5%92%8C%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Mysql事务和存储引擎">Mysql事务和存储引擎</span>
+            <span class="post-date" title="2022-03-07 22:11:06">2022/03/07</span>
+        </a>
+        
+        <a  class="全部文章 数据库 "
+           href="/zjh/2022/03/07/Mysql-InnoDB-%E7%B4%A2%E5%BC%95%E5%8E%9F%E7%90%86%E5%8F%8A%E7%9A%84%E4%BD%BF%E7%94%A8/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Mysql(InnoDB)索引原理及的使用">Mysql(InnoDB)索引原理及的使用</span>
+            <span class="post-date" title="2022-03-07 22:10:05">2022/03/07</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/03/07/%E7%B1%BB%E8%87%AA%E8%BA%AB%E5%B5%8C%E5%A5%97-%E4%BA%8C%E5%8F%89%E6%A0%91%E5%88%A0%E9%99%A4-%E6%A0%88%E5%A0%86%E5%88%86%E6%9E%90/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="类自身嵌套(二叉树删除)栈堆分析">类自身嵌套(二叉树删除)栈堆分析</span>
+            <span class="post-date" title="2022-03-07 22:09:09">2022/03/07</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/03/07/Java%E5%A0%86%E6%8E%92%E5%BA%8F%E7%9A%84%E8%BF%87%E7%A8%8B%E5%88%B0%E8%AE%BE%E8%AE%A1/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Java堆排序的过程到设计">Java堆排序的过程到设计</span>
+            <span class="post-date" title="2022-03-07 22:08:08">2022/03/07</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/02/21/LinkedList%E6%BA%90%E7%A0%81%E4%B8%AD%E4%B8%BA%E4%BD%95%E5%A4%A7%E9%87%8F%E5%87%BA%E7%8E%B0final/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="LinkedList源码中为何大量出现final">LinkedList源码中为何大量出现final</span>
+            <span class="post-date" title="2022-02-21 09:57:35">2022/02/21</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/02/20/LinkedList%E4%B8%ADclear%E5%92%8Cunlink%E6%96%B9%E6%B3%95%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%A4%9A%E6%AC%A1%E7%BD%AE%E7%A9%BA/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="LinkedList中clear和unlink方法为什么要多次置空">LinkedList中clear和unlink方法为什么要多次置空</span>
+            <span class="post-date" title="2022-02-20 00:25:11">2022/02/20</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/02/20/gc%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%9C%BA%E5%88%B6/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="gc垃圾回收机制">gc垃圾回收机制</span>
+            <span class="post-date" title="2022-02-20 00:17:43">2022/02/20</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/zjh/2022/01/11/%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E6%B3%B0%E5%9D%A6%E5%B0%BC%E5%85%8B%E5%8F%B7%E8%8E%B7%E6%95%91%E9%A2%84%E6%B5%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="随机森林——泰坦尼克号获救预测">随机森林——泰坦尼克号获救预测</span>
+            <span class="post-date" title="2022-01-11 03:06:10">2022/01/11</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/zjh/2022/01/01/%E5%86%B3%E7%AD%96%E6%A0%91-%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E7%94%A8%E6%88%B7%E6%B5%81%E5%A4%B1%E9%A2%84%E6%B5%8B%E7%9A%84%E6%A1%88%E4%BE%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="决策树/随机森林——用户流失预测的案例">决策树/随机森林——用户流失预测的案例</span>
+            <span class="post-date" title="2022-01-01 00:41:40">2022/01/01</span>
+        </a>
+        
+        <a  class="全部文章 "
+           href="/zjh/2021/12/25/IDEA%E5%B8%B8%E7%94%A8%E5%BF%AB%E6%8D%B7%E9%94%AE/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="IDEA常用快捷键">IDEA常用快捷键</span>
+            <span class="post-date" title="2021-12-25 21:55:46">2021/12/25</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2021/12/25/%E5%9B%9E%E5%BD%A2%E9%92%88%E6%95%B0%E5%AD%97%E7%9F%A9%E9%98%B5Java%E5%AE%9E%E7%8E%B0/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="回形针数字矩阵Java实现">回形针数字矩阵Java实现</span>
+            <span class="post-date" title="2021-12-25 02:07:12">2021/12/25</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2021/12/25/Java%E5%9B%9B%E7%A7%8Dnext%E7%94%A8%E6%B3%95/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Java四种next用法">Java四种next用法</span>
+            <span class="post-date" title="2021-12-25 01:59:30">2021/12/25</span>
+        </a>
+        
+        <div id="no-item-tips">
+
+        </div>
+    </nav>
+    <div id="outline-list">
+    </div>
+</div>
+
+    </div>
+    <div class="hide-list">
+        <div class="semicircle" data-title="切换全屏 快捷键 s">
+            <div class="brackets first"><</div>
+            <div class="brackets">&gt;</div>
+        </div>
+    </div>
+</aside>
+<div id="post">
+    <div class="pjax">
+        <article id="post-RabbitMQ可靠性-Spring" class="article article-type-post" itemscope itemprop="blogPost">
+    
+        <h1 class="article-title">RabbitMQ可靠性-Spring</h1>
+    
+    <div class="article-meta">
+        
+        
+        
+        <span class="book">
+            <i class="iconfont icon-category"></i>
+            
+            
+            <a  data-rel="Java">Java</a>
+            
+        </span>
+        
+        
+    </div>
+    <div class="article-meta">
+        
+            发布时间 : <time class="date" title='最后更新: 2022-08-27 21:27:48'>2022-08-27 16:02</time>
+        
+    </div>
+    <div class="article-meta">
+        
+        <span>字数:2.7k</span>
+        
+        
+        <span id="busuanzi_container_page_pv">
+            阅读 :<span id="busuanzi_value_page_pv">
+                <span class="count-comment">
+                    <span class="spinner">
+                      <div class="cube1"></div>
+                      <div class="cube2"></div>
+                    </span>
+                </span>
+            </span>
+        </span>
+        
+        
+    </div>
+    
+    <div class="toc-ref">
+    
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E5%8F%91%E5%B8%83%E7%A1%AE%E8%AE%A4"><span class="toc-text">1.为什么需要发布确认</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E5%8F%91%E5%B8%83%E7%A1%AE%E8%AE%A4%E7%9A%84%E6%97%B6%E6%9C%BA"><span class="toc-text">2.发布确认的时机</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-ConfirmCallback%E5%9B%9E%E8%B0%83"><span class="toc-text">3.ConfirmCallback回调</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="toc-text">3.1配置文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2%E5%AE%9E%E7%8E%B0%E5%9B%9E%E8%B0%83%E6%8E%A5%E5%8F%A3"><span class="toc-text">3.2实现回调接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-3%E8%AE%BE%E7%BD%AERabbitTemplate%E5%9B%9E%E8%B0%83%E5%B1%9E%E6%80%A7"><span class="toc-text">3.3设置RabbitTemplate回调属性</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-1%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E6%96%B0%E7%9A%84Bean"><span class="toc-text">3.3.1创建一个新的Bean</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-ReturnCallback%E9%80%80%E5%9B%9E"><span class="toc-text">4.ReturnCallback退回</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1%E5%AE%9E%E7%8E%B0%E9%80%80%E5%9B%9E%E6%8E%A5%E5%8F%A3"><span class="toc-text">4.1实现退回接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2%E7%BB%93%E5%90%883%E5%8F%B7%E6%A0%87%E9%A2%98%E6%95%B4%E5%90%88"><span class="toc-text">4.2结合3号标题整合</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-%E8%A1%A5%EF%BC%9A%E9%85%8D%E7%BD%AE%E7%B1%BB-%E8%BF%9E%E6%8E%A5%E5%B7%A5%E5%8E%82"><span class="toc-text">5.补：配置类+连接工厂</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#5-1%E8%BF%9E%E6%8E%A5%E5%B7%A5%E5%8E%82"><span class="toc-text">5.1连接工厂</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-2%E4%B8%BA%E7%8B%AC%E7%89%B9%E7%9A%84%E9%85%8D%E7%BD%AE%E5%88%9B%E5%BB%BABean%E5%AF%B9%E8%B1%A1"><span class="toc-text">5.2为独特的配置创建Bean对象</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#6-%E5%8F%91%E5%B8%83%E7%A1%AE%E8%AE%A4%E7%9A%84%E5%8E%9F%E7%90%86"><span class="toc-text">6.发布确认的原理</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#6-1%E5%BC%82%E6%AD%A5%E7%9A%84%E5%A5%BD%E5%A4%84"><span class="toc-text">6.1异步的好处</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-2%E5%8E%9F%E7%94%9F%E4%B8%8ESpring%E6%95%B4%E5%90%88%E7%9A%84%E5%BC%82%E6%AD%A5%E5%9B%9E%E8%B0%83%E5%8C%BA%E5%88%AB"><span class="toc-text">6.2原生与Spring整合的异步回调区别</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-2-1%E5%8E%9F%E7%94%9FAPI%E5%AE%9E%E7%8E%B0%E6%89%B9%E9%87%8F%E7%A1%AE%E8%AE%A4-%E4%BA%86%E8%A7%A3"><span class="toc-text">6.2.1原生API实现批量确认(了解)</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#7-%E5%A6%82%E4%BD%95%E5%A4%84%E7%90%86%E5%8F%91%E5%B8%83%E5%A4%B1%E8%B4%A5%E7%9A%84%E6%B6%88%E6%81%AF%EF%BC%9F"><span class="toc-text">7.如何处理发布失败的消息？</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#8-%E5%A4%87%E4%BB%BD%E4%BA%A4%E6%8D%A2%E6%9C%BA"><span class="toc-text">8.备份交换机</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#8-1%E5%8F%91%E5%B8%83%E7%A1%AE%E8%AE%A4%E5%B7%B2%E8%A7%A3%E5%86%B3%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-text">8.1发布确认已解决的问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-2%E5%A4%87%E4%BB%BD%E4%BA%A4%E6%8D%A2%E6%9C%BA%E7%9A%84%E5%A5%BD%E5%A4%84"><span class="toc-text">8.2备份交换机的好处</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-3SpringBoot%E5%86%99%E6%B3%95"><span class="toc-text">8.3SpringBoot写法</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#9-%E6%B6%88%E8%B4%B9%E8%80%85%E5%BA%94%E7%AD%94"><span class="toc-text">9.消费者应答</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#9-1%E9%85%8D%E7%BD%AE%E6%89%8B%E5%8A%A8%E5%BA%94%E7%AD%94"><span class="toc-text">9.1配置手动应答</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-2%E4%B8%89%E7%A7%8D%E5%BA%94%E7%AD%94"><span class="toc-text">9.2三种应答</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#10-%E6%8C%81%E4%B9%85%E5%8C%96"><span class="toc-text">10.持久化</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#10-1%E9%98%9F%E5%88%97%E6%8C%81%E4%B9%85%E5%8C%96"><span class="toc-text">10.1队列持久化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-2%E6%B6%88%E6%81%AF%E6%8C%81%E4%B9%85%E5%8C%96"><span class="toc-text">10.2消息持久化</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#11-%E6%83%B0%E6%80%A7%E9%98%9F%E5%88%97"><span class="toc-text">11.惰性队列</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#12-%E9%9B%86%E7%BE%A4%E4%B8%8E%E9%95%9C%E5%83%8F%E9%98%9F%E5%88%97"><span class="toc-text">12.集群与镜像队列</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#13-%E5%B9%82%E7%AD%89%E8%AE%BE%E8%AE%A1"><span class="toc-text">13.幂等设计</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#14-%E9%98%9F%E5%88%97%E4%BC%98%E5%85%88%E7%BA%A7"><span class="toc-text">14.队列优先级</span></a></li></ol>
+    
+<style>
+    .left-col .switch-btn,
+    .left-col .switch-area {
+        display: none;
+    }
+    .toc-level-3 i,
+    .toc-level-3 ol {
+        display: none !important;
+    }
+</style>
+</div>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <ul>
+<li>消息队列可靠发布包括：(从流程分析)<ol>
+<li>发布层面：<strong>发布确认</strong>(两个回调)、<strong>备份交换机</strong>(与发布确认方案二选一)</li>
+<li>rabbit服务器层面：<strong>队列与消息持久化</strong>、<strong>惰性队列</strong>、<strong>集群与镜像队列</strong></li>
+<li>消费层面：<strong>自动应答</strong>(默认)、<strong>手动应答</strong>(可以自由拒绝或否定)</li>
+<li>业务层面：<strong>幂等性设计</strong>、<strong>优先级队列</strong></li>
+</ol>
+</li>
+<li>以下用SpringBoot演示，本demo中关于发布确认<strong>失败的消息</strong>仅用日志记录，如有需要可以用<code>ConcucrrentSkipListMap</code>来存储<strong>id - 消息内容</strong> 的映射，在回调函数中用<code>correlationData.getId()</code>来获取对应的消息；<strong>也可以通过备份交换机进行处理</strong></li>
+</ul>
+<h1 id="1-为什么需要发布确认"><a href="#1-为什么需要发布确认" class="headerlink" title="1.为什么需要发布确认"></a>1.为什么需要发布确认</h1><ul>
+<li>消息丢失时，消费者感受不到，因此<strong>发布确认机制存在于发送阶段</strong></li>
+<li><strong>生产者找不到对应的exchange或者routingkey或者rabbitmq正在重启</strong>，消息会丢失</li>
+<li>发布确认模式：确保消息的可靠投递</li>
+</ul>
+<h1 id="2-发布确认的时机"><a href="#2-发布确认的时机" class="headerlink" title="2.发布确认的时机"></a>2.发布确认的时机</h1><ul>
+<li>首先：无论是原生API还是SpringBoot的API，<strong>默认都是关闭发布确认的</strong>。需要手动开启</li>
+<li><code>ConfirmCallback </code><strong>回调函数</strong>(重心在判断是否找到<code>exchange</code>) ,生产者的<strong>消息只要进入了broker就会触发</strong>，如果没找到对应的exchange，则ack=false；如果找到了对应的exchange，则ack=true</li>
+<li> <code>ReturnCallback</code><strong>退回模式</strong>(重心在判断是否找到对应的<code>queue</code>)，使用这个之前需要先设置<code>mandatory</code>=true；触发条件是：找到了exchange，但没找到routingkey对应的queue，才会执行（<strong>找到了queue则不执行</strong>）</li>
+</ul>
+<h1 id="3-ConfirmCallback回调"><a href="#3-ConfirmCallback回调" class="headerlink" title="3.ConfirmCallback回调"></a>3.ConfirmCallback回调</h1><h2 id="3-1配置文件"><a href="#3-1配置文件" class="headerlink" title="3.1配置文件"></a>3.1配置文件</h2><p>也可以用连接工厂 而不是写死在配置文件中<br><img src="https://img-blog.csdnimg.cn/8c7ec8c41f4245af98c4192a34f9c880.png"></p>
+<h2 id="3-2实现回调接口"><a href="#3-2实现回调接口" class="headerlink" title="3.2实现回调接口"></a>3.2实现回调接口</h2><pre><code>/**
+ * 消息只要被 rabbitmq broker 接收到就会触发 confirmCallback 回调 。
+ * @param correlationData 回调的相关数据。
+ * @param ack             ack为真，nack为假
+ * @param cause           一个可选的原因，用于nack，如果可用，否则为空。
+ */
+@Slf4j
+@Component
+public class ConfirmCallbackService implements RabbitTemplate.ConfirmCallback &#123;
+
+  @Override
+  public void confirm(CorrelationData correlationData, boolean ack, String cause) &#123;
+    if (!ack) &#123;
+      log.error(&quot;消息发送异常!correlationData=&#123;&#125; ,ack=&#123;&#125;&quot;, correlationData.getId(), ack);
+    &#125; else &#123;
+      log.info(&quot;消息已成功推送到mq队列，correlationData=&#123;&#125; ,ack=&#123;&#125;, cause=&#123;&#125;&quot;, correlationData.getId(), ack, cause);
+    &#125;
+  &#125;
+&#125;
+</code></pre>
+<h2 id="3-3设置RabbitTemplate回调属性"><a href="#3-3设置RabbitTemplate回调属性" class="headerlink" title="3.3设置RabbitTemplate回调属性"></a>3.3设置RabbitTemplate回调属性</h2><ul>
+<li><p>此时如果直接@Autowired一个RabbitTemplate对象，是没有装配这个回调的，需要手动调用：</p>
+</li>
+<li><p><em><code>rabbitTemplate.setConfirmCallback</code>(RabbitTemplate.ConfirmCallback confirmCallback)</em>*</p>
+</li>
+<li><p>由于<code>ConfirmCallback</code>本身是一个接口，根据多态性，这里传入其实现类即可</p>
+</li>
+</ul>
+<p>在3.2中有一个实现类，直接传进入就好，为了可以区分不同的配置，我们可以采用如下方式：</p>
+<h3 id="3-3-1创建一个新的Bean"><a href="#3-3-1创建一个新的Bean" class="headerlink" title="3.3.1创建一个新的Bean"></a>3.3.1创建一个新的Bean</h3><p>在配置类中，创建名为myRabbitTemplate的Bean对象，逻辑是<strong>根据连接工厂</strong>（后面写）新new一个RabbitTemplate对象进行设置属性</p>
+<p><strong>不直接操作原生的rabbitTemplate对象是为了解耦</strong></p>
+<pre><code>  @Bean(name = &quot;myRabbitTemplate&quot;)
+  public RabbitTemplate wwRabbitTemplate(@Qualifier(&quot;myConnectionFactory&quot;) ConnectionFactory connectionFactory) &#123;
+    RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
+    rabbitTemplate.setConfirmCallback(new ConfirmCallbackService());
+    return rabbitTemplate;
+  &#125;
+</code></pre>
+<p>使用时直接用@Resource</p>
+<pre><code>  @Resource(name = &quot;myRabbitTemplate&quot;)
+  private RabbitTemplate rabbitTemplate;
+</code></pre>
+<h1 id="4-ReturnCallback退回"><a href="#4-ReturnCallback退回" class="headerlink" title="4.ReturnCallback退回"></a>4.ReturnCallback退回</h1><h2 id="4-1实现退回接口"><a href="#4-1实现退回接口" class="headerlink" title="4.1实现退回接口"></a>4.1实现退回接口</h2><pre><code>/**
+ * 如果消息未能投递到目标 queue 里将触发回调 returnCallback ，一旦向 queue 投递消息未成功，这里一般会记录下当前消息的详细投递数据，方便后续做重发或者补偿等操作。
+ */
+@Slf4j
+@Component
+public class ReturnCallbackService implements RabbitTemplate.ReturnCallback &#123;
+
+  @Override
+  public void returnedMessage(Message message, int replyCode, String replyText, String exchange, String routingKey) &#123;
+    log.info(&quot;returnedMessage：replyCode=&#123;&#125; ,replyText=&#123;&#125; ,exchange=&#123;&#125; ,routingKey=&#123;&#125;&quot;, replyCode, replyText, exchange, routingKey);
+  &#125;
+&#125;
+</code></pre>
+<h2 id="4-2结合3号标题整合"><a href="#4-2结合3号标题整合" class="headerlink" title="4.2结合3号标题整合"></a>4.2结合3号标题整合</h2><p>当然配置信息其实不应该这样写死，因为能会使用非集群的多个mq，因此在5号标题中引出连接工厂</p>
+<pre><code>spring.rabbitmq.host=12...
+#spring.rabbitmq.port=5672 默认
+spring.rabbitmq.username=ad..
+spring.rabbitmq.password=.
+spring.rabbitmq.publisher-confirm-type=correlated
+spring.rabbitmq.publisher-returns=true
+
+
+  @Bean(name = &quot;myRabbitTemplate&quot;)
+  public RabbitTemplate wwRabbitTemplate(@Qualifier(&quot;myConnectionFactory&quot;) ConnectionFactory connectionFactory) &#123;
+    RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
+    /**
+     * 确保消息发送失败后可以重新返回到队列中
+     * 注意：yml需要配置 publisher-returns: true
+     */
+    // 将两种不同确认模式的回调接口实例传入
+    rabbitTemplate.setConfirmCallback(new ConfirmCallbackService());
+    //找不到routingkey时的处理
+    rabbitTemplate.setMandatory(Boolean.TRUE);//退回函数生效
+    rabbitTemplate.setReturnCallback(new ReturnCallbackService());
+    return rabbitTemplate;
+  &#125;
+</code></pre>
+<h1 id="5-补：配置类-连接工厂"><a href="#5-补：配置类-连接工厂" class="headerlink" title="5.补：配置类+连接工厂"></a>5.补：配置类+连接工厂</h1><h2 id="5-1连接工厂"><a href="#5-1连接工厂" class="headerlink" title="5.1连接工厂"></a>5.1连接工厂</h2><p><img src="https://img-blog.csdnimg.cn/d1c20e478ef74681b7d46044fd4f0b31.png"></p>
+<p>我现在有很多个mq，其中有一个的配置如下（写在配置类中）</p>
+<pre><code>  @Bean(name = &quot;myConnectionFactory&quot;)
+  public ConnectionFactory myConnectionFactory() &#123;
+    CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
+    connectionFactory.setHost(host);
+    connectionFactory.setPort(port);
+    connectionFactory.setVirtualHost(virtualHost);
+    connectionFactory.setUsername(userName);
+    connectionFactory.setPassword(password);
+    connectionFactory.setPublisherConfirms(true); //发布确认回调
+    connectionFactory.setPublisherReturns(true); //退回
+    return connectionFactory;
+  &#125;
+</code></pre>
+<h2 id="5-2为独特的配置创建Bean对象"><a href="#5-2为独特的配置创建Bean对象" class="headerlink" title="5.2为独特的配置创建Bean对象"></a>5.2为独特的配置创建Bean对象</h2><p>使用时用@Resource注入即可</p>
+<pre><code>  @Bean(name = &quot;myRabbitTemplate&quot;)
+  public RabbitTemplate wwRabbitTemplate(@Qualifier(&quot;myConnectionFactory&quot;) ConnectionFactory connectionFactory) &#123;
+    RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
+    /**
+     * 确保消息发送失败后可以重新返回到队列中
+     * 注意：yml需要配置 publisher-returns: true
+     */
+    // 将两种不同确认模式的回调接口实例传入
+    rabbitTemplate.setConfirmCallback(new ConfirmCallbackService());
+    //找不到routingkey时的处理
+    rabbitTemplate.setMandatory(Boolean.TRUE);//退回函数生效
+    rabbitTemplate.setReturnCallback(new ReturnCallbackService());
+    return rabbitTemplate;
+  &#125;
+</code></pre>
+<h1 id="6-发布确认的原理"><a href="#6-发布确认的原理" class="headerlink" title="6.发布确认的原理"></a>6.发布确认的原理</h1><p>首先，Spring整合RabbitMQ中的回调实现是<strong>异步、独立</strong>的<img src="https://img-blog.csdnimg.cn/3a2e6a20973e422c9ab4ea2b96817253.png"><br>并且这个ConfirmCallback不是原生的那个，是Spring中的，是一个内部接口，不要混淆了<br><img src="https://img-blog.csdnimg.cn/601e23df03ba46c6bb6e1e1d5117ba18.png"></p>
+<h2 id="6-1异步的好处"><a href="#6-1异步的好处" class="headerlink" title="6.1异步的好处"></a>6.1异步的好处</h2><p>这就要涉及到另外两个原生的方案：</p>
+<ul>
+<li>同步、独立确认：慢，并发场景效率很低</li>
+<li>同步、批量确认：稍快，不过一旦出问题，不能定位是哪条消息出了问题</li>
+</ul>
+<p>异步、独立确认：不影响消息发布线程，且能准确定位具体是哪条消息出的问题</p>
+<h2 id="6-2原生与Spring整合的异步回调区别"><a href="#6-2原生与Spring整合的异步回调区别" class="headerlink" title="6.2原生与Spring整合的异步回调区别"></a>6.2原生与Spring整合的异步回调区别</h2><ul>
+<li>原生的API中回调接口可以支持批量回调</li>
+<li>但是Spring这个回调明显可以看到只能调用<code>correlationData.getId()</code>获取一个唯一的id，更加可靠</li>
+</ul>
+<h3 id="6-2-1原生API实现批量确认-了解"><a href="#6-2-1原生API实现批量确认-了解" class="headerlink" title="6.2.1原生API实现批量确认(了解)"></a>6.2.1原生API实现批量确认(了解)</h3><pre><code>Channel    channel    = connection.createChannel();
+
+channel.queueDeclare(&quot;异步队列&quot;,true, false,false,null);
+
+
+//1.线程安全有序的一个队列，并发
+ConcurrentSkipListMap&lt;Long, String&gt; mqMap = new ConcurrentSkipListMap&lt;&gt;();
+
+
+//2.回调
+
+  //2.1确认回调
+ConfirmCallback ack = (deliveryTag,multiple)-&gt;&#123;
+      //日志记录等操作，略
+      //去掉回调收到的第deliveryTag号消息
+  if(multiple) &#123;//如果是批量，则批量删除
+    ConcurrentNavigableMap&lt;Long, String&gt; newMqMap = mqMap.headMap(deliveryTag);
+    newMqMap.clear();
+  &#125;else&#123;//单个直接删
+    mqMap.remove(deliveryTag);
+  &#125;
+  //此时的mqMap中只剩下了尚未确认的消息
+
+&#125;;
+
+  //2.2否认回调
+ConfirmCallback nack = (deliveryTag,multiple)-&gt;&#123;
+    //日志记录等操作，略
+  System.out.println(mqMap.get(deliveryTag));
+    /*收到了nack，消息不会重新入队，需要自行处理
+      一般都是需要重发的，所以nack时不去除mqMap中的元素
+    */
+&#125;;
+
+
+
+    /*** 生产者开启confirm确认模式****/
+channel.confirmSelect();
+//3.新的线程：发布确认的消息监听 监听ack和nack
+    //注意顺序， 前面是ack，后面是nack
+channel.addConfirmListener(ack,nack);//还有另外一种构造形式，效果相同
+
+
+
+//4.模拟发布消息
+for(int i = 0 ; i &lt; 1000 ; i++)&#123;
+  channel.basicPublish(&quot;&quot;,//交换机
+      &quot;队列：&quot;+i,//routingKey
+      MessageProperties.PERSISTENT_TEXT_PLAIN,//消息策略：消息持久化
+      (&quot;消息&quot;+i).getBytes(StandardCharsets.UTF_8));//消息内容
+
+  //每次发布，mqMap都更新一个值
+  mqMap.put(channel.getNextPublishSeqNo(),&quot;消息&quot;+i);
+&#125;
+</code></pre>
+<h1 id="7-如何处理发布失败的消息？"><a href="#7-如何处理发布失败的消息？" class="headerlink" title="7.如何处理发布失败的消息？"></a>7.如何处理发布失败的消息？</h1><p>由上述可知：我们可以从回调接口中获取<code>CorrelationData</code>参数，这个类中包含了一个很重要的信息————消息id，我们可以创建一个<code>ConcucrrentSkipListMap</code>来存储<strong>id - 消息内容</strong> 的映射，每次回调时：</p>
+<ul>
+<li>ack = true则去除这个键值对</li>
+<li>ack = false则<strong>取value重发或做一些其他的事</strong></li>
+</ul>
+<h1 id="8-备份交换机"><a href="#8-备份交换机" class="headerlink" title="8.备份交换机"></a>8.备份交换机</h1><h2 id="8-1发布确认已解决的问题"><a href="#8-1发布确认已解决的问题" class="headerlink" title="8.1发布确认已解决的问题"></a>8.1发布确认已解决的问题</h2><ul>
+<li>有了<code>ConfirmCallback</code>：只要进入broker就回调，可以感知到exchange是否出错</li>
+<li>有了<code>mandatory</code>和<code>ReturnCallback</code>：可以感知到queue是否出错</li>
+<li>实现上述两个接口并赋值给RabbitTemplate后，可以确保生产者投递消息时消息不丢失；但是如果要实现消息自由处理需要额外维护一个Map保存（消息id — 消息内容），<strong>不过这样对于生产者来说代码比较重</strong></li>
+<li><strong>注意：同时存在发布确认 和 备份交换机时，失败的消息优先进入备份交换机</strong>，所以方案二选一即可</li>
+</ul>
+<h2 id="8-2备份交换机的好处"><a href="#8-2备份交换机的好处" class="headerlink" title="8.2备份交换机的好处"></a>8.2备份交换机的好处</h2><ul>
+<li>备份交换机是一个fanout-exchange，<strong>当消息投递失败后不用上述两种回调，而是直接投递给备份交换机</strong>，备份交换机可以连接多个消费者如：日志记录，消息重发</li>
+<li>不过这属于锦上添花，减少了回调写法的复杂度</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/78e79b0ecdfd4094a72d6d2a4c9b8736.png"></p>
+<h2 id="8-3SpringBoot写法"><a href="#8-3SpringBoot写法" class="headerlink" title="8.3SpringBoot写法"></a>8.3SpringBoot写法</h2><p>他本质也是个普通的扇出交换机，所以区别只是在“<strong>消息失败后投递给他</strong>”</p>
+<p>普通交换机 指向(<code>alternate-exchange</code>) 备份交换机</p>
+<p><img src="https://img-blog.csdnimg.cn/212fac777b844dfa9877806fde53138d.png"></p>
+<h1 id="9-消费者应答"><a href="#9-消费者应答" class="headerlink" title="9.消费者应答"></a>9.消费者应答</h1><p>SpringBoot默认是自动应答(监听队列也是)，同时提供的API也会应答<img src="https://img-blog.csdnimg.cn/0928df02f9c94e55a34d502dfff6af2b.png"></p>
+<h2 id="9-1配置手动应答"><a href="#9-1配置手动应答" class="headerlink" title="9.1配置手动应答"></a>9.1配置手动应答</h2><p>首先需要关闭自动应答</p>
+<p><img src="https://img-blog.csdnimg.cn/649b28ef3b014255a6714f410082bac2.png"></p>
+<pre><code>spring.rabbitmq.listener.direct.acknowledge-mode=manual
+spring.rabbitmq.listener.simple.acknowledge-mode=manual
+</code></pre>
+<p>当然，仍然可以通过配置类来进行低耦合配置</p>
+<pre><code>  @Bean
+  public RabbitListenerContainerFactory&lt;?&gt; rabbitListenerContainerFactory(@Qualifier(&quot;myConnectionFactory&quot;) ConnectionFactory connectionFactory) &#123;
+    SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+    factory.setConnectionFactory(connectionFactory);
+    factory.setAcknowledgeMode(AcknowledgeMode.MANUAL);
+    return factory;
+  &#125;
+</code></pre>
+<h2 id="9-2三种应答"><a href="#9-2三种应答" class="headerlink" title="9.2三种应答"></a>9.2三种应答</h2><p>注：如果@RabbitListener写在类上，就需要搭配@RabbitHandler使用<br><img src="https://img-blog.csdnimg.cn/1d1ffb650901464b912246d7f6b6ee19.png"><br><img src="https://img-blog.csdnimg.cn/e7564f04205f4554bc8507a40bb0ce06.png"></p>
+<p>形参中有channel</p>
+<pre><code>      // 确认 ： 消息tag，不批量
+      channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+        //拒绝（不重新入队）： 消息tag，不批量
+      channel.basicReject(message.getMessageProperties().getDeliveryTag(), false);
+      // 否定（可选重新入队）：消息tag，不批量，重新入队
+      channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, true);
+</code></pre>
+<h1 id="10-持久化"><a href="#10-持久化" class="headerlink" title="10.持久化"></a>10.持久化</h1><h2 id="10-1队列持久化"><a href="#10-1队列持久化" class="headerlink" title="10.1队列持久化"></a>10.1队列持久化</h2><p>在使用方面，声明队列的时候，其实底层也是调用的channel.queueDeclare(..）中第二个参数<code>durable设置为true</code><br><img src="https://img-blog.csdnimg.cn/bf21817c5db242d1b7e44281cf7c64b4.png"></p>
+<h2 id="10-2消息持久化"><a href="#10-2消息持久化" class="headerlink" title="10.2消息持久化"></a>10.2消息持久化</h2><p>SpringBoot提供的API中是默认消息持久化的</p>
+<p>参考<a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_38322527/article/details/122921878">rabbitTemplate消息持久化</a></p>
+<p>channel.basicPublish的第三个参数，将策略设置为<code>MessageProperties.PERSISTENT_TEXT_PLAIN</code><br><img src="https://img-blog.csdnimg.cn/19eafcab419d4ee6a1da34f24a8cba52.png" alt="第三个参数"></p>
+<ul>
+<li>作用：每次发布消息都告诉MQ，将消息持久化</li>
+<li>缺点：MQ可能在消息持久化过程中挂了</li>
+<li>对于简单任务队列绰绰有余，更可靠的持久化方案是：发布确认</li>
+</ul>
+<h1 id="11-惰性队列"><a href="#11-惰性队列" class="headerlink" title="11.惰性队列"></a>11.惰性队列</h1><ul>
+<li>通俗话讲就是：队列存在磁盘中，内存中只保存索引，消费者消费消息的时候根据索引读取到内存中。</li>
+<li>这样做很安全，内存占用低，但是效率低下</li>
+</ul>
+<p> 参考：</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/xiangjunyes/article/details/121887970">原生写法</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44390164/article/details/120461515">springboot写法</a><br><img src="https://img-blog.csdnimg.cn/9e0865299550478a9503c37d65177e40.png"></p>
+<h1 id="12-集群与镜像队列"><a href="#12-集群与镜像队列" class="headerlink" title="12.集群与镜像队列"></a>12.集群与镜像队列</h1><p><img src="https://img-blog.csdnimg.cn/9f4e8807481c4a0184cf3ba3b19dad26.png"><br>其他的关于RabbitMQ负载均衡部分省略</p>
+<h1 id="13-幂等设计"><a href="#13-幂等设计" class="headerlink" title="13.幂等设计"></a>13.幂等设计</h1><p>一般也都是用Redis，快<br>全局唯一ID + Redis</p>
+<p><img src="https://img-blog.csdnimg.cn/e9429bfcf681465586b0d8527337b4fd.png"></p>
+<h1 id="14-队列优先级"><a href="#14-队列优先级" class="headerlink" title="14.队列优先级"></a>14.队列优先级</h1><p>操作的是max-priority属性<br><img src="https://img-blog.csdnimg.cn/d3a29b1d2fc0429d8e31d6e2a3f93d25.png"></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_39794062/article/details/118226296">参考：原生写法</a></p>
+
+      
+       <hr><span style="font-style: italic;color: gray;"> 生命以负熵为食，归整以抵抗熵增； </span>
+    </div>
+</article>
+
+
+
+
+
+
+
+    
+        <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="//cdn.jsdelivr.net/npm/mathjax@2.7.8/unpacked/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+<input type="hidden" id="MathJax-js"
+        value="//cdn.jsdelivr.net/npm/mathjax@2.7.8/unpacked/MathJax.js?config=TeX-MML-AM_CHTML">
+</input>
+    
+
+
+
+
+    </div>
+    <div class="copyright">
+        <p class="footer-entry">
+    ©2021 ZJH
+</p>
+<p class="footer-entry">"生命以负熵为食"
+
+    </div>
+    <div class="full-toc">
+        <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
+<a class="" id="rocket" ></a>
+
+    </div>
+</div>
+
+</body>
+<script src="/zjh/js/jquery.pjax.js?v=1.1.0" ></script>
+
+<script src="/zjh/js/script.js?v=1.1.0" ></script>
+<script>
+    var img_resize = 'default';
+    function initArticle() {
+        /*渲染对应的表格样式*/
+        
+            $("#post .pjax table").addClass("green_title");
+        
+
+        /*渲染打赏样式*/
+        
+
+        /*高亮代码块行号*/
+        
+        $('pre code').each(function(){
+            var lines = $(this).text().trim().split('\n').length, widther='';
+            if (lines>99) {
+                widther = 'widther'
+            }
+            var $numbering = $('<ul/>').addClass('pre-numbering ' + widther).attr("unselectable","on");
+            $(this).addClass('has-numbering ' + widther)
+                    .parent()
+                    .append($numbering);
+            for(var i=1;i<=lines;i++){
+                $numbering.append($('<li/>').text(i));
+            }
+        });
+        
+
+        /*访问数量*/
+        
+        $.getScript("//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js");
+        
+
+        /*代码高亮，行号对齐*/
+        $('.pre-numbering').css('line-height',$('.has-numbering').css('line-height'));
+
+        
+        
+    }
+
+    /*打赏页面隐藏与展示*/
+    
+
+</script>
+
+<!--加入行号的高亮代码块样式-->
+
+<style>
+    pre{
+        position: relative;
+        margin-bottom: 24px;
+        border-radius: 10px;
+        border: 1px solid #e2dede;
+        background: #FFF;
+        overflow: hidden;
+    }
+    code.has-numbering{
+        margin-left: 30px;
+    }
+    code.has-numbering.widther{
+        margin-left: 35px;
+    }
+    .pre-numbering{
+        margin: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 20px;
+        padding: 0.5em 3px 0.7em 5px;
+        border-right: 1px solid #C3CCD0;
+        text-align: right;
+        color: #AAA;
+        background-color: ;
+    }
+    .pre-numbering.widther {
+        width: 35px;
+    }
+</style>
+
+<!--自定义样式设置-->
+<style>
+    
+    
+    .nav {
+        width: 542px;
+    }
+    .nav.fullscreen {
+        margin-left: -542px;
+    }
+    .nav-left {
+        width: 120px;
+    }
+    
+    
+    @media screen and (max-width: 1468px) {
+        .nav {
+            width: 492px;
+        }
+        .nav.fullscreen {
+            margin-left: -492px;
+        }
+        .nav-left {
+            width: 100px;
+        }
+    }
+    
+    
+    @media screen and (max-width: 1024px) {
+        .nav {
+            width: 492px;
+            margin-left: -492px
+        }
+        .nav.fullscreen {
+            margin-left: 0;
+        }
+    }
+    
+    @media screen and (max-width: 426px) {
+        .nav {
+            width: 100%;
+        }
+        .nav-left {
+            width: 100%;
+        }
+    }
+    
+    
+    .nav-right .title-list nav a .post-title, .nav-right .title-list #local-search-result a .post-title {
+        color: #383636;
+    }
+    
+    
+    .nav-right .title-list nav a .post-date, .nav-right .title-list #local-search-result a .post-date {
+        color: #5e5e5f;
+    }
+    
+    
+    .nav-right nav a.hover, #local-search-result a.hover{
+        background-color: #e2e0e0;
+    }
+    
+    
+
+    /*列表样式*/
+    
+
+    /* 背景图样式 */
+    
+    
+
+
+    /*引用块样式*/
+    
+
+    /*文章列表背景图*/
+    
+
+    
+</style>
+
+
+
+
+
+
+
+</html>

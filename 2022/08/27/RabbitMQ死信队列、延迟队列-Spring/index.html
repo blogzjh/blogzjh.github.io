@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>RabbitMQ死信队列、延迟队列-Spring | ZJH&#39;blog</title>
+  <meta name="keywords" content="">
+  <meta name="description" content="RabbitMQ死信队列、延迟队列-Spring | ZJH&#39;blog">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="description" content="这里讨论Mysql（redolog）、Redis（AOF）、RabbitMQ（消息持久化） 三者的共同点都是：先在内存缓冲池中追加记录、以一定的频率刷盘持久化、批量刷盘都存在数据丢失的风险 刷盘（从内存到磁盘）的过程中可能出现问题，因此中间件需要提供其他的辅助安全方案 redolog和AOF的刷盘都是同步的（master线程），但RabbitMQ是异步的且不能指定刷盘频率，参考官网文档 中间件重">
+<meta property="og:type" content="article">
+<meta property="og:title" content="三种中间件的刷盘(持久化)策略">
+<meta property="og:url" content="https://zjhblog.gitee.io/2022/08/28/%E4%B8%89%E7%A7%8D%E4%B8%AD%E9%97%B4%E4%BB%B6%E7%9A%84%E5%88%B7%E7%9B%98-%E6%8C%81%E4%B9%85%E5%8C%96-%E7%AD%96%E7%95%A5/index.html">
+<meta property="og:site_name" content="ZJH&#39;blog">
+<meta property="og:description" content="这里讨论Mysql（redolog）、Redis（AOF）、RabbitMQ（消息持久化） 三者的共同点都是：先在内存缓冲池中追加记录、以一定的频率刷盘持久化、批量刷盘都存在数据丢失的风险 刷盘（从内存到磁盘）的过程中可能出现问题，因此中间件需要提供其他的辅助安全方案 redolog和AOF的刷盘都是同步的（master线程），但RabbitMQ是异步的且不能指定刷盘频率，参考官网文档 中间件重">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/63a03ebe859341208c8d8c6ed631c457.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/0b463077bdad46bea54169917cbaa8c9.png">
+<meta property="article:published_time" content="2022-08-28T05:34:20.000Z">
+<meta property="article:modified_time" content="2022-08-28T05:34:38.213Z">
+<meta property="article:author" content="ZJH">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/63a03ebe859341208c8d8c6ed631c457.png">
+
+
+<link rel="icon" href="/img/QQ图片20211224224200.jpg">
+
+<link href="/zjh/css/style.css?v=1.1.0" rel="stylesheet">
+
+<link href="/zjh/css/hl_theme/rainbow.css?v=1.1.0" rel="stylesheet">
+
+<link href="//cdn.jsdelivr.net/npm/animate.css@4.1.0/animate.min.css" rel="stylesheet">
+
+<script src="//cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+<script src="/zjh/js/titleTip.js?v=1.1.0" ></script>
+
+<script src="//cdn.jsdelivr.net/npm/highlightjs@9.16.2/highlight.pack.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+<script src="//cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js"></script>
+
+
+
+<script src="//cdn.jsdelivr.net/npm/jquery.cookie@1.4.1/jquery.cookie.min.js" ></script>
+
+<script src="/zjh/js/iconfont.js?v=1.1.0" ></script>
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<div style="display: none">
+  <input class="theme_disqus_on" value="false">
+  <input class="theme_preload_comment" value="">
+  <input class="theme_blog_path" value="/zjh">
+  <input id="theme_shortcut" value="true" />
+  <input id="theme_highlight_on" value="true" />
+  <input id="theme_code_copy" value="true" />
+</div>
+
+
+
+<body>
+<aside class="nav">
+    <div class="nav-left">
+        <a href="/zjh/"
+   class="avatar_target">
+    <img class="avatar"
+         src="/zjh/img/QQ图片20211224224200.jpg"/>
+</a>
+<div class="author">
+    <span>ZJH</span>
+</div>
+
+<div class="icon">
+    
+        
+            <a title="github"
+               href="https://github.com/BetterZJH"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-github"></use>
+                    </svg>
+                
+            </a>
+        
+    
+        
+            <a title="csdn"
+               href="https://blog.csdn.net/m0_56079407"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-csdn"></use>
+                    </svg>
+                
+            </a>
+        
+    
+        
+            <a title="email"
+               href="mailto:847829122@qq.com"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-email"></use>
+                    </svg>
+                
+            </a>
+        
+    
+        
+            <a title="qq"
+               href="http://wpa.qq.com/msgrd?v=3&uin=847829122&site=qq&menu=yes"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-qq"></use>
+                    </svg>
+                
+            </a>
+        
+    
+</div>
+
+
+
+
+<ul>
+    <li>
+        <div class="all active" data-rel="全部文章">全部文章
+            
+                <small>(51)</small>
+            
+        </div>
+    </li>
+    
+        
+            
+                <li>
+                    <div data-rel="数据库">
+                        
+                        数据库
+                        <small>(3)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="数据结构算法">
+                        
+                        数据结构算法
+                        <small>(8)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="工作笔记">
+                        
+                        工作笔记
+                        <small>(11)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="机器学习">
+                        
+                        机器学习
+                        <small>(7)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="源码">
+                        
+                        源码
+                        <small>(8)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="Java">
+                        
+                        Java
+                        <small>(13)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+</ul>
+<div class="left-bottom">
+    <div class="menus">
+        
+            
+            
+            
+    </div>
+    <div>
+        
+        
+    </div>
+</div>
+<input type="hidden" id="yelog_site_posts_number" value="51">
+<input type="hidden" id="yelog_site_word_count" value="96.5k">
+<div style="display: none">
+    <span id="busuanzi_value_site_uv"></span>
+    <span id="busuanzi_value_site_pv"></span>
+</div>
+
+    </div>
+    <div class="nav-right">
+        <div class="friends-area">
+    <div class="friends-title">
+        友情链接
+        <i class="iconfont icon-left"></i>
+    </div>
+    <div class="friends-content">
+        <ul>
+            
+            <li><a target="_blank" href="http://yelog.org/">叶落阁</a></li>
+            
+        </ul>
+    </div>
+</div>
+        <div class="title-list">
+    <div class="right-top">
+        <div id="default-panel">
+            <i class="iconfont icon-search" data-title="搜索 快捷键 i"></i>
+            <div class="right-title">全部文章</div>
+            <i class="iconfont icon-file-tree" data-title="切换到大纲视图 快捷键 w"></i>
+        </div>
+        <div id="search-panel">
+            <i class="iconfont icon-left" data-title="返回"></i>
+            <input id="local-search-input" autocomplete="off"/>
+            <label class="border-line" for="input"></label>
+            <i class="iconfont icon-case-sensitive" data-title="大小写敏感"></i>
+            <i class="iconfont icon-tag" data-title="标签"></i>
+        </div>
+        <div id="outline-panel" style="display: none">
+            <div class="right-title">大纲</div>
+            <i class="iconfont icon-list" data-title="切换到文章列表"></i>
+        </div>
+    </div>
+
+    <div class="tags-list">
+    <input id="tag-search" />
+    <div class="tag-wrapper">
+        
+            <li class="article-tag-list-item">
+                <i class="iconfont icon-tag"></i><a>HashMap</a>
+            </li>
+        
+    </div>
+
+</div>
+
+    
+    <nav id="title-list-nav">
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/08/28/%E4%B8%89%E7%A7%8D%E4%B8%AD%E9%97%B4%E4%BB%B6%E7%9A%84%E5%88%B7%E7%9B%98-%E6%8C%81%E4%B9%85%E5%8C%96-%E7%AD%96%E7%95%A5/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="三种中间件的刷盘(持久化)策略">三种中间件的刷盘(持久化)策略</span>
+            <span class="post-date" title="2022-08-28 13:34:20">2022/08/28</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/08/28/redis%E5%9F%BA%E7%A1%80/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="redis基础">redis基础</span>
+            <span class="post-date" title="2022-08-28 12:21:22">2022/08/28</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/08/27/RabbitMQ%E5%9F%BA%E7%A1%80/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="RabbitMQ基础">RabbitMQ基础</span>
+            <span class="post-date" title="2022-08-27 16:26:14">2022/08/27</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/08/27/RabbitMQ%E5%8F%AF%E9%9D%A0%E6%80%A7-Spring/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="RabbitMQ可靠性-Spring">RabbitMQ可靠性-Spring</span>
+            <span class="post-date" title="2022-08-27 16:02:25">2022/08/27</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/08/27/RabbitMQ%E6%AD%BB%E4%BF%A1%E9%98%9F%E5%88%97%E3%80%81%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97-Spring/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="RabbitMQ死信队列、延迟队列-Spring">RabbitMQ死信队列、延迟队列-Spring</span>
+            <span class="post-date" title="2022-08-27 01:05:35">2022/08/27</span>
+        </a>
+        
+        <a  class="全部文章 数据库 "
+           href="/zjh/2022/08/23/MySQL%E4%BA%8B%E5%8A%A1%E4%B8%8E%E9%94%81/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="MySQL事务与锁">MySQL事务与锁</span>
+            <span class="post-date" title="2022-08-23 12:49:38">2022/08/23</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/08/23/AOP%E5%AE%9E%E7%8E%B0%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="AOP实现分布式锁">AOP实现分布式锁</span>
+            <span class="post-date" title="2022-08-23 12:48:25">2022/08/23</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/08/23/ReentrantLock%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="ReentrantLock源码剖析">ReentrantLock源码剖析</span>
+            <span class="post-date" title="2022-08-23 12:34:15">2022/08/23</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/08/23/%E5%8F%8D%E5%B0%84%E8%8E%B7%E5%8F%96AQS%E4%B8%AD%E5%90%8C%E6%AD%A5%E9%98%9F%E5%88%97%E4%B8%8E%E7%AD%89%E5%BE%85%E9%98%9F%E5%88%97%E7%9A%84%E9%95%BF%E5%BA%A6/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="反射获取AQS中同步队列与等待队列的长度">反射获取AQS中同步队列与等待队列的长度</span>
+            <span class="post-date" title="2022-08-23 12:32:58">2022/08/23</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/08/14/Spring%E3%80%81Servlet%E7%9B%91%E5%90%AC%E5%99%A8/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Spring、Servlet监听器">Spring、Servlet监听器</span>
+            <span class="post-date" title="2022-08-14 21:01:46">2022/08/14</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/08/13/AOP-%E5%8F%8D%E5%B0%84%EF%BC%9A%E6%8E%A5%E5%8F%A3%E5%8F%82%E6%95%B0%E6%A0%A1%E9%AA%8C/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="AOP+反射：接口参数校验">AOP+反射：接口参数校验</span>
+            <span class="post-date" title="2022-08-13 17:12:17">2022/08/13</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/08/12/%E5%AF%B9dto%E6%8C%87%E5%AE%9A%E5%B1%9E%E6%80%A7%E4%B8%80%E9%94%AE%E5%8A%A0%E8%A7%A3%E5%AF%86/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="对dto指定属性一键加解密">对dto指定属性一键加解密</span>
+            <span class="post-date" title="2022-08-12 22:51:17">2022/08/12</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/08/03/%E5%8F%8D%E5%B0%84%E4%BF%AE%E6%94%B9jsessionid%E5%AE%9E%E7%8E%B0session%E5%85%B1%E4%BA%AB/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="反射修改jsessionid实现session共享">反射修改jsessionid实现session共享</span>
+            <span class="post-date" title="2022-08-03 21:53:21">2022/08/03</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/08/03/RestTemlate%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%8F%8A%E5%B7%A5%E5%85%B7%E7%B1%BB%E8%AE%BE%E8%AE%A1/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="RestTemlate源码分析及工具类设计">RestTemlate源码分析及工具类设计</span>
+            <span class="post-date" title="2022-08-03 21:51:57">2022/08/03</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/08/03/%E7%9F%AD%E4%BF%A1%E6%9C%8D%E5%8A%A1%E8%A2%AB%E6%94%BB%E5%87%BB%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="短信服务被攻击解决方案">短信服务被攻击解决方案</span>
+            <span class="post-date" title="2022-08-03 21:51:16">2022/08/03</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/08/03/%E5%9B%9B%E7%A7%8D%E6%96%B9%E6%B3%95Servlet%E5%AE%B9%E5%99%A8%E4%BD%BF%E7%94%A8Spring%E7%9A%84Bean%E5%AF%B9%E8%B1%A1/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="四种方法Servlet容器使用Spring的Bean对象">四种方法Servlet容器使用Spring的Bean对象</span>
+            <span class="post-date" title="2022-08-03 21:47:54">2022/08/03</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/07/29/(%E8%94%9A%E6%9D%A5)%E5%A4%8D%E6%9D%82%E9%93%BE%E8%A1%A8%E7%9A%84%E5%A4%8D%E5%88%B6/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="(蔚来)复杂链表的复制">(蔚来)复杂链表的复制</span>
+            <span class="post-date" title="2022-07-29 12:32:49">2022/07/29</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/07/20/%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%9A%E6%9B%BF%E6%8D%A2%E3%80%81%E5%B7%A6%E6%97%8B%E3%80%81%E7%BC%BA%E5%A4%B1/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="字符串：替换、左旋、缺失">字符串：替换、左旋、缺失</span>
+            <span class="post-date" title="2022-07-20 21:59:41">2022/07/20</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/07/20/%E4%B8%89%E7%A7%8D%E6%83%85%E5%86%B5%E7%9A%84%E5%B1%82%E5%BA%8F%E9%81%8D%E5%8E%86/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="三种情况的层序遍历">三种情况的层序遍历</span>
+            <span class="post-date" title="2022-07-20 21:58:33">2022/07/20</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/07/19/%E5%86%85%E5%AD%98%E5%8C%BA%E5%9F%9F%E3%80%81%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="内存区域、类的加载">内存区域、类的加载</span>
+            <span class="post-date" title="2022-07-19 22:29:21">2022/07/19</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/07/19/Restful%E9%A3%8E%E6%A0%BC%E7%9C%9F%E7%9A%84%E6%9C%89%E5%BF%85%E8%A6%81%E5%90%97/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Restful风格真的有必要吗？">Restful风格真的有必要吗？</span>
+            <span class="post-date" title="2022-07-19 20:19:57">2022/07/19</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/zjh/2022/07/17/%E6%B0%94%E8%B1%A1cv-%E5%9C%B0%E5%9F%BA%E4%BA%91%E5%9B%BE%E4%BA%91%E7%B3%BB%E5%88%86%E5%89%B2/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="气象cv-地基云图云系分割">气象cv-地基云图云系分割</span>
+            <span class="post-date" title="2022-07-17 12:04:12">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/zjh/2022/07/17/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA%E6%9E%A3%E7%B1%BB%E9%81%97%E4%BC%A0%E7%9A%84%E5%9B%9E%E5%BD%92%E9%A2%84%E6%B5%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="支持向量机枣类遗传的回归预测">支持向量机枣类遗传的回归预测</span>
+            <span class="post-date" title="2022-07-17 11:47:04">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/zjh/2022/07/17/%E6%B0%94%E8%B1%A1%E5%A4%A7%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="气象大数据分析">气象大数据分析</span>
+            <span class="post-date" title="2022-07-17 11:44:44">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/zjh/2022/07/17/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%8D%95%E5%9B%BE%E8%B6%85%E5%88%86%E8%BE%A8%E7%8E%87%E7%9A%84%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="卷积神经网络单图超分辨率的深度学习方法">卷积神经网络单图超分辨率的深度学习方法</span>
+            <span class="post-date" title="2022-07-17 11:33:07">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/zjh/2022/07/17/%E7%96%AB%E6%83%85%E6%B8%AF%E5%8F%A3%E6%8C%82%E9%9D%A0%E6%95%B0ARIMA%E6%97%B6%E5%BA%8F%E5%88%86%E6%9E%90/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="疫情港口挂靠数ARIMA时序分析">疫情港口挂靠数ARIMA时序分析</span>
+            <span class="post-date" title="2022-07-17 11:21:13">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/07/15/OGNL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%94%B9%E9%80%A0%E4%BB%A5%E4%BD%BF%E7%94%A8%E7%B4%A2%E5%BC%95/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="OGNL表达式改造以使用索引">OGNL表达式改造以使用索引</span>
+            <span class="post-date" title="2022-07-15 22:27:54">2022/07/15</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/07/15/mvcc+%E6%8C%89%E5%A4%A9%E7%BC%93%E5%AD%98%E7%BB%9F%E8%AE%A1%E4%B8%A4%E4%B8%AA%E6%94%B6%E7%9B%8A/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="mvcc+按天缓存统计两个收益">mvcc+按天缓存统计两个收益</span>
+            <span class="post-date" title="2022-07-15 21:35:25">2022/07/15</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/07/15/%E5%8E%8B%E7%BC%A9%E6%89%93%E5%8C%85%E4%BD%86%E4%B8%8D%E5%BD%92%E6%A1%A3%EF%BC%8C%E5%88%A9%E7%94%A8response/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="压缩打包但不归档，利用response">压缩打包但不归档，利用response</span>
+            <span class="post-date" title="2022-07-15 21:26:51">2022/07/15</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/07/15/%E4%B8%9A%E5%8A%A1%E4%B8%ADdelete_flag%E5%AD%97%E6%AE%B5%E5%AE%B9%E6%98%93%E8%B8%A9%E7%9A%84%E5%9D%91/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="业务中delete_flag字段容易踩的坑">业务中delete_flag字段容易踩的坑</span>
+            <span class="post-date" title="2022-07-15 21:19:19">2022/07/15</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/zjh/2022/07/15/%E9%9D%9E%E6%97%B6%E5%BA%8F%E6%8E%92%E5%BA%8F%E4%B8%8B%E7%9A%84%E7%80%91%E5%B8%83%E6%B5%81%E5%88%86%E9%A1%B5/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="非时序排序下的瀑布流分页">非时序排序下的瀑布流分页</span>
+            <span class="post-date" title="2022-07-15 21:15:15">2022/07/15</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/06/25/%E8%A1%8C%E7%A8%8B%E7%BC%96%E7%A0%81%E5%8E%8B%E7%BC%A9%E5%9B%BE%E7%89%87/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="行程编码压缩图片">行程编码压缩图片</span>
+            <span class="post-date" title="2022-06-25 01:35:20">2022/06/25</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/04/21/%E5%B8%B8%E8%A7%81%E6%8E%92%E5%BA%8F/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="常见排序">常见排序</span>
+            <span class="post-date" title="2022-04-21 09:56:37">2022/04/21</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/04/21/Filter%E7%9A%84%E5%B8%B8%E8%A7%81%E7%94%A8%E6%B3%95/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Filter的常见用法">Filter的常见用法</span>
+            <span class="post-date" title="2022-04-21 09:51:40">2022/04/21</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/04/21/Lambda%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%92%8C%E6%96%B9%E6%B3%95%E5%BC%95%E7%94%A8/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Lambda表达式和方法引用">Lambda表达式和方法引用</span>
+            <span class="post-date" title="2022-04-21 09:50:42">2022/04/21</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/04/21/Mybatis%E4%B8%ADxml%E4%B8%AD%E8%B0%83java%E6%96%B9%E6%B3%95OGNL%E8%A1%A8%E8%BE%BE%E5%BC%8F/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Mybatis中xml中调java方法OGNL表达式">Mybatis中xml中调java方法OGNL表达式</span>
+            <span class="post-date" title="2022-04-21 09:47:36">2022/04/21</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/04/21/Java%E6%B3%A8%E8%A7%A3%E5%92%8C%E5%8F%8D%E5%B0%84/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Java注解和反射">Java注解和反射</span>
+            <span class="post-date" title="2022-04-21 09:45:15">2022/04/21</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/03/21/HashMap%E4%B8%ADentrySet-%E8%AF%A6%E8%A7%A3/"
+           data-tag="HashMap"
+           data-author="" >
+            <span class="post-title" title="HashMap中entrySet()详解">HashMap中entrySet()详解</span>
+            <span class="post-date" title="2022-03-21 00:15:10">2022/03/21</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/03/21/HashMap/"
+           data-tag="HashMap"
+           data-author="" >
+            <span class="post-title" title="HashMap">HashMap</span>
+            <span class="post-date" title="2022-03-21 00:13:23">2022/03/21</span>
+        </a>
+        
+        <a  class="全部文章 数据库 "
+           href="/zjh/2022/03/07/Mysql%E4%BA%8B%E5%8A%A1%E5%92%8C%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Mysql事务和存储引擎">Mysql事务和存储引擎</span>
+            <span class="post-date" title="2022-03-07 22:11:06">2022/03/07</span>
+        </a>
+        
+        <a  class="全部文章 数据库 "
+           href="/zjh/2022/03/07/Mysql-InnoDB-%E7%B4%A2%E5%BC%95%E5%8E%9F%E7%90%86%E5%8F%8A%E7%9A%84%E4%BD%BF%E7%94%A8/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Mysql(InnoDB)索引原理及的使用">Mysql(InnoDB)索引原理及的使用</span>
+            <span class="post-date" title="2022-03-07 22:10:05">2022/03/07</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/03/07/%E7%B1%BB%E8%87%AA%E8%BA%AB%E5%B5%8C%E5%A5%97-%E4%BA%8C%E5%8F%89%E6%A0%91%E5%88%A0%E9%99%A4-%E6%A0%88%E5%A0%86%E5%88%86%E6%9E%90/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="类自身嵌套(二叉树删除)栈堆分析">类自身嵌套(二叉树删除)栈堆分析</span>
+            <span class="post-date" title="2022-03-07 22:09:09">2022/03/07</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/03/07/Java%E5%A0%86%E6%8E%92%E5%BA%8F%E7%9A%84%E8%BF%87%E7%A8%8B%E5%88%B0%E8%AE%BE%E8%AE%A1/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Java堆排序的过程到设计">Java堆排序的过程到设计</span>
+            <span class="post-date" title="2022-03-07 22:08:08">2022/03/07</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/02/21/LinkedList%E6%BA%90%E7%A0%81%E4%B8%AD%E4%B8%BA%E4%BD%95%E5%A4%A7%E9%87%8F%E5%87%BA%E7%8E%B0final/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="LinkedList源码中为何大量出现final">LinkedList源码中为何大量出现final</span>
+            <span class="post-date" title="2022-02-21 09:57:35">2022/02/21</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/02/20/LinkedList%E4%B8%ADclear%E5%92%8Cunlink%E6%96%B9%E6%B3%95%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%A4%9A%E6%AC%A1%E7%BD%AE%E7%A9%BA/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="LinkedList中clear和unlink方法为什么要多次置空">LinkedList中clear和unlink方法为什么要多次置空</span>
+            <span class="post-date" title="2022-02-20 00:25:11">2022/02/20</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2022/02/20/gc%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%9C%BA%E5%88%B6/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="gc垃圾回收机制">gc垃圾回收机制</span>
+            <span class="post-date" title="2022-02-20 00:17:43">2022/02/20</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/zjh/2022/01/11/%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E6%B3%B0%E5%9D%A6%E5%B0%BC%E5%85%8B%E5%8F%B7%E8%8E%B7%E6%95%91%E9%A2%84%E6%B5%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="随机森林——泰坦尼克号获救预测">随机森林——泰坦尼克号获救预测</span>
+            <span class="post-date" title="2022-01-11 03:06:10">2022/01/11</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/zjh/2022/01/01/%E5%86%B3%E7%AD%96%E6%A0%91-%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E7%94%A8%E6%88%B7%E6%B5%81%E5%A4%B1%E9%A2%84%E6%B5%8B%E7%9A%84%E6%A1%88%E4%BE%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="决策树/随机森林——用户流失预测的案例">决策树/随机森林——用户流失预测的案例</span>
+            <span class="post-date" title="2022-01-01 00:41:40">2022/01/01</span>
+        </a>
+        
+        <a  class="全部文章 "
+           href="/zjh/2021/12/25/IDEA%E5%B8%B8%E7%94%A8%E5%BF%AB%E6%8D%B7%E9%94%AE/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="IDEA常用快捷键">IDEA常用快捷键</span>
+            <span class="post-date" title="2021-12-25 21:55:46">2021/12/25</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2021/12/25/%E5%9B%9E%E5%BD%A2%E9%92%88%E6%95%B0%E5%AD%97%E7%9F%A9%E9%98%B5Java%E5%AE%9E%E7%8E%B0/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="回形针数字矩阵Java实现">回形针数字矩阵Java实现</span>
+            <span class="post-date" title="2021-12-25 02:07:12">2021/12/25</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/zjh/2021/12/25/Java%E5%9B%9B%E7%A7%8Dnext%E7%94%A8%E6%B3%95/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Java四种next用法">Java四种next用法</span>
+            <span class="post-date" title="2021-12-25 01:59:30">2021/12/25</span>
+        </a>
+        
+        <div id="no-item-tips">
+
+        </div>
+    </nav>
+    <div id="outline-list">
+    </div>
+</div>
+
+    </div>
+    <div class="hide-list">
+        <div class="semicircle" data-title="切换全屏 快捷键 s">
+            <div class="brackets first"><</div>
+            <div class="brackets">&gt;</div>
+        </div>
+    </div>
+</aside>
+<div id="post">
+    <div class="pjax">
+        <article id="post-RabbitMQ死信队列、延迟队列-Spring" class="article article-type-post" itemscope itemprop="blogPost">
+    
+        <h1 class="article-title">RabbitMQ死信队列、延迟队列-Spring</h1>
+    
+    <div class="article-meta">
+        
+        
+        
+        <span class="book">
+            <i class="iconfont icon-category"></i>
+            
+            
+            <a  data-rel="Java">Java</a>
+            
+        </span>
+        
+        
+    </div>
+    <div class="article-meta">
+        
+            发布时间 : <time class="date" title='最后更新: 2022-08-27 19:33:18'>2022-08-27 01:05</time>
+        
+    </div>
+    <div class="article-meta">
+        
+        <span>字数:1.6k</span>
+        
+        
+        <span id="busuanzi_container_page_pv">
+            阅读 :<span id="busuanzi_value_page_pv">
+                <span class="count-comment">
+                    <span class="spinner">
+                      <div class="cube1"></div>
+                      <div class="cube2"></div>
+                    </span>
+                </span>
+            </span>
+        </span>
+        
+        
+    </div>
+    
+    <div class="toc-ref">
+    
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E6%AD%BB%E4%BF%A1%E9%98%9F%E5%88%97"><span class="toc-text">1.死信队列</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97"><span class="toc-text">2.延迟队列</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1%E9%80%82%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="toc-text">2.1适用场景</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-1%E8%BD%AE%E8%AE%AD%E5%92%8C%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1%E7%9A%84%E7%BC%BA%E7%82%B9"><span class="toc-text">2.1.1轮训和定时任务的缺点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-2%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97%E7%9A%84%E4%BC%98%E7%82%B9"><span class="toc-text">2.1.2延迟队列的优点</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97%E7%9A%84%E4%B8%A4%E7%A7%8D%E5%AE%9E%E7%8E%B0"><span class="toc-text">2.2延迟队列的两种实现</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E6%AD%BB%E4%BF%A1%E5%AE%9E%E7%8E%B0%E5%BB%B6%E6%97%B6%E9%98%9F%E5%88%97"><span class="toc-text">3.死信实现延时队列</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1%E9%85%8D%E7%BD%AE%E4%BF%A1%E6%81%AF"><span class="toc-text">3.1配置信息</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-1pom"><span class="toc-text">3.1.1pom</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-2%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="toc-text">3.1.2配置文件</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2%E6%9E%B6%E6%9E%84%E5%9B%BE"><span class="toc-text">3.2架构图</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-3%E9%85%8D%E7%BD%AE%E7%B1%BB%E5%A3%B0%E6%98%8E%E4%B8%8E%E7%BB%91%E5%AE%9A"><span class="toc-text">3.3配置类声明与绑定</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-1%E4%BA%A4%E6%8D%A2%E6%9C%BA"><span class="toc-text">3.3.1交换机</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-2%E9%98%9F%E5%88%97"><span class="toc-text">3.3.2队列</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-3%E7%BB%91%E5%AE%9A"><span class="toc-text">3.2.3绑定</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-4%E7%94%9F%E4%BA%A7%E8%80%85"><span class="toc-text">3.4生产者</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-5%E6%B6%88%E8%B4%B9%E8%80%85%E7%9B%91%E5%90%AC"><span class="toc-text">3.5消费者监听</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-%E6%8F%92%E4%BB%B6%E5%AE%9E%E7%8E%B0%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97"><span class="toc-text">4.插件实现延迟队列</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1%E9%85%8D%E7%BD%AE%E4%BA%A4%E6%8D%A2%E6%9C%BA"><span class="toc-text">4.1配置交换机</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2%E7%94%9F%E4%BA%A7%E8%80%85%E5%92%8C%E6%B6%88%E8%B4%B9%E8%80%85"><span class="toc-text">4.2生产者和消费者</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-%E8%A1%A5%E5%85%85"><span class="toc-text">5.补充</span></a></li></ol>
+    
+<style>
+    .left-col .switch-btn,
+    .left-col .switch-area {
+        display: none;
+    }
+    .toc-level-3 i,
+    .toc-level-3 ol {
+        display: none !important;
+    }
+</style>
+</div>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="1-死信队列"><a href="#1-死信队列" class="headerlink" title="1.死信队列"></a>1.死信队列</h1><ul>
+<li>当queue中的消息无法被消费时，消息成为死信，产生条件如下三个：<ol>
+<li><strong>消息TTL过期</strong>（TTL一般生产者每次发消息都单独指定）</li>
+<li><strong>queue满了</strong>而无法添加</li>
+<li><strong>消息被拒or否定 且不重新入队</strong>（<code>basic.reject</code>拒绝 或<code> basic.nack</code>否定）并且<code>requeue = false</code>不重新入队</li>
+</ol>
+</li>
+</ul>
+<ul>
+<li>失败消息如何转发到（绑定到）死信队列<ol>
+<li>需要单独声明：死信交换机 和 死信队列</li>
+<li>需要<strong>设置参数</strong>来实现消息转发到死信交换机<img src="https://img-blog.csdnimg.cn/43d6570bc26b4df1a8600254b8edbd6d.png" alt="绑定参数，转发到死信队列"><br><img src="https://img-blog.csdnimg.cn/ba8862e58bb3453197a082d7d3ad97fe.png" alt="消息拒绝"></li>
+</ol>
+</li>
+<li>应用场景举例：<ol>
+<li>需要保证消息不丢失（如下单功能）</li>
+<li>延迟队列的一种实现方式（还有一种是基于插件）</li>
+</ol>
+</li>
+</ul>
+<h1 id="2-延迟队列"><a href="#2-延迟队列" class="headerlink" title="2.延迟队列"></a>2.延迟队列</h1><h2 id="2-1适用场景"><a href="#2-1适用场景" class="headerlink" title="2.1适用场景"></a>2.1适用场景</h2><p><img src="https://img-blog.csdnimg.cn/793a92a64ea544d58908c9b1b208779f.png"></p>
+<h3 id="2-1-1轮训和定时任务的缺点"><a href="#2-1-1轮训和定时任务的缺点" class="headerlink" title="2.1.1轮训和定时任务的缺点"></a>2.1.1轮训和定时任务的缺点</h3><ul>
+<li>数据量小：可以采用每秒轮训实现上述功能（数据量大时会导致轮训瞬间处理太多）</li>
+<li>对时间要求不严格：那么可以每天凌晨跑定时任务来实现（例如生成一些日报）</li>
+</ul>
+<p>但是对于大数据量、时效性强的场景，需要用到延迟队列</p>
+<h3 id="2-1-2延迟队列的优点"><a href="#2-1-2延迟队列的优点" class="headerlink" title="2.1.2延迟队列的优点"></a>2.1.2延迟队列的优点</h3><p>延迟功能有保障（时间要求严格）<br>不会像轮训一样一瞬间处理太多</p>
+<h2 id="2-2延迟队列的两种实现"><a href="#2-2延迟队列的两种实现" class="headerlink" title="2.2延迟队列的两种实现"></a>2.2延迟队列的两种实现</h2><p>RabbitMQ本身是不支持延迟队列的，如果不使用插件，就只能<strong>改造死信队列</strong>————C1消费着直接不存在，<strong>消息到期TTL之后</strong>一定会进入死信队列进行处理</p>
+<p>延迟队列的实现分为“<strong>死信队列实现</strong>”和“<strong>插件直接实现</strong>”，结构图分别为：<img src="https://img-blog.csdnimg.cn/928a035b6dca4d76976c0505627aed56.png" alt="基于死信队列"><br><img src="https://img-blog.csdnimg.cn/e75e296161794b6eb58eeeba5d4f3d34.png" alt="基于插件"></p>
+<h1 id="3-死信实现延时队列"><a href="#3-死信实现延时队列" class="headerlink" title="3.死信实现延时队列"></a>3.死信实现延时队列</h1><p>注意：由于队列的先进先出特性，只有当过期的消息到了队列的顶端（队首），才会被真正的丢弃或者进入死信队列。<br><strong>如果遇到不同的任务类型需要不同的延时的话，需要为每一种不同延迟时间的消息建立单独的消息队列。</strong> </p>
+<h2 id="3-1配置信息"><a href="#3-1配置信息" class="headerlink" title="3.1配置信息"></a>3.1配置信息</h2><h3 id="3-1-1pom"><a href="#3-1-1pom" class="headerlink" title="3.1.1pom"></a>3.1.1pom</h3><p>下面两个 </p>
+<pre><code>    &lt;dependency&gt;
+      &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+      &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+
+     &lt;dependency&gt;
+      &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+      &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
+      &lt;scope&gt;test&lt;/scope&gt;
+    &lt;/dependency&gt;
+
+    &lt;dependency&gt;
+      &lt;groupId&gt;com.rabbitmq&lt;/groupId&gt;
+      &lt;artifactId&gt;amqp-client&lt;/artifactId&gt;
+      &lt;version&gt;5.8.0&lt;/version&gt;
+    &lt;/dependency&gt;
+
+    &lt;dependency&gt;
+      &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+      &lt;artifactId&gt;spring-boot-starter-amqp&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+</code></pre>
+<h3 id="3-1-2配置文件"><a href="#3-1-2配置文件" class="headerlink" title="3.1.2配置文件"></a>3.1.2配置文件</h3><pre><code>spring.rabbitmq.host=124...
+#spring.rabbitmq.port=5672 默认
+spring.rabbitmq.username=admin
+spring.rabbitmq.password=123
+
+server.port=8080
+</code></pre>
+<h2 id="3-2架构图"><a href="#3-2架构图" class="headerlink" title="3.2架构图"></a>3.2架构图</h2><p>左边的YD要与右边的YD相同（<strong>routingkey保证相同</strong>才能正确转发消息）<br><img src="https://img-blog.csdnimg.cn/6fecb8e2907246698431dc4a93465ab6.png"></p>
+<h2 id="3-3配置类声明与绑定"><a href="#3-3配置类声明与绑定" class="headerlink" title="3.3配置类声明与绑定"></a>3.3配置类声明与绑定</h2><pre><code>@Configuration
+public class DeadConfig &#123;
+
+  //  1.交换机
+  public static final String X_EXCHANGE = &quot;X&quot;;
+  public static final String Y_DEAD_LETTER_EXCHANGE = &quot;Y&quot;;
+
+  //  2. 队列
+  public static final String QUEUE_A = &quot;QA&quot;;
+  public static final String QUEUE_B = &quot;QB&quot;;
+  public static final String DEAD_LETTER_QUEUE = &quot;QD&quot;;
+  &#125;
+</code></pre>
+<h3 id="3-3-1交换机"><a href="#3-3-1交换机" class="headerlink" title="3.3.1交换机"></a>3.3.1交换机</h3><pre><code>  @Bean(&quot;xExchange&quot;)
+  public DirectExchange xExchange()&#123;
+    return new DirectExchange(X_EXCHANGE);
+  &#125;
+  @Bean(&quot;yExchange&quot;)
+  public DirectExchange yExchange()&#123;
+    return new DirectExchange(Y_DEAD_LETTER_EXCHANGE);
+  &#125;
+</code></pre>
+<h3 id="3-3-2队列"><a href="#3-3-2队列" class="headerlink" title="3.3.2队列"></a>3.3.2队列</h3><p>关于ttl，实际环境尽量不要写在队列声明期间，而应写在生产者send的时候</p>
+<pre><code> @Bean(&quot;queueA&quot;)//10s过期时间
+  public Queue queueA()&#123;//AMQP包下的Queue
+    //绑定参数————转发到死信交换机
+/*  原始写法
+    HashMap&lt;String, Object&gt; arg = new HashMap&lt;&gt;();
+    arg.put(&quot;x-dead-letter-exchange&quot;,Y_DEAD_LETTER_EXCHANGE);
+    arg.put(&quot;x-dead-letter-routing-key&quot;,&quot;YD&quot;);
+    arg.put(&quot;x-message-ttl&quot;,10000);
+    return QueueBuilder.
+        durable(QUEUE_A).
+        withArguments(arg).
+        build();
+ *///SpringBoot写法
+    return QueueBuilder.
+        durable(QUEUE_A).
+        deadLetterExchange(Y_DEAD_LETTER_EXCHANGE).
+        deadLetterRoutingKey(&quot;YD&quot;).
+        ttl(10000).
+        build();
+  &#125;
+
+  @Bean(&quot;queueB&quot;)//40s过期时间
+  public Queue queueB()&#123;
+    return QueueBuilder.
+        durable(QUEUE_B).
+        deadLetterExchange(Y_DEAD_LETTER_EXCHANGE).
+        deadLetterRoutingKey(&quot;YD&quot;).
+        ttl(40000).
+        build();
+  &#125;
+
+  @Bean(&quot;queueD&quot;)//死信队列
+  public Queue queueD()&#123;
+    return QueueBuilder.durable(DEAD_LETTER_QUEUE).build();
+  &#125;
+</code></pre>
+<h3 id="3-2-3绑定"><a href="#3-2-3绑定" class="headerlink" title="3.2.3绑定"></a>3.2.3绑定</h3><pre><code>  @Bean //参数：QA  xExchange
+  public Binding QAbindX(@Qualifier(&quot;queueA&quot;) Queue QA, @Qualifier(&quot;xExchange&quot;) DirectExchange X)&#123;
+    return BindingBuilder.bind(QA).to(X).with(&quot;XA&quot;);
+  &#125;
+
+  @Bean
+  public Binding QBbindX(@Qualifier(&quot;queueB&quot;) Queue QB, @Qualifier(&quot;xExchange&quot;) DirectExchange X)&#123;
+    return BindingBuilder.bind(QB).to(X).with(&quot;XB&quot;);
+  &#125;
+
+  @Bean
+  public Binding QDbindY(@Qualifier(&quot;queueD&quot;) Queue QD, @Qualifier(&quot;yExchange&quot;) DirectExchange Y)&#123;
+    return BindingBuilder.bind(QD).to(Y).with(&quot;YB&quot;);
+  &#125;
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/39ba8aa28076405b82d1ad4c2fc88202.png" alt="在这里插入图片描述"></p>
+<h2 id="3-4生产者"><a href="#3-4生产者" class="headerlink" title="3.4生产者"></a>3.4生产者</h2><pre><code>@RestController
+@RequestMapping(&quot;ttl&quot;)
+public class ProducerController &#123;
+  @Autowired
+  RabbitTemplate rabbitTemplate;
+
+  @GetMapping(&quot;send&quot;)
+  public void sendA(String msg)&#123;
+    System.out.println(&quot;生产者发送消息：&quot; + new Date().toString());
+    rabbitTemplate.convertAndSend(&quot;X&quot;,&quot;XA&quot;,&quot;10s延迟&quot;);
+    rabbitTemplate.convertAndSend(&quot;X&quot;,&quot;XB&quot;,&quot;40s延迟&quot;);
+
+  &#125;
+
+&#125;
+</code></pre>
+<h2 id="3-5消费者监听"><a href="#3-5消费者监听" class="headerlink" title="3.5消费者监听"></a>3.5消费者监听</h2><p>消费者其实只需要用<code>@RabbitListener</code>进行监听即可，而不是做成一个接口</p>
+<pre><code>@Service
+//@Component也行
+public class ConsumerService &#123;
+
+  @RabbitListener(queues = &quot;QD&quot;)//监听QD队列消息（QD是死信队列）
+  public void receiveD(Message message , Channel channel) &#123;//导入AMQP包
+    System.out.println(&quot;收到死信队列消息：&quot; + new String(message.getBody()) + new Date().toString());
+  &#125;
+
+&#125;
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/3bc7dc2c753e41108447ed562337e908.png"></p>
+<h1 id="4-插件实现延迟队列"><a href="#4-插件实现延迟队列" class="headerlink" title="4.插件实现延迟队列"></a>4.插件实现延迟队列</h1><p>具体百度RabbitMQ延迟队列插件，官网下载，当安装好后可以在web界面看到多了一种交换机————由此可知，<strong>插件是通过交换机实现延迟的</strong><img src="https://img-blog.csdnimg.cn/e4ae02ae2ffd42ceb76840e2c690171a.png"></p>
+<h2 id="4-1配置交换机"><a href="#4-1配置交换机" class="headerlink" title="4.1配置交换机"></a>4.1配置交换机</h2><ul>
+<li>因为基于插件的延迟队列只有交换机不同，所以只需要配置交换机</li>
+<li>而新的交换机在Spring中没有对应的API，所以需要用自定义交换机<code>CustomExchange</code></li>
+</ul>
+<pre><code>  @Bean
+  public Queue delayQueue()&#123;
+    return new Queue(&quot;delayQueue&quot;);
+  &#125;
+
+  @Bean
+  public CustomExchange delayExchange()&#123;
+  //只能用原生写法，没有Spring提供的API
+    HashMap&lt;String, Object&gt; arg = new HashMap&lt;&gt;();
+    arg.put(&quot;x-delayed-type&quot;,&quot;direct&quot;);
+    return new CustomExchange(&quot;dExchange&quot;,&quot;x-delayed-message&quot;,true,false,arg);
+  &#125;
+
+  @Bean
+  public Binding delayBinding(@Qualifier(&quot;delayQueue&quot;) Queue QC,
+      @Qualifier(&quot;delayExchange&quot;) CustomExchange cExchange)&#123;
+    return BindingBuilder.
+        bind(QC).
+        to(cExchange).
+        with(&quot;delayRoutingKey&quot;).
+        noargs();
+  &#125;
+</code></pre>
+<h2 id="4-2生产者和消费者"><a href="#4-2生产者和消费者" class="headerlink" title="4.2生产者和消费者"></a>4.2生产者和消费者</h2><pre><code>  @GetMapping(&quot;delay&quot;)
+  public void delaySent(String msg)&#123;
+    System.out.println(&quot;生产者发送消息：&quot; + new Date().toString());
+    rabbitTemplate.convertAndSend(&quot;dExchange&quot;,&quot;delayRoutingKey&quot;,msg,m -&gt; &#123;
+      m.getMessageProperties().setDelay(5000);//5秒延迟
+      return m;
+    &#125;);
+  &#125;
+
+  @RabbitListener(queues = &quot;delayQueue&quot;)
+  public void delayListenner(Message message , Channel channel)&#123;
+    System.out.println(&quot;收到死信队列消息：&quot; + new String(message.getBody()) + new Date().toString());
+  &#125;
+</code></pre>
+<h1 id="5-补充"><a href="#5-补充" class="headerlink" title="5.补充"></a>5.补充</h1><p>延迟队列的选择还有：Java中的DelayQueue、Quartz；Redis中的zset；Kafka的时间轮。但RabbitMQ的方案最全面</p>
+
+      
+       <hr><span style="font-style: italic;color: gray;"> 生命以负熵为食，归整以抵抗熵增； </span>
+    </div>
+</article>
+
+
+
+
+
+
+
+    
+        <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="//cdn.jsdelivr.net/npm/mathjax@2.7.8/unpacked/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+<input type="hidden" id="MathJax-js"
+        value="//cdn.jsdelivr.net/npm/mathjax@2.7.8/unpacked/MathJax.js?config=TeX-MML-AM_CHTML">
+</input>
+    
+
+
+
+
+    </div>
+    <div class="copyright">
+        <p class="footer-entry">
+    ©2021 ZJH
+</p>
+<p class="footer-entry">"生命以负熵为食"
+
+    </div>
+    <div class="full-toc">
+        <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
+<a class="" id="rocket" ></a>
+
+    </div>
+</div>
+
+</body>
+<script src="/zjh/js/jquery.pjax.js?v=1.1.0" ></script>
+
+<script src="/zjh/js/script.js?v=1.1.0" ></script>
+<script>
+    var img_resize = 'default';
+    function initArticle() {
+        /*渲染对应的表格样式*/
+        
+            $("#post .pjax table").addClass("green_title");
+        
+
+        /*渲染打赏样式*/
+        
+
+        /*高亮代码块行号*/
+        
+        $('pre code').each(function(){
+            var lines = $(this).text().trim().split('\n').length, widther='';
+            if (lines>99) {
+                widther = 'widther'
+            }
+            var $numbering = $('<ul/>').addClass('pre-numbering ' + widther).attr("unselectable","on");
+            $(this).addClass('has-numbering ' + widther)
+                    .parent()
+                    .append($numbering);
+            for(var i=1;i<=lines;i++){
+                $numbering.append($('<li/>').text(i));
+            }
+        });
+        
+
+        /*访问数量*/
+        
+        $.getScript("//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js");
+        
+
+        /*代码高亮，行号对齐*/
+        $('.pre-numbering').css('line-height',$('.has-numbering').css('line-height'));
+
+        
+        
+    }
+
+    /*打赏页面隐藏与展示*/
+    
+
+</script>
+
+<!--加入行号的高亮代码块样式-->
+
+<style>
+    pre{
+        position: relative;
+        margin-bottom: 24px;
+        border-radius: 10px;
+        border: 1px solid #e2dede;
+        background: #FFF;
+        overflow: hidden;
+    }
+    code.has-numbering{
+        margin-left: 30px;
+    }
+    code.has-numbering.widther{
+        margin-left: 35px;
+    }
+    .pre-numbering{
+        margin: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 20px;
+        padding: 0.5em 3px 0.7em 5px;
+        border-right: 1px solid #C3CCD0;
+        text-align: right;
+        color: #AAA;
+        background-color: ;
+    }
+    .pre-numbering.widther {
+        width: 35px;
+    }
+</style>
+
+<!--自定义样式设置-->
+<style>
+    
+    
+    .nav {
+        width: 542px;
+    }
+    .nav.fullscreen {
+        margin-left: -542px;
+    }
+    .nav-left {
+        width: 120px;
+    }
+    
+    
+    @media screen and (max-width: 1468px) {
+        .nav {
+            width: 492px;
+        }
+        .nav.fullscreen {
+            margin-left: -492px;
+        }
+        .nav-left {
+            width: 100px;
+        }
+    }
+    
+    
+    @media screen and (max-width: 1024px) {
+        .nav {
+            width: 492px;
+            margin-left: -492px
+        }
+        .nav.fullscreen {
+            margin-left: 0;
+        }
+    }
+    
+    @media screen and (max-width: 426px) {
+        .nav {
+            width: 100%;
+        }
+        .nav-left {
+            width: 100%;
+        }
+    }
+    
+    
+    .nav-right .title-list nav a .post-title, .nav-right .title-list #local-search-result a .post-title {
+        color: #383636;
+    }
+    
+    
+    .nav-right .title-list nav a .post-date, .nav-right .title-list #local-search-result a .post-date {
+        color: #5e5e5f;
+    }
+    
+    
+    .nav-right nav a.hover, #local-search-result a.hover{
+        background-color: #e2e0e0;
+    }
+    
+    
+
+    /*列表样式*/
+    
+
+    /* 背景图样式 */
+    
+    
+
+
+    /*引用块样式*/
+    
+
+    /*文章列表背景图*/
+    
+
+    
+</style>
+
+
+
+
+
+
+
+</html>
