@@ -2,24 +2,25 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>回形针数字矩阵Java实现 | ZJH&#39;blog</title>
+  <title>几道岛屿问题:dfs+剪枝+回溯 | ZJH&#39;blog</title>
   <meta name="keywords" content="">
-  <meta name="description" content="回形针数字矩阵Java实现 | ZJH&#39;blog">
+  <meta name="description" content="几道岛屿问题:dfs+剪枝+回溯 | ZJH&#39;blog">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="这里讨论Mysql（redolog）、Redis（AOF）、RabbitMQ（消息持久化） 三者的共同点都是：先在内存缓冲池中追加记录、以一定的频率刷盘持久化、批量刷盘都存在数据丢失的风险 刷盘（从内存到磁盘）的过程中可能出现问题，因此中间件需要提供其他的辅助安全方案 redolog和AOF的刷盘都是同步的（master线程），但RabbitMQ是异步的且不能指定刷盘频率，参考官网文档 中间件重">
+<meta name="description" content="因为入行很晚，一直没刷过题，上上周面快手问答部分还不错，一面算法题没做出来但是给过了；二面算法题还是没做出来，拖到了70min，挂了。 痛定思痛！ 这两周狂刷了34道力扣终于刷出了一点感觉，刚刚某蚁金服A了两道题（第二题要建树，A不出来），考完在群里写了两个题解，居然有人不信我是新手！不过第一次因为算法被人夸有天赋，发自内心的高兴哈哈哈哈哈哈哈哈哈哈。   第一题：字符分裂题目描述字符可以分裂为">
 <meta property="og:type" content="article">
-<meta property="og:title" content="三种中间件的刷盘(持久化)策略">
-<meta property="og:url" content="https://zjhblog.gitee.io/2022/08/28/%E4%B8%89%E7%A7%8D%E4%B8%AD%E9%97%B4%E4%BB%B6%E7%9A%84%E5%88%B7%E7%9B%98-%E6%8C%81%E4%B9%85%E5%8C%96-%E7%AD%96%E7%95%A5/index.html">
+<meta property="og:title" content="某蚁金服秋招9-15">
+<meta property="og:url" content="https://zjhblog.gitee.io/2022/09/15/%E6%9F%90%E8%9A%81%E9%87%91%E6%9C%8D%E7%A7%8B%E6%8B%9B9-15/index.html">
 <meta property="og:site_name" content="ZJH&#39;blog">
-<meta property="og:description" content="这里讨论Mysql（redolog）、Redis（AOF）、RabbitMQ（消息持久化） 三者的共同点都是：先在内存缓冲池中追加记录、以一定的频率刷盘持久化、批量刷盘都存在数据丢失的风险 刷盘（从内存到磁盘）的过程中可能出现问题，因此中间件需要提供其他的辅助安全方案 redolog和AOF的刷盘都是同步的（master线程），但RabbitMQ是异步的且不能指定刷盘频率，参考官网文档 中间件重">
+<meta property="og:description" content="因为入行很晚，一直没刷过题，上上周面快手问答部分还不错，一面算法题没做出来但是给过了；二面算法题还是没做出来，拖到了70min，挂了。 痛定思痛！ 这两周狂刷了34道力扣终于刷出了一点感觉，刚刚某蚁金服A了两道题（第二题要建树，A不出来），考完在群里写了两个题解，居然有人不信我是新手！不过第一次因为算法被人夸有天赋，发自内心的高兴哈哈哈哈哈哈哈哈哈哈。   第一题：字符分裂题目描述字符可以分裂为">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/63a03ebe859341208c8d8c6ed631c457.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/0b463077bdad46bea54169917cbaa8c9.png">
-<meta property="article:published_time" content="2022-08-28T05:34:20.000Z">
-<meta property="article:modified_time" content="2022-08-28T05:34:38.213Z">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/1911d614650749c09c111a27d36e2006.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/16896850d08c405dbc9d3981df65e15b.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/3b426aa82dd34eb0b4c7d0330a771a91.png">
+<meta property="article:published_time" content="2022-09-15T13:22:38.000Z">
+<meta property="article:modified_time" content="2022-09-15T13:49:57.293Z">
 <meta property="article:author" content="ZJH">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://img-blog.csdnimg.cn/63a03ebe859341208c8d8c6ed631c457.png">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/1911d614650749c09c111a27d36e2006.png">
 
 
 <link rel="icon" href="/img/QQ图片20211224224200.jpg">
@@ -137,24 +138,10 @@
         
             
                 <li>
-                    <div data-rel="数据库">
-                        
-                        数据库
-                        <small>(3)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
                     <div data-rel="数据结构算法">
                         
                         数据结构算法
-                        <small>(8)</small>
+                        <small>(7)</small>
                         
                     </div>
                     
@@ -196,6 +183,20 @@
                     <div data-rel="源码">
                         
                         源码
+                        <small>(9)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="中间件">
+                        
+                        中间件
                         <small>(8)</small>
                         
                     </div>
@@ -210,7 +211,7 @@
                     <div data-rel="Java">
                         
                         Java
-                        <small>(13)</small>
+                        <small>(8)</small>
                         
                     </div>
                     
@@ -232,7 +233,7 @@
     </div>
 </div>
 <input type="hidden" id="yelog_site_posts_number" value="51">
-<input type="hidden" id="yelog_site_word_count" value="96.5k">
+<input type="hidden" id="yelog_site_word_count" value="102.4k">
 <div style="display: none">
     <span id="busuanzi_value_site_uv"></span>
     <span id="busuanzi_value_site_pv"></span>
@@ -288,7 +289,63 @@
     
     <nav id="title-list-nav">
         
-        <a  class="全部文章 Java "
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/09/15/%E6%9F%90%E8%9A%81%E9%87%91%E6%9C%8D%E7%A7%8B%E6%8B%9B9-15/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="某蚁金服秋招9-15">某蚁金服秋招9-15</span>
+            <span class="post-date" title="2022-09-15 21:22:38">2022/09/15</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/09/15/%E4%B8%89%E7%A7%8D%E6%83%85%E5%86%B5%E7%9A%84%E5%B1%82%E5%BA%8F%E9%81%8D%E5%8E%86/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="三种情况的层序遍历">三种情况的层序遍历</span>
+            <span class="post-date" title="2022-09-15 21:21:24">2022/09/15</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/09/15/%E5%87%A0%E9%81%93%E5%B2%9B%E5%B1%BF%E9%97%AE%E9%A2%98-dfs-%E5%89%AA%E6%9E%9D-%E5%9B%9E%E6%BA%AF/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="几道岛屿问题:dfs+剪枝+回溯">几道岛屿问题:dfs+剪枝+回溯</span>
+            <span class="post-date" title="2022-09-15 21:20:58">2022/09/15</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/09/15/%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%9A%E6%9B%BF%E6%8D%A2%E3%80%81%E5%B7%A6%E6%97%8B%E3%80%81%E7%BC%BA%E5%A4%B1/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="字符串：替换、左旋、缺失">字符串：替换、左旋、缺失</span>
+            <span class="post-date" title="2022-09-15 21:20:41">2022/09/15</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/09/15/%E5%87%A0%E9%81%93%E4%BA%8C%E5%8F%89%E6%A0%91-dfs-%E5%9B%9E%E6%BA%AF/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="几道二叉树:dfs+回溯">几道二叉树:dfs+回溯</span>
+            <span class="post-date" title="2022-09-15 21:19:53">2022/09/15</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/09/15/%E5%87%A0%E9%81%93%E5%8A%A8%E5%BD%92%E6%80%BB%E7%BB%93/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="几道动归总结">几道动归总结</span>
+            <span class="post-date" title="2022-09-15 21:18:43">2022/09/15</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/09/15/BeanFactory%E5%92%8CApplicationContext/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="BeanFactory和ApplicationContext">BeanFactory和ApplicationContext</span>
+            <span class="post-date" title="2022-09-15 21:17:39">2022/09/15</span>
+        </a>
+        
+        <a  class="全部文章 中间件 "
            href="/zjh/2022/08/28/%E4%B8%89%E7%A7%8D%E4%B8%AD%E9%97%B4%E4%BB%B6%E7%9A%84%E5%88%B7%E7%9B%98-%E6%8C%81%E4%B9%85%E5%8C%96-%E7%AD%96%E7%95%A5/"
            data-tag=""
            data-author="" >
@@ -296,7 +353,7 @@
             <span class="post-date" title="2022-08-28 13:34:20">2022/08/28</span>
         </a>
         
-        <a  class="全部文章 Java "
+        <a  class="全部文章 中间件 "
            href="/zjh/2022/08/28/redis%E5%9F%BA%E7%A1%80/"
            data-tag=""
            data-author="" >
@@ -304,7 +361,7 @@
             <span class="post-date" title="2022-08-28 12:21:22">2022/08/28</span>
         </a>
         
-        <a  class="全部文章 Java "
+        <a  class="全部文章 中间件 "
            href="/zjh/2022/08/27/RabbitMQ%E5%9F%BA%E7%A1%80/"
            data-tag=""
            data-author="" >
@@ -312,7 +369,7 @@
             <span class="post-date" title="2022-08-27 16:26:14">2022/08/27</span>
         </a>
         
-        <a  class="全部文章 Java "
+        <a  class="全部文章 中间件 "
            href="/zjh/2022/08/27/RabbitMQ%E5%8F%AF%E9%9D%A0%E6%80%A7-Spring/"
            data-tag=""
            data-author="" >
@@ -320,7 +377,7 @@
             <span class="post-date" title="2022-08-27 16:02:25">2022/08/27</span>
         </a>
         
-        <a  class="全部文章 Java "
+        <a  class="全部文章 中间件 "
            href="/zjh/2022/08/27/RabbitMQ%E6%AD%BB%E4%BF%A1%E9%98%9F%E5%88%97%E3%80%81%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97-Spring/"
            data-tag=""
            data-author="" >
@@ -328,7 +385,7 @@
             <span class="post-date" title="2022-08-27 01:05:35">2022/08/27</span>
         </a>
         
-        <a  class="全部文章 数据库 "
+        <a  class="全部文章 中间件 "
            href="/zjh/2022/08/23/MySQL%E4%BA%8B%E5%8A%A1%E4%B8%8E%E9%94%81/"
            data-tag=""
            data-author="" >
@@ -414,30 +471,6 @@
            data-author="" >
             <span class="post-title" title="四种方法Servlet容器使用Spring的Bean对象">四种方法Servlet容器使用Spring的Bean对象</span>
             <span class="post-date" title="2022-08-03 21:47:54">2022/08/03</span>
-        </a>
-        
-        <a  class="全部文章 数据结构算法 "
-           href="/zjh/2022/07/29/(%E8%94%9A%E6%9D%A5)%E5%A4%8D%E6%9D%82%E9%93%BE%E8%A1%A8%E7%9A%84%E5%A4%8D%E5%88%B6/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="(蔚来)复杂链表的复制">(蔚来)复杂链表的复制</span>
-            <span class="post-date" title="2022-07-29 12:32:49">2022/07/29</span>
-        </a>
-        
-        <a  class="全部文章 数据结构算法 "
-           href="/zjh/2022/07/20/%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%9A%E6%9B%BF%E6%8D%A2%E3%80%81%E5%B7%A6%E6%97%8B%E3%80%81%E7%BC%BA%E5%A4%B1/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="字符串：替换、左旋、缺失">字符串：替换、左旋、缺失</span>
-            <span class="post-date" title="2022-07-20 21:59:41">2022/07/20</span>
-        </a>
-        
-        <a  class="全部文章 数据结构算法 "
-           href="/zjh/2022/07/20/%E4%B8%89%E7%A7%8D%E6%83%85%E5%86%B5%E7%9A%84%E5%B1%82%E5%BA%8F%E9%81%8D%E5%8E%86/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="三种情况的层序遍历">三种情况的层序遍历</span>
-            <span class="post-date" title="2022-07-20 21:58:33">2022/07/20</span>
         </a>
         
         <a  class="全部文章 Java "
@@ -544,14 +577,6 @@
             <span class="post-date" title="2022-06-25 01:35:20">2022/06/25</span>
         </a>
         
-        <a  class="全部文章 数据结构算法 "
-           href="/zjh/2022/04/21/%E5%B8%B8%E8%A7%81%E6%8E%92%E5%BA%8F/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="常见排序">常见排序</span>
-            <span class="post-date" title="2022-04-21 09:56:37">2022/04/21</span>
-        </a>
-        
         <a  class="全部文章 Java "
            href="/zjh/2022/04/21/Filter%E7%9A%84%E5%B8%B8%E8%A7%81%E7%94%A8%E6%B3%95/"
            data-tag=""
@@ -600,7 +625,7 @@
             <span class="post-date" title="2022-03-21 00:13:23">2022/03/21</span>
         </a>
         
-        <a  class="全部文章 数据库 "
+        <a  class="全部文章 中间件 "
            href="/zjh/2022/03/07/Mysql%E4%BA%8B%E5%8A%A1%E5%92%8C%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/"
            data-tag=""
            data-author="" >
@@ -608,28 +633,12 @@
             <span class="post-date" title="2022-03-07 22:11:06">2022/03/07</span>
         </a>
         
-        <a  class="全部文章 数据库 "
+        <a  class="全部文章 中间件 "
            href="/zjh/2022/03/07/Mysql-InnoDB-%E7%B4%A2%E5%BC%95%E5%8E%9F%E7%90%86%E5%8F%8A%E7%9A%84%E4%BD%BF%E7%94%A8/"
            data-tag=""
            data-author="" >
             <span class="post-title" title="Mysql(InnoDB)索引原理及的使用">Mysql(InnoDB)索引原理及的使用</span>
             <span class="post-date" title="2022-03-07 22:10:05">2022/03/07</span>
-        </a>
-        
-        <a  class="全部文章 数据结构算法 "
-           href="/zjh/2022/03/07/%E7%B1%BB%E8%87%AA%E8%BA%AB%E5%B5%8C%E5%A5%97-%E4%BA%8C%E5%8F%89%E6%A0%91%E5%88%A0%E9%99%A4-%E6%A0%88%E5%A0%86%E5%88%86%E6%9E%90/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="类自身嵌套(二叉树删除)栈堆分析">类自身嵌套(二叉树删除)栈堆分析</span>
-            <span class="post-date" title="2022-03-07 22:09:09">2022/03/07</span>
-        </a>
-        
-        <a  class="全部文章 数据结构算法 "
-           href="/zjh/2022/03/07/Java%E5%A0%86%E6%8E%92%E5%BA%8F%E7%9A%84%E8%BF%87%E7%A8%8B%E5%88%B0%E8%AE%BE%E8%AE%A1/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Java堆排序的过程到设计">Java堆排序的过程到设计</span>
-            <span class="post-date" title="2022-03-07 22:08:08">2022/03/07</span>
         </a>
         
         <a  class="全部文章 源码 "
@@ -680,14 +689,6 @@
             <span class="post-date" title="2021-12-25 21:55:46">2021/12/25</span>
         </a>
         
-        <a  class="全部文章 数据结构算法 "
-           href="/zjh/2021/12/25/%E5%9B%9E%E5%BD%A2%E9%92%88%E6%95%B0%E5%AD%97%E7%9F%A9%E9%98%B5Java%E5%AE%9E%E7%8E%B0/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="回形针数字矩阵Java实现">回形针数字矩阵Java实现</span>
-            <span class="post-date" title="2021-12-25 02:07:12">2021/12/25</span>
-        </a>
-        
         <a  class="全部文章 Java "
            href="/zjh/2021/12/25/Java%E5%9B%9B%E7%A7%8Dnext%E7%94%A8%E6%B3%95/"
            data-tag=""
@@ -714,9 +715,9 @@
 </aside>
 <div id="post">
     <div class="pjax">
-        <article id="post-回形针数字矩阵Java实现" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-几道岛屿问题-dfs-剪枝-回溯" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">回形针数字矩阵Java实现</h1>
+        <h1 class="article-title">几道岛屿问题:dfs+剪枝+回溯</h1>
     
     <div class="article-meta">
         
@@ -734,12 +735,12 @@
     </div>
     <div class="article-meta">
         
-            发布时间 : <time class="date" title='最后更新: 2022-07-20 21:58:02'>2021-12-25 02:07</time>
+            发布时间 : <time class="date" title='最后更新: 2022-09-15 21:21:10'>2022-09-15 21:20</time>
         
     </div>
     <div class="article-meta">
         
-        <span>字数:337</span>
+        <span>字数:2.1k</span>
         
         
         <span id="busuanzi_container_page_pv">
@@ -758,7 +759,7 @@
     
     <div class="toc-ref">
     
-        
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E5%89%91%E6%8C%8712"><span class="toc-text">1.剑指12</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0"><span class="toc-text">1.1题目描述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2%E9%A2%98%E8%A7%A3"><span class="toc-text">1.2题解</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E5%8A%9B%E6%89%A3200"><span class="toc-text">2.力扣200</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0"><span class="toc-text">2.1题目描述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2%E9%A2%98%E8%A7%A3"><span class="toc-text">2.2题解</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E5%8A%9B%E6%89%A3463"><span class="toc-text">3.力扣463</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0"><span class="toc-text">3.1题目描述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2%E9%A2%98%E8%A7%A3"><span class="toc-text">3.2题解</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-1%E6%93%8D%E4%BD%9C%E9%9D%99%E6%80%81%E5%8F%98%E9%87%8F"><span class="toc-text">3.2.1操作静态变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-2%E7%94%A8%E5%9B%9E%E6%BA%AF"><span class="toc-text">3.2.2用回溯</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-%E5%8A%9B%E6%89%A3695"><span class="toc-text">4.力扣695</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0"><span class="toc-text">4.1题目描述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2%E9%A2%98%E8%A7%A3"><span class="toc-text">4.2题解</span></a></li></ol></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -774,46 +775,216 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p><img src="https://img-blog.csdnimg.cn/20210726004539592.png"><br>我们发现这个回形数矩阵的逻辑是：→↓←↑四个为一个循环，故考虑框架为：一个外层for里面嵌套4个内层for</p>
-<p>每个内层for的起点终点都随着外层的变化而变化</p>
-<pre><code>import java.util.Scanner;
-public class Test1 &#123;
-    public static void main(String[] args) &#123;
-        Scanner scan = new Scanner(System.in);
-        System.out.println(&quot;输入一个数，返回回形数矩阵&quot;);
-        int i = scan.nextInt();
-        // 键盘输入一个数
-        int[][] arr = new int[i][i];
-        int m = 1;//用于赋值
-        /*思考循环数的逻辑顺序，→↓←↑四个为一个循环，故考虑框架为一个外层for里面套4个内层for*/
-        /*每一个循环的→↓←↑内层for循环，其起点和终点都不断改变，所以起点终点必须表现出来这个联系，绝不能为常数*/
-        for (int j = 0; j &lt; i; j++) &#123;
- 
-            for (int k = j; k &lt; i - j; k++) &#123;//k=j和k&lt;i-j都在不断的改变
-                        arr[j][k] = m;
-                m++;
-            &#125; 
-            for (int l = j + 1; l &lt; i - j; l++) &#123;
-                arr[l][i - j - 1] = m;
-                m++;
+        <ul>
+<li><strong>深度优先搜索</strong>： 可以理解为暴力法遍历矩阵中所有字符串可能性。DFS 通过递归，先朝一个方向搜到底，再回溯至上个节点，沿另一个方向搜索，以此类推。</li>
+<li><strong>剪枝</strong>： 在搜索中，遇到 这条路不可能和目标字符串匹配成功 的情况（例如：<code>此矩阵元素和目标字符不同、此元素已被访问</code>），则应立即返回，称之为 可行性剪枝 。</li>
+<li>在矩阵深度优先算法中，DFS方法总有参数：<strong>横坐标 i 、 纵坐标 j 、待匹配的参数</strong>，这样才可以进行自由地深度优先算法（<strong>方便指定方向、指定待匹配参数</strong>）</li>
+<li>在矩阵深度优先算法中，<strong>每个位置都可以作为递归的起点，因此<code>main方法中</code>需要两层for循环来实现</strong></li>
+</ul>
+<p>一些区别：</p>
+<ul>
+<li><strong>虽然都涉及标记已经遍历过的位置</strong>，但 是否存在的匹配问题，每轮（不同起点）执行后都需要恢复；而像“岛屿数量”这种计数问题，则不能恢复</li>
+<li>**虽然都要遍历上下左右(调用4个方向的dfs)**，但“是否存在匹配”的问题只要一个匹配就算成功，所以涉及到回溯，用 || 连接四个方向的dfs结果</li>
+</ul>
+<h1 id="1-剑指12"><a href="#1-剑指12" class="headerlink" title="1.剑指12"></a>1.剑指12</h1><h2 id="1-1题目描述"><a href="#1-1题目描述" class="headerlink" title="1.1题目描述"></a>1.1题目描述</h2><p>给定一个 m x n 二维字符网格 board 和一个字符串单词 word 。如果 word 存在于网格中，返回 true ；否则，返回 false 。<br>单词必须按照字母顺序，通过相邻的单元格内的字母构成，其中“相邻”单元格是那些水平相邻或垂直相邻的单元格。同一个单元格内的字母不允许被重复使用。<br><img src="https://img-blog.csdnimg.cn/881c0a71318e4299bd635e2cddc00b4f.png"></p>
+<h2 id="1-2题解"><a href="#1-2题解" class="headerlink" title="1.2题解"></a>1.2题解</h2><ul>
+<li>每轮(以不同元素为起点)的标记行为，不能影响其他轮次，因此顺序必须是<code>标记-DFS-恢复</code> </li>
+<li>DFS中先考虑边界条件：4个边界(false)  or  字符串到末尾了(true)</li>
+</ul>
+<p>。</p>
+<pre><code>class Solution &#123;
+    public boolean exist(char[][] board, String word) &#123;
+            char[] arr = word.toCharArray();
+            for(int i = 0 ; i &lt; board.length ; i++)&#123;
+                for(int j = 0 ; j &lt; board[0].length ; j++)&#123;
+                    if( dfs(board, i ,j , arr, 0) )&#123; return true&#125;;
+                &#125;
             &#125;
-            for (int p = i - j - 2; p &gt; j - 1; p--) &#123;
-                arr[i - j - 1][p] = m;
-                m++;
-            &#125;
-            for (int q = i - j - 2; q &gt; j; q--) &#123;
-                arr[q][j] = m;
-                m++;
+            return false;
+    &#125;
+
+    //判断i j位置上word的第index号元素是否匹配
+    public boolean dfs(char[][] board , int i , int j , char[] word,int index)&#123;
+        /**因为涉及递归，条件需要写全 */
+        //矩阵边界 false
+        if(i&lt;0 || j&lt;0 || i&gt;=board.length || j&gt;=board[0].length)&#123;return false;&#125;
+        //当前不匹配 false
+        if(word[index] != board[i][j])&#123;return false;&#125;
+        //字符串匹配到了末尾 true
+        if(index == word.length-1)&#123;return true;&#125;
+        /**如果没到末尾，就先标记当前位置，再往四个方向递归 */
+        board[i][j] = &#39;\0&#39;;//只要不是A~Z 字母就行，注意转义  &#39;.&#39;也可以
+
+        //因为是递归，如果存在匹配成功，总有一个DFS的末端返回true，回溯都返回true
+        //所以用||来处理回溯结果
+        boolean currentRes = dfs(board, i+1 ,j ,word , index+1) ||
+                            dfs(board, i ,j+1 ,word , index+1) ||
+                            dfs(board, i-1 ,j ,word , index+1) ||
+                            dfs(board, i ,j-1 ,word , index+1) ;
+        board[i][j] = word[index];
+        return currentRes;
+
+    &#125;
+&#125;
+</code></pre>
+<h1 id="2-力扣200"><a href="#2-力扣200" class="headerlink" title="2.力扣200"></a>2.力扣200</h1><h2 id="2-1题目描述"><a href="#2-1题目描述" class="headerlink" title="2.1题目描述"></a>2.1题目描述</h2><p>给你一个由 ‘1’（陆地）和 ‘0’（水）组成的的二维网格，请你计算网格中岛屿的数量。</p>
+<p>岛屿总是被水包围，并且每座岛屿只能由<strong>水平方向和/或竖直方向上</strong>相邻的陆地连接形成。</p>
+<p>此外，你可以假设该网格的四条边均被水包围。</p>
+<p> <img src="https://img-blog.csdnimg.cn/b081b0c5e51e4340a88a65dcdb26a464.png"></p>
+<h2 id="2-2题解"><a href="#2-2题解" class="headerlink" title="2.2题解"></a>2.2题解</h2><pre><code>class Solution &#123;
+    public int numIslands(char[][] grid) &#123;
+        //空值
+        if(grid == null || grid.length == 0 || grid[0].length == 0)&#123; return 0;&#125;
+        int sum = 0;
+        //以每个位置为起点，每次都dfs将当前岛屿全部置为0
+        for(int i = 0 ; i &lt; grid.length ; i++)&#123;
+            for(int j = 0 ; j &lt; grid[0].length ; j++)&#123;
+                if(grid[i][j] == &#39;1&#39;)&#123;
+                    //当前位置为1时，计数+1，相邻所有1变为0
+                    sum++;
+                    dfs(grid , i , j);
+                &#125;
             &#125;
         &#125;
-        // 输出矩阵
-        for (int a = 0; a &lt; arr.length; a++) &#123;
-            for (int b = 0; b &lt; arr[a].length; b++) &#123;
-                System.out.print(arr[a][b] + &quot;\t&quot;);
- 
+        return sum;
+    &#125;
+
+    //将相邻的所有1变为0，每次递归都对上下左右暴力置0
+    public void dfs(char[][] grid, int i, int j)&#123;
+        //越界直接返回
+        if(i &lt; 0 || j &lt; 0 || i &gt;= grid.length || j &gt;= grid[0].length)&#123;return;&#125;
+        //本来就是0也直接返回
+        if(grid[i][j] == &#39;0&#39;)&#123;return;&#125;
+        //当前是1，置为0后上下左右dfs
+        grid[i][j] = &#39;0&#39;;
+        dfs(grid , i+1 , j);
+        dfs(grid , i-1 , j);
+        dfs(grid , i , j+1);
+        dfs(grid , i , j-1);
+    &#125;
+&#125;
+</code></pre>
+<h1 id="3-力扣463"><a href="#3-力扣463" class="headerlink" title="3.力扣463"></a>3.力扣463</h1><h2 id="3-1题目描述"><a href="#3-1题目描述" class="headerlink" title="3.1题目描述"></a>3.1题目描述</h2><p>给定一个 row x col 的二维网格地图 grid ，其中：grid[i][j] = 1 表示陆地， grid[i][j] = 0 表示水域。</p>
+<p>网格中的格子 水平和垂直 方向相连（对角线方向不相连）。整个网格被水完全包围，但其中恰好有一个岛屿（或者说，一个或多个表示陆地的格子相连组成的岛屿）。</p>
+<p>岛屿中没有“湖”（“湖” 指水域在岛屿内部且不和岛屿周围的水相连）。格子是边长为 1 的正方形。网格为长方形，且宽度和高度均不超过 100 。计算这个岛屿的周长。</p>
+<p><img src="https://img-blog.csdnimg.cn/6a48c609290247ecbe4208d1f5a79ddc.png"></p>
+<h2 id="3-2题解"><a href="#3-2题解" class="headerlink" title="3.2题解"></a>3.2题解</h2><p>核心就是：陆地（1）旁边如果越界、或者是海洋（0），那么计数+1<br>我们可以将DFS算法返回值为void，直接对静态变量进行操作；也可以将DFS方法返回值设为int，用回溯来做</p>
+<h3 id="3-2-1操作静态变量"><a href="#3-2-1操作静态变量" class="headerlink" title="3.2.1操作静态变量"></a>3.2.1操作静态变量</h3><pre><code>class Solution &#123;
+    static int sum = 0;
+    public int islandPerimeter(int[][] grid) &#123;
+        if(grid == null || grid.length == 0 || grid[0].length == 0)&#123;return 0;&#125;
+        for(int i = 0 ; i &lt; grid.length ; i++)&#123;
+            for(int j = 0 ; j &lt; grid[0].length ; j++)&#123;
+                if(grid[i][j] == 1)&#123;
+                    dfs(grid , i , j);
+                &#125;
             &#125;
-            System.out.println();
         &#125;
+        return sum;
+    &#125;
+
+
+
+    public void dfs(int[][] grid , int i , int j )&#123;
+        //若当前位置不是陆地，那么周长+1
+        if(i &lt; 0 || j &lt; 0 || i &gt;= grid.length || j &gt;= grid[0].length || grid[i][j] == 0)&#123;
+            sum++;
+            return;
+            &#125;
+        
+        //如果当前是陆地，那么周长总计不变，继续上下左右遍历
+        //所到之处标为2：需要标记，且不能标记为0,  0会被计数
+        if(grid[i][j] == 1)&#123;
+            grid[i][j] = 2;
+            dfs(grid, i+1 , j );
+            dfs(grid, i-1 , j );
+            dfs(grid, i , j+1 );
+            dfs(grid, i , j-1 );
+        &#125;
+    &#125;
+&#125;
+</code></pre>
+<h3 id="3-2-2用回溯"><a href="#3-2-2用回溯" class="headerlink" title="3.2.2用回溯"></a>3.2.2用回溯</h3><pre><code>class Solution &#123;
+    public int islandPerimeter(int[][] grid) &#123;
+        if(grid == null || grid.length == 0 || grid[0].length == 0)&#123;return 0;&#125;
+        for(int i = 0 ; i &lt; grid.length ; i++)&#123;
+            for(int j = 0 ; j &lt; grid[0].length ; j++)&#123;
+                if(grid[i][j] == 1)&#123;
+                   return dfs(grid , i , j);
+                &#125;
+            &#125;
+        &#125;
+        return 0;
+    &#125;
+
+    public int dfs(int[][] grid , int i , int j )&#123;
+        //若当前位置越界，那么周长+1，且需要返回
+        if(i &lt; 0 || j &lt; 0 || i &gt;= grid.length || j &gt;= grid[0].length )&#123;
+            return 1;
+            &#125;
+        if( grid[i][j] == 0)&#123;
+            return 1;
+        &#125;
+        
+        //如果当前是陆地，那么周长总计不变，继续上下左右遍历
+        //所到之处标为2：需要标记，且不能标记为0,  0会被计数
+        if(grid[i][j] == 1)&#123;
+            grid[i][j] = 2;
+            return
+            dfs(grid, i+1 , j )+
+            dfs(grid, i-1 , j )+
+            dfs(grid, i , j+1 )+
+            dfs(grid, i , j-1 );
+        &#125;
+        return 0;
+    &#125;
+&#125;
+</code></pre>
+<h1 id="4-力扣695"><a href="#4-力扣695" class="headerlink" title="4.力扣695"></a>4.力扣695</h1><h2 id="4-1题目描述"><a href="#4-1题目描述" class="headerlink" title="4.1题目描述"></a>4.1题目描述</h2><p>给你一个大小为 m x n 的二进制矩阵 grid 。</p>
+<p>岛屿 是由一些相邻的 1 (代表土地) 构成的组合，这里的「相邻」要求两个 1 必须在 水平或者竖直的四个方向上 相邻。你可以假设 grid 的四个边缘都被 0（代表水）包围着。</p>
+<p>岛屿的面积是岛上值为 1 的单元格的数目。</p>
+<p>计算并返回 grid 中最大的岛屿面积。如果没有岛屿，则返回面积为 0 。</p>
+<p><img src="https://img-blog.csdnimg.cn/7c5880fe8f2841e5897cdd357fa37d7a.png"></p>
+<h2 id="4-2题解"><a href="#4-2题解" class="headerlink" title="4.2题解"></a>4.2题解</h2><p>同样的DFS+回溯统计结果</p>
+<pre><code>class Solution &#123;
+    public int maxAreaOfIsland(int[][] grid) &#123;
+       //空值
+        if(grid == null || grid.length == 0 ||grid[0].length == 0)&#123;
+            return 0;
+        &#125;
+        //最大面积
+        int max = 0;
+        int temp = 0;
+        for(int i = 0 ; i &lt; grid.length ; i++)&#123;
+            for(int j = 0 ; j &lt; grid[0].length ; j++)&#123;
+                if(grid[i][j] == 1)&#123;
+                    //该轮dfs的面积值
+                   temp = dfs(grid,i,j);
+                   if(temp &gt; max)&#123;
+                       max = temp;
+                   &#125;
+                &#125;
+            &#125;
+        &#125;
+        return max;
+    &#125;
+
+    public int dfs(int[][] grid , int i , int j )&#123;
+        //越界or海洋  则返回0
+        if(i &lt; 0 || j &lt; 0 || i &gt;= grid.length || j &gt;= grid[0].length || grid[i][j] == 0)&#123;
+            return 0;
+        &#125;
+        //每轮dfs的返回值总
+        if(grid[i][j] == 1)&#123;
+            grid[i][j] = 2;
+            //回溯，注意要加上自身（+1）
+            return 1+
+            dfs(grid , i+1 , j )+
+            dfs(grid , i-1 , j )+
+            dfs(grid , i , j+1 )+
+            dfs(grid , i , j-1 );
+        &#125;
+        return 0;
     &#125;
 &#125;
 </code></pre>

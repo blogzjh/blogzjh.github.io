@@ -2,24 +2,25 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>(蔚来)复杂链表的复制 | ZJH&#39;blog</title>
+  <title>ZJH&#39;blog</title>
   <meta name="keywords" content="">
-  <meta name="description" content="(蔚来)复杂链表的复制 | ZJH&#39;blog">
+  <meta name="description" content="ZJH&#39;blog">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="这里讨论Mysql（redolog）、Redis（AOF）、RabbitMQ（消息持久化） 三者的共同点都是：先在内存缓冲池中追加记录、以一定的频率刷盘持久化、批量刷盘都存在数据丢失的风险 刷盘（从内存到磁盘）的过程中可能出现问题，因此中间件需要提供其他的辅助安全方案 redolog和AOF的刷盘都是同步的（master线程），但RabbitMQ是异步的且不能指定刷盘频率，参考官网文档 中间件重">
+<meta name="description" content="因为入行很晚，一直没刷过题，上上周面快手问答部分还不错，一面算法题没做出来但是给过了；二面算法题还是没做出来，拖到了70min，挂了。 痛定思痛！ 这两周狂刷了34道力扣终于刷出了一点感觉，刚刚某蚁金服A了两道题（第二题要建树，A不出来），考完在群里写了两个题解，居然有人不信我是新手！不过第一次因为算法被人夸有天赋，发自内心的高兴哈哈哈哈哈哈哈哈哈哈。   第一题：字符分裂题目描述字符可以分裂为">
 <meta property="og:type" content="article">
-<meta property="og:title" content="三种中间件的刷盘(持久化)策略">
-<meta property="og:url" content="https://zjhblog.gitee.io/2022/08/28/%E4%B8%89%E7%A7%8D%E4%B8%AD%E9%97%B4%E4%BB%B6%E7%9A%84%E5%88%B7%E7%9B%98-%E6%8C%81%E4%B9%85%E5%8C%96-%E7%AD%96%E7%95%A5/index.html">
+<meta property="og:title" content="某蚁金服秋招9-15">
+<meta property="og:url" content="https://zjhblog.gitee.io/2022/09/15/%E6%9F%90%E8%9A%81%E9%87%91%E6%9C%8D%E7%A7%8B%E6%8B%9B9-15/index.html">
 <meta property="og:site_name" content="ZJH&#39;blog">
-<meta property="og:description" content="这里讨论Mysql（redolog）、Redis（AOF）、RabbitMQ（消息持久化） 三者的共同点都是：先在内存缓冲池中追加记录、以一定的频率刷盘持久化、批量刷盘都存在数据丢失的风险 刷盘（从内存到磁盘）的过程中可能出现问题，因此中间件需要提供其他的辅助安全方案 redolog和AOF的刷盘都是同步的（master线程），但RabbitMQ是异步的且不能指定刷盘频率，参考官网文档 中间件重">
+<meta property="og:description" content="因为入行很晚，一直没刷过题，上上周面快手问答部分还不错，一面算法题没做出来但是给过了；二面算法题还是没做出来，拖到了70min，挂了。 痛定思痛！ 这两周狂刷了34道力扣终于刷出了一点感觉，刚刚某蚁金服A了两道题（第二题要建树，A不出来），考完在群里写了两个题解，居然有人不信我是新手！不过第一次因为算法被人夸有天赋，发自内心的高兴哈哈哈哈哈哈哈哈哈哈。   第一题：字符分裂题目描述字符可以分裂为">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/63a03ebe859341208c8d8c6ed631c457.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/0b463077bdad46bea54169917cbaa8c9.png">
-<meta property="article:published_time" content="2022-08-28T05:34:20.000Z">
-<meta property="article:modified_time" content="2022-08-28T05:34:38.213Z">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/1911d614650749c09c111a27d36e2006.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/16896850d08c405dbc9d3981df65e15b.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/3b426aa82dd34eb0b4c7d0330a771a91.png">
+<meta property="article:published_time" content="2022-09-15T13:22:38.000Z">
+<meta property="article:modified_time" content="2022-09-15T13:49:57.293Z">
 <meta property="article:author" content="ZJH">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://img-blog.csdnimg.cn/63a03ebe859341208c8d8c6ed631c457.png">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/1911d614650749c09c111a27d36e2006.png">
 
 
 <link rel="icon" href="/img/QQ图片20211224224200.jpg">
@@ -59,7 +60,7 @@
 
 
 <body>
-<aside class="nav">
+<aside class="nav mobile">
     <div class="nav-left">
         <a href="/zjh/"
    class="avatar_target">
@@ -137,24 +138,10 @@
         
             
                 <li>
-                    <div data-rel="数据库">
-                        
-                        数据库
-                        <small>(3)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
                     <div data-rel="数据结构算法">
                         
                         数据结构算法
-                        <small>(8)</small>
+                        <small>(7)</small>
                         
                     </div>
                     
@@ -196,6 +183,20 @@
                     <div data-rel="源码">
                         
                         源码
+                        <small>(9)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="中间件">
+                        
+                        中间件
                         <small>(8)</small>
                         
                     </div>
@@ -210,7 +211,7 @@
                     <div data-rel="Java">
                         
                         Java
-                        <small>(13)</small>
+                        <small>(8)</small>
                         
                     </div>
                     
@@ -232,7 +233,7 @@
     </div>
 </div>
 <input type="hidden" id="yelog_site_posts_number" value="51">
-<input type="hidden" id="yelog_site_word_count" value="96.5k">
+<input type="hidden" id="yelog_site_word_count" value="102.4k">
 <div style="display: none">
     <span id="busuanzi_value_site_uv"></span>
     <span id="busuanzi_value_site_pv"></span>
@@ -288,7 +289,63 @@
     
     <nav id="title-list-nav">
         
-        <a  class="全部文章 Java "
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/09/15/%E6%9F%90%E8%9A%81%E9%87%91%E6%9C%8D%E7%A7%8B%E6%8B%9B9-15/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="某蚁金服秋招9-15">某蚁金服秋招9-15</span>
+            <span class="post-date" title="2022-09-15 21:22:38">2022/09/15</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/09/15/%E4%B8%89%E7%A7%8D%E6%83%85%E5%86%B5%E7%9A%84%E5%B1%82%E5%BA%8F%E9%81%8D%E5%8E%86/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="三种情况的层序遍历">三种情况的层序遍历</span>
+            <span class="post-date" title="2022-09-15 21:21:24">2022/09/15</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/09/15/%E5%87%A0%E9%81%93%E5%B2%9B%E5%B1%BF%E9%97%AE%E9%A2%98-dfs-%E5%89%AA%E6%9E%9D-%E5%9B%9E%E6%BA%AF/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="几道岛屿问题:dfs+剪枝+回溯">几道岛屿问题:dfs+剪枝+回溯</span>
+            <span class="post-date" title="2022-09-15 21:20:58">2022/09/15</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/09/15/%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%9A%E6%9B%BF%E6%8D%A2%E3%80%81%E5%B7%A6%E6%97%8B%E3%80%81%E7%BC%BA%E5%A4%B1/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="字符串：替换、左旋、缺失">字符串：替换、左旋、缺失</span>
+            <span class="post-date" title="2022-09-15 21:20:41">2022/09/15</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/09/15/%E5%87%A0%E9%81%93%E4%BA%8C%E5%8F%89%E6%A0%91-dfs-%E5%9B%9E%E6%BA%AF/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="几道二叉树:dfs+回溯">几道二叉树:dfs+回溯</span>
+            <span class="post-date" title="2022-09-15 21:19:53">2022/09/15</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/09/15/%E5%87%A0%E9%81%93%E5%8A%A8%E5%BD%92%E6%80%BB%E7%BB%93/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="几道动归总结">几道动归总结</span>
+            <span class="post-date" title="2022-09-15 21:18:43">2022/09/15</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/09/15/BeanFactory%E5%92%8CApplicationContext/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="BeanFactory和ApplicationContext">BeanFactory和ApplicationContext</span>
+            <span class="post-date" title="2022-09-15 21:17:39">2022/09/15</span>
+        </a>
+        
+        <a  class="全部文章 中间件 "
            href="/zjh/2022/08/28/%E4%B8%89%E7%A7%8D%E4%B8%AD%E9%97%B4%E4%BB%B6%E7%9A%84%E5%88%B7%E7%9B%98-%E6%8C%81%E4%B9%85%E5%8C%96-%E7%AD%96%E7%95%A5/"
            data-tag=""
            data-author="" >
@@ -296,7 +353,7 @@
             <span class="post-date" title="2022-08-28 13:34:20">2022/08/28</span>
         </a>
         
-        <a  class="全部文章 Java "
+        <a  class="全部文章 中间件 "
            href="/zjh/2022/08/28/redis%E5%9F%BA%E7%A1%80/"
            data-tag=""
            data-author="" >
@@ -304,7 +361,7 @@
             <span class="post-date" title="2022-08-28 12:21:22">2022/08/28</span>
         </a>
         
-        <a  class="全部文章 Java "
+        <a  class="全部文章 中间件 "
            href="/zjh/2022/08/27/RabbitMQ%E5%9F%BA%E7%A1%80/"
            data-tag=""
            data-author="" >
@@ -312,7 +369,7 @@
             <span class="post-date" title="2022-08-27 16:26:14">2022/08/27</span>
         </a>
         
-        <a  class="全部文章 Java "
+        <a  class="全部文章 中间件 "
            href="/zjh/2022/08/27/RabbitMQ%E5%8F%AF%E9%9D%A0%E6%80%A7-Spring/"
            data-tag=""
            data-author="" >
@@ -320,7 +377,7 @@
             <span class="post-date" title="2022-08-27 16:02:25">2022/08/27</span>
         </a>
         
-        <a  class="全部文章 Java "
+        <a  class="全部文章 中间件 "
            href="/zjh/2022/08/27/RabbitMQ%E6%AD%BB%E4%BF%A1%E9%98%9F%E5%88%97%E3%80%81%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97-Spring/"
            data-tag=""
            data-author="" >
@@ -328,7 +385,7 @@
             <span class="post-date" title="2022-08-27 01:05:35">2022/08/27</span>
         </a>
         
-        <a  class="全部文章 数据库 "
+        <a  class="全部文章 中间件 "
            href="/zjh/2022/08/23/MySQL%E4%BA%8B%E5%8A%A1%E4%B8%8E%E9%94%81/"
            data-tag=""
            data-author="" >
@@ -414,30 +471,6 @@
            data-author="" >
             <span class="post-title" title="四种方法Servlet容器使用Spring的Bean对象">四种方法Servlet容器使用Spring的Bean对象</span>
             <span class="post-date" title="2022-08-03 21:47:54">2022/08/03</span>
-        </a>
-        
-        <a  class="全部文章 数据结构算法 "
-           href="/zjh/2022/07/29/(%E8%94%9A%E6%9D%A5)%E5%A4%8D%E6%9D%82%E9%93%BE%E8%A1%A8%E7%9A%84%E5%A4%8D%E5%88%B6/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="(蔚来)复杂链表的复制">(蔚来)复杂链表的复制</span>
-            <span class="post-date" title="2022-07-29 12:32:49">2022/07/29</span>
-        </a>
-        
-        <a  class="全部文章 数据结构算法 "
-           href="/zjh/2022/07/20/%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%9A%E6%9B%BF%E6%8D%A2%E3%80%81%E5%B7%A6%E6%97%8B%E3%80%81%E7%BC%BA%E5%A4%B1/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="字符串：替换、左旋、缺失">字符串：替换、左旋、缺失</span>
-            <span class="post-date" title="2022-07-20 21:59:41">2022/07/20</span>
-        </a>
-        
-        <a  class="全部文章 数据结构算法 "
-           href="/zjh/2022/07/20/%E4%B8%89%E7%A7%8D%E6%83%85%E5%86%B5%E7%9A%84%E5%B1%82%E5%BA%8F%E9%81%8D%E5%8E%86/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="三种情况的层序遍历">三种情况的层序遍历</span>
-            <span class="post-date" title="2022-07-20 21:58:33">2022/07/20</span>
         </a>
         
         <a  class="全部文章 Java "
@@ -544,14 +577,6 @@
             <span class="post-date" title="2022-06-25 01:35:20">2022/06/25</span>
         </a>
         
-        <a  class="全部文章 数据结构算法 "
-           href="/zjh/2022/04/21/%E5%B8%B8%E8%A7%81%E6%8E%92%E5%BA%8F/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="常见排序">常见排序</span>
-            <span class="post-date" title="2022-04-21 09:56:37">2022/04/21</span>
-        </a>
-        
         <a  class="全部文章 Java "
            href="/zjh/2022/04/21/Filter%E7%9A%84%E5%B8%B8%E8%A7%81%E7%94%A8%E6%B3%95/"
            data-tag=""
@@ -600,7 +625,7 @@
             <span class="post-date" title="2022-03-21 00:13:23">2022/03/21</span>
         </a>
         
-        <a  class="全部文章 数据库 "
+        <a  class="全部文章 中间件 "
            href="/zjh/2022/03/07/Mysql%E4%BA%8B%E5%8A%A1%E5%92%8C%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/"
            data-tag=""
            data-author="" >
@@ -608,28 +633,12 @@
             <span class="post-date" title="2022-03-07 22:11:06">2022/03/07</span>
         </a>
         
-        <a  class="全部文章 数据库 "
+        <a  class="全部文章 中间件 "
            href="/zjh/2022/03/07/Mysql-InnoDB-%E7%B4%A2%E5%BC%95%E5%8E%9F%E7%90%86%E5%8F%8A%E7%9A%84%E4%BD%BF%E7%94%A8/"
            data-tag=""
            data-author="" >
             <span class="post-title" title="Mysql(InnoDB)索引原理及的使用">Mysql(InnoDB)索引原理及的使用</span>
             <span class="post-date" title="2022-03-07 22:10:05">2022/03/07</span>
-        </a>
-        
-        <a  class="全部文章 数据结构算法 "
-           href="/zjh/2022/03/07/%E7%B1%BB%E8%87%AA%E8%BA%AB%E5%B5%8C%E5%A5%97-%E4%BA%8C%E5%8F%89%E6%A0%91%E5%88%A0%E9%99%A4-%E6%A0%88%E5%A0%86%E5%88%86%E6%9E%90/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="类自身嵌套(二叉树删除)栈堆分析">类自身嵌套(二叉树删除)栈堆分析</span>
-            <span class="post-date" title="2022-03-07 22:09:09">2022/03/07</span>
-        </a>
-        
-        <a  class="全部文章 数据结构算法 "
-           href="/zjh/2022/03/07/Java%E5%A0%86%E6%8E%92%E5%BA%8F%E7%9A%84%E8%BF%87%E7%A8%8B%E5%88%B0%E8%AE%BE%E8%AE%A1/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Java堆排序的过程到设计">Java堆排序的过程到设计</span>
-            <span class="post-date" title="2022-03-07 22:08:08">2022/03/07</span>
         </a>
         
         <a  class="全部文章 源码 "
@@ -680,14 +689,6 @@
             <span class="post-date" title="2021-12-25 21:55:46">2021/12/25</span>
         </a>
         
-        <a  class="全部文章 数据结构算法 "
-           href="/zjh/2021/12/25/%E5%9B%9E%E5%BD%A2%E9%92%88%E6%95%B0%E5%AD%97%E7%9F%A9%E9%98%B5Java%E5%AE%9E%E7%8E%B0/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="回形针数字矩阵Java实现">回形针数字矩阵Java实现</span>
-            <span class="post-date" title="2021-12-25 02:07:12">2021/12/25</span>
-        </a>
-        
         <a  class="全部文章 Java "
            href="/zjh/2021/12/25/Java%E5%9B%9B%E7%A7%8Dnext%E7%94%A8%E6%B3%95/"
            data-tag=""
@@ -712,53 +713,12 @@
         </div>
     </div>
 </aside>
-<div id="post">
+<div id="post" class="index">
     <div class="pjax">
-        <article id="post-(蔚来)复杂链表的复制" class="article article-type-post" itemscope itemprop="blogPost">
+        <article class="index">
+            <div class="toc-ref">
     
-        <h1 class="article-title">(蔚来)复杂链表的复制</h1>
-    
-    <div class="article-meta">
-        
-        
-        
-        <span class="book">
-            <i class="iconfont icon-category"></i>
-            
-            
-            <a  data-rel="数据结构算法">数据结构算法</a>
-            
-        </span>
-        
-        
-    </div>
-    <div class="article-meta">
-        
-            发布时间 : <time class="date" title='最后更新: 2022-08-03 21:59:33'>2022-07-29 12:32</time>
-        
-    </div>
-    <div class="article-meta">
-        
-        <span>字数:231</span>
-        
-        
-        <span id="busuanzi_container_page_pv">
-            阅读 :<span id="busuanzi_value_page_pv">
-                <span class="count-comment">
-                    <span class="spinner">
-                      <div class="cube1"></div>
-                      <div class="cube2"></div>
-                    </span>
-                </span>
-            </span>
-        </span>
-        
-        
-    </div>
-    
-    <div class="toc-ref">
-    
-        
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BC%95%E5%AF%BC"><span class="toc-text">引导</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%A5%E5%8D%9A%E5%AE%A2%E4%B8%8B%E7%9A%84%E5%BF%AB%E6%8D%B7%E9%94%AE"><span class="toc-text">该博客下的快捷键</span></a></li></ol></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -771,109 +731,66 @@
     }
 </style>
 </div>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>2022-07-28蔚来提前批算法第一题，已AC，剑指相似的题，笔试要多判断random指针为空的情况</p>
-<p>笔试的时候是直接一个while循环搞定，这里贴出另外一个解法</p>
-<p>请实现 copyRandomList 函数，复制一个复杂链表。在复杂链表中，每个节点除了有一个 next 指针指向下一个节点，还有一个 random 指针指向链表中的任意节点或者 null。</p>
-<p> <img src="https://img-blog.csdnimg.cn/684077f34afa495b91ed7add08e1e53e.png"><br><img src="https://img-blog.csdnimg.cn/dc54fe25f2a94db38c1b8e0f65063629.png"><br><img src="https://img-blog.csdnimg.cn/10eddcdb7b8a49cab0687f20789c01db.png"></p>
-<pre><code>/*
-// Definition for a Node.
-class Node &#123;
-    int val;
-    Node next;
-    Node random;
+            <h1 id="引导"><a href="#引导" class="headerlink" title="引导"></a>引导</h1><p>点击这里切换目录与文章列表</p>
+<p><img src="https://img-blog.csdnimg.cn/2bb36e3cf82b44d5b4f895033d7f4371.png"></p>
+<h2 id="该博客下的快捷键"><a href="#该博客下的快捷键" class="headerlink" title="该博客下的快捷键"></a>该博客下的快捷键</h2><table>
+<thead>
+<tr>
+<th align="center">快捷键</th>
+<th align="center">功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">s/S</td>
+<td align="center">全屏/取消全屏</td>
+</tr>
+<tr>
+<td align="center">w/W</td>
+<td align="center">打开/关闭文章目录</td>
+</tr>
+<tr>
+<td align="center">i/I</td>
+<td align="center">获取搜索框焦点</td>
+</tr>
+<tr>
+<td align="center">j/J</td>
+<td align="center">向下滑动</td>
+</tr>
+<tr>
+<td align="center">k/K</td>
+<td align="center">向上滑动</td>
+</tr>
+<tr>
+<td align="center">gg/GG</td>
+<td align="center">到最顶端</td>
+</tr>
+<tr>
+<td align="center">shift+G/g</td>
+<td align="center">到最下端</td>
+</tr>
+<tr>
+<td align="center">ESC</td>
+<td align="center">1.如果输入框有内容，清除内容<br>2.如果输入框无内容，失去焦点</td>
+</tr>
+<tr>
+<td align="center">下</td>
+<td align="center">向下选择文章</td>
+</tr>
+<tr>
+<td align="center">上</td>
+<td align="center">向上选择文章</td>
+</tr>
+<tr>
+<td align="center">回车</td>
+<td align="center">打开当前选中的文章，若没有，则默认打开第一个</td>
+</tr>
+</tbody></table>
+<p>到目前为止已经写了<code class="article_number"></code>篇文章， 共<code class="site_word_count"></code>字。</p>
+<p>本站访问人数：<code class="site_uv"></code>人次 ， 访问量：<code class="site_pv"></code>次</p>
 
-    public Node(int val) &#123;
-        this.val = val;
-        this.next = null;
-        this.random = null;
-    &#125;
-&#125;
-*/
-/**
-法1：用hashMap来维护
- */
-class Solution &#123;
-    public Node copyRandomList(Node head) &#123;
-        if(head == null)
-        return null;
-        HashMap&lt;Node,Node&gt; hs = new HashMap&lt;Node,Node&gt;();
-        Node curr = head;
-        while(curr != null)&#123;
-            hs.put(curr,new Node(curr.val));
-            curr = curr.next;
-        &#125;
-        curr = head;
-        while(curr != null)&#123;
-            hs.get(curr).next = hs.get(curr.next);
-            hs.get(curr).random = hs.get(curr.random);
-            curr = curr.next;
-        &#125;
-        return hs.get(head);
-
-
-    &#125;
-&#125;
-</code></pre>
-
-      
-       <hr><span style="font-style: italic;color: gray;"> 生命以负熵为食，归整以抵抗熵增； </span>
-    </div>
-</article>
-
-
-
-
-
-
-
-    
-        <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-    "HTML-CSS": {
-        preferredFont: "TeX",
-        availableFonts: ["STIX","TeX"],
-        linebreaks: { automatic:true },
-        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
-    },
-    tex2jax: {
-        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
-        processEscapes: true,
-        ignoreClass: "tex2jax_ignore|dno",
-        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-    },
-    TeX: {
-        equationNumbers: { autoNumber: "AMS" },
-        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
-        Macros: { href: "{}" }
-    },
-    messageStyle: "none"
-    });
-</script>
-<!-- 给MathJax元素添加has-jax class -->
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax(), i;
-        for(i=0; i < all.length; i += 1) {
-            all[i].SourceElement().parentNode.className += ' has-jax';
-        }
-    });
-</script>
-<!-- 通过连接CDN加载MathJax的js代码 -->
-<script type="text/javascript" async
-        src="//cdn.jsdelivr.net/npm/mathjax@2.7.8/unpacked/MathJax.js?config=TeX-MML-AM_CHTML">
-</script>
-<input type="hidden" id="MathJax-js"
-        value="//cdn.jsdelivr.net/npm/mathjax@2.7.8/unpacked/MathJax.js?config=TeX-MML-AM_CHTML">
-</input>
-    
-
-
-
-
+        </article>
+        
+        
     </div>
     <div class="copyright">
         <p class="footer-entry">
@@ -882,11 +799,11 @@ class Solution &#123;
 <p class="footer-entry">"生命以负熵为食"
 
     </div>
-    <div class="full-toc">
-        <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
+</div>
+<div class="full-toc">
+    <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
 <a class="" id="rocket" ></a>
 
-    </div>
 </div>
 
 </body>

@@ -2,24 +2,25 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>类自身嵌套(二叉树删除)栈堆分析 | ZJH&#39;blog</title>
+  <title>几道动归总结 | ZJH&#39;blog</title>
   <meta name="keywords" content="">
-  <meta name="description" content="类自身嵌套(二叉树删除)栈堆分析 | ZJH&#39;blog">
+  <meta name="description" content="几道动归总结 | ZJH&#39;blog">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="这里讨论Mysql（redolog）、Redis（AOF）、RabbitMQ（消息持久化） 三者的共同点都是：先在内存缓冲池中追加记录、以一定的频率刷盘持久化、批量刷盘都存在数据丢失的风险 刷盘（从内存到磁盘）的过程中可能出现问题，因此中间件需要提供其他的辅助安全方案 redolog和AOF的刷盘都是同步的（master线程），但RabbitMQ是异步的且不能指定刷盘频率，参考官网文档 中间件重">
+<meta name="description" content="因为入行很晚，一直没刷过题，上上周面快手问答部分还不错，一面算法题没做出来但是给过了；二面算法题还是没做出来，拖到了70min，挂了。 痛定思痛！ 这两周狂刷了34道力扣终于刷出了一点感觉，刚刚某蚁金服A了两道题（第二题要建树，A不出来），考完在群里写了两个题解，居然有人不信我是新手！不过第一次因为算法被人夸有天赋，发自内心的高兴哈哈哈哈哈哈哈哈哈哈。   第一题：字符分裂题目描述字符可以分裂为">
 <meta property="og:type" content="article">
-<meta property="og:title" content="三种中间件的刷盘(持久化)策略">
-<meta property="og:url" content="https://zjhblog.gitee.io/2022/08/28/%E4%B8%89%E7%A7%8D%E4%B8%AD%E9%97%B4%E4%BB%B6%E7%9A%84%E5%88%B7%E7%9B%98-%E6%8C%81%E4%B9%85%E5%8C%96-%E7%AD%96%E7%95%A5/index.html">
+<meta property="og:title" content="某蚁金服秋招9-15">
+<meta property="og:url" content="https://zjhblog.gitee.io/2022/09/15/%E6%9F%90%E8%9A%81%E9%87%91%E6%9C%8D%E7%A7%8B%E6%8B%9B9-15/index.html">
 <meta property="og:site_name" content="ZJH&#39;blog">
-<meta property="og:description" content="这里讨论Mysql（redolog）、Redis（AOF）、RabbitMQ（消息持久化） 三者的共同点都是：先在内存缓冲池中追加记录、以一定的频率刷盘持久化、批量刷盘都存在数据丢失的风险 刷盘（从内存到磁盘）的过程中可能出现问题，因此中间件需要提供其他的辅助安全方案 redolog和AOF的刷盘都是同步的（master线程），但RabbitMQ是异步的且不能指定刷盘频率，参考官网文档 中间件重">
+<meta property="og:description" content="因为入行很晚，一直没刷过题，上上周面快手问答部分还不错，一面算法题没做出来但是给过了；二面算法题还是没做出来，拖到了70min，挂了。 痛定思痛！ 这两周狂刷了34道力扣终于刷出了一点感觉，刚刚某蚁金服A了两道题（第二题要建树，A不出来），考完在群里写了两个题解，居然有人不信我是新手！不过第一次因为算法被人夸有天赋，发自内心的高兴哈哈哈哈哈哈哈哈哈哈。   第一题：字符分裂题目描述字符可以分裂为">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/63a03ebe859341208c8d8c6ed631c457.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/0b463077bdad46bea54169917cbaa8c9.png">
-<meta property="article:published_time" content="2022-08-28T05:34:20.000Z">
-<meta property="article:modified_time" content="2022-08-28T05:34:38.213Z">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/1911d614650749c09c111a27d36e2006.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/16896850d08c405dbc9d3981df65e15b.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/3b426aa82dd34eb0b4c7d0330a771a91.png">
+<meta property="article:published_time" content="2022-09-15T13:22:38.000Z">
+<meta property="article:modified_time" content="2022-09-15T13:49:57.293Z">
 <meta property="article:author" content="ZJH">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://img-blog.csdnimg.cn/63a03ebe859341208c8d8c6ed631c457.png">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/1911d614650749c09c111a27d36e2006.png">
 
 
 <link rel="icon" href="/img/QQ图片20211224224200.jpg">
@@ -137,24 +138,10 @@
         
             
                 <li>
-                    <div data-rel="数据库">
-                        
-                        数据库
-                        <small>(3)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
                     <div data-rel="数据结构算法">
                         
                         数据结构算法
-                        <small>(8)</small>
+                        <small>(7)</small>
                         
                     </div>
                     
@@ -196,6 +183,20 @@
                     <div data-rel="源码">
                         
                         源码
+                        <small>(9)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="中间件">
+                        
+                        中间件
                         <small>(8)</small>
                         
                     </div>
@@ -210,7 +211,7 @@
                     <div data-rel="Java">
                         
                         Java
-                        <small>(13)</small>
+                        <small>(8)</small>
                         
                     </div>
                     
@@ -232,7 +233,7 @@
     </div>
 </div>
 <input type="hidden" id="yelog_site_posts_number" value="51">
-<input type="hidden" id="yelog_site_word_count" value="96.5k">
+<input type="hidden" id="yelog_site_word_count" value="102.4k">
 <div style="display: none">
     <span id="busuanzi_value_site_uv"></span>
     <span id="busuanzi_value_site_pv"></span>
@@ -288,7 +289,63 @@
     
     <nav id="title-list-nav">
         
-        <a  class="全部文章 Java "
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/09/15/%E6%9F%90%E8%9A%81%E9%87%91%E6%9C%8D%E7%A7%8B%E6%8B%9B9-15/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="某蚁金服秋招9-15">某蚁金服秋招9-15</span>
+            <span class="post-date" title="2022-09-15 21:22:38">2022/09/15</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/09/15/%E4%B8%89%E7%A7%8D%E6%83%85%E5%86%B5%E7%9A%84%E5%B1%82%E5%BA%8F%E9%81%8D%E5%8E%86/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="三种情况的层序遍历">三种情况的层序遍历</span>
+            <span class="post-date" title="2022-09-15 21:21:24">2022/09/15</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/09/15/%E5%87%A0%E9%81%93%E5%B2%9B%E5%B1%BF%E9%97%AE%E9%A2%98-dfs-%E5%89%AA%E6%9E%9D-%E5%9B%9E%E6%BA%AF/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="几道岛屿问题:dfs+剪枝+回溯">几道岛屿问题:dfs+剪枝+回溯</span>
+            <span class="post-date" title="2022-09-15 21:20:58">2022/09/15</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/09/15/%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%9A%E6%9B%BF%E6%8D%A2%E3%80%81%E5%B7%A6%E6%97%8B%E3%80%81%E7%BC%BA%E5%A4%B1/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="字符串：替换、左旋、缺失">字符串：替换、左旋、缺失</span>
+            <span class="post-date" title="2022-09-15 21:20:41">2022/09/15</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/09/15/%E5%87%A0%E9%81%93%E4%BA%8C%E5%8F%89%E6%A0%91-dfs-%E5%9B%9E%E6%BA%AF/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="几道二叉树:dfs+回溯">几道二叉树:dfs+回溯</span>
+            <span class="post-date" title="2022-09-15 21:19:53">2022/09/15</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/zjh/2022/09/15/%E5%87%A0%E9%81%93%E5%8A%A8%E5%BD%92%E6%80%BB%E7%BB%93/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="几道动归总结">几道动归总结</span>
+            <span class="post-date" title="2022-09-15 21:18:43">2022/09/15</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/zjh/2022/09/15/BeanFactory%E5%92%8CApplicationContext/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="BeanFactory和ApplicationContext">BeanFactory和ApplicationContext</span>
+            <span class="post-date" title="2022-09-15 21:17:39">2022/09/15</span>
+        </a>
+        
+        <a  class="全部文章 中间件 "
            href="/zjh/2022/08/28/%E4%B8%89%E7%A7%8D%E4%B8%AD%E9%97%B4%E4%BB%B6%E7%9A%84%E5%88%B7%E7%9B%98-%E6%8C%81%E4%B9%85%E5%8C%96-%E7%AD%96%E7%95%A5/"
            data-tag=""
            data-author="" >
@@ -296,7 +353,7 @@
             <span class="post-date" title="2022-08-28 13:34:20">2022/08/28</span>
         </a>
         
-        <a  class="全部文章 Java "
+        <a  class="全部文章 中间件 "
            href="/zjh/2022/08/28/redis%E5%9F%BA%E7%A1%80/"
            data-tag=""
            data-author="" >
@@ -304,7 +361,7 @@
             <span class="post-date" title="2022-08-28 12:21:22">2022/08/28</span>
         </a>
         
-        <a  class="全部文章 Java "
+        <a  class="全部文章 中间件 "
            href="/zjh/2022/08/27/RabbitMQ%E5%9F%BA%E7%A1%80/"
            data-tag=""
            data-author="" >
@@ -312,7 +369,7 @@
             <span class="post-date" title="2022-08-27 16:26:14">2022/08/27</span>
         </a>
         
-        <a  class="全部文章 Java "
+        <a  class="全部文章 中间件 "
            href="/zjh/2022/08/27/RabbitMQ%E5%8F%AF%E9%9D%A0%E6%80%A7-Spring/"
            data-tag=""
            data-author="" >
@@ -320,7 +377,7 @@
             <span class="post-date" title="2022-08-27 16:02:25">2022/08/27</span>
         </a>
         
-        <a  class="全部文章 Java "
+        <a  class="全部文章 中间件 "
            href="/zjh/2022/08/27/RabbitMQ%E6%AD%BB%E4%BF%A1%E9%98%9F%E5%88%97%E3%80%81%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97-Spring/"
            data-tag=""
            data-author="" >
@@ -328,7 +385,7 @@
             <span class="post-date" title="2022-08-27 01:05:35">2022/08/27</span>
         </a>
         
-        <a  class="全部文章 数据库 "
+        <a  class="全部文章 中间件 "
            href="/zjh/2022/08/23/MySQL%E4%BA%8B%E5%8A%A1%E4%B8%8E%E9%94%81/"
            data-tag=""
            data-author="" >
@@ -414,30 +471,6 @@
            data-author="" >
             <span class="post-title" title="四种方法Servlet容器使用Spring的Bean对象">四种方法Servlet容器使用Spring的Bean对象</span>
             <span class="post-date" title="2022-08-03 21:47:54">2022/08/03</span>
-        </a>
-        
-        <a  class="全部文章 数据结构算法 "
-           href="/zjh/2022/07/29/(%E8%94%9A%E6%9D%A5)%E5%A4%8D%E6%9D%82%E9%93%BE%E8%A1%A8%E7%9A%84%E5%A4%8D%E5%88%B6/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="(蔚来)复杂链表的复制">(蔚来)复杂链表的复制</span>
-            <span class="post-date" title="2022-07-29 12:32:49">2022/07/29</span>
-        </a>
-        
-        <a  class="全部文章 数据结构算法 "
-           href="/zjh/2022/07/20/%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%9A%E6%9B%BF%E6%8D%A2%E3%80%81%E5%B7%A6%E6%97%8B%E3%80%81%E7%BC%BA%E5%A4%B1/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="字符串：替换、左旋、缺失">字符串：替换、左旋、缺失</span>
-            <span class="post-date" title="2022-07-20 21:59:41">2022/07/20</span>
-        </a>
-        
-        <a  class="全部文章 数据结构算法 "
-           href="/zjh/2022/07/20/%E4%B8%89%E7%A7%8D%E6%83%85%E5%86%B5%E7%9A%84%E5%B1%82%E5%BA%8F%E9%81%8D%E5%8E%86/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="三种情况的层序遍历">三种情况的层序遍历</span>
-            <span class="post-date" title="2022-07-20 21:58:33">2022/07/20</span>
         </a>
         
         <a  class="全部文章 Java "
@@ -544,14 +577,6 @@
             <span class="post-date" title="2022-06-25 01:35:20">2022/06/25</span>
         </a>
         
-        <a  class="全部文章 数据结构算法 "
-           href="/zjh/2022/04/21/%E5%B8%B8%E8%A7%81%E6%8E%92%E5%BA%8F/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="常见排序">常见排序</span>
-            <span class="post-date" title="2022-04-21 09:56:37">2022/04/21</span>
-        </a>
-        
         <a  class="全部文章 Java "
            href="/zjh/2022/04/21/Filter%E7%9A%84%E5%B8%B8%E8%A7%81%E7%94%A8%E6%B3%95/"
            data-tag=""
@@ -600,7 +625,7 @@
             <span class="post-date" title="2022-03-21 00:13:23">2022/03/21</span>
         </a>
         
-        <a  class="全部文章 数据库 "
+        <a  class="全部文章 中间件 "
            href="/zjh/2022/03/07/Mysql%E4%BA%8B%E5%8A%A1%E5%92%8C%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/"
            data-tag=""
            data-author="" >
@@ -608,28 +633,12 @@
             <span class="post-date" title="2022-03-07 22:11:06">2022/03/07</span>
         </a>
         
-        <a  class="全部文章 数据库 "
+        <a  class="全部文章 中间件 "
            href="/zjh/2022/03/07/Mysql-InnoDB-%E7%B4%A2%E5%BC%95%E5%8E%9F%E7%90%86%E5%8F%8A%E7%9A%84%E4%BD%BF%E7%94%A8/"
            data-tag=""
            data-author="" >
             <span class="post-title" title="Mysql(InnoDB)索引原理及的使用">Mysql(InnoDB)索引原理及的使用</span>
             <span class="post-date" title="2022-03-07 22:10:05">2022/03/07</span>
-        </a>
-        
-        <a  class="全部文章 数据结构算法 "
-           href="/zjh/2022/03/07/%E7%B1%BB%E8%87%AA%E8%BA%AB%E5%B5%8C%E5%A5%97-%E4%BA%8C%E5%8F%89%E6%A0%91%E5%88%A0%E9%99%A4-%E6%A0%88%E5%A0%86%E5%88%86%E6%9E%90/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="类自身嵌套(二叉树删除)栈堆分析">类自身嵌套(二叉树删除)栈堆分析</span>
-            <span class="post-date" title="2022-03-07 22:09:09">2022/03/07</span>
-        </a>
-        
-        <a  class="全部文章 数据结构算法 "
-           href="/zjh/2022/03/07/Java%E5%A0%86%E6%8E%92%E5%BA%8F%E7%9A%84%E8%BF%87%E7%A8%8B%E5%88%B0%E8%AE%BE%E8%AE%A1/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Java堆排序的过程到设计">Java堆排序的过程到设计</span>
-            <span class="post-date" title="2022-03-07 22:08:08">2022/03/07</span>
         </a>
         
         <a  class="全部文章 源码 "
@@ -680,14 +689,6 @@
             <span class="post-date" title="2021-12-25 21:55:46">2021/12/25</span>
         </a>
         
-        <a  class="全部文章 数据结构算法 "
-           href="/zjh/2021/12/25/%E5%9B%9E%E5%BD%A2%E9%92%88%E6%95%B0%E5%AD%97%E7%9F%A9%E9%98%B5Java%E5%AE%9E%E7%8E%B0/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="回形针数字矩阵Java实现">回形针数字矩阵Java实现</span>
-            <span class="post-date" title="2021-12-25 02:07:12">2021/12/25</span>
-        </a>
-        
         <a  class="全部文章 Java "
            href="/zjh/2021/12/25/Java%E5%9B%9B%E7%A7%8Dnext%E7%94%A8%E6%B3%95/"
            data-tag=""
@@ -714,9 +715,9 @@
 </aside>
 <div id="post">
     <div class="pjax">
-        <article id="post-类自身嵌套-二叉树删除-栈堆分析" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-几道动归总结" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">类自身嵌套(二叉树删除)栈堆分析</h1>
+        <h1 class="article-title">几道动归总结</h1>
     
     <div class="article-meta">
         
@@ -734,12 +735,12 @@
     </div>
     <div class="article-meta">
         
-            发布时间 : <time class="date" title='最后更新: 2022-03-07 22:09:41'>2022-03-07 22:09</time>
+            发布时间 : <time class="date" title='最后更新: 2022-09-15 21:19:16'>2022-09-15 21:18</time>
         
     </div>
     <div class="article-meta">
         
-        <span>字数:680</span>
+        <span>字数:2k</span>
         
         
         <span id="busuanzi_container_page_pv">
@@ -758,7 +759,7 @@
     
     <div class="toc-ref">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%B1%BB%E8%87%AA%E5%B5%8C%E5%A0%86%E6%A0%88%E5%88%86%E6%9E%90"><span class="toc-text">类自嵌堆栈分析</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%87%AA%E8%BA%AB%E5%B5%8C%E5%A5%97%E4%B8%8D%E5%88%9B%E5%BB%BA%E6%A0%88%E7%A9%BA%E9%97%B4"><span class="toc-text">自身嵌套不创建栈空间</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%88%A0%E9%99%A4%E6%96%B9%E6%B3%95"><span class="toc-text">删除方法</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A1%A5%E5%85%85"><span class="toc-text">补充</span></a></li></ol></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8A%A8%E5%BD%92%E4%B8%AA%E4%BA%BA%E7%90%86%E8%A7%A3"><span class="toc-text">动归个人理解</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8A%9B%E6%89%A35%E6%9C%80%E9%95%BF%E5%9B%9E%E6%96%87%E5%AD%90%E4%B8%B2"><span class="toc-text">力扣5最长回文子串</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0"><span class="toc-text">题目描述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%8A%B6%E6%80%81%E8%BD%AC%E7%A7%BB%E6%96%B9%E7%A8%8B"><span class="toc-text">状态转移方程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A2%98%E8%A7%A3"><span class="toc-text">题解</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%90%8C%E7%A8%8B%E7%A7%8B%E6%8B%9B"><span class="toc-text">同程秋招</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0-1"><span class="toc-text">题目描述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A2%98%E8%A7%A3-1"><span class="toc-text">题解</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8A%9B%E6%89%A355%E8%B7%B3%E8%B7%83%E6%B8%B8%E6%88%8F"><span class="toc-text">力扣55跳跃游戏</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0-2"><span class="toc-text">题目描述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%8A%B6%E6%80%81%E8%BD%AC%E7%A7%BB%E6%96%B9%E7%A8%8B-1"><span class="toc-text">状态转移方程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A2%98%E8%A7%A3-2"><span class="toc-text">题解</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8A%9B%E6%89%A3139%E5%8D%95%E8%AF%8D%E6%8B%86%E5%88%86"><span class="toc-text">力扣139单词拆分</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0-3"><span class="toc-text">题目描述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%8A%B6%E6%80%81%E8%BD%AC%E7%A7%BB%E6%96%B9%E7%A8%8B-2"><span class="toc-text">状态转移方程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A2%98%E8%A7%A3-3"><span class="toc-text">题解</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8A%9B%E6%89%A362%E4%B8%8D%E5%90%8C%E8%B7%AF%E5%BE%84"><span class="toc-text">力扣62不同路径</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0-4"><span class="toc-text">题目描述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A2%98%E8%A7%A31%EF%BC%9A%E9%80%92%E5%BD%92"><span class="toc-text">题解1：递归</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A2%98%E8%A7%A32%EF%BC%9Adp"><span class="toc-text">题解2：dp</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%8A%B6%E6%80%81%E8%BD%AC%E7%A7%BB%E6%96%B9%E7%A8%8B-3"><span class="toc-text">状态转移方程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8A%9B%E6%89%A364%E6%9C%80%E5%B0%8F%E8%B7%AF%E5%BE%84%E5%92%8C"><span class="toc-text">力扣64最小路径和</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%8A%B6%E6%80%81%E8%BD%AC%E7%A7%BB%E6%96%B9%E7%A8%8B-4"><span class="toc-text">状态转移方程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A2%98%E8%A7%A3-4"><span class="toc-text">题解</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8A%9B%E6%89%A3121%E4%B9%B0%E5%8D%96%E8%82%A1%E7%A5%A8%E6%9C%80%E4%BD%B3%E6%97%B6%E6%9C%BA"><span class="toc-text">力扣121买卖股票最佳时机</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%8A%B6%E6%80%81%E8%BD%AC%E7%A7%BB%E6%96%B9%E7%A8%8B-5"><span class="toc-text">状态转移方程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A2%98%E8%A7%A3-5"><span class="toc-text">题解</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%9D%92%E8%9B%99%E8%B7%B3%E5%8F%B0%E3%80%81%E6%96%90%E6%B3%A2%E9%82%A3%E5%A5%91%E3%80%81%E7%88%AC%E6%A5%BC%E6%A2%AF"><span class="toc-text">青蛙跳台、斐波那契、爬楼梯</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%80%92%E5%BD%92"><span class="toc-text">递归</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8A%A8%E5%BD%92"><span class="toc-text">动归</span></a></li></ol></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -774,100 +775,246 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="类自嵌堆栈分析"><a href="#类自嵌堆栈分析" class="headerlink" title="类自嵌堆栈分析"></a>类自嵌堆栈分析</h1><pre><code>//节点类，构造器等方法省略
-    class MyNode &#123;
-        Key key;
-        Value value;
-        MyNode left;
-        MyNode right;
-&#125;
-</code></pre>
-<h2 id="自身嵌套不创建栈空间"><a href="#自身嵌套不创建栈空间" class="headerlink" title="自身嵌套不创建栈空间"></a>自身嵌套不创建栈空间</h2><pre><code>@Test
-    public void test1()&#123;
-    
-    MyNode node1 = new MyNode();//第一个节点
-    node1.left = new MyNode();
-
-    node1.left.left = new MyNode();
-    node1.left.left.left = new MyNode();
-    node1.left.left.left.left = new MyNode();
-    node1.left.left.left.left.left = new MyNode();
-
-    //栈地址：node2 ≠ node1.left
-    //栈值(堆地址)：node2 = node1.left
-    MyNode node2 = node1.left;
-
-    node2.left.left.left.left = null;//尾节点置空，修改堆的值，相当于node1.left.left.left.left.left=null;
-
-
-    //原node1之下的树：
-    System.out.println(node1.left.left.left.left);//tree.BinaryTree$MyNode@2d3fcdbd;但该节点的4个属性都为null
-    System.out.println(node1.left.left.left.left.left);//null
-&#125;
-</code></pre>
-<p><img src="https://img-blog.csdnimg.cn/b19e546980ea41b7901bd9a23976beca.png"></p>
-<p><img src="https://img-blog.csdnimg.cn/9039c0f58be8492189820eae8e716a47.png"><br><strong>因此对node2.left.left…的属性进行修改是会影响到node1.left.left…的</strong></p>
-<h1 id="删除方法"><a href="#删除方法" class="headerlink" title="删除方法"></a>删除方法</h1><p>一个简陋版的删除方法，有一些小bug，但大题思路是这样</p>
-<ul>
-<li>开辟栈空间，用temp中间变量来进入树的内部，因为修改的是堆对象，所以这个新开辟的temp也能达到并修改</li>
-<li>当删除的节点左右分支都存在时，右子树的最小节点将作为替换节点</li>
+        <h1 id="动归个人理解"><a href="#动归个人理解" class="headerlink" title="动归个人理解"></a>动归个人理解</h1><ul>
+<li>一般来说<strong>求i到j的范围数据，需要参考前面的</strong>，必须new int[][]维护dp数组；</li>
+<li>如果只是<strong>单纯的求xx最大值</strong>，就只需要维护一个int maxXxx来作为状态转移即可</li>
+<li>一般递归都能改成dp，就像是递归的方法名<strong>必须要明确其含义</strong>（输入xx和yy，来得到zz），dp数组的<strong>含义也必须明确</strong>（dp[i][j]代表例如：i天买入，j天卖出的收益）</li>
+<li>dp[][]数组的状态转移方程，<strong>所依赖的位置必须事先已经遍历过</strong>，否则可能因为new数组时默认赋值而产生问题（力扣5题）</li>
 </ul>
-<p><img src="https://img-blog.csdnimg.cn/b59481d64bea4f94bf00c048ea4c21d0.png" alt="在这里插入图片描述"></p>
-<pre><code>public MyNode deleteFrom(MyNode x , Key key)&#123;
-    if(x==null)&#123;
-        return null;
-    &#125;
-
-    int cmp = key.compareTo(x.key);
-//递归
-    if(cmp&lt;0)&#123;
-        x.left = deleteFrom(x, key);
-    &#125;else if(cmp&gt;0)&#123;
-        x.right = deleteFrom(x,key);
-    &#125;else&#123;//当前节点就是需要删除的节点
-        //如果两边都有节点，那么要找出right子树的最小节点temp替代当前节点
-        if(x.right==null)&#123;
-            return x.left;
-        &#125;else if(x.left==null)&#123;
-            return x.right;
-        &#125;else&#123;
-            //1,找到右子树最小节点temp,并在原树中删除
-            MyNode temp = x.right;//开辟栈temp
-
-                      MyNode destTemp = null;//开辟栈destTemp
-
-            while(temp.left != null)&#123;
-                temp = temp.left;
-
-                if(temp.left.left == null)&#123;//temp.left就是该换位的节点，
-                    //1.1 destTemp拿到最终节点的地址值
-                    destTemp = temp.left;  //栈中destTemp拿到对象
-                    //1.2
-                    temp.left = null;     //堆中对象的left属性置空，但堆对象存在
-                    break;
+<h1 id="力扣5最长回文子串"><a href="#力扣5最长回文子串" class="headerlink" title="力扣5最长回文子串"></a>力扣5最长回文子串</h1><h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>超经典的一道题，用二维数组维护状态转移方程，有一个细节点就是<strong>到底维护dp[][]的右上角还是左下角</strong></p>
+<h2 id="状态转移方程"><a href="#状态转移方程" class="headerlink" title="状态转移方程"></a>状态转移方程</h2><p>dp[i][j]表示i到j是回文串，为true <code>=</code> 当前arr[i]等于arr[j]  <code>且</code>  内层dp[i+1][j-1]为true <code>或</code> 长度小于3( j-i&lt;=2 )</p>
+<h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><ul>
+<li>因为<img src="https://img-blog.csdnimg.cn/4cb8f38c71a6479c92959651c36b6016.png"></li>
+<li>所以这是错的，<strong>状态转移参考的是dp数组默认的false</strong><img src="https://img-blog.csdnimg.cn/95c8d9006add4bcead473fc356a0064f.png"></li>
+<li>这是对的<img src="https://img-blog.csdnimg.cn/ba1ce62ea95f4f62b0869094dfecd779.png"></li>
+</ul>
+<p>最终实现</p>
+<pre><code>class Solution &#123;
+    public String longestPalindrome(String s) &#123;
+        if(s == null || s.length() &lt;= 1)&#123;return s;&#125;
+        char[] arr = s.toCharArray();
+        int len = s.length();
+        //保留最长回文串的前后指针
+        int left = 0;
+        int right = 0;
+        //dp保存i到j是否是回文串:状态转移方程是：i+1~~j-1也是true
+        boolean[][] dp = new boolean[len][len];//默认都是false
+        for(int i = 0 ; i &lt; len ; i++)&#123;
+            dp[i][i] = true;//自身是一个回文串
+        &#125;
+        //i到j是否是回文串
+        for(int j = 1 ; j &lt; len ; j++)&#123;//左i
+            for(int i = 0 ; i &lt; j ;i++)&#123;//右j
+                //首尾不同 不是回文串
+                if(arr[i] != arr[j])&#123;continue;&#125;
+                //首尾相同，要参考内部是不是回文串
+                if( j-i &lt;= 2 || dp[i+1][j-1] )&#123;//长度小于3 or 内层(dp左下角是true)
+                    dp[i][j] = true;
+                    if(right-left &lt; j-i)&#123;
+                        right = j;
+                        left = i;
+                    &#125;
                 &#125;
             &#125;
-
-                        temp = destTemp; //栈中temp拿到了右子树最小节点的地址
-
-            //2,temp指向x.left和x.right
-            temp.left = x.left;
-            temp.right = x.right;
-
-            //3,temp替换x
-            x = temp;
-            &#125;
-            n--;
         &#125;
-    return x;
+        return s.substring(left,right+1);
+    &#125;
+&#125;
+</code></pre>
+<h1 id="同程秋招"><a href="#同程秋招" class="headerlink" title="同程秋招"></a>同程秋招</h1><p>趁着回忆出来记录一下，不过感觉这个题状态转移方程没那么强的像动归，更像是一个普通的字符串问题</p>
+<h2 id="题目描述-1"><a href="#题目描述-1" class="headerlink" title="题目描述"></a>题目描述</h2><p>若输入字符串s = “level” ，返回”l”，即<strong>最长相同前后缀</strong>。（前缀：l、le、lev、leve）（后缀：e、ev、eve、evel）（不包括s自身）</p>
+<p>若输入字符串s = “ababab” 则返回”abab”</p>
+<h2 id="题解-1"><a href="#题解-1" class="headerlink" title="题解"></a>题解</h2><pre><code>public class Solution &#123;
+
+  public static void main(String[] args) &#123;
+    Solution solution = new Solution();
+    String   level    = solution.longestPrefix(&quot;ababab&quot;);
+    System.out.println(level);
+
+  &#125;
+
+
+  public String longestPrefix (String s) &#123;
+    //最长、既是前缀、也是后缀
+    //1.空串
+    if(s == null || s.length() == 0)&#123;
+      return &quot;&quot;;
+    &#125;
+    int len = s.length();
+    char[] arr =  s.toCharArray();
+    //长度1一定是
+    if(len == 1)&#123;
+      return s;
+    &#125;
+    //题目说不能包括s自身，所以特殊情况
+    if(len == 2 &amp;&amp; arr[0] == arr[1])&#123;
+      return &quot;&quot; + arr[0];
+    &#125;
+
+    //指定一个跨度
+    int gap = 1;
+    String dest = &quot;&quot;;
+    //前gap 和 后gap是否相同
+    while(gap &lt; len)&#123;
+      //前缀
+      String leftString = s.substring(0,gap);
+      //后缀
+      String rightString = s.substring(len-gap,len);
+      gap++;//gap扩大
+      if( !leftString.equals(rightString) )&#123;
+        continue;//不能用break
+      &#125;else&#123;
+        dest = leftString;
+      &#125;
+    &#125;
+    return dest;
+  &#125;
+&#125;
+</code></pre>
+<h1 id="力扣55跳跃游戏"><a href="#力扣55跳跃游戏" class="headerlink" title="力扣55跳跃游戏"></a>力扣55跳跃游戏</h1><h2 id="题目描述-2"><a href="#题目描述-2" class="headerlink" title="题目描述"></a>题目描述</h2><p><img src="https://img-blog.csdnimg.cn/67452586d1c54145a507b349930cb268.png"></p>
+<h2 id="状态转移方程-1"><a href="#状态转移方程-1" class="headerlink" title="状态转移方程"></a>状态转移方程</h2><p>最大能达到的角标 = 遍历到的i位置 + i位置上的跳跃距离</p>
+<h2 id="题解-2"><a href="#题解-2" class="headerlink" title="题解"></a>题解</h2><pre><code>class Solution &#123;
+    public boolean canJump(int[] nums) &#123;
+        if(nums == null)&#123;return true;&#125;
+        
+        int remote = 0;//最远的角标（状态转移方程：= Math.max）
+        for(int i = 0 ; i &lt; nums.length; i++)&#123;
+            //跳不到i这来
+            if(remote &lt; i)&#123;return false;&#125;
+            //当前角标 + 跳跃长度
+            remote = Math.max(remote, i+nums[i]);
+            if(remote &gt;= nums.length - 1)&#123;return true;&#125;
+        &#125;
+        return false;
+    &#125;
+&#125;
+</code></pre>
+<h1 id="力扣139单词拆分"><a href="#力扣139单词拆分" class="headerlink" title="力扣139单词拆分"></a>力扣139单词拆分</h1><h2 id="题目描述-3"><a href="#题目描述-3" class="headerlink" title="题目描述"></a>题目描述</h2><p><img src="https://img-blog.csdnimg.cn/1adf56a442f14f6e87a59727ad81c39b.png"></p>
+<h2 id="状态转移方程-2"><a href="#状态转移方程-2" class="headerlink" title="状态转移方程"></a>状态转移方程</h2><p>dp[x]表示x位置之前都能被字典匹配 = 当前角标i + 用String::<code>startsWith(String word ; int offset)</code>匹配到的字符串长度</p>
+<h2 id="题解-3"><a href="#题解-3" class="headerlink" title="题解"></a>题解</h2><pre><code>class Solution &#123;
+    public boolean wordBreak(String s, List&lt;String&gt; wordDict) &#123;
+        if(&quot;&quot;.equals(s) || s == null)&#123;return true;&#125;
+        int len = s.length();
+        //创建一个dp数组，boolean类型，保证第一个为true（最开始就能匹配）
+        //然后用这个 被匹配到的字典长度+原来角标———再去匹配
+        //每次匹配都会去遍历wordDict字典
+        boolean[] dp = new boolean[len + 1];//因为最后是判断dp[len] == true，保证指针不越界
+        dp[0] = true;//认为字符串s前面还拼接了一个&quot;&quot;，dp的长度位len+1，0号位是&quot;&quot;一定能被匹配，dp[1]对应的是s的0号位
+        for(int i = 0 ; i &lt; len ; i++)&#123;
+            if( !dp[i] )&#123;continue;&#125;
+            //i位置，遍历匹配字典
+            for(String word : wordDict)&#123;
+                //不越界 &amp;&amp; s从i开始能匹配上word
+                if( i + word.length() &lt;= len &amp;&amp; s.startsWith(word,i) )&#123;
+                    dp[i + word.length()] = true; 
+                &#125;
+            &#125;
+        &#125;
+        return dp[len];
+    &#125;
 
 &#125;
 </code></pre>
-<h2 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h2><ul>
-<li>匿名对象也不创建栈，只创建堆对象，即便是匿名对象被引用了，例如:<br>Thread t1 = new Thread(new MyRunable());</li>
-<li>不显式声明的对象都没有栈</li>
-<li>jvm栈中的内存在类结构确定时就知道了，随着方法结束或者线程消亡，内存自然而然被回收了，<strong>因此尽量不使用递归，递归的方法不结束会连续创建很多个栈空间，可能爆栈；而循环每循环一次都会入栈出栈</strong></li>
-</ul>
+<h1 id="力扣62不同路径"><a href="#力扣62不同路径" class="headerlink" title="力扣62不同路径"></a>力扣62不同路径</h1><h2 id="题目描述-4"><a href="#题目描述-4" class="headerlink" title="题目描述"></a>题目描述</h2><p>一个机器人位于一个 m x n 网格的左上角 （起始点在下图中标记为 “Start” ）。</p>
+<p>机器人每次只能向下或者向右移动一步。机器人试图达到网格的右下角（在下图中标记为 “Finish” ）。</p>
+<p>问总共有多少条不同的路径？</p>
+<p><img src="https://img-blog.csdnimg.cn/36a1c99cb9de4a599a4d62880fa78a42.png"></p>
+<h2 id="题解1：递归"><a href="#题解1：递归" class="headerlink" title="题解1：递归"></a>题解1：递归</h2><p>太暴力了，容易爆栈</p>
+<pre><code>class Solution &#123;
+    public int uniquePaths(int m, int n) &#123;
+        if(m == 1 || n == 1)&#123;return 1;&#125;
+        return uniquePaths(m-1,n) + uniquePaths(m,n-1);
+    &#125;
+&#125;
+</code></pre>
+<h2 id="题解2：dp"><a href="#题解2：dp" class="headerlink" title="题解2：dp"></a>题解2：dp</h2><h2 id="状态转移方程-3"><a href="#状态转移方程-3" class="headerlink" title="状态转移方程"></a>状态转移方程</h2><p>dp[i][j] = dp[i-1][j] + dp[i][j-1];左边路径数 + 上边路径数</p>
+<pre><code>class Solution &#123;
+    public int uniquePaths(int m, int n) &#123;
+    
+        int[][] dp = new int[m][n];
+        for(int i = 0 ; i &lt; m ; i++)&#123;
+            dp[i][0] = 1;
+        &#125;
+        for(int j = 0 ; j &lt; n ; j++)&#123;
+            dp[0][j] = 1;
+        &#125;
+        for(int i = 1 ; i &lt; m ; i++)&#123;
+            for(int j = 1 ; j &lt; n ; j++)&#123;
+                dp[i][j] = dp[i-1][j] + dp[i][j-1];
+            &#125;
+        &#125;
+        return dp[m-1][n-1];
+    &#125;
+&#125;
+</code></pre>
+<h2 id="力扣64最小路径和"><a href="#力扣64最小路径和" class="headerlink" title="力扣64最小路径和"></a>力扣64最小路径和</h2><p>上面这道题的延申</p>
+<p>给定一个包含非负整数的 m x n 网格 grid ，请找出一条从左上角到右下角的路径，使得路径上的数字总和为最小。</p>
+<p>说明：每次只能向下或者向右移动一步。</p>
+<p><img src="https://img-blog.csdnimg.cn/a0639ea1e30f425c834eca94796919d8.png"></p>
+<h2 id="状态转移方程-4"><a href="#状态转移方程-4" class="headerlink" title="状态转移方程"></a>状态转移方程</h2><p>维护一个dp[i][j]表示该位置上的路径 = Math.min（ 上or左路径 ） +  自身路径grid[i][j]</p>
+<h2 id="题解-4"><a href="#题解-4" class="headerlink" title="题解"></a>题解</h2><p>其实可以发现这里不用新建一个dp[][]，可以直接在原有的grid上进行修改</p>
+<pre><code>class Solution &#123;
+    public int minPathSum(int[][] grid) &#123;
+        int row = grid.length;
+        int len = grid[0].length;
+        int[][] dp = new int[row][len];
+        dp[0][0] = grid[0][0];
+        for(int i = 1 ; i &lt; row ; i++)&#123;
+            dp[i][0] = grid[i][0] + dp[i-1][0];
+        &#125;
+        for(int j = 1 ; j &lt; len ; j++)&#123;
+            dp[0][j] = grid[0][j] + dp[0][j-1];
+        &#125;
+        for(int i = 1 ; i &lt; row ; i++)&#123;
+            for(int j = 1 ; j &lt; len ; j++)&#123;
+                dp[i][j] = Math.min( dp[i-1][j] , dp[i][j-1])  +   grid[i][j];
+            &#125;
+        &#125;
+        return dp[row-1][len-1];
+    &#125;
+&#125;
+</code></pre>
+<h1 id="力扣121买卖股票最佳时机"><a href="#力扣121买卖股票最佳时机" class="headerlink" title="力扣121买卖股票最佳时机"></a>力扣121买卖股票最佳时机</h1><p>简单题</p>
+<p><img src="https://img-blog.csdnimg.cn/64de6e1b19b54cd399e4bc7fa0803e28.png"></p>
+<h2 id="状态转移方程-5"><a href="#状态转移方程-5" class="headerlink" title="状态转移方程"></a>状态转移方程</h2><p>因为我们只是求最大值，所以不用维护dp[][]，直接维护一个maxProfit用Math.max()来更新最大值即可</p>
+<h2 id="题解-5"><a href="#题解-5" class="headerlink" title="题解"></a>题解</h2><pre><code>class Solution &#123;
+    public int maxProfit(int[] prices) &#123;
+        int len = prices.length;
+        int maxProfit = 0;
+        for(int i = 0 ; i &lt; len-1 ; i++)&#123;
+            for(int j = i+1 ; j &lt; len ; j++)&#123;
+                maxProfit = Math.max(maxProfit, prices[j]-prices[i]);
+            &#125;
+        &#125;
+      return maxProfit;
+
+    &#125;
+&#125;
+</code></pre>
+<h1 id="青蛙跳台、斐波那契、爬楼梯"><a href="#青蛙跳台、斐波那契、爬楼梯" class="headerlink" title="青蛙跳台、斐波那契、爬楼梯"></a>青蛙跳台、斐波那契、爬楼梯</h1><p>随便参考一个，用一维dp[]来保存前两位的值</p>
+<h2 id="递归"><a href="#递归" class="headerlink" title="递归"></a>递归</h2><p>递归老问题，容易超时、爆栈</p>
+<pre><code>class Solution &#123;
+    public int climbStairs(int n) &#123;
+        if(n == 1 ) return 1;
+        if(n == 2 ) return 2;
+        return climbStairs(n-1) + climbStairs(n-2);
+    &#125;
+&#125;
+</code></pre>
+<h2 id="动归"><a href="#动归" class="headerlink" title="动归"></a>动归</h2><pre><code>class Solution &#123;
+    public int climbStairs(int n) &#123;
+        if(n == 1)return 1;
+        if(n == 2)return 2;
+        int[] dp = new int[n+1];
+        dp[1] = 1;
+        dp[2] = 2;
+        for(int i = 3 ; i &lt;= n ; i++)&#123;
+            dp[i] = dp[i-1] + dp[i-2];
+        &#125;
+        return dp[n];
+    &#125;
+&#125;
+</code></pre>
 
       
        <hr><span style="font-style: italic;color: gray;"> 生命以负熵为食，归整以抵抗熵增； </span>
