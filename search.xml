@@ -871,44 +871,6 @@
     
     
     <entry>
-      <title>LinkedList源码中为何大量出现final</title>
-      <link href="/zjh/2022/02/21/LinkedList%E6%BA%90%E7%A0%81%E4%B8%AD%E4%B8%BA%E4%BD%95%E5%A4%A7%E9%87%8F%E5%87%BA%E7%8E%B0final/"/>
-      <url>/zjh/2022/02/21/LinkedList%E6%BA%90%E7%A0%81%E4%B8%AD%E4%B8%BA%E4%BD%95%E5%A4%A7%E9%87%8F%E5%87%BA%E7%8E%B0final/</url>
-      
-        <content type="html"><![CDATA[<h1 id="源码中出现final的地方"><a href="#源码中出现final的地方" class="headerlink" title="源码中出现final的地方"></a>源码中出现final的地方</h1><ul><li>所有的link有关的方法（增删操作）add remove</li><li>需要保存中间变量的节点（prev和next指针需要修改的节点）</li><li>像clear get这种不涉及“更改指针指向”的方法不需要对中间变量定义final</li></ul><p><img src="https://img-blog.csdnimg.cn/8205fb2b21234a24a8f79d42bc9ca406.png" alt="linkFirst"><br><img src="https://img-blog.csdnimg.cn/e59b57429ad34923b07be9a51fda4c53.png" alt="unlink"></p><h1 id="final的作用"><a href="#final的作用" class="headerlink" title="final的作用"></a>final的作用</h1><p><a href="https://www.cnblogs.com/chhyan-dream/p/10685878.html">final关键字的作用</a><br><img src="https://img-blog.csdnimg.cn/1b4bfe04d9a54f7ba8de7ee622f9b5a7.png"></p><p>LinkedList中Node是一个对象，因此适用于第二条<strong>引用数据类型</strong>，举个例子：</p><h2 id="有无final修饰的浅拷贝"><a href="#有无final修饰的浅拷贝" class="headerlink" title="有无final修饰的浅拷贝"></a>有无final修饰的浅拷贝</h2><pre><code>People p1 = new People(18,&quot;张三&quot;);People p2 = p1;</code></pre><ol><li><p>当：p1 = null;或者p1 = new People(20,”李四”);<br>实际上是栈中的p1存储的地址改变，但堆空间中之前 new People(18,”张三”);的对象仍然存在。因此p2不受影响</p></li><li><p>当：p1.setAge(21); 此时操作的是堆空间中的唯一对象，p2会受到影响</p></li></ol><p>在源码中：</p><pre><code>    final E element = x.item;    final Node&lt;E&gt; next = x.next;    final Node&lt;E&gt; prev = x.prev;</code></pre><p>使得element  next    prev三个属性<strong>栈空间保存的地址不可再被重定向</strong>，但可以修改值，例如：next.prev = prev和prev.next=next <strong>可以对栈所指向的堆成员变量进行修改</strong></p><h1 id="使用final初始化的优点"><a href="#使用final初始化的优点" class="headerlink" title="使用final初始化的优点"></a>使用final初始化的优点</h1><p>参考链接：</p><p><a href="https://www.cnblogs.com/noteless/p/10416678.html">https://www.cnblogs.com/noteless/p/10416678.html</a><br><a href="https://www.cnblogs.com/noteless/p/10410368.html">https://www.cnblogs.com/noteless/p/10410368.html</a><br><a href="https://www.cnblogs.com/mianlaoshu/articles/3648403.html">https://www.cnblogs.com/mianlaoshu/articles/3648403.html</a><br><a href="https://www.cnblogs.com/maxiaopao/p/9212903.html">https://www.cnblogs.com/maxiaopao/p/9212903.html</a><br><a href="https://zhuanlan.zhihu.com/p/88775601">https://zhuanlan.zhihu.com/p/88775601</a><br><a href="https://www.zhihu.com/question/21762917/answer/19239387">https://www.zhihu.com/question/21762917/answer/19239387</a><br>第四条链接中讲final的优点很详细<br>第五条讲到了重排序<br>第六条是JVM对方法中的final变量性能调优</p><h2 id="安全性分析"><a href="#安全性分析" class="headerlink" title="安全性分析"></a>安全性分析</h2><ul><li>LinkedList本身是不安全，但这并不影响，因为每次事务初始化的都不是同一个Node对象，如果多线程并发并同时add，那么即便是源码定义了final，也可能会出现错误，因此LinkedList在并发场景下需要自行同步</li><li><strong>但多线程并发对于方法中局部变量是不存在冲突的</strong></li><li><strong>排除安全性的可能</strong></li></ul><h2 id="性能分析"><a href="#性能分析" class="headerlink" title="性能分析"></a>性能分析</h2><ul><li><strong>在能够通过编译的前提下，无论局部变量声明时带不带final关键字修饰，对其访问的效率都一样。</strong></li><li>既然一样，那性能上没影响了。排除</li></ul><h2 id="规范"><a href="#规范" class="headerlink" title="规范"></a>规范</h2><p>参考阿里巴巴的开发手册<br><img src="https://img-blog.csdnimg.cn/6039ed0d6c4c41f0b0dccf8451657ef2.png"><br>不允许修改的局部变量声明为final更多的是一种规范，在实质作用上加与不加没有区别，但他就是个规范。<strong>排除任何可能对这个变量进行修改的可能性</strong></p><p>本问题花了我14个小时，查阅了无数资料，问了无数的人，最后能总结出来的答案就是：规范<br>hhhh浪费了我一天的宝贵时间</p><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ul><li>方法内部初始化的final变量是局部变量</li><li>没有多线程冲突问题</li><li>局部静态基本数据变量定义final才有JVM优化，而引用类型则没有</li><li>final可以避免误操作可能带来的问题，因此对所有不会修改的局部变量都用final定义</li><li>LikedList仍然是线程不安全的，需要手动上锁</li></ul>]]></content>
-      
-      
-      <categories>
-          
-          <category> 源码 </category>
-          
-      </categories>
-      
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>LinkedList中clear和unlink方法为什么多次置null</title>
-      <link href="/zjh/2022/02/20/LinkedList%E4%B8%ADclear%E5%92%8Cunlink%E5%A4%9A%E6%AC%A1%E7%BD%AEnull/"/>
-      <url>/zjh/2022/02/20/LinkedList%E4%B8%ADclear%E5%92%8Cunlink%E5%A4%9A%E6%AC%A1%E7%BD%AEnull/</url>
-      
-        <content type="html"><![CDATA[<p>今天在看LinkedList源码的时候发现clear和unlink源码都对Node的前后和itme进行了<strong>分别置空</strong>，我之前的想法是直接把所有的Node本身直接置空，x.prev=null和x.next=null，直接x = null也可以使得所有节点为空啊</p><p>但在参考了很多资料后发现，如果单纯的x=null而不x.prev=null和x.next=null，可能不会正常触发GC，事情远远没有那么简单……</p><p>阅读本文需要有JVM垃圾回收机制的知识储备</p><p>参考资料：<br><a href="https://www.iteye.com/problems/71569">https://www.iteye.com/problems/71569</a><br><a href="https://www.bilibili.com/video/BV1AE411E7uj?p=1">https://www.bilibili.com/video/BV1AE411E7uj?p=1</a><br><a href="https://www.bilibili.com/video/BV1yE411Z7AP?spm_id_from=333.999.0.0">https://www.bilibili.com/video/BV1yE411Z7AP?spm_id_from=333.999.0.0</a><br><a href="https://www.cnblogs.com/chenpt/p/9803298.html">https://www.cnblogs.com/chenpt/p/9803298.html</a><br><a href="https://www.iteye.com/problems/71569">https://www.iteye.com/problems/71569</a><br><a href="https://codingdict.com/questions/113892">https://codingdict.com/questions/113892</a><br><a href="https://www.cnblogs.com/dmzna/archive/2020/05/18/12913458.html">https://www.cnblogs.com/dmzna/archive/2020/05/18/12913458.html</a><br><a href="https://www.cnblogs.com/shouyaya/p/13524476.html">https://www.cnblogs.com/shouyaya/p/13524476.html</a><br><a href="https://blog.csdn.net/mccand1234/article/details/52078645">https://blog.csdn.net/mccand1234/article/details/52078645</a><br><a href="https://blog.csdn.net/qq_41701956/article/details/81664921">https://blog.csdn.net/qq_41701956/article/details/81664921</a><br><a href="https://blog.csdn.net/yubujian_l/article/details/80804708">https://blog.csdn.net/yubujian_l/article/details/80804708</a></p><h1 id="例如clear的源码"><a href="#例如clear的源码" class="headerlink" title="例如clear的源码"></a>例如clear的源码</h1><p><img src="https://img-blog.csdnimg.cn/2569150ae8b14450b59c58678e2c33d1.png"><br>x.next = null，即表示下一个节点对象=null，为什么还要分成3步写来把属性=null呢？为什么不仅仅是把首尾节点=null让链表找不到入口呢？</p><h1 id="注释翻译："><a href="#注释翻译：" class="headerlink" title="注释翻译："></a>注释翻译：</h1><ul><li><pre><code>is sure to free memory even if there is a reachable Iterator 即便是有迭代器指针此时正在访问中间的节点，也会置空。</code></pre></li><li>helps a generational GC if the discarded nodes inhabit more than one generation有多个节点时，这样做有助于GC垃圾回收</li></ul><h2 id="注解解读："><a href="#注解解读：" class="headerlink" title="注解解读："></a>注解解读：</h2><h3 id="第一个"><a href="#第一个" class="headerlink" title="第一个"></a>第一个</h3><p>如果仅仅是把首尾置空，中间的链表虽然找不到首尾入口，但若此时：</p><ul><li>有迭代器正好访问到中间，取到了中间的node对象</li><li>中间的某个node已被<strong>强引用</strong></li></ul><h3 id="第二个"><a href="#第二个" class="headerlink" title="第二个"></a>第二个</h3><p>倘若JDK版本在8以上，可以忽略这一条，但老版本的gc机制，所用的垃圾收集器可能使用的算法是<strong>引用计数器算法</strong>，该算法不能解决相互引用情况下的垃圾回收</p><p>例如：没有迭代器访问，中间节点对象也没有被强引用，但是他们之间是互相调用的，引用计数器算法不能回收这样的对象，即便是他们没有入口</p><p>而在JDK的流行高版本中一般不使用引用计数器算法，而使用可达性分析算法，当他们都没有被强引用时，便没有了GC Roots根对象，因此会被垃圾回收，但引用计数器算法也并未被淘汰，在著名的单进程高并发缓存Redis中依然采用这种算法来进行内存回收</p><p>综上：第二个注释“<strong>help GC</strong>”所表达的含义是防止因为JDK版本低，垃圾回收算法所导致的“无法回收循环引用”的情况</p><p>同样 对于remove方法调用了unlink，注解也说了help GC<br><img src="https://img-blog.csdnimg.cn/b8137bccbd6943c69eaa21c3a5343348.png"></p>]]></content>
-      
-      
-      <categories>
-          
-          <category> 源码 </category>
-          
-      </categories>
-      
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>随机森林——泰坦尼克号获救预测</title>
       <link href="/zjh/2022/01/11/%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E6%B3%B0%E5%9D%A6%E5%B0%BC%E5%85%8B%E5%8F%B7%E8%8E%B7%E6%95%91%E9%A2%84%E6%B5%8B/"/>
       <url>/zjh/2022/01/11/%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E6%B3%B0%E5%9D%A6%E5%B0%BC%E5%85%8B%E5%8F%B7%E8%8E%B7%E6%95%91%E9%A2%84%E6%B5%8B/</url>
