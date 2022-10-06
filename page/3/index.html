@@ -2,966 +2,1726 @@
 <html>
 <head>
   <meta charset="utf-8">
+  
+
+  
   <title>ZJH&#39;blog</title>
-  <meta name="keywords" content="">
-  <meta name="description" content="ZJH&#39;blog">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="1.已知布隆过滤有误判概率 因为hash运算后存在“假阳性”，因此做黑名单时可能把正常用户给拦截了 做白名单时一定是准确无误的 理论上做成黑名单有误判缺陷，但做白名单毫无问题，因此黑白名单结合才能实现黑名单的功能  2.黑白名单组合解决：ip黑名单问题直接列下我的设计思路：  现在有一个布隆过滤器保存了一组ip黑名单 一个正常用户ip遇到hash碰撞，被拦截了 接口直接跳转“验证真人的接口” 验证">
-<meta property="og:type" content="article">
-<meta property="og:title" content="布隆过滤做黑名单的方案">
-<meta property="og:url" content="https://blogzjh.github.io/2022/09/26/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%81%9A%E9%BB%91%E5%90%8D%E5%8D%95%E7%9A%84%E6%96%B9%E6%A1%88/index.html">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="ZJH&#39;blog">
+<meta property="og:url" content="https://blogzjh.github.io/page/3/index.html">
 <meta property="og:site_name" content="ZJH&#39;blog">
-<meta property="og:description" content="1.已知布隆过滤有误判概率 因为hash运算后存在“假阳性”，因此做黑名单时可能把正常用户给拦截了 做白名单时一定是准确无误的 理论上做成黑名单有误判缺陷，但做白名单毫无问题，因此黑白名单结合才能实现黑名单的功能  2.黑白名单组合解决：ip黑名单问题直接列下我的设计思路：  现在有一个布隆过滤器保存了一组ip黑名单 一个正常用户ip遇到hash碰撞，被拦截了 接口直接跳转“验证真人的接口” 验证">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-09-25T18:22:57.000Z">
-<meta property="article:modified_time" content="2022-09-25T18:22:44.126Z">
 <meta property="article:author" content="ZJH&#39;blog">
 <meta name="twitter:card" content="summary">
-
-
-<link rel="icon" href="/img/QQ图片20211224224200.jpg">
-
-<link href="/zjh/css/style.css?v=1.1.0" rel="stylesheet">
-
-<link href="/zjh/css/hl_theme/rainbow.css?v=1.1.0" rel="stylesheet">
-
-<link href="//cdn.jsdelivr.net/npm/animate.css@4.1.0/animate.min.css" rel="stylesheet">
-
-<script src="//cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
-<script src="/zjh/js/titleTip.js?v=1.1.0" ></script>
-
-<script src="//cdn.jsdelivr.net/npm/highlightjs@9.16.2/highlight.pack.min.js"></script>
-<script>
-    hljs.initHighlightingOnLoad();
-</script>
-
-<script src="//cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js"></script>
-
-
-
-<script src="//cdn.jsdelivr.net/npm/jquery.cookie@1.4.1/jquery.cookie.min.js" ></script>
-
-<script src="/zjh/js/iconfont.js?v=1.1.0" ></script>
+  
+    <link rel="alternate" href="/atom.xml" title="ZJH&#39;blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
 
 <meta name="generator" content="Hexo 5.4.0"></head>
-<div style="display: none">
-  <input class="theme_disqus_on" value="false">
-  <input class="theme_preload_comment" value="">
-  <input class="theme_blog_path" value="/zjh">
-  <input id="theme_shortcut" value="true" />
-  <input id="theme_highlight_on" value="true" />
-  <input id="theme_code_copy" value="true" />
-</div>
-
-
 
 <body>
-<aside class="nav mobile">
-    <div class="nav-left">
-        <a href="/zjh/"
-   class="avatar_target">
-    <img class="avatar"
-         src="/zjh/img/QQ图片20211224224200.jpg"/>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">ZJH&#39;blog</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://blogzjh.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-反射修改jsessionid实现session共享" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2022/08/03/%E5%8F%8D%E5%B0%84%E4%BF%AE%E6%94%B9jsessionid%E5%AE%9E%E7%8E%B0session%E5%85%B1%E4%BA%AB/" class="article-date">
+  <time datetime="2022-08-03T13:53:21.000Z" itemprop="datePublished">2022-08-03</time>
 </a>
-<div class="author">
-    <span>ZJH&#39;blog</span>
-</div>
-
-<div class="icon">
     
-        
-            <a title="github"
-               href="https://github.com/BetterZJH"
-               target="_blank">
-                
-                    <svg class="iconfont-svg" aria-hidden="true">
-                        <use xlink:href="#icon-github"></use>
-                    </svg>
-                
-            </a>
-        
-    
-        
-            <a title="csdn"
-               href="https://blog.csdn.net/m0_56079407"
-               target="_blank">
-                
-                    <svg class="iconfont-svg" aria-hidden="true">
-                        <use xlink:href="#icon-csdn"></use>
-                    </svg>
-                
-            </a>
-        
-    
-        
-            <a title="email"
-               href="mailto:847829122@qq.com"
-               target="_blank">
-                
-                    <svg class="iconfont-svg" aria-hidden="true">
-                        <use xlink:href="#icon-email"></use>
-                    </svg>
-                
-            </a>
-        
-    
-        
-            <a title="qq"
-               href="http://wpa.qq.com/msgrd?v=3&uin=847829122&site=qq&menu=yes"
-               target="_blank">
-                
-                    <svg class="iconfont-svg" aria-hidden="true">
-                        <use xlink:href="#icon-qq"></use>
-                    </svg>
-                
-            </a>
-        
-    
-</div>
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E6%BA%90%E7%A0%81/">源码</a>
+  </div>
 
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2022/08/03/%E5%8F%8D%E5%B0%84%E4%BF%AE%E6%94%B9jsessionid%E5%AE%9E%E7%8E%B0session%E5%85%B1%E4%BA%AB/">反射修改jsessionid实现session共享</a>
+    </h1>
+  
 
-
-
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>1~7为源码分析，8为最终改造代码（工具类）</p>
 <ul>
-    <li>
-        <div class="all active" data-rel="全部文章">全部文章
-            
-                <small>(50)</small>
-            
-        </div>
-    </li>
-    
-        
-            
-                <li>
-                    <div data-rel="数据结构算法">
-                        
-                        数据结构算法
-                        <small>(7)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="工作笔记">
-                        
-                        工作笔记
-                        <small>(12)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="机器学习">
-                        
-                        机器学习
-                        <small>(7)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="源码">
-                        
-                        源码
-                        <small>(8)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="中间件">
-                        
-                        中间件
-                        <small>(8)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="Java">
-                        
-                        Java
-                        <small>(7)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
+<li>虽然说前端可以通过伪造Cookie中的JESESSIONID来模拟劫持</li>
+<li>而后端<strong>并不能直接通过原生API</strong>成功修改JESSIONID获取指定session。我在阅读源码后推测很多年前支持直接指定jsessionid，但现在只能通过反射修改session获取逻辑</li>
+<li> 本案例一共12000字，源码分析部分10000字左右</li>
 </ul>
-<div class="left-bottom">
-    <div class="menus">
-        
-            
-            
-            
-    </div>
-    <div>
-        
-        
-    </div>
-</div>
-<input type="hidden" id="yelog_site_posts_number" value="50">
-<input type="hidden" id="yelog_site_word_count" value="100.4k">
-<div style="display: none">
-    <span id="busuanzi_value_site_uv"></span>
-    <span id="busuanzi_value_site_pv"></span>
-</div>
+<h1 id="0-Session域的大体流程"><a href="#0-Session域的大体流程" class="headerlink" title="0.Session域的大体流程"></a>0.Session域的大体流程</h1><p>先大概了解一下为了创建Session会话域，原生API做了什么</p>
+<ul>
+<li>存在一个接口：HttpServletRequest，有实现类Request、RequestFacade（外观模式，也是实际请求对象）</li>
+<li>Session对象维护在Request中</li>
+<li>Request对象维护在RequestFacade中<img src="https://img-blog.csdnimg.cn/86b981f85bbc4d16928a4e3024abe45a.png"></li>
+</ul>
+<h2 id="0-1第一次：创建Session"><a href="#0-1第一次：创建Session" class="headerlink" title="0.1第一次：创建Session"></a>0.1第一次：创建Session</h2><ul>
+<li>JSESSIONID是在请求打过来的时候初始化的时候，用<code>ServerCookie</code>对Request进行了赋值（Request类是HttpServletRequest的实现类）</li>
+<li>然后创建一个供用户使用的Cookie（实际上是ServerCookie的拷贝值、<strong>ServerCookie不允许用户使用</strong>） </li>
+<li>请求打过来的初始化过程就对Request对象的<code>Session和jsessionid</code>属性进行了绑定</li>
+<li>Request对象的<code>Session和jsessionid</code>属性（主要是这两个）在很多地方都起着互相校验的功能（<strong>修改时需要两个一起修改，否则会导致request.getSession()时重新生成Session</strong>）</li>
+</ul>
+<h2 id="0-2第二次：获取Session"><a href="#0-2第二次：获取Session" class="headerlink" title="0.2第二次：获取Session"></a>0.2第二次：获取Session</h2><ul>
+<li>ServerCookie中携带的jseesionid赋值给Request对象</li>
+<li>请求打过来时<strong>被预先处理</strong>，调用<code>request -》context -》manager</code>的<code>findSession</code>方法直接获取Session后<strong>传给Request对象当形参</strong></li>
+<li>之后使用request.getSession()调用则<strong>直接调用</strong>Request的属性地址</li>
+</ul>
+<p>下面进行论述</p>
+<h1 id="1-前端设置Cookie再发送"><a href="#1-前端设置Cookie再发送" class="headerlink" title="1.前端设置Cookie再发送"></a>1.前端设置Cookie再发送</h1><p>那么正常情况下我们切换浏览器（切换Session）是不能够获取这个k-v对的，但是我们可以通过在<code>浏览器、PostMan、js代码</code>将JSESSIONID设置为刚才的<br>这样就能在服务器中劫持Session了<img src="https://img-blog.csdnimg.cn/8f1447491cd441078be3d676f634f0ce.png">但是实际开发环境中，这种方案可行度接近于0，<strong>那么尝试下后端原生API修改Cookie的值？？</strong></p>
+<h1 id="2-后端设置Cookie值"><a href="#2-后端设置Cookie值" class="headerlink" title="2.后端设置Cookie值"></a>2.后端设置Cookie值</h1><h2 id="2-1输出JSESSIONID"><a href="#2-1输出JSESSIONID" class="headerlink" title="2.1输出JSESSIONID"></a>2.1输出JSESSIONID</h2><pre><code>Cookie[] cookies = request.getCookies();
+    if(cookies!=null)
+for(Cookie c: cookies)&#123;
+  //此案例中Cookie仅包含JSESIONID，等价于(request.getSession().getId())
+  System.out.println(c.getName()+&quot;:&quot;+c.getValue());
+&#125;
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/be0458c3d1734ee299440cb92417d948.png"></p>
+<h2 id="2-2修改JSESSIONID"><a href="#2-2修改JSESSIONID" class="headerlink" title="2.2修改JSESSIONID"></a>2.2修改JSESSIONID</h2><pre><code>request.getCookies()[0].setValue(&quot;newJSessionId&quot;);
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/bdec123319b34d33981f784b870d853c.png"></p>
+<h2 id="2-3getSession-不变"><a href="#2-3getSession-不变" class="headerlink" title="2.3getSession()不变"></a>2.3getSession()不变</h2><pre><code>//还是之前的JSESSIONID
+System.out.println(request.getSession().getId());
+</code></pre>
+<h1 id="3-后端为什么不能修改Session"><a href="#3-后端为什么不能修改Session" class="headerlink" title="3.后端为什么不能修改Session"></a>3.后端为什么不能修改Session</h1><h2 id="3-1虽然后端是可以修改Cookie的"><a href="#3-1虽然后端是可以修改Cookie的" class="headerlink" title="3.1虽然后端是可以修改Cookie的"></a>3.1虽然后端是可以修改Cookie的</h2><p>比如在使用<br> <code> request.getCookies()[0].setValue(&quot;newJSessionId&quot;);</code><br> 修改了Cookie之后，重新获取的Cookie确实是最新修改后的</p>
+<pre><code>    Cookie[] cookies2 = request.getCookies();
+    if(cookies!=null)
+      for(Cookie c: cookies2)&#123;
+        System.out.println(c.getName()+&quot;:&quot;+c.getValue());
+      &#125;
+</code></pre>
+<p>但是出了另外一个问题，<strong>Cookie能修改，Cookie中的JESSIONID修改后却没有用？</strong></p>
+<h2 id="3-2修改JSESSIONID但无效"><a href="#3-2修改JSESSIONID但无效" class="headerlink" title="3.2修改JSESSIONID但无效"></a>3.2修改JSESSIONID但无效</h2><h3 id="3-2-1debug：getSession"><a href="#3-2-1debug：getSession" class="headerlink" title="3.2.1debug：getSession()"></a>3.2.1debug：getSession()</h3><p>一直跟进<code>request.getSession()</code>方法，发现修改Cookie中JSESSIONID之前和之后都是在这个地方返回的session对象，<strong>证明在getSession()之前，session一定被初始化了，修改Cookie不影响直接获取session</strong><br><img src="https://img-blog.csdnimg.cn/01c148e0a43c489a9d8bf98b3a1ee927.png"></p>
+<ul>
+<li>整个过程没有看到任何跟Cookie中JSESSIONID有关的代码</li>
+</ul>
+<ul>
+<li>因此可以大胆推测：<strong>session对象早在请求打过来的时候就获取了其对应的地址值，后期修改Cookie不会导致session对象指向的地址改变</strong></li>
+</ul>
+<h1 id="4-session初始化过程-多次请求的角度"><a href="#4-session初始化过程-多次请求的角度" class="headerlink" title="4.session初始化过程(多次请求的角度)"></a>4.session初始化过程(多次请求的角度)</h1><p>既然session不能被中途修改，那么一定是在初始化的时候，从Cookie中取出JSESSIONID，然后赋值给的session</p>
+<h2 id="4-1利用debug技巧定位"><a href="#4-1利用debug技巧定位" class="headerlink" title="4.1利用debug技巧定位"></a>4.1利用debug技巧定位</h2><p><strong>一个小技巧</strong>，可以在session对象上面打一个断点，每次（按F9）执行到修改session值的时候都会进入<img src="https://img-blog.csdnimg.cn/69bf55cd80154168915c009b5a073f31.png"></p>
+<h2 id="4-2模拟创建Session"><a href="#4-2模拟创建Session" class="headerlink" title="4.2模拟创建Session"></a>4.2模拟创建Session</h2><ul>
+<li>现在代码里写一个<code>request.getSession()</code>;然后新开一个浏览器请求两次，<strong>模拟创建Session和寻找Session的过程</strong></li>
+<li>Session的使用是<code>懒汉式</code>的，<strong>如果你不调getSession方法，他就不会去创建，更不会在响应Cookie里面携带JSESSIONID</strong>。</li>
+<li><strong>Session的创建是懒汉，但并不意味着有关Session的配置信息的初始化是懒汉的</strong><h3 id="4-2-1创建Session"><a href="#4-2-1创建Session" class="headerlink" title="4.2.1创建Session"></a>4.2.1创建Session</h3></li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/1d7b6a71d3354fedbba9620e2b6b1902.png"></p>
+<h3 id="4-2-2寻找Session"><a href="#4-2-2寻找Session" class="headerlink" title="4.2.2寻找Session"></a>4.2.2寻找Session</h3><p><img src="https://img-blog.csdnimg.cn/c8aaf611bb7a430f94a93b6679d2a4f1.png"></p>
+<h3 id="4-2-3释放"><a href="#4-2-3释放" class="headerlink" title="4.2.3释放"></a>4.2.3释放</h3><p>释放环节，为下一次请求做准备<br><img src="https://img-blog.csdnimg.cn/fc468410164b41f4a1210402ecaee7fb.png"></p>
+<p><img src="https://img-blog.csdnimg.cn/4eb868bee6044898a091b6c8e735733a.png"></p>
+<h2 id="4-3模拟第二次请求Session"><a href="#4-3模拟第二次请求Session" class="headerlink" title="4.3模拟第二次请求Session"></a>4.3模拟第二次请求Session</h2><p>浏览器刷新一下请求</p>
+<h3 id="4-3-1直接寻找Session"><a href="#4-3-1直接寻找Session" class="headerlink" title="4.3.1直接寻找Session"></a>4.3.1直接寻找Session</h3><p>这次不需要创建，而是直接根据requestedSesionId来寻找，然后将其维护在request的session属性中<br><img src="https://img-blog.csdnimg.cn/c8aaf611bb7a430f94a93b6679d2a4f1.png"></p>
+<h3 id="4-3-2释放"><a href="#4-3-2释放" class="headerlink" title="4.3.2释放"></a>4.3.2释放</h3><p>再次释放资源<br><img src="https://img-blog.csdnimg.cn/4eb868bee6044898a091b6c8e735733a.png"></p>
+<h2 id="4-4小结"><a href="#4-4小结" class="headerlink" title="4.4小结"></a>4.4小结</h2><p>Session的<strong>创建，寻找</strong>都是在<code>doGetSession(boolean create)</code>方法中完成的。</p>
+<h1 id="5-getSession的实现-多次调用的角度"><a href="#5-getSession的实现-多次调用的角度" class="headerlink" title="5.getSession的实现(多次调用的角度)"></a>5.getSession的实现(多次调用的角度)</h1><p>由上述可知，getSession()最终调用的逻辑一定是doGetSession()，验证一下</p>
+<p><img src="https://img-blog.csdnimg.cn/2746e2619eb44a768dcdacfbcb7d80dc.png"></p>
+<ul>
+<li><strong>应该找与Request同包的，里面只有两个</strong></li>
+</ul>
+<h2 id="5-1基本结构"><a href="#5-1基本结构" class="headerlink" title="5.1基本结构"></a>5.1基本结构</h2><h3 id="5-1-1外观模式Facade"><a href="#5-1-1外观模式Facade" class="headerlink" title="5.1.1外观模式Facade"></a>5.1.1外观模式Facade</h3><ul>
+<li>Facade是外观模式，最终的调用者肯定都是<code>request</code></li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/6da00f7266564ef7bf140eb410ad467a.png"></p>
+<h3 id="5-1-2Request中的getSession-create"><a href="#5-1-2Request中的getSession-create" class="headerlink" title="5.1.2Request中的getSession(create)"></a>5.1.2Request中的getSession(create)</h3><p>这里明显有个create，<strong>决定这个方法是获取还是创建</strong></p>
+<ul>
+<li>明显空参的是使用的时候调</li>
+<li>带参的一定带false参数，在初始化的时候调<br><img src="https://img-blog.csdnimg.cn/c179c9130bad4363bd620dc2b7b1a5e9.png"><h2 id="5-2一次请求，多次getSession"><a href="#5-2一次请求，多次getSession" class="headerlink" title="5.2一次请求，多次getSession()"></a>5.2一次请求，多次getSession()</h2>在接口中写下代码模拟调用两次getSession()。现在仅模拟第二次请求（不需要再去创建Session，只需要去寻找Session）</li>
+</ul>
+<pre><code>HttpSession session1 = request.getSession();
+HttpSession sessio2n = request.getSession();
+</code></pre>
+<p>通过debug可以知道</p>
+<ul>
+<li>session1 需要先findSession把session交给request去维护，然后从request中取session对象</li>
+<li>而sessio2n 只需要直接从request中取session对象</li>
+</ul>
+<h2 id="5-3小结"><a href="#5-3小结" class="headerlink" title="5.3小结"></a>5.3小结</h2><p>通过上面的案例可以侧面反映出大标题4中为什么最后需要进行<code>资源释放</code></p>
+<h1 id="6-Session流程总结"><a href="#6-Session流程总结" class="headerlink" title="6.Session流程总结"></a>6.Session流程总结</h1><h2 id="6-1创建和获取都是懒汉式的"><a href="#6-1创建和获取都是懒汉式的" class="headerlink" title="6.1创建和获取都是懒汉式的"></a>6.1创建和获取都是懒汉式的</h2><h3 id="6-1-1创建懒汉式"><a href="#6-1-1创建懒汉式" class="headerlink" title="6.1.1创建懒汉式"></a>6.1.1创建懒汉式</h3><ul>
+<li>如果<code>每次请求</code>都不需要getSession()，那么<strong>Session永不创建</strong>，<strong>Cookie中的JSESSIONID永不创建</strong></li>
+</ul>
+<h3 id="6-1-2获取懒汉式"><a href="#6-1-2获取懒汉式" class="headerlink" title="6.1.2获取懒汉式"></a>6.1.2获取懒汉式</h3><ul>
+<li>如果<code>一次请求</code>中多次使用getSession()，那么只有第一次会涉及createSession、findSession、request.session获取</li>
+<li>而<code>接下来</code>每一次都只直接request.session获取</li>
+</ul>
+<h2 id="6-2路径变量历史遗留问题"><a href="#6-2路径变量历史遗留问题" class="headerlink" title="6.2路径变量历史遗留问题"></a>6.2路径变量历史遗留问题</h2><p>早期应该是可以通过url上指定jsessionid来设置的，现在会覆盖掉导致设置失效</p>
+<h2 id="6-3创建、数据预置的关系"><a href="#6-3创建、数据预置的关系" class="headerlink" title="6.3创建、数据预置的关系"></a>6.3创建、数据预置的关系</h2><ul>
+<li>其实在<code>CoyoteAdapter</code>类的后置初始化过程中，会将jsessionid写入request，至于你用不用session完全取决于自己。</li>
+<li>这个过程是数据预置，预置了也不一定会创建or获取</li>
+</ul>
+<p><strong>那么问题现在转成了这个requestSessionId是如何被初始化的</strong></p>
+<h1 id="7-CoyoteAdapter-初始化过程"><a href="#7-CoyoteAdapter-初始化过程" class="headerlink" title="7.CoyoteAdapter(初始化过程)"></a>7.CoyoteAdapter(初始化过程)</h1><p>适配器模式的 Adapter接口的一个实现类<br>观察里面的方法，并在<code>service</code> <code>postParseRequest</code>的开头分别打上断点<br>其中<code>service(核心业务)</code>先将Requset对象进行创建，<br>然后<code>postParseRequest(后置处理)</code>将req写入request</p>
+<pre><code>一个题外话，关于url上面可能字符被编码成了%xxx%yyy也是在这里面进行解码的
+</code></pre>
+<h2 id="7-1postParseRequest"><a href="#7-1postParseRequest" class="headerlink" title="7.1postParseRequest()"></a>7.1postParseRequest()</h2><p>这个方法名结合注释可知：解析完request之后必须要做的一些事。在开头打个断点然后发请求<br><img src="https://img-blog.csdnimg.cn/b983e5fc6e604f77ac91f7fd9912d635.png"></p>
+<h3 id="7-1-1request对象赋值"><a href="#7-1-1request对象赋值" class="headerlink" title="7.1.1request对象赋值"></a>7.1.1request对象赋值</h3><p>在执行postParseRequest()之前，request对象中还没有值，所有的请求的值都存在于<code>org.apache.coyote.Request req</code>中 执行完成之后就将请求参数赋值给了request</p>
+<p><img src="https://img-blog.csdnimg.cn/1f290a3fa994429e84ddcf929a9a6664.png"></p>
+<ul>
+<li><strong>注意这三个的顺序！</strong></li>
+<li>后面经分析我认为这个parsePathParameters解析路径变量是一个<strong>历史遗留问题</strong>，以前应该是支持的，现在无论如何都会被下面的逻辑覆盖<br><img src="https://img-blog.csdnimg.cn/8702cbfecc3e41aeba2cecf49bf00b18.png"></li>
+</ul>
+<h3 id="7-1-2先parsePathParameters解析路径变量"><a href="#7-1-2先parsePathParameters解析路径变量" class="headerlink" title="7.1.2先parsePathParameters解析路径变量"></a>7.1.2先parsePathParameters解析路径变量</h3><p>按这种url格式发送<a target="_blank" rel="noopener" href="http://localhost:8088/pic/people/pic1;jsessionid=F0D3200C7D61C8D41E129924585B6234">http://localhost:8088/pic/people/pic1;jsessionid=F0D3200C7D61C8D41E129924585B6234</a></p>
+<p><img src="https://img-blog.csdnimg.cn/f364b20a9b954a528804993d35ae5d89.png"></p>
+<p>这里通过解析request.getParam   用这个枚举类，即<strong>解析路径变量中的jessesionid</strong> 然后赋值给request<img src="https://img-blog.csdnimg.cn/f480e850673347b1baf6cbbdd0358b4e.png"></p>
+<p><img src="https://img-blog.csdnimg.cn/d04db5de9fd442ddb3d27fd66fa4c311.png"></p>
+<h3 id="7-1-3然后parseSessionCookiesId"><a href="#7-1-3然后parseSessionCookiesId" class="headerlink" title="7.1.3然后parseSessionCookiesId"></a>7.1.3然后parseSessionCookiesId</h3><ul>
+<li>这里并没有将<code>Cookie</code>赋值给request，而是直接从<code>ServerCookie</code>中取值JSESSIONID塞给<code>request</code></li>
+<li>并且这个方法是在7.1.1之后执行的，也就是即便是路径变量中写了这个参数也会被覆盖<br><img src="https://img-blog.csdnimg.cn/9928f158ef324b9480bcdaeb859e2e3a.png"><br><img src="https://img-blog.csdnimg.cn/6caefbb14071416ead6e94a34b481e55.png"></li>
+</ul>
+<h3 id="7-1-3被覆盖的路径变量jsessionid-历史遗留问题"><a href="#7-1-3被覆盖的路径变量jsessionid-历史遗留问题" class="headerlink" title="7.1.3被覆盖的路径变量jsessionid(历史遗留问题)"></a>7.1.3被覆盖的路径变量jsessionid(历史遗留问题)</h3><p><a target="_blank" rel="noopener" href="http://localhost:8088/pic/people/pic1;jsessionid=F0D3200C7D61C8D41E129924585B623%E8%BF%99%E6%A0%B7%E7%9A%84%E5%86%99%E6%B3%95%EF%BC%8C%E4%BC%9A%E5%AF%BC%E8%87%B4%EF%BC%9A">http://localhost:8088/pic/people/pic1;jsessionid=F0D3200C7D61C8D41E129924585B623这样的写法，会导致：</a></p>
+<ul>
+<li>先修改成功request中的sessionid</li>
+<li>然后<strong>再次被ServerCookie中的sessionid所覆盖</strong></li>
+<li>然后再用这个sessionid去获取Session对象<h2 id="7-2小结"><a href="#7-2小结" class="headerlink" title="7.2小结"></a>7.2小结</h2></li>
+</ul>
+<h3 id="7-2-1后端修改为何没用"><a href="#7-2-1后端修改为何没用" class="headerlink" title="7.2.1后端修改为何没用"></a>7.2.1后端修改为何没用</h3><p>正是因为JSESSIONID是在这个<code>CoyoteAdapter</code>类中的<code>postParseRequest()</code>方法中的<code>parseSessionCookiesId()</code>方法中就对JSESSIONID进行了赋值，导致如下情况：</p>
+<ul>
+<li>前端请求可以通过修改Cookie中的JSESSIONID来实现获取指定session</li>
+<li>但后端<strong>不能</strong>通过request在代码中修改Cookie中的JSESSIONID来实现获取指定session，也不能指定路径变量jsessionid（可能是历史遗留问题，会被覆盖）</li>
+</ul>
+<h3 id="7-2-2Cookie和ServerCookie"><a href="#7-2-2Cookie和ServerCookie" class="headerlink" title="7.2.2Cookie和ServerCookie"></a>7.2.2Cookie和ServerCookie</h3><p>很明显这个JSESSIONID是从ServerCookie中获取的，那二者有什么区别呢？</p>
+<p><img src="https://img-blog.csdnimg.cn/e5e8d921dca746e69eee08b1646f01a0.png"></p>
+<p>ServerCookie来自于coyoteRequest，即tomcat的底层实现，因此不能针对其Cookie进行修改从而达到模拟session的效果<br><img src="https://img-blog.csdnimg.cn/c23451ee616b4bdaba411117939b2c77.png"><br><img src="https://img-blog.csdnimg.cn/251b2b5c84b8424583c463d2f36aad76.png"></p>
+<h1 id="8-反射"><a href="#8-反射" class="headerlink" title="8.反射"></a>8.反射</h1><p>因为<code>request.getSession()</code>调用的是Reuqest类下的<code>doGetSession()</code>，<code>requestedSessionId</code>又是Request下的属性，那么能不能通过反射修改requestedSessionId的值来修改<code>findSession()</code>的结果呢？答案是可以</p>
+<p><img src="https://img-blog.csdnimg.cn/acdd4d91d81f4aa9ad6f7232257df7fa.png"></p>
+<h2 id="8-0撸工具类的前提知识"><a href="#8-0撸工具类的前提知识" class="headerlink" title="8.0撸工具类的前提知识"></a>8.0撸工具类的前提知识</h2><ul>
+<li>通常作为形参进行传递的<code>HttpServletRequest</code>是一个接口，实际上传递是是其实现类<code>RequestFacade</code>，在涉及到反射操作的时候需要再开辟一个<code>RequestFacade</code>的栈空间指向<code>HttpServletRequest</code>堆空间</li>
+<li>外观模式：<code>RequestFacade</code>实际上大部分调用的是<code>Request</code></li>
+<li>Request下的<code>doGetSession(Boolean craete)</code>是最终获取Session对象的方法，包括初始化时session的生成、httpServletRequest.getSeesion()获取。区别是<strong>前者形参create=true、后者形参create=false</strong></li>
+<li>在Request类下的doGetSession()方法中，当<strong>存在session时</strong>直接走<code>manager.findSession(sessionId)</code>；<strong>当初始化时</strong>，先<code>getRequestedSessionId()</code>根据JVM随机数获取sessionid，然后作为形参调用<code>session = manager.createSession(sessionId);</code></li>
+</ul>
+<p>因此可以有如下两条思路： </p>
+<ol>
+<li>通过findSession()直接从ConcurrentHashMap中获取Session对象</li>
+<li>通过对doGetSession()的所需的参数进行一个覆盖操作</li>
+</ol>
+<h2 id="8-1根据JSESSIONID直接返回Session对象"><a href="#8-1根据JSESSIONID直接返回Session对象" class="headerlink" title="8.1根据JSESSIONID直接返回Session对象"></a>8.1根据JSESSIONID直接返回Session对象</h2><pre><code>   /**
+     * @param httpServletRequest 多态性，本质是requestFacade
+     * @param jsessionid 指定的jsessionid
+     * @return javax.servlet.http.HttpSession 指定的Session对象
+     **/
+    public static HttpSession getSession(HttpServletRequest httpServletRequest,String jsessionid) throws  Exception&#123;
+        RequestFacade requestFacade = (RequestFacade)httpServletRequest;
+        Class&lt;? extends RequestFacade&gt; facadeClazz = requestFacade.getClass();
+        Field requestField = facadeClazz.getDeclaredField(&quot;request&quot;);
+        requestField.setAccessible(true);
+        Request request = (Request)requestField.get(requestFacade);
+        Context context = request.getContext();
+        Manager manager = context.getManager();
+        Session session = manager.findSession(jsessionid);
+        return session.getSession();
+    &#125;
+</code></pre>
+<h2 id="8-2将指定的Session和JSESSIONID赋值给request"><a href="#8-2将指定的Session和JSESSIONID赋值给request" class="headerlink" title="8.2将指定的Session和JSESSIONID赋值给request"></a>8.2将指定的Session和JSESSIONID赋值给request</h2><pre><code>/**
+ * @Description 调用此方法后，httpServletRequest.getSession()获取的是jsessionid对应的Session
+ * @Author zjh
+ * @Date 17:59 2022/8/3
+ * @param httpServletRequest 请求头，用于获取session
+ * @param jsessionid 指定的sessionid
+ * @return void
+ **/
+public static void setSession2Request(HttpServletRequest httpServletRequest,String jsessionid) throws Exception&#123;
+    //RequestFacade
+    RequestFacade requestFacade = (RequestFacade) httpServletRequest;
+    Class&lt;? extends RequestFacade&gt; facadeClazz = requestFacade.getClass();
+    //RequestFacade获取Request
+    Field requestField = facadeClazz.getDeclaredField(&quot;request&quot;);
+    requestField.setAccessible(true);
+    //Request
+    Request request = (Request)requestField.get(requestFacade);
+    Class&lt;? extends Request&gt; requestClazz = request.getClass();
+    //Request设置Session=null
+    Field sessionField = requestClazz.getDeclaredField(&quot;session&quot;);
+    sessionField.setAccessible(true);
+    sessionField.set(request,null);
+    //Request设置requestedSessionId = 指定值
+    Field requestedSessionIdField = requestClazz.getDeclaredField(&quot;requestedSessionId&quot;);
+    requestedSessionIdField.setAccessible(true);
+    requestedSessionIdField.set(request,jsessionid);
+&#125;
+</code></pre>
+<h2 id="8-3最终工具类"><a href="#8-3最终工具类" class="headerlink" title="8.3最终工具类"></a>8.3最终工具类</h2><p>经过异常处理之后的呈现结果</p>
+<pre><code>import java.io.IOException;
+import java.lang.reflect.Field;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import org.apache.catalina.Context;
+import org.apache.catalina.Manager;
+import org.apache.catalina.Session;
+import org.apache.catalina.connector.Request;
+import org.apache.catalina.connector.RequestFacade;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-    </div>
-    <div class="nav-right">
-        <div class="friends-area">
-    <div class="friends-title">
-        友情链接
-        <i class="iconfont icon-left"></i>
-    </div>
-    <div class="friends-content">
-        <ul>
-            
-            <li><a target="_blank" href="http://yelog.org/">叶落阁</a></li>
-            
-        </ul>
-    </div>
-</div>
-        <div class="title-list">
-    <div class="right-top">
-        <div id="default-panel">
-            <i class="iconfont icon-search" data-title="搜索 快捷键 i"></i>
-            <div class="right-title">全部文章</div>
-            <i class="iconfont icon-file-tree" data-title="切换到大纲视图 快捷键 w"></i>
-        </div>
-        <div id="search-panel">
-            <i class="iconfont icon-left" data-title="返回"></i>
-            <input id="local-search-input" autocomplete="off"/>
-            <label class="border-line" for="input"></label>
-            <i class="iconfont icon-case-sensitive" data-title="大小写敏感"></i>
-            <i class="iconfont icon-tag" data-title="标签"></i>
-        </div>
-        <div id="outline-panel" style="display: none">
-            <div class="right-title">大纲</div>
-            <i class="iconfont icon-list" data-title="切换到文章列表"></i>
-        </div>
-    </div>
 
-    <div class="tags-list">
-    <input id="tag-search" />
-    <div class="tag-wrapper">
-        
-            <li class="article-tag-list-item">
-                <i class="iconfont icon-tag"></i><a>HashMap</a>
-            </li>
-        
+/**
+ * @Description Session共享的工具类，用于Session共享，可实现传入JSESSIONID返回对应Session对象，也可实现传入JSESSIONID永久修改request
+ * @Author zjh
+ * @Date 16:10 2022/8/3
+ **/
+public class SessionShareUtils &#123;
+    private static Logger logger = LoggerFactory.getLogger(&quot;SessionShareUtils&quot;);
+    /**
+     * @param httpServletRequest 多态性，本质是requestFacade
+     * @param jsessionid 指定的jsessionid
+     * @return org.apache.catalina.Session 指定的Session对象
+     **/
+    public static HttpSession getSession(HttpServletRequest httpServletRequest,String jsessionid) &#123;
+
+        Session session = null;
+        try &#123;
+            RequestFacade requestFacade = (RequestFacade)httpServletRequest;
+            Class&lt;? extends RequestFacade&gt; facadeClazz = requestFacade.getClass();
+            //获取Request 最后findSession
+            Field requestField = facadeClazz.getDeclaredField(&quot;request&quot;);
+            requestField.setAccessible(true);
+            Request request = (Request)requestField.get(requestFacade);
+            Context context = request.getContext();
+            Manager manager = context.getManager();
+            session = manager.findSession(jsessionid);
+        &#125;
+        catch (NoSuchFieldException e) &#123;
+            logger.error(&quot;反射找不到属性&#123;&#125;&quot;,e);
+        &#125;
+        catch (IllegalAccessException e) &#123;
+            logger.error(&quot;反射未设置允许访问&#123;&#125;&quot;,e);
+        &#125;
+        catch (IOException e) &#123;
+            logger.error(&quot;HttpServletRequest的IO异常&#123;&#125;&quot;,e);
+        &#125;
+        return session.getSession();
+    &#125;
+
+    /**
+     * @Description 调用此方法后，httpServletRequest.getSession()获取的是jsessionid对应的Session
+     * @Author zjh
+     * @Date 17:59 2022/8/3
+     * @param httpServletRequest 请求头，用于获取session
+     * @param jsessionid 指定的sessionid
+     * @return void
+     **/
+    public static void setSession2Request(HttpServletRequest httpServletRequest,String jsessionid) &#123;
+        try &#123;
+            //RequestFacade
+            RequestFacade requestFacade = (RequestFacade) httpServletRequest;
+            Class&lt;? extends RequestFacade&gt; facadeClazz = requestFacade.getClass();
+            //RequestFacade获取Request
+            Field requestField = facadeClazz.getDeclaredField(&quot;request&quot;);
+            requestField.setAccessible(true);
+            //Request
+            Request request = (Request)requestField.get(requestFacade);
+            Class&lt;? extends Request&gt; requestClazz = request.getClass();
+            //Request设置Session=null
+            Field sessionField = requestClazz.getDeclaredField(&quot;session&quot;);
+            sessionField.setAccessible(true);
+            sessionField.set(request,null);
+            //Request设置requestedSessionId = 指定值
+            Field requestedSessionIdField = requestClazz.getDeclaredField(&quot;requestedSessionId&quot;);
+            requestedSessionIdField.setAccessible(true);
+            requestedSessionIdField.set(request,jsessionid);
+        &#125;
+        catch (NoSuchFieldException e) &#123;
+            logger.error(&quot;反射找不到属性&#123;&#125;&quot;,e);
+        &#125;
+        catch (IllegalAccessException e) &#123;
+            logger.error(&quot;反射未设置允许访问&#123;&#125;&quot;,e);
+        &#125;
+    &#125;
+
+&#125;
+</code></pre>
+
+      
     </div>
+    <footer class="article-footer">
+      <a data-url="https://blogzjh.github.io/2022/08/03/%E5%8F%8D%E5%B0%84%E4%BF%AE%E6%94%B9jsessionid%E5%AE%9E%E7%8E%B0session%E5%85%B1%E4%BA%AB/" data-id="cl8wv0v2v00271gta0yd3fykr" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
 
-</div>
 
+  
+    <article id="post-RestTemlate源码分析及工具类设计" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2022/08/03/RestTemlate%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%8F%8A%E5%B7%A5%E5%85%B7%E7%B1%BB%E8%AE%BE%E8%AE%A1/" class="article-date">
+  <time datetime="2022-08-03T13:51:57.000Z" itemprop="datePublished">2022-08-03</time>
+</a>
     
-    <nav id="title-list-nav">
-        
-        <a  class="全部文章 工作笔记 "
-           href="/2022/09/26/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%81%9A%E9%BB%91%E5%90%8D%E5%8D%95%E7%9A%84%E6%96%B9%E6%A1%88/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="布隆过滤做黑名单的方案">布隆过滤做黑名单的方案</span>
-            <span class="post-date" title="2022-09-26 02:22:57">2022/09/26</span>
-        </a>
-        
-        <a  class="全部文章 数据结构算法 "
-           href="/2022/09/15/%E6%9F%90%E8%9A%81%E9%87%91%E6%9C%8D%E7%A7%8B%E6%8B%9B9-15/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="某蚁金服秋招9-15">某蚁金服秋招9-15</span>
-            <span class="post-date" title="2022-09-15 21:22:38">2022/09/15</span>
-        </a>
-        
-        <a  class="全部文章 数据结构算法 "
-           href="/2022/09/15/%E4%B8%89%E7%A7%8D%E6%83%85%E5%86%B5%E7%9A%84%E5%B1%82%E5%BA%8F%E9%81%8D%E5%8E%86/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="三种情况的层序遍历">三种情况的层序遍历</span>
-            <span class="post-date" title="2022-09-15 21:21:24">2022/09/15</span>
-        </a>
-        
-        <a  class="全部文章 数据结构算法 "
-           href="/2022/09/15/%E5%87%A0%E9%81%93%E5%B2%9B%E5%B1%BF%E9%97%AE%E9%A2%98-dfs-%E5%89%AA%E6%9E%9D-%E5%9B%9E%E6%BA%AF/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="几道岛屿问题:dfs+剪枝+回溯">几道岛屿问题:dfs+剪枝+回溯</span>
-            <span class="post-date" title="2022-09-15 21:20:58">2022/09/15</span>
-        </a>
-        
-        <a  class="全部文章 数据结构算法 "
-           href="/2022/09/15/%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%9A%E6%9B%BF%E6%8D%A2%E3%80%81%E5%B7%A6%E6%97%8B%E3%80%81%E7%BC%BA%E5%A4%B1/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="字符串：替换、左旋、缺失">字符串：替换、左旋、缺失</span>
-            <span class="post-date" title="2022-09-15 21:20:41">2022/09/15</span>
-        </a>
-        
-        <a  class="全部文章 数据结构算法 "
-           href="/2022/09/15/%E5%87%A0%E9%81%93%E4%BA%8C%E5%8F%89%E6%A0%91-dfs-%E5%9B%9E%E6%BA%AF/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="几道二叉树:dfs+回溯">几道二叉树:dfs+回溯</span>
-            <span class="post-date" title="2022-09-15 21:19:53">2022/09/15</span>
-        </a>
-        
-        <a  class="全部文章 数据结构算法 "
-           href="/2022/09/15/%E5%87%A0%E9%81%93%E5%8A%A8%E5%BD%92%E6%80%BB%E7%BB%93/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="几道动归总结">几道动归总结</span>
-            <span class="post-date" title="2022-09-15 21:18:43">2022/09/15</span>
-        </a>
-        
-        <a  class="全部文章 源码 "
-           href="/2022/09/15/BeanFactory%E5%92%8CApplicationContext/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="BeanFactory和ApplicationContext">BeanFactory和ApplicationContext</span>
-            <span class="post-date" title="2022-09-15 21:17:39">2022/09/15</span>
-        </a>
-        
-        <a  class="全部文章 中间件 "
-           href="/2022/08/28/%E4%B8%89%E7%A7%8D%E4%B8%AD%E9%97%B4%E4%BB%B6%E7%9A%84%E5%88%B7%E7%9B%98-%E6%8C%81%E4%B9%85%E5%8C%96-%E7%AD%96%E7%95%A5/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="三种中间件的刷盘(持久化)策略">三种中间件的刷盘(持久化)策略</span>
-            <span class="post-date" title="2022-08-28 13:34:20">2022/08/28</span>
-        </a>
-        
-        <a  class="全部文章 中间件 "
-           href="/2022/08/28/redis%E5%9F%BA%E7%A1%80/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="redis基础">redis基础</span>
-            <span class="post-date" title="2022-08-28 12:21:22">2022/08/28</span>
-        </a>
-        
-        <a  class="全部文章 中间件 "
-           href="/2022/08/27/RabbitMQ%E5%9F%BA%E7%A1%80/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="RabbitMQ基础">RabbitMQ基础</span>
-            <span class="post-date" title="2022-08-27 16:26:14">2022/08/27</span>
-        </a>
-        
-        <a  class="全部文章 中间件 "
-           href="/2022/08/27/RabbitMQ%E5%8F%AF%E9%9D%A0%E6%80%A7-Spring/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="RabbitMQ可靠性-Spring">RabbitMQ可靠性-Spring</span>
-            <span class="post-date" title="2022-08-27 16:02:25">2022/08/27</span>
-        </a>
-        
-        <a  class="全部文章 中间件 "
-           href="/2022/08/27/RabbitMQ%E6%AD%BB%E4%BF%A1%E9%98%9F%E5%88%97%E3%80%81%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97-Spring/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="RabbitMQ死信队列、延迟队列-Spring">RabbitMQ死信队列、延迟队列-Spring</span>
-            <span class="post-date" title="2022-08-27 01:05:35">2022/08/27</span>
-        </a>
-        
-        <a  class="全部文章 中间件 "
-           href="/2022/08/23/MySQL%E4%BA%8B%E5%8A%A1%E4%B8%8E%E9%94%81/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="MySQL事务与锁">MySQL事务与锁</span>
-            <span class="post-date" title="2022-08-23 12:49:38">2022/08/23</span>
-        </a>
-        
-        <a  class="全部文章 工作笔记 "
-           href="/2022/08/23/AOP%E5%AE%9E%E7%8E%B0%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="AOP实现分布式锁">AOP实现分布式锁</span>
-            <span class="post-date" title="2022-08-23 12:48:25">2022/08/23</span>
-        </a>
-        
-        <a  class="全部文章 源码 "
-           href="/2022/08/23/ReentrantLock%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="ReentrantLock源码剖析">ReentrantLock源码剖析</span>
-            <span class="post-date" title="2022-08-23 12:34:15">2022/08/23</span>
-        </a>
-        
-        <a  class="全部文章 源码 "
-           href="/2022/08/23/%E5%8F%8D%E5%B0%84%E8%8E%B7%E5%8F%96AQS%E4%B8%AD%E5%90%8C%E6%AD%A5%E9%98%9F%E5%88%97%E4%B8%8E%E7%AD%89%E5%BE%85%E9%98%9F%E5%88%97%E7%9A%84%E9%95%BF%E5%BA%A6/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="反射获取AQS中同步队列与等待队列的长度">反射获取AQS中同步队列与等待队列的长度</span>
-            <span class="post-date" title="2022-08-23 12:32:58">2022/08/23</span>
-        </a>
-        
-        <a  class="全部文章 Java "
-           href="/2022/08/14/Spring%E3%80%81Servlet%E7%9B%91%E5%90%AC%E5%99%A8/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Spring、Servlet监听器">Spring、Servlet监听器</span>
-            <span class="post-date" title="2022-08-14 21:01:46">2022/08/14</span>
-        </a>
-        
-        <a  class="全部文章 工作笔记 "
-           href="/2022/08/13/AOP-%E5%8F%8D%E5%B0%84%EF%BC%9A%E6%8E%A5%E5%8F%A3%E5%8F%82%E6%95%B0%E6%A0%A1%E9%AA%8C/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="AOP+反射：接口参数校验">AOP+反射：接口参数校验</span>
-            <span class="post-date" title="2022-08-13 17:12:17">2022/08/13</span>
-        </a>
-        
-        <a  class="全部文章 工作笔记 "
-           href="/2022/08/12/%E5%AF%B9dto%E6%8C%87%E5%AE%9A%E5%B1%9E%E6%80%A7%E4%B8%80%E9%94%AE%E5%8A%A0%E8%A7%A3%E5%AF%86/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="对dto指定属性一键加解密">对dto指定属性一键加解密</span>
-            <span class="post-date" title="2022-08-12 22:51:17">2022/08/12</span>
-        </a>
-        
-        <a  class="全部文章 源码 "
-           href="/2022/08/03/%E5%8F%8D%E5%B0%84%E4%BF%AE%E6%94%B9jsessionid%E5%AE%9E%E7%8E%B0session%E5%85%B1%E4%BA%AB/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="反射修改jsessionid实现session共享">反射修改jsessionid实现session共享</span>
-            <span class="post-date" title="2022-08-03 21:53:21">2022/08/03</span>
-        </a>
-        
-        <a  class="全部文章 源码 "
-           href="/2022/08/03/RestTemlate%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%8F%8A%E5%B7%A5%E5%85%B7%E7%B1%BB%E8%AE%BE%E8%AE%A1/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="RestTemlate源码分析及工具类设计">RestTemlate源码分析及工具类设计</span>
-            <span class="post-date" title="2022-08-03 21:51:57">2022/08/03</span>
-        </a>
-        
-        <a  class="全部文章 工作笔记 "
-           href="/2022/08/03/%E7%9F%AD%E4%BF%A1%E6%9C%8D%E5%8A%A1%E8%A2%AB%E6%94%BB%E5%87%BB%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="短信服务被攻击解决方案">短信服务被攻击解决方案</span>
-            <span class="post-date" title="2022-08-03 21:51:16">2022/08/03</span>
-        </a>
-        
-        <a  class="全部文章 工作笔记 "
-           href="/2022/08/03/%E5%9B%9B%E7%A7%8D%E6%96%B9%E6%B3%95Servlet%E5%AE%B9%E5%99%A8%E4%BD%BF%E7%94%A8Spring%E7%9A%84Bean%E5%AF%B9%E8%B1%A1/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="四种方法Servlet容器使用Spring的Bean对象">四种方法Servlet容器使用Spring的Bean对象</span>
-            <span class="post-date" title="2022-08-03 21:47:54">2022/08/03</span>
-        </a>
-        
-        <a  class="全部文章 Java "
-           href="/2022/07/19/%E5%86%85%E5%AD%98%E5%8C%BA%E5%9F%9F%E3%80%81%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="内存区域、类的加载">内存区域、类的加载</span>
-            <span class="post-date" title="2022-07-19 22:29:21">2022/07/19</span>
-        </a>
-        
-        <a  class="全部文章 工作笔记 "
-           href="/2022/07/19/Restful%E9%A3%8E%E6%A0%BC%E7%9C%9F%E7%9A%84%E6%9C%89%E5%BF%85%E8%A6%81%E5%90%97/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Restful风格真的有必要吗？">Restful风格真的有必要吗？</span>
-            <span class="post-date" title="2022-07-19 20:19:57">2022/07/19</span>
-        </a>
-        
-        <a  class="全部文章 机器学习 "
-           href="/2022/07/17/%E6%B0%94%E8%B1%A1cv-%E5%9C%B0%E5%9F%BA%E4%BA%91%E5%9B%BE%E4%BA%91%E7%B3%BB%E5%88%86%E5%89%B2/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="气象cv-地基云图云系分割">气象cv-地基云图云系分割</span>
-            <span class="post-date" title="2022-07-17 12:04:12">2022/07/17</span>
-        </a>
-        
-        <a  class="全部文章 机器学习 "
-           href="/2022/07/17/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA%E6%9E%A3%E7%B1%BB%E9%81%97%E4%BC%A0%E7%9A%84%E5%9B%9E%E5%BD%92%E9%A2%84%E6%B5%8B/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="支持向量机枣类遗传的回归预测">支持向量机枣类遗传的回归预测</span>
-            <span class="post-date" title="2022-07-17 11:47:04">2022/07/17</span>
-        </a>
-        
-        <a  class="全部文章 机器学习 "
-           href="/2022/07/17/%E6%B0%94%E8%B1%A1%E5%A4%A7%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="气象大数据分析">气象大数据分析</span>
-            <span class="post-date" title="2022-07-17 11:44:44">2022/07/17</span>
-        </a>
-        
-        <a  class="全部文章 机器学习 "
-           href="/2022/07/17/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%8D%95%E5%9B%BE%E8%B6%85%E5%88%86%E8%BE%A8%E7%8E%87%E7%9A%84%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="卷积神经网络单图超分辨率的深度学习方法">卷积神经网络单图超分辨率的深度学习方法</span>
-            <span class="post-date" title="2022-07-17 11:33:07">2022/07/17</span>
-        </a>
-        
-        <a  class="全部文章 机器学习 "
-           href="/2022/07/17/%E7%96%AB%E6%83%85%E6%B8%AF%E5%8F%A3%E6%8C%82%E9%9D%A0%E6%95%B0ARIMA%E6%97%B6%E5%BA%8F%E5%88%86%E6%9E%90/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="疫情港口挂靠数ARIMA时序分析">疫情港口挂靠数ARIMA时序分析</span>
-            <span class="post-date" title="2022-07-17 11:21:13">2022/07/17</span>
-        </a>
-        
-        <a  class="全部文章 工作笔记 "
-           href="/2022/07/15/OGNL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%94%B9%E9%80%A0%E4%BB%A5%E4%BD%BF%E7%94%A8%E7%B4%A2%E5%BC%95/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="OGNL表达式改造以使用索引">OGNL表达式改造以使用索引</span>
-            <span class="post-date" title="2022-07-15 22:27:54">2022/07/15</span>
-        </a>
-        
-        <a  class="全部文章 工作笔记 "
-           href="/2022/07/15/mvcc+%E6%8C%89%E5%A4%A9%E7%BC%93%E5%AD%98%E7%BB%9F%E8%AE%A1%E4%B8%A4%E4%B8%AA%E6%94%B6%E7%9B%8A/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="mvcc+按天缓存统计两个收益">mvcc+按天缓存统计两个收益</span>
-            <span class="post-date" title="2022-07-15 21:35:25">2022/07/15</span>
-        </a>
-        
-        <a  class="全部文章 工作笔记 "
-           href="/2022/07/15/%E5%8E%8B%E7%BC%A9%E6%89%93%E5%8C%85%E4%BD%86%E4%B8%8D%E5%BD%92%E6%A1%A3%EF%BC%8C%E5%88%A9%E7%94%A8response/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="压缩打包但不归档，利用response">压缩打包但不归档，利用response</span>
-            <span class="post-date" title="2022-07-15 21:26:51">2022/07/15</span>
-        </a>
-        
-        <a  class="全部文章 工作笔记 "
-           href="/2022/07/15/%E4%B8%9A%E5%8A%A1%E4%B8%ADdelete_flag%E5%AD%97%E6%AE%B5%E5%AE%B9%E6%98%93%E8%B8%A9%E7%9A%84%E5%9D%91/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="业务中delete_flag字段容易踩的坑">业务中delete_flag字段容易踩的坑</span>
-            <span class="post-date" title="2022-07-15 21:19:19">2022/07/15</span>
-        </a>
-        
-        <a  class="全部文章 工作笔记 "
-           href="/2022/07/15/%E9%9D%9E%E6%97%B6%E5%BA%8F%E6%8E%92%E5%BA%8F%E4%B8%8B%E7%9A%84%E7%80%91%E5%B8%83%E6%B5%81%E5%88%86%E9%A1%B5/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="非时序排序下的瀑布流分页">非时序排序下的瀑布流分页</span>
-            <span class="post-date" title="2022-07-15 21:15:15">2022/07/15</span>
-        </a>
-        
-        <a  class="全部文章 数据结构算法 "
-           href="/2022/06/25/%E8%A1%8C%E7%A8%8B%E7%BC%96%E7%A0%81%E5%8E%8B%E7%BC%A9%E5%9B%BE%E7%89%87/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="行程编码压缩图片">行程编码压缩图片</span>
-            <span class="post-date" title="2022-06-25 01:35:20">2022/06/25</span>
-        </a>
-        
-        <a  class="全部文章 Java "
-           href="/2022/04/21/Filter%E7%9A%84%E5%B8%B8%E8%A7%81%E7%94%A8%E6%B3%95/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Filter的常见用法">Filter的常见用法</span>
-            <span class="post-date" title="2022-04-21 09:51:40">2022/04/21</span>
-        </a>
-        
-        <a  class="全部文章 Java "
-           href="/2022/04/21/Lambda%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%92%8C%E6%96%B9%E6%B3%95%E5%BC%95%E7%94%A8/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Lambda表达式和方法引用">Lambda表达式和方法引用</span>
-            <span class="post-date" title="2022-04-21 09:50:42">2022/04/21</span>
-        </a>
-        
-        <a  class="全部文章 Java "
-           href="/2022/04/21/Mybatis%E4%B8%ADxml%E4%B8%AD%E8%B0%83java%E6%96%B9%E6%B3%95OGNL%E8%A1%A8%E8%BE%BE%E5%BC%8F/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Mybatis中xml中调java方法OGNL表达式">Mybatis中xml中调java方法OGNL表达式</span>
-            <span class="post-date" title="2022-04-21 09:47:36">2022/04/21</span>
-        </a>
-        
-        <a  class="全部文章 Java "
-           href="/2022/04/21/Java%E6%B3%A8%E8%A7%A3%E5%92%8C%E5%8F%8D%E5%B0%84/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Java注解和反射">Java注解和反射</span>
-            <span class="post-date" title="2022-04-21 09:45:15">2022/04/21</span>
-        </a>
-        
-        <a  class="全部文章 源码 "
-           href="/2022/03/21/HashMap%E4%B8%ADentrySet-%E8%AF%A6%E8%A7%A3/"
-           data-tag="HashMap"
-           data-author="" >
-            <span class="post-title" title="HashMap中entrySet()详解">HashMap中entrySet()详解</span>
-            <span class="post-date" title="2022-03-21 00:15:10">2022/03/21</span>
-        </a>
-        
-        <a  class="全部文章 源码 "
-           href="/2022/03/21/HashMap/"
-           data-tag="HashMap"
-           data-author="" >
-            <span class="post-title" title="HashMap">HashMap</span>
-            <span class="post-date" title="2022-03-21 00:13:23">2022/03/21</span>
-        </a>
-        
-        <a  class="全部文章 中间件 "
-           href="/2022/03/07/Mysql%E4%BA%8B%E5%8A%A1%E5%92%8C%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Mysql事务和存储引擎">Mysql事务和存储引擎</span>
-            <span class="post-date" title="2022-03-07 22:11:06">2022/03/07</span>
-        </a>
-        
-        <a  class="全部文章 中间件 "
-           href="/2022/03/07/Mysql-InnoDB-%E7%B4%A2%E5%BC%95%E5%8E%9F%E7%90%86%E5%8F%8A%E7%9A%84%E4%BD%BF%E7%94%A8/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Mysql(InnoDB)索引原理及的使用">Mysql(InnoDB)索引原理及的使用</span>
-            <span class="post-date" title="2022-03-07 22:10:05">2022/03/07</span>
-        </a>
-        
-        <a  class="全部文章 源码 "
-           href="/2022/02/21/LinkedList%E6%BA%90%E7%A0%81%E4%B8%AD%E4%B8%BA%E4%BD%95%E5%A4%A7%E9%87%8F%E5%87%BA%E7%8E%B0final/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="LinkedList源码中为何大量出现final">LinkedList源码中为何大量出现final</span>
-            <span class="post-date" title="2022-02-21 09:57:35">2022/02/21</span>
-        </a>
-        
-        <a  class="全部文章 机器学习 "
-           href="/2022/01/11/%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E6%B3%B0%E5%9D%A6%E5%B0%BC%E5%85%8B%E5%8F%B7%E8%8E%B7%E6%95%91%E9%A2%84%E6%B5%8B/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="随机森林——泰坦尼克号获救预测">随机森林——泰坦尼克号获救预测</span>
-            <span class="post-date" title="2022-01-11 03:06:10">2022/01/11</span>
-        </a>
-        
-        <a  class="全部文章 机器学习 "
-           href="/2022/01/01/%E5%86%B3%E7%AD%96%E6%A0%91-%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E7%94%A8%E6%88%B7%E6%B5%81%E5%A4%B1%E9%A2%84%E6%B5%8B%E7%9A%84%E6%A1%88%E4%BE%8B/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="决策树/随机森林——用户流失预测的案例">决策树/随机森林——用户流失预测的案例</span>
-            <span class="post-date" title="2022-01-01 00:41:40">2022/01/01</span>
-        </a>
-        
-        <a  class="全部文章 "
-           href="/2021/12/25/IDEA%E5%B8%B8%E7%94%A8%E5%BF%AB%E6%8D%B7%E9%94%AE/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="IDEA常用快捷键">IDEA常用快捷键</span>
-            <span class="post-date" title="2021-12-25 21:55:46">2021/12/25</span>
-        </a>
-        
-        <a  class="全部文章 Java "
-           href="/2021/12/25/Java%E5%9B%9B%E7%A7%8Dnext%E7%94%A8%E6%B3%95/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Java四种next用法">Java四种next用法</span>
-            <span class="post-date" title="2021-12-25 01:59:30">2021/12/25</span>
-        </a>
-        
-        <div id="no-item-tips">
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E6%BA%90%E7%A0%81/">源码</a>
+  </div>
 
-        </div>
-    </nav>
-    <div id="outline-list">
-    </div>
-</div>
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2022/08/03/RestTemlate%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%8F%8A%E5%B7%A5%E5%85%B7%E7%B1%BB%E8%AE%BE%E8%AE%A1/">RestTemlate源码分析及工具类设计</a>
+    </h1>
+  
 
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>先说个大概的结构：</p>
+<ul>
+<li>RestTemlate的所有方法最终调用的是<code>doExecute()</code>，层层向外封装</li>
+<li>其中<code>exchange()</code>适合用来封装成工具类，他的返回值是ResponseEntity</li>
+<li><code>postForObject()</code>  和 <code> postForEntity</code>本质上一样，只是<code>后者</code>对运行结果进行了封装，返回的也是ResponseEntity，类似于lambda表达式中的Option类</li>
+</ul>
+<p>1.本文的源码分析部分采用“从外到内”的顺序进行分析<br>2.类似postForObject和getForObject这种的区别仅仅是GET请求和POST请求的区别，本文仅分析POST请求的<br>3.postFroLocation()方法是返回一个URI，不是本文的重点</p>
+<h1 id="1-返回值ResponseEntity有什么用？"><a href="#1-返回值ResponseEntity有什么用？" class="headerlink" title="1.返回值ResponseEntity有什么用？"></a>1.返回值ResponseEntity有什么用？</h1><h2 id="1-1-postForObject-和postForEntity"><a href="#1-1-postForObject-和postForEntity" class="headerlink" title="1.1 postForObject()和postForEntity()"></a>1.1 postForObject()和postForEntity()</h2><p><strong>看源码的注释部分，几乎一致，也就是两个方法基本没有什么区别</strong></p>
+<p>其中一个返回值是封装类ResponseEntity</p>
+<p><img src="https://img-blog.csdnimg.cn/ff77b26b03a846c0a63c5ab067ca1c2a.png"><br><strong>重要！！：关于提取响应的方式</strong></p>
+<p>postForObject：<code>HttpMessageConvertExtractor</code><br>postforEntity：<code>ResponseExtractor</code><br>这两个Extractor类都有一个公共接口<code>extractData</code>，他在execute方法执行的时候被调用，用于获取HTTP响应的数据，只是在实现上，一个只获取响应体，另一个还要额外获取headers和status<br><img src="https://img-blog.csdnimg.cn/1134d9e8c5ba48ca8c789762e64b3932.png" alt="公共接口"></p>
+<p><img src="https://img-blog.csdnimg.cn/cbb84d0aeee54c4a8d206a7ca16c84d2.png"></p>
+<h2 id="1-2ResponseEntity的重要参数"><a href="#1-2ResponseEntity的重要参数" class="headerlink" title="1.2ResponseEntity的重要参数"></a>1.2ResponseEntity的重要参数</h2><p><strong>既然这个封装类有状态码status，响应头headers，那么一定在某个地方，getForObject没有去指定而getForEntity指定了</strong>（这时候应该猜到是extractData()方法，将在后面讨论）</p>
+<p><img src="https://img-blog.csdnimg.cn/d5474ff09bc943b5afb10948902e1965.png" alt="形参"></p>
+<p><img src="https://img-blog.csdnimg.cn/f65367f397be4f47aa015251311c2ac0.png" alt="父类"></p>
+<h3 id="1-2-1状态码"><a href="#1-2-1状态码" class="headerlink" title="1.2.1状态码"></a>1.2.1状态码</h3><p><img src="https://img-blog.csdnimg.cn/cd139059659d4120a31725ab5fd0f4af.png"></p>
+<h3 id="1-2-2-getBody-getHeaders"><a href="#1-2-2-getBody-getHeaders" class="headerlink" title="1.2.2 getBody() getHeaders()"></a>1.2.2 getBody() getHeaders()</h3><p>直接获取上面两个参数，不再赘述</p>
+<h2 id="1-3ResponseEntity是如何封装返回值的？"><a href="#1-3ResponseEntity是如何封装返回值的？" class="headerlink" title="1.3ResponseEntity是如何封装返回值的？"></a>1.3ResponseEntity是如何封装返回值的？</h2><h3 id="1-3-1-responseExtrator-extractData-response-提取数据"><a href="#1-3-1-responseExtrator-extractData-response-提取数据" class="headerlink" title="1.3.1 responseExtrator.extractData(response)提取数据"></a>1.3.1 responseExtrator.extractData(response)提取数据</h3><ul>
+<li>已知，最终都是调用doExecute()</li>
+<li>两个方法到这里的Extractor都是非空的，都是一定要执行，两个执行逻辑不同</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/4617c2b5c4f342e8b090be01ea87b37e.png"></p>
+<h3 id="1-3-2extractDatad抽象方法"><a href="#1-3-2extractDatad抽象方法" class="headerlink" title="1.3.2extractDatad抽象方法"></a>1.3.2extractDatad抽象方法</h3><p>这里直接看getForEntity对应的<code>ResponseEntityResponseExtractor</code>，<strong>即封装了status和headers的执行过程</strong></p>
+<p><img src="https://img-blog.csdnimg.cn/8b3bff8efafa410ca33c7e9971af2d95.png"><br><strong>因此，只有返回值是Entity的才有headers和status，否则像getForObject这种方法返回的只是一个响应体</strong></p>
+<p><img src="https://img-blog.csdnimg.cn/e3d76f4b94734da3919f2f0ba4cceef4.png"></p>
+<h3 id="1-3-3公共的extractData-逻辑"><a href="#1-3-3公共的extractData-逻辑" class="headerlink" title="1.3.3公共的extractData()逻辑"></a>1.3.3公共的extractData()逻辑</h3><p>即两个都会调用的，上面那么打红框的，通篇都是只针对了响应体进行操作，没有涉及任何的headers和status</p>
+<p><img src="https://img-blog.csdnimg.cn/0bb36eb745b948838436c3474fe09222.png"></p>
+<h3 id="1-3-4nonNull检验是否为空"><a href="#1-3-4nonNull检验是否为空" class="headerlink" title="1.3.4nonNull检验是否为空"></a>1.3.4nonNull检验是否为空</h3><p>如果是封装为Entity，那么还要再加一层判断方法<img src="https://img-blog.csdnimg.cn/365add9267e14f11bcf45c145c8f4c1f.png"></p>
+<h2 id="1-4小结"><a href="#1-4小结" class="headerlink" title="1.4小结"></a>1.4小结</h2><ul>
+<li><p>到此为止我们分析了为什么getForObject()返回的只有响应体，而getForEntity()返回的包括了响应体 响应头  响应状态</p>
+</li>
+<li><p>而getForEntity()和exchange()返回的都是ResponseEntity对象，因此第二点引出二者的区别</p>
+</li>
+<li><p>get和post请求只有一个区别，后续会演示如何使用API<img src="https://img-blog.csdnimg.cn/2692bd692fd5477994460bb07621cbd1.png"></p>
+</li>
+</ul>
+<h1 id="2-exchange-和xxxtForEntity"><a href="#2-exchange-和xxxtForEntity" class="headerlink" title="2.exchange()和xxxtForEntity()"></a>2.exchange()和xxxtForEntity()</h1><ul>
+<li>可以看出区别就是<code>requestEntity</code>请求参数</li>
+<li>至于请求方法method不是主要矛盾</li>
+<li>这三个方法，参数所对应的含义如下：<br>第一个：url<br>对于exchange，第二个参数是请求方式自定义<br>第三个：请求体参数，exchange和post有，get没有，<strong>用map或dto或requestEntity封装</strong><br>第四个：返回值类型<br>第五个：路径参数，对应的是@RequestParam和@PathVariable，<strong>使用方式是在url中用{}占位</strong>，类似logger的{}，也类似String.format()中的%s占位，因此Object…uriVariables是一个可变数组</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/805cd29b3f874c5db1447b8403cc378b.png"></p>
+<p><img src="https://img-blog.csdnimg.cn/4b0a8113b4814064af683d591efa2f3e.png"></p>
+<p>这里找了一个写的比较全的API演示：<a target="_blank" rel="noopener" href="https://blog.csdn.net/u012843361/article/details/79893638">参考链接</a></p>
+<h2 id="2-1get占位符和可变数组"><a href="#2-1get占位符和可变数组" class="headerlink" title="2.1get占位符和可变数组"></a>2.1get占位符和可变数组</h2><h3 id="2-1-1-RequestParam案例"><a href="#2-1-1-RequestParam案例" class="headerlink" title="2.1.1@RequestParam案例"></a>2.1.1@RequestParam案例</h3><p>请求的接口有两个@RequestParam参数，通过姓名和性别获取图片的一个例子</p>
+<pre><code>    ResponseEntity&lt;byte[]&gt; responseEntity =
+            restTemplate.getForEntity(&quot;http://localhost:8080/pic/pic1?name=&#123;name&#125;&amp;sex=&#123;sex&#125;&quot;, byte[].class,
+                    &quot;名字&quot;, &quot;性别&quot;);
+    ServletOutputStream os = response.getOutputStream();
+    os.write(responseEntity.getBody());
+</code></pre>
+<p>当然对于@RequestParam最好的做法是放在最后一个形参中，传一个map，在后面会提到</p>
+<h3 id="2-1-2-PathVariable案例"><a href="#2-1-2-PathVariable案例" class="headerlink" title="2.1.2@PathVariable案例"></a>2.1.2@PathVariable案例</h3><p>大同小异</p>
+<pre><code> restTemplate.getForEntity(&quot;http://localhost:8080/pic/pic1/&#123;name&#125;/&#123;sex&#125;&quot;, byte[].class,
+                    &quot;名字&quot;, &quot;性别&quot;);
+</code></pre>
+<h2 id="2-2post携带请求体"><a href="#2-2post携带请求体" class="headerlink" title="2.2post携带请求体"></a>2.2post携带请求体</h2><h3 id="2-2-1当本地有dto代码时-直接使用"><a href="#2-2-1当本地有dto代码时-直接使用" class="headerlink" title="2.2.1当本地有dto代码时-直接使用"></a>2.2.1当本地有dto代码时-直接使用</h3><p>当本地有dto代码的时候，第二个形参直接用dto就好</p>
+<pre><code>    //当本地有dto的代码时,可以直接用dto来作为第二个请求体形参
+    People people = new People();
+    people.setAge(22);
+    people.setName(&quot;张三&quot;);
+    people.setTall(181);
+    //最后一个可变数组的形参不用指定
+    ResponseEntity&lt;byte[]&gt; res =
+            restTemplate.postForEntity(&quot;http://localhost:8080/pic/people/pic1&quot;, people, byte[].class);
+    ServletOutputStream os = response.getOutputStream();
+    os.write(res.getBody());
+</code></pre>
+<p>但不一定是任何时候都有这个dto代码，如果没有这个dto代码，去调用其他的服务器，还需要写一个dto吗？不需要</p>
+<h3 id="2-2-2-不能使用HashMap"><a href="#2-2-2-不能使用HashMap" class="headerlink" title="2.2.2 不能使用HashMap"></a>2.2.2 不能使用HashMap</h3><p>使用HashMap虽然在语法上没有问题<strong>，但是会导致请求体对应不上去</strong>，被请求的接口收不到请求体参数</p>
+<p>例如：</p>
+<pre><code>      HashMap&lt;String, String&gt; hashMap = new HashMap&lt;&gt;();
+    hashMap.put(&quot;name&quot;,&quot;张三&quot;);
+    hashMap.put(&quot;age&quot;,&quot;1&quot;);
+    hashMap.put(&quot;tall&quot;,&quot;181&quot;);
+
+    //最后一个可变数组的形参不用指定
+    ResponseEntity&lt;byte[]&gt; res =
+            restTemplate.postForEntity(&quot;http://localhost:8080/pic/people/pic1&quot;, hashMap, byte[].class);
+    ServletOutputStream os = response.getOutputStream();
+    os.write(res.getBody());
+</code></pre>
+<h3 id="2-2-3-使用SpringMVC下的map"><a href="#2-2-3-使用SpringMVC下的map" class="headerlink" title="2.2.3 使用SpringMVC下的map"></a>2.2.3 使用SpringMVC下的map</h3><p><code>MultiValueMap&lt;String, String&gt; map = new LinkedMultiValueMap&lt;String, String&gt;();</code></p>
+<p><strong>他是org.springframework.util包下的一个Map<br>他兼容了类型匹配，与SpringMVC的适配性很好</strong></p>
+<pre><code>    MultiValueMap&lt;String, String&gt; map = new LinkedMultiValueMap&lt;String, String&gt;();
+    map.add(&quot;name&quot;,&quot;张三&quot;);
+    map.add(&quot;age&quot;,&quot;11&quot;);
+    map.add(&quot;tall&quot;,&quot;181&quot;);
+
+    //最后一个可变数组的形参不用指定
+    ResponseEntity&lt;byte[]&gt; res =
+            restTemplate.postForEntity(&quot;http://localhost:8080/pic/people/pic1&quot;, map, byte[].class);
+    ServletOutputStream os = response.getOutputStream();
+    os.write(res.getBody());
+</code></pre>
+<h3 id="2-2-4-同时设置请求体and请求头"><a href="#2-2-4-同时设置请求体and请求头" class="headerlink" title="2.2.4 同时设置请求体and请求头"></a>2.2.4 同时设置请求体and请求头</h3><ul>
+<li><p>请求体写在<code>MultiValueMap</code></p>
+</li>
+<li><p>请求头写在<code>HttpHeaders</code></p>
+</li>
+<li><p>最终用<code>HttpEntity</code>封装，需要注意泛型的指定就是MultiValueMap</p>
+<pre><code>      MultiValueMap&lt;String, String&gt; map = new LinkedMultiValueMap&lt;String, String&gt;();
+      map.add(&quot;name&quot;,&quot;张三&quot;);
+      map.add(&quot;age&quot;,&quot;11&quot;);
+      map.add(&quot;tall&quot;,&quot;181&quot;);
+
+      HttpHeaders httpHeaders = new HttpHeaders();
+      //按需求自行添加
+  //        httpHeaders.setContentType();
+  //        httpHeaders.setExpires();
+
+      //这个Entity包含了请求体 和 请求头
+      //泛型的指定即：map的类型
+      HttpEntity&lt;MultiValueMap&lt;String, String&gt;&gt; entity = new HttpEntity&lt;&gt;(map,httpHeaders);
+
+      //最后一个可变数组的形参不用指定
+      ResponseEntity&lt;byte[]&gt; res =
+              restTemplate.postForEntity(&quot;http://localhost:8080/pic/people/pic1&quot;, entity, byte[].class);
+      ServletOutputStream os = response.getOutputStream();
+      os.write(res.getBody());
+</code></pre>
+</li>
+</ul>
+<h3 id="2-2-5同时请求体-请求参数"><a href="#2-2-5同时请求体-请求参数" class="headerlink" title="2.2.5同时请求体 请求参数"></a>2.2.5同时请求体 请求参数</h3><p>有两种写法，一种是url拼接，利用最后一个参数是可变数组</p>
+<pre><code>ResponseEntity&lt;byte[]&gt; res = restTemplate.exchange(&quot;http://localhost:8080/pic/withbody?param1=&#123;param1&#125;&quot;, HttpMethod.POST,
+    httpEntity, byte[].class, &quot;请求参数1&quot;
+);
+</code></pre>
+<p>第二种是最后一个参数用一个map</p>
+<pre><code>HashMap&lt;String, String&gt; urls = new HashMap&lt;&gt;();
+urls.put(&quot;param1&quot;,&quot;测试1&quot;);
+
+ResponseEntity&lt;byte[]&gt; res = restTemplate.exchange(&quot;http://localhost:8080/pic/withbody&quot;, HttpMethod.POST,
+    httpEntity, byte[].class, urls
+);
+</code></pre>
+<h1 id="3-工具类"><a href="#3-工具类" class="headerlink" title="3.工具类"></a>3.工具类</h1><ul>
+<li>根据公司业务写了一个工具类，可以根据需要，对<code>baseByteTractor</code>和<code>baseJsonTractor</code>进行封装</li>
+<li>可根据业务，携带param、body、header请求接口，并可选择是否将其响应数据的header和statusCode写入响应体</li>
+<li>工具类没有选择使用Spring Bean，而是使用安全的单例模式，移植性更强</li>
+</ul>
+<h2 id="3-1完整代码："><a href="#3-1完整代码：" class="headerlink" title="3.1完整代码："></a>3.1完整代码：</h2><pre><code>import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
+
+/**
+ * @Description RestTemplate工具类
+ * 1.getByte() postByte()是用来下载流的，因此形参必须有HttpResponseBody
+ * 2.getJson() postJson()是用来获取json的，形参可以不带response
+ * 3.每个方法最后一个形参requireBodyOnly默认true，即只需要响应体，一般建议设为true，
+ *     否则可能造成因header自动解析产生的问题
+ * 4.post请求可以额外携带请求体
+ * 5.可能产生EOFException异常，正常，可以全局捕获日志记录
+ * 
+ * @Author zjh
+ * @Date 17:04 2022/7/28
+ **/
+public class RestTemplateUtils &#123;
+
+  private static          Logger       logger = LoggerFactory.getLogger(&quot;RestLogger&quot;);
+  private volatile static RestTemplate restTemplate;
+
+  /**
+   * RestTemplate单例 懒汉 双检锁
+   **/
+  public static RestTemplate getSingleRestTemplate() &#123;
+    if (restTemplate == null) &#123;
+      synchronized (RestTemplateUtils.class) &#123;
+        if (restTemplate == null) &#123;
+          restTemplate = new RestTemplate();
+        &#125;
+      &#125;
+    &#125;
+    return restTemplate;
+  &#125;
+
+
+  /**
+   * 基础方法，下载文件二进制流到response输出流
+   *
+   * @param url 不包含请求参数 即 ?param=&#123;&#125;
+   * @param method POST或GET
+   * @param requestHeaders 请求头，可为空
+   * @param requestParams 请求参数，可为空
+   * @param requestBody 请求体，可为空
+   * @param requireBodyOnly 是否是只需要响应体,默认true，true：只需要响应体  false：同时返回响应状态 响应头  响应体
+   * @return void
+   **/
+  public static void baseByteTractor(String url, HttpMethod method,
+      @Nullable Map&lt;String, String&gt; requestHeaders,
+      @Nullable Map&lt;String, Object&gt; requestParams,
+      @Nullable Map&lt;String, Object&gt; requestBody,
+      HttpServletResponse response,
+      @Nullable Boolean requireBodyOnly) &#123;
+    if (requireBodyOnly == null) &#123;
+      requireBodyOnly = true;
+    &#125;
+    MultiValueMap&lt;String, Object&gt; params  = new LinkedMultiValueMap&lt;String, Object&gt;();
+    MultiValueMap&lt;String, Object&gt; body    = new LinkedMultiValueMap&lt;String, Object&gt;();
+    HttpHeaders                   headers = new HttpHeaders();
+
+    //1.设置请求参数
+    if (requestParams != null &amp;&amp; !requestParams.isEmpty()) &#123;
+      Iterator&lt;Entry&lt;String, Object&gt;&gt; paramsIterator = requestParams.entrySet().iterator();
+      Entry&lt;String, Object&gt;           nextParam      = null;
+      while (paramsIterator.hasNext()) &#123;
+        nextParam = paramsIterator.next();
+        params.add(nextParam.getKey(), nextParam.getValue());
+      &#125;
+    &#125;
+    //2.设置请求头
+    if (requestHeaders != null &amp;&amp; !requestHeaders.isEmpty()) &#123;
+      Iterator&lt;Entry&lt;String, String&gt;&gt; headersIterator = requestHeaders.entrySet().iterator();
+      Entry&lt;String, String&gt;           nextHeader      = null;
+      while (headersIterator.hasNext()) &#123;
+        nextHeader = headersIterator.next();
+        headers.add(nextHeader.getKey(), nextHeader.getValue());
+      &#125;
+    &#125;
+    //3.设置请求体
+    if (requestBody != null &amp;&amp; !requestBody.isEmpty()) &#123;
+      Iterator&lt;Entry&lt;String, Object&gt;&gt; bodyIterator = requestBody.entrySet().iterator();
+      Entry&lt;String, Object&gt;           bodyNext     = null;
+      while (bodyIterator.hasNext()) &#123;
+        bodyNext = bodyIterator.next();
+        body.add(bodyNext.getKey(), bodyNext.getValue());
+      &#125;
+    &#125;
+    //4.请求体 请求头封装到HttpEntity
+    HttpEntity&lt;MultiValueMap&lt;String, Object&gt;&gt; entity = new HttpEntity&lt;&gt;(body, headers);
+    //5.执行
+    RestTemplate         restTemplate = getSingleRestTemplate();
+    BufferedOutputStream bos          = null;
+    try &#123;
+      ResponseEntity&lt;byte[]&gt; exchange = restTemplate.exchange(url, method, entity, byte[].class, params);
+      if (!requireBodyOnly &amp;&amp; response != null) &#123;
+        //响应状态码
+        response.setStatus(exchange.getStatusCodeValue());
+        //响应头,可能存在一个key对应多个value,本方法中会将同名header合并
+        HttpHeaders                           resHeaders         = exchange.getHeaders();
+        Iterator&lt;Entry&lt;String, List&lt;String&gt;&gt;&gt; resHeadersIterator = resHeaders.entrySet().iterator();
+        while (resHeadersIterator.hasNext()) &#123;
+          Entry&lt;String, List&lt;String&gt;&gt; headersNext = resHeadersIterator.next();
+          response.setHeader(headersNext.getKey(), headersNext.getValue().toString());
+        &#125;
+      &#125;
+      //响应体
+      ServletOutputStream os = response.getOutputStream();
+      bos = new BufferedOutputStream(os);
+      byte[] buf = exchange.getBody();
+      bos.write(buf);
+      bos.flush();
+    &#125; catch (IOException e) &#123;
+      logger.error(&quot;RestTemplateUtils获取接口二进制流异常&quot;);
+    &#125; catch (RestClientException e) &#123;
+      logger.error(&quot;远程调用接口异常&#123;&#125;&quot;, e);
+    &#125; finally &#123;
+      try &#123;
+        bos.close();
+      &#125; catch (IOException e) &#123;
+        logger.error(&quot;RestTemplateUtils流关闭异常&quot;);
+      &#125;
+    &#125;
+  &#125;
+
+  /**
+   * 基础方法，请求接口，返回JSON
+   *
+   * @param url 不包含请求参数 即 ?param=&#123;&#125;
+   * @param method POST或GET
+   * @param requestHeaders 请求头，可为空
+   * @param requestParams 请求参数，可为空
+   * @param requestBody 请求体，可为空
+   * @param requireBodyOnly 是否是只需要响应体,默认true，true：只需要响应体  false：同时返回响应状态 响应头  响应体
+   * @return String Json
+   **/
+  public static String baseJsonTracktor(String url, HttpMethod method,
+      @Nullable Map&lt;String, String&gt; requestHeaders,
+      @Nullable Map&lt;String, Object&gt; requestParams,
+      @Nullable Map&lt;String, Object&gt; requestBody,
+      @Nullable HttpServletResponse response,
+      @Nullable Boolean requireBodyOnly) &#123;
+    if (requireBodyOnly == null) &#123;
+      requireBodyOnly = true;
+    &#125;
+    MultiValueMap&lt;String, Object&gt; params  = new LinkedMultiValueMap&lt;String, Object&gt;();
+    MultiValueMap&lt;String, Object&gt; body    = new LinkedMultiValueMap&lt;String, Object&gt;();
+    HttpHeaders                   headers = new HttpHeaders();
+
+    //1.设置请求参数
+    if (requestParams != null &amp;&amp; !requestParams.isEmpty()) &#123;
+      Iterator&lt;Entry&lt;String, Object&gt;&gt; paramsIterator = requestParams.entrySet().iterator();
+      Entry&lt;String, Object&gt;           nextParam      = null;
+      while (paramsIterator.hasNext()) &#123;
+        nextParam = paramsIterator.next();
+        params.add(nextParam.getKey(), nextParam.getValue());
+      &#125;
+    &#125;
+    //2.设置请求头
+    if (requestHeaders != null &amp;&amp; !requestHeaders.isEmpty()) &#123;
+      Iterator&lt;Entry&lt;String, String&gt;&gt; headersIterator = requestHeaders.entrySet().iterator();
+      Entry&lt;String, String&gt;           nextHeader      = null;
+      while (headersIterator.hasNext()) &#123;
+        nextHeader = headersIterator.next();
+        headers.add(nextHeader.getKey(), nextHeader.getValue());
+      &#125;
+    &#125;
+    //3.设置请求体
+    if (requestBody != null &amp;&amp; !requestBody.isEmpty()) &#123;
+      Iterator&lt;Entry&lt;String, Object&gt;&gt; bodyIterator = requestBody.entrySet().iterator();
+      Entry&lt;String, Object&gt;           bodyNext     = null;
+      while (bodyIterator.hasNext()) &#123;
+        bodyNext = bodyIterator.next();
+        body.add(bodyNext.getKey(), bodyNext.getValue());
+      &#125;
+    &#125;
+    //4.请求体 请求头封装到HttpEntity
+    HttpEntity&lt;MultiValueMap&lt;String, Object&gt;&gt; entity = new HttpEntity&lt;&gt;(body, headers);
+    //5.执行
+    RestTemplate restTemplate = getSingleRestTemplate();
+    String       bodyJson     = &quot;&quot;;
+    try &#123;
+      ResponseEntity&lt;String&gt; exchange = restTemplate.exchange(url, method, entity, String.class, params);
+      if (!requireBodyOnly &amp;&amp; response != null) &#123;
+        //响应状态码
+        response.setStatus(exchange.getStatusCodeValue());
+        //响应头,可能存在一个key对应多个value,本方法中会将同名header合并
+        HttpHeaders                           resHeaders         = exchange.getHeaders();
+        Iterator&lt;Entry&lt;String, List&lt;String&gt;&gt;&gt; resHeadersIterator = resHeaders.entrySet().iterator();
+        while (resHeadersIterator.hasNext()) &#123;
+          Entry&lt;String, List&lt;String&gt;&gt; headersNext = resHeadersIterator.next();
+          response.setHeader(headersNext.getKey(), headersNext.getValue().toString());
+        &#125;
+      &#125;
+      bodyJson = exchange.getBody();
+    &#125; catch (RestClientException e) &#123;
+      logger.error(&quot;远程调用接口异常&#123;&#125;&quot;, e);
+    &#125;
+    return bodyJson;
+  &#125;
+
+  /**
+   * GET请求 下载流
+   *
+   * @param url 不包含请求参数 即 ?param=&#123;&#125;
+   * @param requestParams 请求参数，可为空
+   * @param requireBodyOnly 是否是只需要响应体,默认true，true：只需要响应体  false：同时返回响应状态 响应头  响应体
+   * @return void
+   **/
+  public static void getByte(String url, HttpServletResponse response,
+      @Nullable Map&lt;String, Object&gt; requestParams,
+      @Nullable Boolean requireBodyOnly) &#123;
+    if (requireBodyOnly == null) &#123;
+      requireBodyOnly = true;
+    &#125;
+    baseByteTractor(url, HttpMethod.GET, null, requestParams, null, response, requireBodyOnly);
+  &#125;
+
+
+  /**
+   * POST请求 下载流
+   *
+   * @param url 不包含请求参数 即 ?param=&#123;&#125;
+   * @param requestParams 请求参数，可为空
+   * @param requestBody 请求体，可为空
+   * @param requireBodyOnly 是否是只需要响应体,默认true，true：只需要响应体  false：同时返回响应状态 响应头  响应体
+   * @return void
+   **/
+  public static void postByte(String url, HttpServletResponse response,
+      @Nullable Map&lt;String, Object&gt; requestParams,
+      @Nullable Map&lt;String, Object&gt; requestBody,
+      @Nullable Boolean requireBodyOnly) &#123;
+    if (requireBodyOnly == null) &#123;
+      requireBodyOnly = true;
+    &#125;
+    baseByteTractor(url, HttpMethod.POST, null, requestParams, requestBody, response, requireBodyOnly);
+  &#125;
+
+
+  /**
+   * GET请求 获取JSON
+   *
+   * @param url 不包含请求参数 即 ?param=&#123;&#125;
+   * @param requestParams 请求参数，可为空
+   * @param requireBodyOnly 是否是只需要响应体,默认true，true：只需要响应体  false：同时返回响应状态 响应头  响应体
+   * @return void
+   **/
+  public static String getJson(String url,
+      @Nullable HttpServletResponse response,
+      @Nullable Map&lt;String, Object&gt; requestParams,
+      @Nullable Boolean requireBodyOnly) &#123;
+    if (requireBodyOnly == null) &#123;
+      requireBodyOnly = true;
+    &#125;
+    String resJson = baseJsonTracktor(url, HttpMethod.GET, null, requestParams, null, response, requireBodyOnly);
+    return resJson;
+  &#125;
+
+
+  /**
+   * POST请求 获取JSON
+   *
+   * @param url 不包含请求参数 即 ?param=&#123;&#125;
+   * @param requestParams 请求参数，可为空
+   * @param requestBody 请求体，可为空
+   * @param requireBodyOnly 是否是只需要响应体,默认true，true：只需要响应体  false：同时返回响应状态 响应头  响应体
+   * @return void
+   **/
+  public static String postJson(String url,
+      @Nullable HttpServletResponse response,
+      @Nullable Map&lt;String, Object&gt; requestParams,
+      @Nullable Map&lt;String, Object&gt; requestBody,
+      @Nullable Boolean requireBodyOnly) &#123;
+    if (requireBodyOnly == null) &#123;
+      requireBodyOnly = true;
+    &#125;
+    String resJson = baseJsonTracktor(url, HttpMethod.POST, null, requestParams, requestBody, response, requireBodyOnly);
+    return resJson;
+  &#125;
+
+
+&#125;
+</code></pre>
+<h2 id="3-2演示"><a href="#3-2演示" class="headerlink" title="3.2演示"></a>3.2演示</h2><p><img src="https://img-blog.csdnimg.cn/466841ea1eb54688a58f13f5a91da1c6.png" alt="BYTE"><br><img src="https://img-blog.csdnimg.cn/2aaa7850f1574bdaaa2e86b11e302dc2.png" alt="JSON"></p>
+<h1 id="4-小插曲"><a href="#4-小插曲" class="headerlink" title="4.小插曲"></a>4.小插曲</h1><p>在决定写下这篇文章之前，其实是在解决一个业务需求时碰到的问题，问题很简单，粗心导致的，但是反正都已经debug看了分析了源码了，所以干脆写下了上面的源码分析文章和工具类。。。</p>
+<h2 id="4-1环境模拟"><a href="#4-1环境模拟" class="headerlink" title="4.1环境模拟"></a>4.1环境模拟</h2><h3 id="4-1-2接口提供"><a href="#4-1-2接口提供" class="headerlink" title="4.1.2接口提供"></a>4.1.2接口提供</h3><p>提供一个接口，设置一个请求头给response，把图片二进制流写入response</p>
+<pre><code>@GetMapping(&quot;/pic1&quot;)
+public void getPic(HttpServletRequest request,HttpServletResponse response) throws IOException &#123;
+    response.setHeader(&quot;keyy&quot;,&quot;valuee&quot;);
+    System.out.println(response.getHeader(&quot;keyy&quot;));
+    File file = new File(&quot;C:\\Users\\zhangjiahao\\Desktop\\图片.jpg&quot;);
+    FileInputStream fis = new FileInputStream(file);
+    BufferedInputStream bis = new BufferedInputStream(fis);
+    byte[] buf = new byte[2048];
+    ServletOutputStream os = response.getOutputStream();
+    BufferedOutputStream bos = new BufferedOutputStream(os);
+    while(bis.read(buf) != -1)&#123;
+        bos.write(buf);
+    &#125;
+    bos.flush();
+    bos.close();
+    bis.close();
+   &#125;
+</code></pre>
+<h2 id="4-2源码分析思路"><a href="#4-2源码分析思路" class="headerlink" title="4.2源码分析思路"></a>4.2源码分析思路</h2><h3 id="4-2-1方法本身区别"><a href="#4-2-1方法本身区别" class="headerlink" title="4.2.1方法本身区别"></a>4.2.1方法本身区别</h3><p><strong>调用exchange()的时候，内部调用的方法是需要携带请求参数的，不过可以设为null</strong></p>
+<p><img src="https://img-blog.csdnimg.cn/f4d74fc424e2449ab72a25e7dd853729.png" alt="getForEntity"><br><img src="https://img-blog.csdnimg.cn/cd8896e0622c45e48e6e2b73d9a86778.png" alt="exchange"><br>两个方法本身的区别就是：<code>requestEntity</code>，即请求参数</p>
+<h3 id="4-2-2分别看两个内部的方法"><a href="#4-2-2分别看两个内部的方法" class="headerlink" title="4.2.2分别看两个内部的方法"></a>4.2.2分别看两个内部的方法</h3><h3 id="4-2-2-1-exchange-带参的：httpEntityCallback"><a href="#4-2-2-1-exchange-带参的：httpEntityCallback" class="headerlink" title="4.2.2.1 exchange-带参的：httpEntityCallback"></a>4.2.2.1 exchange-带参的：httpEntityCallback</h3><p><img src="https://img-blog.csdnimg.cn/5e4711f12bab4fc5971de022cbf8a823.png"></p>
+<p>到目前为止没有看到对返回值response进行操作的内容<br><img src="https://img-blog.csdnimg.cn/ec598eb6550f4dc2a2cc44e9a2a37423.png"></p>
+<h3 id="4-2-2-2getFroEntity-无参：acceptHeaderRequestCallback"><a href="#4-2-2-2getFroEntity-无参：acceptHeaderRequestCallback" class="headerlink" title="4.2.2.2getFroEntity-无参：acceptHeaderRequestCallback"></a>4.2.2.2getFroEntity-无参：acceptHeaderRequestCallback</h3><p><img src="https://img-blog.csdnimg.cn/c966fb07a8c34b6685ce62f58bc03d81.png"><br><img src="https://img-blog.csdnimg.cn/6fef8e3477fc4c51a64dba0f2ea602ad.png"></p>
+<h2 id="4-3到此没有分析出异常，则看request回调相关的execute"><a href="#4-3到此没有分析出异常，则看request回调相关的execute" class="headerlink" title="4.3到此没有分析出异常，则看request回调相关的execute"></a>4.3到此没有分析出异常，则看request回调相关的execute</h2><h3 id="4-3-1分析理由"><a href="#4-3-1分析理由" class="headerlink" title="4.3.1分析理由"></a>4.3.1分析理由</h3><p>因为两个方法的区别就是在于回调<code>RequestCallback</code>，本身分析不出来问题，就去找其他<code>RequestCallback</code>相关的即<code>execute()</code>执行方法本身<img src="https://img-blog.csdnimg.cn/bc1f4bfe85644f90a190de7c7b214726.png"></p>
+<h3 id="4-3-2doExecute"><a href="#4-3-2doExecute" class="headerlink" title="4.3.2doExecute()"></a>4.3.2doExecute()</h3><p>doWithRequest()对于这两个方法来说，其实都是会执行的</p>
+<p><img src="https://img-blog.csdnimg.cn/1e0853997c16464c8753fd8b296bd15d.png"><br>debug的时候能正常进去</p>
+<p><img src="https://img-blog.csdnimg.cn/f226121a4b514ef7afcc5be894fa83f9.png"></p>
+<p>虽然这里没有指定requestEntity</p>
+<p><img src="https://img-blog.csdnimg.cn/717c0b61574448ee96c3aa0bf051d3aa.png">但是内部造了一个requestCallBack，和requestEntity没有关系</p>
+<p><img src="https://img-blog.csdnimg.cn/d072a85dd9694ea59111d2f50aa6a542.png"></p>
+<h2 id="4-4定位到doWithRequest（）"><a href="#4-4定位到doWithRequest（）" class="headerlink" title="4.4定位到doWithRequest（）"></a>4.4定位到doWithRequest（）</h2><p><img src="https://img-blog.csdnimg.cn/ea860a58bf7d43f5bf0ae992610ed1c7.png"></p>
+<p>这两个实现类其实是父子类关系，都会调用（内部用的super）<img src="https://img-blog.csdnimg.cn/e6927c9c1bc443c6b02d6352e3399664.png" alt="两个实现类"></p>
+<h3 id="4-4-1-debug-发现支持的媒体类型"><a href="#4-4-1-debug-发现支持的媒体类型" class="headerlink" title="4.4.1 debug 发现支持的媒体类型"></a>4.4.1 debug 发现支持的媒体类型</h3><p>发现在使用getForEntity()的时候，走到这里是false，因此没有指定返回值的类型<br><img src="https://img-blog.csdnimg.cn/0d970c9b6b524a30b58c069d25b7831f.png"><br>而正常正确的应该是这样</p>
+<p><img src="https://img-blog.csdnimg.cn/0883ff19327b418291e7fe957edbaeba.png"></p>
+<h3 id="4-4-2回去看参数是否正确"><a href="#4-4-2回去看参数是否正确" class="headerlink" title="4.4.2回去看参数是否正确"></a>4.4.2回去看参数是否正确</h3><p>发现这里给responseType指定为了null，那么问题来了，为什么参数写错了但是没提示？</p>
+<p><img src="https://img-blog.csdnimg.cn/4696156abb0744b7a0fd8accd3786a96.png"><br><strong>这是因为最后最后一个形参是<code>Object... uriVariables</code>，这种形参放在最后一位就支持这种很多逗号的写法</strong></p>
+<h2 id="4-5修改参数"><a href="#4-5修改参数" class="headerlink" title="4.5修改参数"></a>4.5修改参数</h2><p><img src="https://img-blog.csdnimg.cn/9aae1ca4f8df43b1aee39106e1e3707b.png"></p>
+<p>然后就跑通了</p>
+<h2 id="4-6结论"><a href="#4-6结论" class="headerlink" title="4.6结论"></a>4.6结论</h2><p>其实这两个方法本质只有“是否携带请求参数”的区别，其他的所有东西都一样，执行的过程一样，返回值一样，返回值的使用方式一样。<br>唯一值得需要注意的是，<strong>以后遇到这种最后一个形参是<code>Object... uriVariables</code>的，就要对形参的个数比较敏感一点</strong></p>
+
+      
     </div>
-    <div class="hide-list">
-        <div class="semicircle" data-title="切换全屏 快捷键 s">
-            <div class="brackets first"><</div>
-            <div class="brackets">&gt;</div>
-        </div>
+    <footer class="article-footer">
+      <a data-url="https://blogzjh.github.io/2022/08/03/RestTemlate%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%8F%8A%E5%B7%A5%E5%85%B7%E7%B1%BB%E8%AE%BE%E8%AE%A1/" data-id="cl8wv0v20001b1gta2898boyi" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-短信服务被攻击解决方案" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2022/08/03/%E7%9F%AD%E4%BF%A1%E6%9C%8D%E5%8A%A1%E8%A2%AB%E6%94%BB%E5%87%BB%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" class="article-date">
+  <time datetime="2022-08-03T13:51:16.000Z" itemprop="datePublished">2022-08-03</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E5%B7%A5%E4%BD%9C%E7%AC%94%E8%AE%B0/">工作笔记</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2022/08/03/%E7%9F%AD%E4%BF%A1%E6%9C%8D%E5%8A%A1%E8%A2%AB%E6%94%BB%E5%87%BB%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/">短信服务被攻击解决方案</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="1-需求背景"><a href="#1-需求背景" class="headerlink" title="1.需求背景"></a>1.需求背景</h1><ul>
+<li>开放平台短信接口被攻击</li>
+<li>生成图片验证码的功能在一个公共项目中，开放平台没有加图片验证，因此短信服务被别人恶意攻击接口<h2 id="1-1远程服务"><a href="#1-1远程服务" class="headerlink" title="1.1远程服务"></a>1.1远程服务</h2></li>
+<li>发送图片验证码的功能写在一个公共项目中（前后端分离，无xss攻击风险；但复用的图片验证码组件是servlet写的）</li>
+<li>开放平台（前后端不分离，使用java volatile，虽有防攻击框架，但不排除有xss攻击风险）</li>
+</ul>
+<h2 id="1-2历史遗留问题"><a href="#1-2历史遗留问题" class="headerlink" title="1.2历史遗留问题"></a>1.2历史遗留问题</h2><ul>
+<li>当年没有开源的图片验证码生成工具，因此在公共项目中直接复用了以前的Servlet代码（生成图片验证码）</li>
+<li>Servlet提供接口，生成图片验证码；通过Filter进行拦截校验；验证的答案存在session中</li>
+</ul>
+<h2 id="1-3开放平台解决方案"><a href="#1-3开放平台解决方案" class="headerlink" title="1.3开放平台解决方案"></a>1.3开放平台解决方案</h2><ul>
+<li>准备直接调用公共平台的接口生成图片验证码（读取二进制流，答案经过非对称加密后写到响应头）</li>
+<li>从响应头取出加密后的答案存入本地session，校验的时候从开放平台（本地）取session</li>
+</ul>
+<h3 id="1-3-1为何不复用公共项目的Filter"><a href="#1-3-1为何不复用公共项目的Filter" class="headerlink" title="1.3.1为何不复用公共项目的Filter"></a>1.3.1为何不复用公共项目的Filter</h3><ul>
+<li>因为涉及远程调用，两次调用的jsessionid其实是不一样的，也就不能共享公共平台中的session域进行校验。。</li>
+<li>虽然后续自己复盘的时候通过反射小改了以下web框架获取session的逻辑，但是业务复杂度提升了————链接: <a target="_blank" rel="noopener" href="https://zjhblog.gitee.io/zjh/2022/08/03/%E5%8F%8D%E5%B0%84%E4%BF%AE%E6%94%B9jsessionid%E5%AE%9E%E7%8E%B0session%E5%85%B1%E4%BA%AB/">共享Session的方案</a></li>
+</ul>
+<h3 id="1-3-2防止XSS攻击"><a href="#1-3-2防止XSS攻击" class="headerlink" title="1.3.2防止XSS攻击"></a>1.3.2防止XSS攻击</h3><ul>
+<li>开放平台使用Java volatile，可能会收到<code>XSS攻击</code>，例如<code>#if($!session.getAttribute(&quot;Key&quot;))</code>从而直接获取到图片验证码的答案</li>
+<li>但是远程调用接口的时候，答案已经用内部工具进行非对称加密</li>
+</ul>
+<h3 id="1-3-3补：公共项目Servlet使用SpringBean不便"><a href="#1-3-3补：公共项目Servlet使用SpringBean不便" class="headerlink" title="1.3.3补：公共项目Servlet使用SpringBean不便"></a>1.3.3补：公共项目Servlet使用SpringBean不便</h3><p>这个很好解决，我的另一篇文章提出了4种在Servlet中使用Bean的方法。分别使用的思想是：</p>
+<ul>
+<li><code>SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, servletConfig.getServletContext()</code>Servlet初始化时，把自己（this）交给Spring容器进行托管</li>
+<li> <code>WebApplicationContextUtils.getWebApplicationContext(servletContext).getBean()</code>将指定的Bean对象地址交给Servlet</li>
+<li><code>ApplicationContext.getBean()</code>将指定的Bean对象地址交给Servlet</li>
+<li>在@Config类中利用Servlet<code>构造函数 or Set</code>方法，将Bean的地址传给Servlet</li>
+</ul>
+<p>链接: <a target="_blank" rel="noopener" href="https://zjhblog.gitee.io/zjh/2022/08/03/%E5%9B%9B%E7%A7%8D%E6%96%B9%E6%B3%95Servlet%E5%AE%B9%E5%99%A8%E4%BD%BF%E7%94%A8Spring%E7%9A%84Bean%E5%AF%B9%E8%B1%A1/">四种方法Servlet容器使用Spring的Bean对象</a></p>
+<h1 id="2-远程调用方：开放平台的解决方案"><a href="#2-远程调用方：开放平台的解决方案" class="headerlink" title="2.远程调用方：开放平台的解决方案"></a>2.远程调用方：开放平台的解决方案</h1><p>因为涉及到远程调用，临时学了下RestTemplate的用法，后续复盘的时候补充了一个工具类</p>
+<h2 id="2-1撸了一个RestTemplateUtils工具类"><a href="#2-1撸了一个RestTemplateUtils工具类" class="headerlink" title="2.1撸了一个RestTemplateUtils工具类"></a>2.1撸了一个RestTemplateUtils工具类</h2><p>远程调用获取图片，并取出响应Header中的图片验证码答案，存入本地session，用于后续校验</p>
+<p>链接: <a target="_blank" rel="noopener" href="https://zjhblog.gitee.io/zjh/2022/08/03/RestTemlate%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%8F%8A%E5%B7%A5%E5%85%B7%E7%B1%BB%E8%AE%BE%E8%AE%A1/">RestTemplateUtils工具类及源码分析</a></p>
+<h2 id="2-2接口复用"><a href="#2-2接口复用" class="headerlink" title="2.2接口复用"></a>2.2接口复用</h2><p>因为注册、忘记密码、编辑、验证旧号、验证新号逻辑大体一致，因此在一个接口上进行处理，<strong>通过URI的不同</strong>，<strong>设置的手机验证码的key不同</strong></p>
+<h1 id="3-小结"><a href="#3-小结" class="headerlink" title="3.小结"></a>3.小结</h1><ul>
+<li>开放平台 请求 公共服务，同时获取二进制流与响应header中的加密答案</li>
+<li>答案经过非对称加密，提升了XSS攻击的难度</li>
+<li>虽然有通过反射session共享的方案，但业务复杂度较高因此没有用</li>
+</ul>
+<h1 id="4-复盘反思"><a href="#4-复盘反思" class="headerlink" title="4.复盘反思"></a>4.复盘反思</h1><ul>
+<li>如果让我来写，非对称加密的方案不应该把密钥写死在前后端，应该每次会话自动生成一对密钥，降低XSS攻击风险。</li>
+<li>用户请求服务器A，调用服务器B的接口，调用两次是两个不同的session，如果想要共享session内容需要通过反射改造session获取逻辑 <a target="_blank" rel="noopener" href="https://zjhblog.gitee.io/zjh/2022/08/03/%E5%8F%8D%E5%B0%84%E4%BF%AE%E6%94%B9jsessionid%E5%AE%9E%E7%8E%B0session%E5%85%B1%E4%BA%AB/">共享Session的方案</a></li>
+<li>公共服务不应该用Servlet写，应该更换目前的开源MVC组件，用Servlet写的功能在Spring项目中维护起来有点恶心。。。</li>
+<li>相似功能，相同逻辑的服务可以写为一个MVC方法，通过url来进行细微的命名区分</li>
+<li>涉及到图片验证码这种类似的功能，每次请求需要覆盖以前的答案</li>
+<li>对于像手机验证码这种<strong>需要花钱</strong>的服务，如果让我来做一个业务层，我会将<strong>最近一段时间的所有手机验证码存入一个list</strong>，每次比对的时候跟list进行比对而不只是当前最新的验证码。</li>
+</ul>
+
+      
     </div>
+    <footer class="article-footer">
+      <a data-url="https://blogzjh.github.io/2022/08/03/%E7%9F%AD%E4%BF%A1%E6%9C%8D%E5%8A%A1%E8%A2%AB%E6%94%BB%E5%87%BB%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" data-id="cl8wv0v32002t1gta8ywle3nf" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-四种方法Servlet容器使用Spring的Bean对象" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2022/08/03/%E5%9B%9B%E7%A7%8D%E6%96%B9%E6%B3%95Servlet%E5%AE%B9%E5%99%A8%E4%BD%BF%E7%94%A8Spring%E7%9A%84Bean%E5%AF%B9%E8%B1%A1/" class="article-date">
+  <time datetime="2022-08-03T13:47:54.000Z" itemprop="datePublished">2022-08-03</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E5%B7%A5%E4%BD%9C%E7%AC%94%E8%AE%B0/">工作笔记</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2022/08/03/%E5%9B%9B%E7%A7%8D%E6%96%B9%E6%B3%95Servlet%E5%AE%B9%E5%99%A8%E4%BD%BF%E7%94%A8Spring%E7%9A%84Bean%E5%AF%B9%E8%B1%A1/">四种方法Servlet容器使用Spring的Bean对象</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>今天在做一个需求的时候，需要在Servlet接口中调用一个Spring的Bean对象，因为Servlet和Spring生命周期不同，所被管理的容器不同，因此不能直接通过@Autowire注入</p>
+<p>以下三个方案，思路分别是：</p>
+<ul>
+<li>在初始化这个Servlet类接口的时候，<strong>重写init()方法</strong>，允许Servlet扫描Bean对象</li>
+<li>在初始化这个Servlet类接口的时候，<strong>重写init()方法</strong>，指定获取bean：getBean()</li>
+<li>在利用配置类在装载Servlet的时候，将<strong>bean对象地址</strong>作为形参传给Servlet</li>
+</ul>
+<h1 id="0-Servlet结构演示"><a href="#0-Servlet结构演示" class="headerlink" title="0.Servlet结构演示"></a>0.Servlet结构演示</h1><p>这里做演示用的StringRedisTemplate 本身不是一个SpringBean对象，但是由于项目中有配置将其扫描为了bean，所以这里直接用StringRedisTemplate 来做演示</p>
+<pre><code>public class ValidateCodeServlet extends HttpServlet &#123;
+//@Autowired
+private StringRedisTemplate stringRedisTemplate;
+
+//    public ValidateCodeServlet() &#123;
+//    &#125;
+//    public ValidateCodeServlet(StringRedisTemplate stringRedisTemplate) &#123;
+//        this.stringRedisTemplate = stringRedisTemplate;
+//    &#125;
+
+
+ @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) &#123;
+....&#125;
+
+
+    @Override
+    public void init(ServletConfig config) throws ServletException &#123;
+.....
+    &#125;
+</code></pre>
+<h1 id="1-允许Servlet扫描Bean对象"><a href="#1-允许Servlet扫描Bean对象" class="headerlink" title="1.允许Servlet扫描Bean对象"></a>1.允许Servlet扫描Bean对象</h1><pre><code>@Override
+public void init(ServletConfig config) throws ServletException &#123;
+    // 父类不初始化会导致getServletContext()空指针异常
+    super.init(config);
+    // 将当前this 的 Servlet交给Spring托管，因此该Servlet可以用@Autowired
+    SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, config.getServletContext());
+&#125;
+</code></pre>
+<h2 id="1-1SpringBeanAutowiringSupport类"><a href="#1-1SpringBeanAutowiringSupport类" class="headerlink" title="1.1SpringBeanAutowiringSupport类"></a>1.1SpringBeanAutowiringSupport类</h2><p>通过这个类的名字，结合注释可以知道，这个类主要的作用是对@Autowired进行增强<br>看注释中的如下部分，<strong>通过@Autowired将Spring的Bean对象解析到当前的Web上下文(Servlet上下文)</strong><br><img src="https://img-blog.csdnimg.cn/3b56013f4c68405b909f7c44524eb547.png"></p>
+<h2 id="1-2processInjectionBasedOnServletContext"><a href="#1-2processInjectionBasedOnServletContext" class="headerlink" title="1.2processInjectionBasedOnServletContext"></a>1.2processInjectionBasedOnServletContext</h2><p>Servlet注入Spring的Bean对象，最终的执行方法是<code>processInjection()</code></p>
+<p><img src="https://img-blog.csdnimg.cn/76d97cee3eb04f5d99097ec79e3d81b8.png"></p>
+<h3 id="1-2-1processInjection"><a href="#1-2-1processInjection" class="headerlink" title="1.2.1processInjection()"></a>1.2.1processInjection()</h3><p><img src="https://img-blog.csdnimg.cn/acc487e186a24230843850ad1a5e2804.png"></p>
+<h1 id="2-get指定的bean"><a href="#2-get指定的bean" class="headerlink" title="2.get指定的bean"></a>2.get指定的bean</h1><pre><code>@Override
+public void init(ServletConfig config) throws ServletException &#123;
+
+     ServletContext servletContext = this.getServletContext();
+     WebApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(servletContext);
+     this.stringRedisTemplate = (StringRedisTemplate) context.getBean(&quot;StringRedisTemplate&quot;);
+     &#125;
+</code></pre>
+<p>如果目标类本身没有直接注入Spring容器而是配置扫描，会报错，所以不推荐这种做法，更推荐方法1</p>
+<h2 id="2-1WebApplicationContextUtils工具类"><a href="#2-1WebApplicationContextUtils工具类" class="headerlink" title="2.1WebApplicationContextUtils工具类"></a>2.1WebApplicationContextUtils工具类</h2><p>在SpringBeanAutowiringSupport类的注释中有提到<br>WebApplicationContextUtils类允许基于ServletContext轻松访问Spring根web应用程序上下文。<br><img src="https://img-blog.csdnimg.cn/a52db8aefb894fb5afb02f07622a1fa5.png"></p>
+<h1 id="3-配置类传递bean地址"><a href="#3-配置类传递bean地址" class="headerlink" title="3.配置类传递bean地址"></a>3.配置类传递bean地址</h1><p>bean对象本质上也是一个java的对象，只要能获取其地址值，就可以正常使用</p>
+<p><img src="https://img-blog.csdnimg.cn/e56c9456d3d746ee9eec7089826b1dc6.png"></p>
+<p><img src="https://img-blog.csdnimg.cn/509aaea83be74091b540716a4a5d3ec1.png"><br>这样配置就不需要写inti()了</p>
+<h1 id="4-同样的，对于Filter"><a href="#4-同样的，对于Filter" class="headerlink" title="4.同样的，对于Filter"></a>4.同样的，对于Filter</h1><p>Filter也是Servlet的产物，他的上下文环境也不同于Spring上下文，同样还是这个需求里面用的是Filter对其进行校验，也需要注入Srping的Bean对象，当然不能直接@Autowired</p>
+<p><img src="https://img-blog.csdnimg.cn/a0c4fd70e8b4495aaa67edea8b4d1820.png"><br><img src="https://img-blog.csdnimg.cn/385af820bedc467c9955b319aaf5f37e.png"></p>
+<h1 id="5-普通类调用bean工具类"><a href="#5-普通类调用bean工具类" class="headerlink" title="5.普通类调用bean工具类"></a>5.普通类调用bean工具类</h1><pre><code> @Component
+public class SpringContexUtil implements ApplicationContextAware &#123;
+private static ApplicationContext applicationContext;
+
+@Override
+public void setApplicationContext(ApplicationContext context) throws BeansException &#123;
+applicationContext = context;
+&#125;
+
+//静态加载applicationContext
+public static ApplicationContext getApplicationContext() &#123;
+return applicationContext;
+&#125;
+//通过反射获取Bean
+public static &lt;T&gt; T getBean(Class&lt;T&gt; requiredType)&#123;
+return getApplicationContext().getBean(requiredType);
+&#125;
+//通过id名获取bean
+public static &lt;T&gt; T getBean(String name)&#123;
+return (T) getApplicationContext().getBean(name);
+&#125;
+&#125;
+</code></pre>
+<p>把Servlet或者Filter当普通类，直接用工具类调用即可</p>
+<h1 id="需要注意的点"><a href="#需要注意的点" class="headerlink" title="需要注意的点"></a>需要注意的点</h1><p>因为项目启动时装载在前，很多修改“装载过程”的地方不能通过热部署来reload，需要重启项目</p>
+<h1 id="6-小结"><a href="#6-小结" class="headerlink" title="6.小结"></a>6.小结</h1><p>在使用Servlet对象之前，将其需要注入的SpringBean作为形参，在配置类中（即启动时装载）指定SpringBean对象的地址值给Servlet或Filter的形参即可</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://blogzjh.github.io/2022/08/03/%E5%9B%9B%E7%A7%8D%E6%96%B9%E6%B3%95Servlet%E5%AE%B9%E5%99%A8%E4%BD%BF%E7%94%A8Spring%E7%9A%84Bean%E5%AF%B9%E8%B1%A1/" data-id="cl8wv0v2w002d1gta55vu9ckm" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-内存区域、类的加载" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2022/07/19/%E5%86%85%E5%AD%98%E5%8C%BA%E5%9F%9F%E3%80%81%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD/" class="article-date">
+  <time datetime="2022-07-19T14:29:21.000Z" itemprop="datePublished">2022-07-19</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Java/">Java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2022/07/19/%E5%86%85%E5%AD%98%E5%8C%BA%E5%9F%9F%E3%80%81%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD/">内存区域、类的加载</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="0-JVM和字节码"><a href="#0-JVM和字节码" class="headerlink" title="0.JVM和字节码"></a>0.JVM和字节码</h1><ul>
+<li>JVM实际上现在已经成为了<strong>跨语言平台</strong>，只要按字节码生成规则，都可以在JVM上运行</li>
+<li>JVM规范中最具含金量的虚拟机实现是HotSpot也是JDK1.3至今的默认虚拟机，其他的还有JRockit、IBM J9等</li>
+<li>JDK9之后 G1垃圾回收器完全替代了CMS</li>
+<li>编译成规范的字节码的好处是：一次编译，到处运行</li>
+</ul>
+<h2 id="0-1JVM和传统虚拟机"><a href="#0-1JVM和传统虚拟机" class="headerlink" title="0.1JVM和传统虚拟机"></a>0.1JVM和传统虚拟机</h2><ul>
+<li>传统意义上的虚拟机如VMware，它是在硬件层面模拟了一个操作系统</li>
+<li>而JVM是在操作系统之上，<strong>解释运行字节码文件</strong>的一个细粒度的虚拟机。<strong>它没有和硬件直接交互</strong></li>
+<li>他们的层次是: 硬件——操作系统——JVM——字节码 </li>
+</ul>
+<h2 id="0-2三种虚拟机"><a href="#0-2三种虚拟机" class="headerlink" title="0.2三种虚拟机"></a>0.2三种虚拟机</h2><p><img src="https://img-blog.csdnimg.cn/b4d3c3fb6a394e389c92832eb6adbe28.png" alt="引用"></p>
+<p><img src="https://img-blog.csdnimg.cn/4b6c72d00e104b0d8fe71bdeeb8d8692.png" alt="引用"></p>
+<p><img src="https://img-blog.csdnimg.cn/860d9efd535c422ca9c6c693a7d75946.png" alt="引用"></p>
+<h1 id="1-内存管理概述"><a href="#1-内存管理概述" class="headerlink" title="1.内存管理概述"></a>1.内存管理概述</h1><ul>
+<li>对于Java程序员来说，在<code>JVM自动内存管理机制</code>的帮助下，不需要为每一个new出来的对象配对<code>delete/free</code>去释放内存，<strong>不容易出现出现内存泄漏和内存溢出问题。</strong><br>但是一旦出现了这方面的问题，不了解JVM是怎么使用内存的话就很难排查错误。</li>
+<li><code>HotSpot是</code>JVM概念的一个实现，最初由Sun开发，现在由Oracle拥有。 还有其他JVM规范的实现，如<code>JRockit ， IBM J9</code>等等。 </li>
+</ul>
+<h1 id="2-运行时数据区"><a href="#2-运行时数据区" class="headerlink" title="2.运行时数据区"></a>2.运行时数据区</h1><p>JVM运行时会把它所管理的内存划分为若干个不同的数据区，有的区域随JVM启动而一直存在，有的区域依赖用户线程的启动和结束。它包括了以下几种运行时数据区。<br>（按相关性和逻辑顺序依次介绍）</p>
+<h2 id="2-1程序计数器"><a href="#2-1程序计数器" class="headerlink" title="2.1程序计数器"></a>2.1程序计数器</h2><p>首先：JVM的多线程是靠<code>线程轮流切换、分配处理器执行时间</code>来实现的，那么在切换的过程中，如何确定当前线程执行到哪里了呢？</p>
+<ul>
+<li><code>线程私有</code>：每个线程都有自己独立的程序计数器，独立存储，互不影响</li>
+<li>程序计数器占用的内存空间很小</li>
+<li><code>字节码解释器</code>就是通过改变程序计数器的值，<strong>来选取下一条需要执行的字节码指令</strong></li>
+<li><strong>分支、循环、跳转、异常处理、线程恢复</strong>等功能都依赖于程序计数器</li>
+</ul>
+<h2 id="2-2虚拟机栈"><a href="#2-2虚拟机栈" class="headerlink" title="2.2虚拟机栈"></a>2.2虚拟机栈</h2><h3 id="2-2-1概念"><a href="#2-2-1概念" class="headerlink" title="2.2.1概念"></a>2.2.1概念</h3><ul>
+<li><code>线程私有</code>，其生命周期和线程相同</li>
+<li>每一个方法被执行的时候，JVM都会同步创建一个<code>栈帧</code></li>
+<li><code>栈帧</code>用于存储：<strong>局部变量、操作数栈、动态连接、方法出口等信息</strong></li>
+<li>每一个方法从调用到结束，对应一个栈帧的入栈出栈</li>
+</ul>
+<h3 id="2-2-2局部变量表"><a href="#2-2-2局部变量表" class="headerlink" title="2.2.2局部变量表"></a>2.2.2局部变量表</h3><p>虚拟机栈一般都用来指<code>局部变量表</code>，一般包括：</p>
+<ul>
+<li>8种基本数据类型（其中long和double占用<strong>两个局部变量槽Slot</strong>）</li>
+<li>对象引用,如People p = new People()种的p；int[] arr = new int[]{}中的arr</li>
+<li>因此虚拟机栈的大小<strong>是可以完全确定的</strong>，如果线程请求的虚拟机栈深度&gt;JVM允许的最大深度，则会报错<code>StackOverflowError</code>即俗称的<code>爆栈</code>，在递归调用的时候较为容易出现爆栈的情况</li>
+</ul>
+<h2 id="2-3本地方法栈"><a href="#2-3本地方法栈" class="headerlink" title="2.3本地方法栈"></a>2.3本地方法栈</h2><ul>
+<li><code>线程私有</code></li>
+<li>本地：native：即指编写JDK所用到底层C++库</li>
+<li>它和虚拟机栈大同小异，区别就是：<strong>虚拟机栈调用的是Java方法的字节码，本地方法栈调用的是C++的库</strong></li>
+<li>JVM的HotSpot实现将它们二者合二为一了</li>
+</ul>
+<h2 id="2-4堆"><a href="#2-4堆" class="headerlink" title="2.4堆"></a>2.4堆</h2><blockquote>
+<p>一般Java程序员在没有了解JVM的情况下，喜欢把JVM粗略的分为堆和栈，这种分法来自于C++，但JVM规范中的划分更加复杂</p>
+</blockquote>
+<ul>
+<li><code>多线程共享</code></li>
+<li>堆是JVM管理内存中最大的一块，<code>几乎所有</code>的对象实例都存放于此</li>
+<li>对于大的对象（典型如数组）一般都是使用连续的内存空间</li>
+<li>Java堆是可扩展的，一般通过设置<code>-Xmx和-Xms</code>，超过最大限度后报错OutOfMemoryError，即俗称的<code>OOM</code></li>
+<li>Java堆也叫<code>GC堆，因为其是垃圾收集器管理内存的区域</code></li>
+</ul>
+<h2 id="2-5方法区和元空间"><a href="#2-5方法区和元空间" class="headerlink" title="2.5方法区和元空间"></a>2.5方法区和元空间</h2><blockquote>
+<p>在JDK8以前，很多程序员喜欢使用HotSpot来开发Java程序，HotSpot将<strong>分代设计</strong>拓展至了方法区，因此很多人将方法区和永久代混为一谈。此外永久代也出现了很多严重的内存泄露BUG，因此目前被摒弃</p>
+</blockquote>
+<blockquote>
+<p>对于JRockit、IBM J9虚拟机来说，永久代被完全摒弃，取而代之的是<code>元空间</code>，同理<strong>方法区是HotSpot独有的</strong></p>
+</blockquote>
+<ul>
+<li> <code>多线程共享</code></li>
+<li>准确来说，<strong>永久代实现了方法区，在JDK8之后替换为了元空间实现方法区</strong>。二者效果相近。</li>
+<li>对于以前永久代中的<code>静态变量、字符串常量池</code>，目前是放在了堆Heap中</li>
+<li>元空间使用本地内存也就意味着只要本地内存足够，就不会出现OOM的错误。</li>
+<li>Java1.8的运行时数据区域如图所示。方法区已经不见了踪影，多出来的是叫做元数据区的区域。<br><img src="https://img-blog.csdnimg.cn/d66f7775a3224bba8821b9b060fe650e.png" alt="引用"></li>
+</ul>
+<h2 id="2-6运行时常量池"><a href="#2-6运行时常量池" class="headerlink" title="2.6运行时常量池"></a>2.6运行时常量池</h2><p>Class常量池(又称常量池) :主要用于存放两大类常量:字面量(Literal)和符号引用量(Symbolic References)。</p>
+<p>字面量相当于Java语言层面常量的概念,如文本<strong>字符串</strong>，声明为<strong>final</strong>的常量值等；</p>
+<p>符号引用则属于编译原理方面的概念，包括了<strong>三种类型的常量</strong>:<strong>类和接口的全限定名</strong>、<strong>字段名称和描述符</strong>、<strong>方法名称和描述符</strong>。</p>
+<p><img src="https://img-blog.csdnimg.cn/33f7c62d082d4f19bdc62bd846934edc.png" alt="引用"></p>
+<h2 id="2-7-直接内存"><a href="#2-7-直接内存" class="headerlink" title="2.7*直接内存"></a>2.7*直接内存</h2><p>这个直接内存并不是JVM运行时数据区的一部分，它是JDK4引入的<strong>NIO的一种缓冲优化策略：</strong><br>可以将Native库直接分配到堆外内存，然后通过Java堆中的一个缓冲对象来引用，<strong>避免了反复在Java堆和Native堆的复制数据。</strong></p>
+<h1 id="3-类的加载"><a href="#3-类的加载" class="headerlink" title="3.类的加载"></a>3.类的加载</h1><h2 id="3-1"><a href="#3-1" class="headerlink" title="3.1"></a>3.1</h2>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://blogzjh.github.io/2022/07/19/%E5%86%85%E5%AD%98%E5%8C%BA%E5%9F%9F%E3%80%81%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD/" data-id="cl8wv0v2p001t1gtaabruahpx" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Restful风格真的有必要吗" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2022/07/19/Restful%E9%A3%8E%E6%A0%BC%E7%9C%9F%E7%9A%84%E6%9C%89%E5%BF%85%E8%A6%81%E5%90%97/" class="article-date">
+  <time datetime="2022-07-19T12:19:57.000Z" itemprop="datePublished">2022-07-19</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E5%B7%A5%E4%BD%9C%E7%AC%94%E8%AE%B0/">工作笔记</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2022/07/19/Restful%E9%A3%8E%E6%A0%BC%E7%9C%9F%E7%9A%84%E6%9C%89%E5%BF%85%E8%A6%81%E5%90%97/">Restful风格真的有必要吗？</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>到现在经过了两段实习，也因为喜欢网上冲浪，认识了不少大厂的朋友。反正大家的一致意见都是Restful利大于弊。我查了几天资料，稍微总结一下</p>
+<h1 id="为什么不用Restful"><a href="#为什么不用Restful" class="headerlink" title="为什么不用Restful"></a>为什么不用Restful</h1><h2 id="1-浏览器方面"><a href="#1-浏览器方面" class="headerlink" title="1.浏览器方面"></a>1.浏览器方面</h2><ul>
+<li>浏览器普遍对GET和POST的支持最好</li>
+<li>浏览器表单form提交只支持GET和POST</li>
+</ul>
+<h2 id="2-SpringMVC方面"><a href="#2-SpringMVC方面" class="headerlink" title="2.SpringMVC方面"></a>2.SpringMVC方面</h2><ul>
+<li><strong>SpringMVC解析POST请求可以自动解析param和body，不需要加注解，而PUT DELETE请求必须加@RequestParam、@PathVariable、@RequestBody注解</strong>，虽然Spring3支持对PUT请求体的映射，但是需要在web.xml或者WebMvcConfigurerAdapter中进行配置————————这一点确实很好用，我现在维护的这个项目时间长了觉得真的很方便，很多没必要去字段匹配的直接写就好了</li>
+</ul>
+<h2 id="3-业务方面"><a href="#3-业务方面" class="headerlink" title="3.业务方面"></a>3.业务方面</h2><ul>
+<li>一个“删”“改”操作不一定会那么干净，里面可能会夹杂很多的“查”“增”操作，但用一个PUT连基本RESTful的优势都成了劣势</li>
+<li>增删改查的不同操作可以通过url的最后一项来区分：例如 */deleteXxxx或editXxxx</li>
+<li>Restful只是一种风格，不是规范，对业务没有帮助</li>
+</ul>
+<h2 id="4-Http协议方面"><a href="#4-Http协议方面" class="headerlink" title="4.Http协议方面"></a>4.Http协议方面</h2><ul>
+<li>同时，<strong>POST请求在大多数浏览器中默认提交两次tcp包，在网络环境差的情况下更保险</strong></li>
+<li><strong>PUT和DELETE在http协议中本质和POST一样，没有任何优势</strong>，反而在SpringMVC中容易出现一些问题</li>
+</ul>
+<h1 id="什么时候能用Restful"><a href="#什么时候能用Restful" class="headerlink" title="什么时候能用Restful"></a>什么时候能用Restful</h1><p>当且仅当</p>
+<ul>
+<li><strong>幂等修改删除</strong>可以用put，delete；不幂等用post</li>
+<li>删除就是删除，修改就是修改，不会影响其他的业务数据</li>
+<li>培训机构忽悠小白时</li>
+</ul>
+<h1 id="Get和Post的一些区别"><a href="#Get和Post的一些区别" class="headerlink" title="Get和Post的一些区别"></a>Get和Post的一些区别</h1><ul>
+<li>“是否提交大量数据”的功能可以直接由POST和GET来区分，GET不能放body参数，数据只能裸露放在url上，但浏览器url的长度大多限制为2kb，可以用POST来放body参数。</li>
+<li>GET请求的请求数据可能被浏览器缓存</li>
+<li>如果非幂等请求用GET，结果如果被缓存就会出错，可以通过请求<strong>参数带时间戳等不重复无关参数</strong>来强制防止缓存</li>
+<li>如果敏感信息用GET，那你的敏感信息就可能被完整的保存在了本地浏览器。当然，可以通过加密手段解决</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://blogzjh.github.io/2022/07/19/Restful%E9%A3%8E%E6%A0%BC%E7%9C%9F%E7%9A%84%E6%9C%89%E5%BF%85%E8%A6%81%E5%90%97/" data-id="cl8wv0v1z00191gta7zl722yi" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-气象cv-地基云图云系分割" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2022/07/17/%E6%B0%94%E8%B1%A1cv-%E5%9C%B0%E5%9F%BA%E4%BA%91%E5%9B%BE%E4%BA%91%E7%B3%BB%E5%88%86%E5%89%B2/" class="article-date">
+  <time datetime="2022-07-17T04:04:12.000Z" itemprop="datePublished">2022-07-17</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2022/07/17/%E6%B0%94%E8%B1%A1cv-%E5%9C%B0%E5%9F%BA%E4%BA%91%E5%9B%BE%E4%BA%91%E7%B3%BB%E5%88%86%E5%89%B2/">气象cv-地基云图云系分割</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="1-引言"><a href="#1-引言" class="headerlink" title="1. 引言"></a>1. 引言</h1><h2 id="1-1-题目概述"><a href="#1-1-题目概述" class="headerlink" title="1.1 题目概述"></a>1.1 题目概述</h2><p>卫星云图包含丰富的云信息，从中可以形象直观地看到云系的形状和演变情况，卫星云图的应用也非常广泛，例如天气分析、降水估计和暴雨短时预报系统中，也要求输入云图信息。为使云图判识客观化、自动化，扩展卫星云图在天气预报、环境监测中的应用，进行云图定量自动判识研究是必要的。云图自动判识包括云图分割和识别两部分，对云图的分割研究一直处于摸索中，存在着诸多困难，基于对自动识别云图、对云进行自动分割这种技术的需要，本文主要对地基云图云系分割技术开展探索研究。</p>
+<h2 id="1-2-研究意义"><a href="#1-2-研究意义" class="headerlink" title="1.2 研究意义"></a>1.2 研究意义</h2><p>随着科学技术的不断发展，气象观测领域的计算机技术、传感技术有了很大的进步，目前对温度、气压、湿度以及风的观测方法已基本实现了自动化，可在云的观测中，只对云高的测量实现了自动化，对云状、对于卫星云图的自动分割技术还处于探索阶段，它的难点在于，一幅云图上常常有多种不同的云系存在，而且云系的灰度随云系的种类、地域和时间而变，同时云系的形状很不规则，不能简单地用阈值或形状将不同云系分割开。<br>目前关于对云图的研究工作，大部分都集中在卫星云图方面，而对从地面向上所拍摄的地基云图研究比较少。目前对云图云系的分割还需要进行手动分割，这会带来很多缺陷，首先手动分割会耗费大量的人力与精力，其次，人工分割对于图像边缘或者单独小块的云难以分割清楚，这就会带来一定的精度误差，影响云识别的准确性。因此本研究对于实现地基云图的自动分割具有一定价值。</p>
+<h1 id="2-数据准备"><a href="#2-数据准备" class="headerlink" title="2. 数据准备"></a>2. 数据准备</h1><h2 id="2-1-数据准备"><a href="#2-1-数据准备" class="headerlink" title="2.1 数据准备"></a>2.1 数据准备</h2><h3 id="2-1-1-数据集介绍"><a href="#2-1-1-数据集介绍" class="headerlink" title="2.1.1 数据集介绍"></a>2.1.1 数据集介绍</h3><p>本实验采用了给定的卫星云图数据集。该数据集共有六百张分辨率为 256*256 的彩色 jpg 图片，我们发现地基云图是观测到的覆盖了多种不同地形的各种云图，其中包含了高山、海面、稻田、山脊等各种地形，识别难度较大。同时了解到地基云观测数据主要包括云量、云状、云底高度，根据<br>三者的不同表现可以将云分为 3 族、10 属、29 类，具有种类多、变化快、相似、易与天空背景融合等特点。因此本实验考虑到要适用于各种地形，所以在选择训练集和测试集的时候，进行了初步的筛选。在考虑到了地形、云量等影响因素，在进行了筛选之后，我们选择了 cloud101-cloud300、cloud401-cloud500 以及 cloud601-cloud700 作为我们的训练集，其余的作为测试集。部分原始数据如下所示。</p>
+<p><img src="https://img-blog.csdnimg.cn/2e4139b48d14476fb0b1ec9fdc9d30e9.png"></p>
+<h3 id="2-1-2-数据增强"><a href="#2-1-2-数据增强" class="headerlink" title="2.1.2 数据增强"></a>2.1.2 数据增强</h3><p>有了原始数据后，还需要相应的标签才能构建完整训练数据集。一般处理图像类的卷积神经网络输入都是图像，而标签(或言之输出结果)是根据任务而定的。以分类任务为例，标签就是一个单一类别，以目标检测为例，输出是 4 维向量。语义分割结合了图像分类、目标检测和图像分割，通过一定的方法将图像分割成具有一定语义含义的区域块，并识别出每个区域块的语义类别，实现从底层到高层的语义推理过程，最终得到一幅具有逐像素语义标注的分割图像。其本质是对图像中每一个像素进行分类，对图像中每个像素都打上一个标签就是语义分割的标注过程。一般情况下，这个工作需要我们手工完成且工作量极大，本文研究内容是对卫星云图里面的云系进行识别，即是云和不是云的判断，是一个二分类任务。所以选取的云图分割标签如下所示<br><img src="https://img-blog.csdnimg.cn/2989337b5e6645e391c66a48fa19219f.png" alt="表 1 云图分割标签"><br>本文使用 MATLAB 的标注工具箱 imageLabeler 进行人工完整标注，在利用其做好云标注后，利用 python 转换出相应 PNG 格式的标注图像。在图像标注过程中由于是人工标注，因此在云边界标注上有所欠缺，相应部分标注结果图如下所示。<img src="https://img-blog.csdnimg.cn/6b3e69b0aad8466dae10fc476c809589.png"></p>
+<h1 id="3-模型构建"><a href="#3-模型构建" class="headerlink" title="3. 模型构建"></a>3. 模型构建</h1><h2 id="3-1-设计思路"><a href="#3-1-设计思路" class="headerlink" title="3.1 设计思路"></a>3.1 设计思路</h2><p>基于地基云图的分割属于计算机视觉问题中语义分割的应用。语义分割结合了图像分类、目标检测和图像分割，通过一定的方法将图像分割成具有一定语义含义的区域块，并识别出每个区域块的语义类别，实现从底层到高层的语义推理过程，最终得到一幅具有逐像素语义标注的分割图像。<br>在地基云图进行分割，即需要将属于云的像素分为一类，属于天空的像素分为一类。由于缺少气象专业知识，我们仅进行云图的语义分割，没有再进一步划分不同云类的实例分割。<br>由于深度学习在语义分割上得到巨大的成功，我们选择基于深度学习的语义分割模型。常用的语义分割模型包括 FCN、SegNet、DeepLab 系列模型。<br>语义分割模型建立在利用 CNN 网络提取特征分类的基础上，所以面临着需要提升感受野和选择恰当的空间信息的问题。我们选择利用空洞卷积来减少下采样率同时保证感受野的 DeepLabv3+模型。<br>DeepLabv3+模型属于谷歌团队提出的语义分割算法 DeepLab 系列最新改进的版本。其具有速度快、准确度高、模块简单等优点。且其在应用于地基云图分割中，具有不俗的表现，超过 PSPNet、AdapNet 等深度学习算法。[1]</p>
+<h2 id="3-2-模型介绍"><a href="#3-2-模型介绍" class="headerlink" title="3.2 模型介绍"></a>3.2 模型介绍</h2><p>DeeplabV3+主要在模型的架构上引入了可任意控制编码器提取特征的分辨率，通过空洞卷积平衡精度和耗时。DeeplabV3+在 Encoder 部分引入了大量的空洞卷积，在不损失信息的情况下，加大了感受野，让每个卷积输出都包含较大范围的信息。其网络结构图如下所示。</p>
+<p><img src="https://img-blog.csdnimg.cn/6f485ace49b447789d89e9b5a3612fd8.png"><br>由图可以看到他是 Encoder-Decoder 网络结构。接下来我们主要分成 Encoder 和 Decoder 进行解析。<br>Input 经过骨干网络（backbone，也就是图中标注 DCNN Atrous Conv 的部分）得到两个输出：一个是 low-level feature，这是个 output=4x 的输出；另一个是高级特征，给 ASPP 的输出，这是个output=16x 的输出。<br>在 Encoder 中，高级特征经过 ASPP 的 5 个不同的操作得到 5 个输出，其中 1 个 1×1 卷积，3 个不同 rate 的 dillation conv，1 个 ImagePooling。这里要注意 ImagePooling 是全局平均池化之后再上采样到原来大小。这 5 个输出经过 concatenate 操作和 1×1 卷积得到 output stride=16x 的输出。使用<br>deeplabv3 作为编码器。网络中的空洞卷积提取特征，获取多尺度的上下文信息，同时替代了下采样，使输出的 feature map 的 output_stride=16。ASPP 模块使用了多个平行的空洞卷积，配合了图像级特征（即全局平均池化）。</p>
+<p>在这里 ， 一方面 encoder 输 出 的 feature(output_stride=16)经 过 双 线 性 上 采 样 4 倍 得 到FA(output_stride=4), 再取 encoder 中对应着相同分辨率(即 output_stride=4)的特征层，经过 1×1 卷积降通道，此时输出的 feature 记为 FBF。这里经过 1×1 卷积降通道，是因为此分辨率的特征通道较多(256<br>或 512)，而 FA 输出只有 256，故降通道以保持与 FA 所占比重，利于模型学习。将 FA 和 FB 做 concat，再经过一个 3×3 卷积细化 feature，最终再双线性上采样 4 倍得到预测结果。<br>另一方面，encode 主体部分，替换成深度扩张分离卷积网络。深度可分离卷积是把标准卷积分解成深度卷积(depthwise convolution)和逐点卷积(pointwise convolution)。深度卷积对每个通道独立使用空间卷积，逐点卷积用于结合深度卷积的输出。深度分离卷积可以大幅度降低参数量和计算量。<br>deeplabv3+将扩张卷积和深度分离卷积结合到一起，即扩张分离卷积。扩张分离卷积能够显著的减少模型的计算复杂度并维持相似的表现， 如下图：</p>
+<p><img src="https://img-blog.csdnimg.cn/dc183a96f2c94aea85d45b54aea36653.png"><br>在 Decoder 中，两个输入分别操作：low-level featur 经过 1x1 卷积调整维度（output stride=4x），论文 4.1 节介绍实验结果表明 low-level feature 调整到 48 channels 时效果最好；Encoder 输出上采样 4倍（output stride 从 16x 变为 4x）。将两个 4x 特征 concatenate，后面接一些 3×3 卷积，再上采样 4 倍得到 Dense Prediction。论文 4.1 节介绍实验结果表明 decoder 两个 4x 输出特征 concatenate，后面接2 个 out_channels=256 的 3x3 卷积，输出效果较好，可采用这种设计。Decoder 里面所有的 Upsample都是用双线性差值。得到最终的有效特征层后，利用一个 1x1 卷积进行通道调整，调整到 Num_Classes；然后利用resize 进行上采样使得最终输出层，宽高和输入图片一样。</p>
+<h1 id="4-模型训练"><a href="#4-模型训练" class="headerlink" title="4. 模型训练"></a>4. 模型训练</h1><h2 id="4-1-训练环境"><a href="#4-1-训练环境" class="headerlink" title="4.1 训练环境"></a>4.1 训练环境</h2><p>本文中涉及程序在 matlab 中实现。下表所示为运行环境的配置。</p>
+<p><img src="https://img-blog.csdnimg.cn/5ad01a79537c4a0b8220d66bdb400ad9.png"></p>
+<h2 id="4-2-超参数设置"><a href="#4-2-超参数设置" class="headerlink" title="4.2 超参数设置"></a>4.2 超参数设置</h2><p>因为需要足够大且含有人工标定标签的训练样本来训练网络，我们选择使用迁移学习来训练神经网络。选择 mobilenetv2 作为图像特征选取网络，因为该模型使用 ImageNet 数据集进行预训练，将该模型的参数作为初始化参数。迁移学习能提高训练的效率。本实验采用微调的方法，即把预训<br>练好的模型用于数据，使参数适应自己的数据集。<br>在训练过程中，批处理大小为 1，根据图像大小，定义网络输入大小为 256x256x3。选择 adam优化器，其具有实现简单、计算高效、对内存需求少并且其参数的更新不受梯度的伸缩变换影响的优点。而且我们发现其超参数具有很好的解释性，且通常无需调整或仅需很少的微调。将初始学习率设置为 1e-3，同时设置根据迭代的代数自动调整学习率，每 20 代学习率降低 0.4。选择 L2 范数作为损失函数进行正则化，保持较小的权重，防止模型过拟合。L2 正则化因子设置为 0.005。训练集最大得带次数为 40 次，每次训练迭代的最小批次为 8，在每个训练时期前都将数据进行重新排序。将测试集数据作为训练期间用于验证的数据，同时验证指标评估的迭代 2 次。</p>
+<h2 id="4-3-训练过程"><a href="#4-3-训练过程" class="headerlink" title="4.3 训练过程"></a>4.3 训练过程</h2><p><img src="https://img-blog.csdnimg.cn/b38800ee8f4a4d85adeeb37e3ed7740e.png"></p>
+<h1 id="5-模型测试与结果分析"><a href="#5-模型测试与结果分析" class="headerlink" title="5. 模型测试与结果分析"></a>5. 模型测试与结果分析</h1><h2 id="5-1-模型测试"><a href="#5-1-模型测试" class="headerlink" title="5.1 模型测试"></a>5.1 模型测试</h2><p><img src="https://img-blog.csdnimg.cn/0bfdc32d55ae4180b4a599c714419d32.png"><br><img src="https://img-blog.csdnimg.cn/077a4234208a41d8b31a9a77996a0c70.png"><br><img src="https://img-blog.csdnimg.cn/d092039c2d22455796ed5ec243fb561a.png"><br><img src="https://img-blog.csdnimg.cn/7ab7ee3370ff4d64bf09cb8ff72d9320.png"><br><img src="https://img-blog.csdnimg.cn/1c6eea866e764d71b007eefd7013bf21.png"><br>选取了 5 张测试图使用网络测试，结果如上。可以发现，对比之前浅色区域识别不佳的情况，在增加训练集数量后，明显提高了识别度。然而，仍有将白色建筑错误识别成云的情况，因此在后续的过程中，可以将云的块状特征以及不规则特征进行提取，将形状规则的、体积较小的白色建筑物在识别过程中剔除。<br>观察训练网络的过程，开始准确度上升极快，到后期准确度几乎不发生变化，甚至有降低，因此可以降低迭代的次数，来进行更多参数的测试。</p>
+<h1 id="6-总结与展望"><a href="#6-总结与展望" class="headerlink" title="6. 总结与展望"></a>6. 总结与展望</h1><p>通过阅读文献与相关资料，我们对卫星云图分割的研究内容及其研究现状有了一定的了解。云图分割是地基云图云系处理过程中非常重要的环节，在实际生活中得到非常广泛的应用。云图分割效果好坏直接影响对图像的进一步分析、识别以及分类的有效性和准确性，因此具有非常重要的意义。<br>通过对地基云图特点的分析，以及对各种分割算法特点的了解，提出了一种基于 DeepLabv3+模型的地基云图分割算法，由于受到各方面因素的影响，使图像的质量好坏不一以及图像本身复杂度增大，使得很难有一种适用于所有地基云图的分割方法，因此对地基云图的分割方法的研究还有很长的路要走。<br>此次研究报告我们选择通过 DeepLabv3+模型对地基云图云系进行语义分割，并搭建了Encoder-Decoder 网络结构使用迁移学习来训练神经网络，在研究过程中调整超参数的二设置来使模型训练达到最好效果，例如 mobilenetv2 作为图像特征，选择 adam 优化器，找到最好的学习率等等。<br>本文只是对地基云图分割的基本内容进行了一些简单的尝试，由于图像分割所涉及的研究内容很广泛，分割方法也是多种多样，受到水平和时间的限制，本文所研究的工作还有很多不足之处，还需要进一步深入研究。</p>
+<h1 id="7-参考文献"><a href="#7-参考文献" class="headerlink" title="7. 参考文献"></a>7. 参考文献</h1><p>[1]刘普. 基于深度学习的地基云图分类与分割研究[D].南京信息工程大学,2020</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://blogzjh.github.io/2022/07/17/%E6%B0%94%E8%B1%A1cv-%E5%9C%B0%E5%9F%BA%E4%BA%91%E5%9B%BE%E4%BA%91%E7%B3%BB%E5%88%86%E5%89%B2/" data-id="cl8wv0v31002p1gtaaaeuheyw" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-支持向量机枣类遗传的回归预测" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2022/07/17/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA%E6%9E%A3%E7%B1%BB%E9%81%97%E4%BC%A0%E7%9A%84%E5%9B%9E%E5%BD%92%E9%A2%84%E6%B5%8B/" class="article-date">
+  <time datetime="2022-07-17T03:47:04.000Z" itemprop="datePublished">2022-07-17</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2022/07/17/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA%E6%9E%A3%E7%B1%BB%E9%81%97%E4%BC%A0%E7%9A%84%E5%9B%9E%E5%BD%92%E9%A2%84%E6%B5%8B/">支持向量机枣类遗传的回归预测</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <pre><code>import numpy as np
+import pandas as pd
+from lazypredict.Supervised import LazyClassifier
+from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from sklearn.svm import LinearSVC
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# 读取数据集
+raw=pd.read_csv(r&#39;code/水果数据集.csv&#39;)
+# 使用sklearn的编码器，将Class文本类型标签转换为数值类型
+label_encoder=LabelEncoder()
+encoded=pd.DataFrame(label_encoder.fit_transform(raw[&#39;Class&#39;]), columns=[&#39;Encoded&#39;])
+# 复制一份数据集，将编码后的列数据合并
+df_encoded=raw.copy()
+df_encoded=pd.concat([df_encoded, encoded], axis=1)
+# 对空数据进行补全
+df_encoded[&#39;Encoded&#39;].fillna(0, inplace=True)
+df_encoded.drop(columns=[&#39;Class&#39;], axis=1, inplace=True)
+# 自变量和因变量赋值
+x=df_encoded.drop([&#39;Encoded&#39;], axis=1)
+y=df_encoded[&#39;Encoded&#39;]
+# 使用标准归一化方法将数据归一化
+SS=StandardScaler()
+x=SS.fit_transform(x)
+# 划分训练集与测试集，划分比例为6：4
+x_train,x_test,y_train,y_test =train_test_split(x,y,test_size=0.4, random_state=0)
+# 使用机器学习包选取最优的预测模型
+clf = LazyClassifier(predictions=True)
+models, predictions = clf.fit(x_train, x_test, y_train, y_test)
+print(models)
+print(predictions) # 可以看到最优的模型是LinearSVC模型
+</code></pre>
+<p>运行结果：<br><img src="https://img-blog.csdnimg.cn/f01ae9bb0c314550afd25f68994be86d.png"></p>
+<pre><code># 使用线性支持向量机
+svc = LinearSVC()
+# 拟合数据
+svc.fit(x_train,y_train)
+y_pre=svc.predict(x_test)
+# 生成预测报告
+print(classification_report(y_test,y_pre))
+# 生成混淆矩阵
+sns.heatmap(confusion_matrix(y_test,y_pre),annot=True,cmap=&#39;YlGnBu_r&#39;)
+plt.show()
+</code></pre>
+<p>运行结果：<br><img src="https://img-blog.csdnimg.cn/724cbaf9fd334370a5ba84004e7365e9.png"><br>混淆矩阵：<br><img src="https://img-blog.csdnimg.cn/6c0bdfe3a13c43499fef9f2e7c038c2a.png"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://blogzjh.github.io/2022/07/17/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA%E6%9E%A3%E7%B1%BB%E9%81%97%E4%BC%A0%E7%9A%84%E5%9B%9E%E5%BD%92%E9%A2%84%E6%B5%8B/" data-id="cl8wv0v2z002j1gta7p87g23u" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-气象大数据分析" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2022/07/17/%E6%B0%94%E8%B1%A1%E5%A4%A7%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/" class="article-date">
+  <time datetime="2022-07-17T03:44:44.000Z" itemprop="datePublished">2022-07-17</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2022/07/17/%E6%B0%94%E8%B1%A1%E5%A4%A7%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/">气象大数据分析</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h1><p>降水情况的预测对城市管理、居民生活都有巨大影响。本文利用逻辑回归、支持向量机、决策树分类、随机森林四种方法对洛杉矶的天气进行预测，并对这几种方法的预测准确度进行比较。<br><strong>关键词</strong>  回归预测；逻辑回归；支持向量机；决策树分类；随机森林      </p>
+<h1 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract:"></a>Abstract:</h1><p>The forecast of precipitation had a huge impact on urban management, residents live. This paper, by us-ing logistic regression, support vector machines, decision tree classification, gaussian naive bayes, gradient in-creasing tree, random forests, XGBoost, CatBoost several methods to predict the weather of the Los Angeles, and prediction accuracy of these methods were compared.<br>Key words: Regression prediction; Logistic regression; SVM; decision tree classification; Random forests</p>
+<p>  目前降水季节趋势预报主要分为统计学、动力学和动力统计相结合三类方法。统计方法充分利用历史资料规律，选取有明确物理意义和显著相关的因子进行建模。但由于各预测因子相互作用过程复杂，不同时间尺度的预测信号不一致，加大了预测的难度。随着数值模式的发展，动力模式成为气候预测的主要工具，许多国家建立了数值预报模式。近年来，我国季节预测模式对大气环流、ENSO(El Niňo-Southern Oscillation)现象、亚洲夏季风等的预测能力已有明显提升,但对降水预测技巧依然有限，特别是对东亚地区夏季降水的预报技巧相对较低。<br>  机器学习强调从历史数据中学习规则，对新数据进行推理和预测。区别于传统统计方法，机器学习擅长处理非线性问题，利用机器学习的优势可以从地球系统中发现并提取新的相互关联信号(贺圣平等，2021)。近年来，机器学习在气象领域的应用越来越广泛，常用的机器学习算法有支持向量机、贝叶斯算法、神经网络、决策树算法等。随着计算能力的提高和深度学习理论的发展，以卷积神经网络(Convolutional Neural Networks, CNN)和长短期时间记忆网络(Long Short-Term Memory, LSTM)为代表的深度学习方法在气候领域得到应用。<br>  洛杉矶降水时空分布不均，影响因子复杂，当前对其机理和预测的研究还存在短板，动力模式预测水平与业务服务需求存在差距，有必要利用机器学习的优势进一步提高当地预测水平。本文采用逻辑回归、支持向量机、决策树分类、高斯朴素贝叶斯、梯度提升树、随机森林、XGBoost、CatBoost，建立适用于洛杉矶的降水统计预测方法。</p>
+<h1 id="1-资料和方法"><a href="#1-资料和方法" class="headerlink" title="1 资料和方法"></a>1 资料和方法</h1><h2 id="1-1-数据介绍"><a href="#1-1-数据介绍" class="headerlink" title="1.1 数据介绍"></a>1.1 数据介绍</h2><p>数据来源kaggle的[Precipitation Prediction in LA] 。<br>本次处理的天气数据有如下特征：<br>PRCP = 降水量（十分之一毫米）<br>TMAX = 最高温度（十分之一摄氏度）<br>TMIN = 最低温度（十分之一摄氏度）<br>PGTM = 阵风高峰时间（小时和分钟，即 HHMM）<br>AWND = 每日平均风速（每秒十分之一米）<br>TAVG = 平均温度（十摄氏度）<br>WDFx = 最快 x 分风向（度）<br>WSFx = 最快 x 分钟风速（每秒十分之一米）<br>WT = 天气类型 </p>
+<h2 id="1-2-数据预处理"><a href="#1-2-数据预处理" class="headerlink" title="1.2 数据预处理"></a>1.2 数据预处理</h2><p>使用pandas框架导入数据并对其进行进一步分析。<br>使用seaborn库将数据分析的结果进行可视化。<br>首先处理PRCR列（目标列），降雨量为0的不下雨情况标记为标签0，降雨量不为0的下雨情况标记为标签1，处理后发现不下雨的天数过多，柱状图可视化天数后如图1-1</p>
+<p><img src="https://img-blog.csdnimg.cn/b15a5402a48947fa931a5571ba20127e.png" alt="图1-1  0为不下雨，1为下雨，纵轴为天数计数"><br>清楚地看到，降水发生时的样本数量远小于降水不发生的情况。因此，存在阶级失衡，于是采用smote方法对数据过采样，增多下雨天数来平衡不下雨和下雨的计数。<br>通过热力图检查缺失值发现，缺失值很多，如图1-2：<br><img src="https://img-blog.csdnimg.cn/2e9d4389e54345db945cf52998fc3945.png" alt="图 1-2  热力图"><br>根据热力图看出，白色的部分是缺失值，由此可知，PGTM和TAVG属性空值过多，应当删除，其余属性的空值使用缺失值处理。</p>
+<p>在数据中，站点名和地区名相同，因此对实验的预测没有影响，可以删除此两列，此外，此次分析的气象数据不具有季节性，所以是否下雨与日期值无关，所以删除此列。<br>将缺失值标记为NA，再使用众数进行填补，最后删除重复值，对处理后的数据使用热力图进行检查：<br><img src="https://img-blog.csdnimg.cn/38918d16034f49dda2b8c89db6bc509c.png" alt="图 1-3  热力图"></p>
+<h1 id="2-特征选择和数据规范化"><a href="#2-特征选择和数据规范化" class="headerlink" title="2 特征选择和数据规范化"></a>2 特征选择和数据规范化</h1><p>基本方法是使用卡方检验进行特征选择和使用 MinMaxScaler 对数据进行规范化。</p>
+<h2 id="2-1-特征选择"><a href="#2-1-特征选择" class="headerlink" title="2.1 特征选择"></a>2.1 特征选择</h2><p>卡方检验介绍：<br>基本思想：根据样本数据推断总体分布与期望分布是否有显著性差异，或者推断两个分类变量是否相关或者独立。<br>一般可以设原假设为：察频数与期望频数没有差异，或者两个变量相互独立不相关。<br>实际应用中，我们先假设原假设成立，计算出卡方值，卡方表示观察值与理论值间的偏离程度。</p>
+<p>通过卡方检验进行特征选择，其中p-value值依据不同特征进行可视化：<br><img src="https://img-blog.csdnimg.cn/1309a8d811f643bf8be3345cfef3f2ce.png" alt="图 2-1  p-value值可视化"></p>
+<p>由于WT02具有高p_value值(显著&gt;0.05)，因此表示此变量与PRCP无关，可以不用考虑用于模型训练，并删除特征’WT02’。</p>
+<h2 id="2-2-归一化"><a href="#2-2-归一化" class="headerlink" title="2.2 归一化"></a>2.2 归一化</h2><p>归一化是指将数据集中的要素设置比例。此实验中随机划分x和y的训练集和测试集，对训练集里面样本数量较少的类别（PRCP=1）进行过采样，合成新的样本来缓解类不平衡。并且将数据映射到[0~1]的区间。</p>
+<h1 id="3-不同模型的实现"><a href="#3-不同模型的实现" class="headerlink" title="3 不同模型的实现"></a>3 不同模型的实现</h1><h2 id="3-1-逻辑回归"><a href="#3-1-逻辑回归" class="headerlink" title="3.1 逻辑回归"></a>3.1 逻辑回归</h2><h3 id="3-1-1-原理"><a href="#3-1-1-原理" class="headerlink" title="3.1.1 原理"></a>3.1.1 原理</h3><p>对率回归属于监督学习。在对率回归分类器中，先输入样本和对应的标签，对率回归就是根据样本的特征值，把样本映射为 区间中的一个值（以下称这个值为回归值），在根据回归值的大小进行分类。本次二分类任务是把回归值在 区间中的样本归为标签为0的类，回归值在 中的样本归为标签为1的类。<br>下面给出具体的数学原理解释：<br>假设一组样本具有n维的属性，且属性值 与回归值之间满足线性关系：<br><img src="https://img-blog.csdnimg.cn/34debef3003042848cb49d6edc59c7b7.png"><br><img src="https://img-blog.csdnimg.cn/aeefe07da04349608fd563be423bc587.png" alt="word复制粘贴没公式了~"><br>这就是常见的Logistic模型表达式，X是自变量，p是因变量的函数图像如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/4a1185d9c9eb43589158d16b51ea6a73.png" alt="图 3-1"><br>可见，在二分类任务中，当对每一个输入特征 都给定一个权值 ，对特征值进行加权，再通过logistic模型(1-1)得到<br>样本属于1类别的概率：<br><img src="https://img-blog.csdnimg.cn/004bf18e22414b8a9b7237c6cdd5d7a1.png"></p>
+<h3 id="3-1-2-实验结果"><a href="#3-1-2-实验结果" class="headerlink" title="3.1.2 实验结果"></a>3.1.2 实验结果</h3><p>偏置值为51.8，惩罚值为12，ROC_AUC得分为0.97，两类错误矩阵及其可视化如下：<br><img src="https://img-blog.csdnimg.cn/8f37bccf5dad4732850e4d3547e4532e.png"><br><img src="https://img-blog.csdnimg.cn/00e1de1f15dc447189e0621c7b42d558.png"></p>
+<h2 id="3-2-支持向量机"><a href="#3-2-支持向量机" class="headerlink" title="3.2 支持向量机"></a>3.2 支持向量机</h2><h3 id="3-2-1-原理"><a href="#3-2-1-原理" class="headerlink" title="3.2.1 原理"></a>3.2.1 原理</h3><p>支持向量机 (SVM)是一组用于分类、 回归和异常值检测的监督学习方法。<br>支持向量机的优点是：</p>
+<ul>
+<li>   在高维空间中有效。</li>
+<li>   在维度数大于样本数的情况下仍然有效。</li>
+<li>   在决策函数中使用训练点的子集（称为支持向量），因此它也具有内存效率。</li>
+<li>   通用性：可以为决策函数指定不同的内核函数提供了通用内核，但也可以指定自定义内核。</li>
+</ul>
+<p>支持向量机的缺点包括：</p>
+<ul>
+<li>   如果特征数量远大于样本数量，在选择核函数时避免过度拟合，正则化项至关重要。</li>
+<li>   SVM 不直接提供概率估计，这些是使用昂贵的五折交叉验证计算的（参见下面的分数和概率）。</li>
+</ul>
+<p>SVM学习的基本想法是求解能够正确划分训练数据集（下图中实心黑点与空心点）并且几何间隔最大的分离超平面。如下图所示， w·x+b=0即为分离超平面作为决策边界，对于线性可分的数据集来说，这样的超平面有无穷多个（即感知机），但是几何间隔最大的分离超平面却是唯一的。<br><img src="https://img-blog.csdnimg.cn/185ac387b50d43379a9bdcd73807fb3a.png" alt="图3-3 SVM可视化解释"><br>在几何中，超平面是一个空间的子空间，它是维度比所在空间小一维的空间。 如果数据空间本身是三维的，则其超平面是二维平面，而如果数据空间本身是二维的，则其超平面是一维的直线。在二分类问题中，如果一个超平面能够将数据划分为两个集合，其中每个集合中包含单独的一个类别，我们就说这个超平面是数据的“决策边界“。<br>SVM目标是”找出边际最大的决策边界”，听起来是一个十分熟悉的表达，这是一个最优化问题，而最优化问题往往和损失函数联系在一起。和逻辑回归中的过程一样，SVM也是通过最小化损失函数来求解一个用于后续模型使用的重要信息：决策边界。<br>这里梳理一下这整个过程：<br><img src="https://img-blog.csdnimg.cn/3309f69df7974fae97d5a521fe0c2882.png"></p>
+<h3 id="3-2-2-实验结果"><a href="#3-2-2-实验结果" class="headerlink" title="3.2.2 实验结果"></a>3.2.2 实验结果</h3><p>支持向量机最优参数：惩罚系数C=100，选择kernel=rbf，gamma=1<br>ROC_AUC得分为0.95<br>两类错误矩阵及其可视化如下：<br><img src="https://img-blog.csdnimg.cn/9d8ba90c358148018056fce138898cbb.png"><br><img src="https://img-blog.csdnimg.cn/adbafaf756e949a7b08068d0114dc2f7.png"></p>
+<h2 id="3-3-决策树分类"><a href="#3-3-决策树分类" class="headerlink" title="3.3 决策树分类"></a>3.3 决策树分类</h2><h3 id="3-3-1-原理"><a href="#3-3-1-原理" class="headerlink" title="3.3.1 原理"></a>3.3.1 原理</h3><p>决策树(Decision Tree)是在已知各种情况发生概率的基础上，通过构建决策树来 进行分析的一种方式，是一种直观应用概率分析的一种图解法；决策树是一种预 测模型，代表的是对象属性与对象值之间的映射关系；决策树是一种树形结构， 其中每个内部节点表示一个属性的测试，每个分支表示一个测试输出，每个叶节 点代表一种类别；决策树是一种非常常用的有监督的分类算法。<br>决策树的决策过程就是从根节点开始，测试待分类项中对应的特征属性，并按照 其值选择输出分支，直到叶子节点，将叶子节点的存放的类别作为决策结果。<br>决策树分为两大类：分类树和回归树，前者用于分类标签值，后者用于预测连续值，常用算法有ID3、C4.5、CART等<br>构建步骤如下：</p>
+<ul>
+<li>   将所有的特征看成一个一个的节点；</li>
+<li>   遍历每个特征的每一种分割方式，找到最好的分割点；将数据划分为不同的子节点，eg： N1、N2…； 计算之后所有子节点的’纯度’信息；</li>
+<li>   对第二步产生的分割，选择出最优的特征以及最优的划分方式；得出最终的子节点: N1、N2…Nm</li>
+<li>   对子节点N1、N2…Nm分别继续执行2-3步，直到每个最终的子节点都足够’纯’。</li>
+</ul>
+<p>决策树特征属性类型</p>
+<ul>
+<li>   属性是离散值，而且不要求生成的是二叉决策树，此时一个属性就是一个分支</li>
+<li>   属性是离散值，而且要求生成的是二叉决策树，此时使用属性划分的子集进行测试，按照 “属于此子集”和“不属于此子集”分成两个分支</li>
+<li>   属性是连续值，可以确定一个值作为分裂点split_point，按照&gt;split_point和 &lt;=split_point生成两个分支<h3 id="3-3-2-实验结果"><a href="#3-3-2-实验结果" class="headerlink" title="3.3.2 实验结果"></a>3.3.2 实验结果</h3>两类错误矩阵及其可视化如下：ROC_AUC=0.81<br><img src="https://img-blog.csdnimg.cn/75de8e18c0d3499da2fb5a7adb72885a.png"><br><img src="https://img-blog.csdnimg.cn/c761115217af4234b556ed6103508a4b.png"></li>
+</ul>
+<h2 id="3-4-随机森林"><a href="#3-4-随机森林" class="headerlink" title="3.4 随机森林"></a>3.4 随机森林</h2><h3 id="3-4-1-原理"><a href="#3-4-1-原理" class="headerlink" title="3.4.1 原理"></a>3.4.1 原理</h3><p>随机森林算法是由Breiman于2001年提出的一种基于Bagging重复采样技术，将多棵决策树进行组合的方法。该方法由随机向量θ构成一个组合模型：{h(X,θi),i=1,…,k}，θ服从独立同分布，X为自变量，k为决策树的数量。一般按照8:2的比例将原始数据集分为训练集和测试集，在训练集中建立随机森林模型，对特征变量重要性进行分析，在测试集中对模型评估效果进行检验。<br>随机森林模型对于数据的容忍度较强，并且可以很好地处理存在异常值和缺失值的数据。在对特征变量进行重要性程度分析时，区别于线性回归模型，随机森林算法具有分类速度快、抗噪音能力强、不会出现过度拟合、不需对函数形式进行事先假定等优点。模型会选择一个噪声随机加入特征变量中，并观察结果是否会出现差异，通过比较方差大小来判断是否存在差异，并确定该变量的重要性程度。<br>随机森林包含分类和回归两种技术，本文研究的保值率影响因素问题属于回归预测问题。回归的基本思路是：<br>(1）在n个原始样本数据基础上，应用bootstrap有放回地随机抽取K个自助样本集，并以此构建K棵回归树，每次抽样时未被抽到的样本又组成K个袋外数据，组成随机森林的测试样本；<br>(2）假设原始数据变量个数为N，在每棵回归树的每个节点处随机抽取mtry个变量作为备选分支变量，然后根据最优分支原则选取最优分支数。同时由于树可以最大化地生长，因此无需采取剪枝操作；</p>
+<h3 id="3-4-2-实验结果"><a href="#3-4-2-实验结果" class="headerlink" title="3.4.2 实验结果"></a>3.4.2 实验结果</h3><p>准确率为95.62%，两类错误矩阵及其可视化如下：<br><img src="https://img-blog.csdnimg.cn/0f130e60235b429c80bc5c34bad7885d.png"><br>AUC值为0.95427，结果可视化如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/fad6f11b67a1412bb9d5504fdee69c5e.png"></p>
+<h1 id="4-模型比较"><a href="#4-模型比较" class="headerlink" title="4 模型比较"></a>4 模型比较</h1><p>模型的MLA Train Accuracy、MLA Test Accuracy、MLA Precission、MLA Recall、MLA AUC比较如下表：<br><img src="https://img-blog.csdnimg.cn/9f7386a1ddaf4778993ce5e26f3bde35.png"></p>
+<h1 id="5-结论"><a href="#5-结论" class="headerlink" title="5 结论"></a>5 结论</h1><p>天气数据最常见的问题是数据的缺失和异常，所以在数据的处理上要采用合适的方法。从预测结果来看，LR测试集极低的准确度可以看出天气特征随是否降雨呈非线性关系。并且从社会意义上来看，降雨预测的高准确率可以对城市的管理及居民的生活产生极大的效益。传统的天气预报方法已经发展的很完善，在短时间内很难有质的飞跃，数值预报技术是气象预报工作中重要的预报方式，但该技术的运行速度和预报准确率都有待提高，且还存在着一些弱点和问题需要解决。近年来，机器学习方法在很多领域中得到广泛使用，且在诸多方面取得了突破性的进展，但是有些理论和方法不够完善，需要进一步探索出更有实效性的机器学习方法来提高天气预报能力。这些机器学习方法也被应用于临近预报中。<br>由于不同的机器学习方法的构建方式不同，运算机理也不同，临近预报结果的好坏很大程度上依赖于机器学习方法本身及初始参数的设定，这些都增加使用不同机器学习方法临近预报时的不确定性。目前本文的研究仅针对是否降雨使用不同的机器学习方法进行临近降雨预报及不同预报方法之间的预报效果比较，还有更多的问题需要研究和探索。<br>机器学习方法还处于不断发展的阶段，许多方法还未被挖掘使用，有些方法的理论也还不够完善。机器学习方法训练模型时各内部各参数的最优配置也因训练数据集的不同而发生变化，另外训练数据集的分布情况及数量等也影响机器学习方法临近预报的效果。如何提高临近预报的准确率、预报的质量，探究有效的适应复杂气象数据特点的预报方法都是今后还需要深入研究的问题。</p>
+<h1 id="参考文献（References）"><a href="#参考文献（References）" class="headerlink" title="参考文献（References）"></a>参考文献（References）</h1><p>[1]陈明轩,俞小鼎,等.对流天气临近预报技术的发展与研究进展[J.应用气象学报,200415(6):754-766<br>[2]Eilts M D,Johnson J T,et al.Severe warning decision support system[J].18th Conf on severe local storms,Amer Meteor Soc,San Fransisco,CA,1996:536-540AA.<br>[3]Dixon M.TITAN:Thunderstorm identification,tracking,analysis,and nowcasting aradar-based methodolo-gy[J].Atoms Oceanic Technol,1993,8:467-476.<br>[4]Golding B W.Nimrod:A system for generating automated very short range forecasts [J]Meteor Appl,1998,5:1-16.<br>[5]Wilson J W,Ebert EE,Saxen T R,et al.Sydney 2000 forecast demonstration project:convective storm nowcast-ing[J].Weather and Forecasting,2004,19:131-150.<br>[6]Pierce C E,Collier C G,et al.GANDOLF:a system for generating automated now casts of convective precipita-tion[J].Meteor Appl,2000,7:341-360.<br>[7]陈云浩,史培军,李晓兵.不同热力背景对城市降雨(暴雨)的影响()一基于人工神经网络的集成预报模型[J.自然灾害学报,2001,10(3):26-31<br>[8]熊聪聪,王静,宋鹏,等.遗传算法在多模式集成天气预报中的应用[.天津科技大学学报,2008,23(4):80-84.<br>[9]吴清佳,张庆平,万健.遗传神经网络的智能天气预报系统[J.计算机工程,2005,31(14):176-177<br>[10]吴建生,金龙,汪灵枝.遗传算法进化设计BP神经网络气象预报建模研究[).热带气象学报,2006,22(4):411-416.<br>[11]陈永义,俞小鼎,等.处理非线性分类和回归问题的一种新方法(1)一支持向量机方法简[J.应用气象学报,2004,15(3):345-354<br>[12]冯汉中,陈永义.处理非线性分类和回归问题的一种新方法一支持向量机方法在天气预报中的应用[J).应用气象学报,2004,15(3):335-365.<br>[13]李智才,马文瑞.支持向量机在短期气候预测中的应用[J.气象,2016,32(5):58-60.<br>[14]熊秋芬,曾晓青.SVM方法在降水预报中的应用及改进[J.气象,2008,34(12):90-95.<br>[15]贺佳佳,陈劲松等.一种多时间尺度SVM局部短时临近降雨预测方法).气象,2017,43(4):402-412.</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://blogzjh.github.io/2022/07/17/%E6%B0%94%E8%B1%A1%E5%A4%A7%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/" data-id="cl8wv0v30002n1gta4d9r0a2o" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-卷积神经网络单图超分辨率的深度学习方法" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2022/07/17/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%8D%95%E5%9B%BE%E8%B6%85%E5%88%86%E8%BE%A8%E7%8E%87%E7%9A%84%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95/" class="article-date">
+  <time datetime="2022-07-17T03:33:07.000Z" itemprop="datePublished">2022-07-17</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2022/07/17/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%8D%95%E5%9B%BE%E8%B6%85%E5%88%86%E8%BE%A8%E7%8E%87%E7%9A%84%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95/">卷积神经网络单图超分辨率的深度学习方法</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h1><p>我们提出了一种用于单图像超分辨率（SR）的深度学习方法。 我们的方法直接学习低或高分辨率图像之间的端到端映射。 映射被表示为深度卷积神经网络（CNN），其将低分辨率图像作为输入和输出高分辨率。我们进一步表明，还可以将传统的稀疏编码的SR方法视为深卷积网络。 但与传统方法不同，这些方法单独处理每个组件，我们的方法都会共同优化所有层。 我们的深层卷积神经网络具有轻量级结构，但展示了最先进的恢复质量，并实现了实际在线使用的快速速度。 我们探索不同的网络结构和参数设置，以实现性能和速度之间的权衡。 此外，我们将网络扩展到同时应对三种颜色通道，并显示出更好的整体重建质量。</p>
+<h1 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h1><p>We propose a deep learning method for single image hyperresolution (SR). Our method directly learns end-to-end mapping between low- or high resolution images. The mapping is represented as a deep convolutional neural network (CNN), which uses low resolution images as input and output high resolution. We further show that<br>traditional sparsely encoded SR methods can also be regarded as deep convolutional networks. However, unlike traditional methods, these methods deal with each component separately, and our methods will jointly optimise all layers. Our deep convolutional neural network has a lightweight structure, but it shows the most advanced recovery quality and realises the fast speed of actual online use. We explore different network structures and parameter settings to realise the trade off between performance and speed. In addition, we have expanded the network to deal with three colour channels at the same time, and show a better overall reconstruction quality.</p>
+<p>目录<br>摘要    2<br>1.前言及研究背景    4<br>1.1图像的超分辨率问题    4<br>1.2传统方法    4<br>1.3 本报告提出的方法    5<br>1.4 优越性    5<br>2.实验过程    5<br>2.1实验方法    5<br>使用深卷积网络进行图像的超级分辨率（SRCNN）：    5<br>2.2 SRCNN的结构特性：    6<br>2.3论证稀疏编码表示在RSCNN中的可行性    7<br>2.4损失函数    8<br>3.实验结果    8<br>3.1调整参数    8<br>3.2评价指标：    9<br>3.3对颜色通道的实验结果：    9<br>4.实验结论    11</p>
+<h1 id="1-前言及研究背景"><a href="#1-前言及研究背景" class="headerlink" title="1.前言及研究背景"></a>1.前言及研究背景</h1><h2 id="1-1图像的超分辨率问题"><a href="#1-1图像的超分辨率问题" class="headerlink" title="1.1图像的超分辨率问题"></a>1.1图像的超分辨率问题</h2><p>图像分辨率指图像中存储的信息量，是每英寸图像内有多少个像素点，分辨率的单位为PPI(Pixels Per Inch)，通常叫做像素每英寸。一般情况下，图像分辨率越高，图像中包含的细节就越多，信息量也越大。图像分辨率分为空间分辨率和时间分辨率。通常，分辨率被表示成每一个方向上的像素数量，例如64*64的二维图像。但分辨率的高低其实并不等同于像素数量的多少，例如一个通过插值放大了5倍的图像并不表示它包含的细节增加了多少。图像超分辨率重建关注的是恢复图像中丢失的细节，即高频信息。 在大量的电子图像应用领域，人们经常期望得到高分辨率（简称HR）图像。但由于设备、传感器等原因，我们得到的图像往往是低分辨率图像（LR）。因此,将LR映射到HR的函数空间非常大,学习一个好的解是非常困难的。而且低分辨率图像往往缺失图像超分辨率最需要的高频信息和纹理特征,却包含大量的低频信息来阻碍超分辨率重建,导致图像超分辨率是一个极具挑战性的任务。近年来,深度学习方法在计算机视觉领域大放异彩,同时也给图像超分辨率提供了新的解决方案。【1】增加空间分辨率最直接的解决方法就是通过传感器制造技术减少像素尺寸（例如增加每单元面积的像素数量）；另外一个增加空间分辨率的方法是增加芯片的尺寸，从而增加图像的容量。因为很难提高大容量的偶合转换率，所以这种方法一般不认为是有效的，因此，引出了图像超分辨率技术。<br>针对深度卷积神经网络对特征信息利用不足的问题和基于像素损失的网络无法克服重建图像伪影和平滑的问题进行研究,对深度卷积神经网络的特定结构、网络模块、损失函数等进行分析,通过构建信息蒸馏和密集特征融合模块加强了网络内部信息的流动效率;引入改进的生成对抗网络来改善重建图像的伪影和过于平滑的问题。【2】<br>超分辨率问题本质是不适定的或者说欠定逆问题，也就是图像超分辨率的解是不唯一的。对于任何给定的低分辨率像素都存在多重解，所以对于这个问题通常用强先验信息约束解空间来缓解，为了学习强先验信息，主要有两种思路：<br>（1）利用同一图像的内部相似性；<br>（2）从外部低分辨率和高分辨率样例图片对中学习映射函数</p>
+<h2 id="1-2传统方法"><a href="#1-2传统方法" class="headerlink" title="1.2传统方法"></a>1.2传统方法</h2><p>传统基于稀疏编码的超分辨率方法是基于外部实例方法的一种方法，该方法流程如下：<br>（1）从输入图片中密集地进行采样形成大量的重叠的patches，并且对这些patch进行预处理（例如减去均值、标准化）；<br>（2）用一个低分辨率的字典对patches进行编码；<br>（3）稀疏系数被传递到一个高分辨率字典中，用来重构高分辨率的patches；<br>（4）将重叠的patches进行聚合（平均权重）产生最终的输出；</p>
+<h2 id="1-3-本报告提出的方法"><a href="#1-3-本报告提出的方法" class="headerlink" title="1.3 本报告提出的方法"></a>1.3 本报告提出的方法</h2><p>这篇课程设计报告的实验是基于2015年由何恺明博士、汤晓鸥教授等发表于TPAMI的关于图像超分辨率的一篇论文《Image Super-resolution Using Deep Convolutional Networks (SRCNN)》，同时也是世界上较早的将深度学习应用在图像超分辨率的工作【3】，文中提出了一种用于单图像超分辨率的三层卷积网络，即SRCNN来实现图像的超分辨率的深度学习方法，相较于传统的基于稀疏表示的字典学习方法，一定程度上提升了图像重建的质量。</p>
+<h2 id="1-4-优越性"><a href="#1-4-优越性" class="headerlink" title="1.4 优越性"></a>1.4 优越性</h2><p>针对低分辨率图像在预处理时使用双三次插值导致图像丢失一些重要的高频纹理细节以及网络模型优化问题,文章提出了连分式插值结合卷积神经网络的超分辨率重建方法。在原有的轻量级基于卷积神经网络的超分辨率重建算法（super-resolution convolutional neural net work, SRCNN）网络模型基础上,首先采用Newton-Thiele型连分式插值函数将低分辨率图像插值到目标尺寸;然后利用3个卷积层进行图像特征提取、非线性映射、重建与优化;该文在网络收敛时利用Radam优化算法自适应地调整梯度,并且采用余弦衰减法逐渐降低学习率。实验结果表明,该网络模型能够在轻量级的卷积神经网络下获得更丰富的纹理细节和更清晰的图像边缘。 【4】<br>与稀疏编码表示的方法相比，SRCNN有诸多优点：<br>①SRCNN没有显式地学习用于modeling the patch space的dictionaries或manifolds，而是通过隐藏层隐式实现的。<br>②patch的提取和聚合也被表示为卷积层，因此也被包含在了优化过程中。<br>③完全是通过学习获得的，几乎没有预处理或后处理。<br>④结构简单而且准确率还比一些基于实例的先进方法的高；<br>⑤有合适的卷积核数和层数，即便使用CPU，也能有很快的速度；<br>⑥SRCNN是完全前馈的网络，在使用中不需要解决任何优化问题，因此要快于其他基于实例的方法；<br>⑦当数据集更大、更多样化或者模型更大、更深时，网络的恢复质量可以进一步提高；<br>⑧SRCNN可以同时处理彩色图像的三通道，提高了超分辨率性能</p>
+<h1 id="2-实验过程"><a href="#2-实验过程" class="headerlink" title="2.实验过程"></a>2.实验过程</h1><h2 id="2-1实验方法"><a href="#2-1实验方法" class="headerlink" title="2.1实验方法"></a>2.1实验方法</h2><p>使用深卷积网络进行图像的超级分辨率（SRCNN）：<br>简单来讲，SRCNN的原理可以概括为：直接学习低/高分辨率图像之间的端到端映射。 这一映射被表示为深度卷积神经网络（CNN），其将低分辨率图像作为输入，经映射后输出高分辨率图形，达到了很好的效果，同时证明了传统基于稀疏编码的SR方法也可以看作是一个深度卷积网络。其区别在于，传统方法是分别处理每个组件，而SRCNN则是联合优化所有层。SRCNN网络问世后,它在图像超分辨重建的应用使得深度学习在图像处理领域得到扩展。2014年,深度学习模型SRCNN一经提出,为深度学习解决图像压缩领域的像素问题开创了新纪元。【5】</p>
+<p><img src="https://img-blog.csdnimg.cn/d6f664b731e942f68e464da586d23829.png" alt="图1 论文中展示的三种方法效果比较"><br><img src="https://img-blog.csdnimg.cn/6d16c36c60a84707b52124b535d30fd4.png" alt="图2 用demo code复现进行图片测试SRCNN的超分辨率效果"></p>
+<h2 id="2-2-SRCNN的结构特性："><a href="#2-2-SRCNN的结构特性：" class="headerlink" title="2.2 SRCNN的结构特性："></a>2.2 SRCNN的结构特性：</h2><p>SRCNN具有三层网络结构，在具有轻量结构的同时，还具有最先进的恢复质量，并实现了快速的在线使用，作者在论文中探索了不同的网络结构和参数设置，以实现性能和速度之间的权衡。从处理过程来看，SRCNN可以同时处理RGB三个颜色通道，从而表现出更好的整体重建质量。<br><img src="https://img-blog.csdnimg.cn/92c13c1bf2274db7a5759b18ccea5bf5.png" alt="图3 SRCNN的三层网络结构图解"></p>
+<ul>
+<li><p>第一卷积层：提取一组特征映射<img src="https://img-blog.csdnimg.cn/363154deb0e54a16b083f89aee64e2a7.png"><br>W1表示为滤波器，B1表示为偏差；</p>
+</li>
+<li><p>第二卷积层：映射这些特征非线性地映射到高分辨率表示<img src="https://img-blog.csdnimg.cn/8daf3bbc7de1444ab954b4b0148444dd.png"></p>
+</li>
+<li><p>第三卷积层：结合了空间邻域内的预测重建，以产生最终的高分辨率图像<img src="https://img-blog.csdnimg.cn/40545e99569d4c94aeaac35694a7ae64.png"><br>W3是一组线性滤波器</p>
+</li>
+</ul>
+<h2 id="2-3论证稀疏编码表示在RSCNN中的可行性"><a href="#2-3论证稀疏编码表示在RSCNN中的可行性" class="headerlink" title="2.3论证稀疏编码表示在RSCNN中的可行性"></a>2.3论证稀疏编码表示在RSCNN中的可行性</h2><p><img src="https://img-blog.csdnimg.cn/9ae717db7900475b8e91774846c4bbea.png" alt="图4 基于稀疏编码的方法的例证在卷积神经网络的视图中"><br>①左半部分：可以看作是把f1×f1低分辨率的patch看成是从输入图片提取出来的，稀疏编码将patch投影到一个字典上，如果这个字典的大小为n1，那么相当于在输入图片上使用n1个大小f1×f1的卷积核进行卷积运算。<br>②中间部分：稀疏编码会迭代的处理n1维度的向量，从而得到一个n2维度的向量，一般来说n1、n2是相等的，这个时候稀疏编码求解程序起的作用就是一个大小为1×1的非线性映射运算符。<br>③右半部分：最后再对n2维度的向量投影到另一个字典空间目的是产生高分辨率的patch，重叠部分的patch会进行平均操作。</p>
+<h2 id="2-4损失函数"><a href="#2-4损失函数" class="headerlink" title="2.4损失函数"></a>2.4损失函数</h2><p>SRCNN模型的参数有：W1, W2, W3, B1, B2, B3。给定一组高分辨率图片Xi以及对应低分辨率图片Yi，我们使用均方误差MSE（mean squared error）作为损失函数。设为：<img src="https://img-blog.csdnimg.cn/b0901c59b07c40368942b9b1faed0a91.png"><br>其中n是训练样本的数量。<br>损失函数使用随机梯度下降进行优化<br><img src="https://img-blog.csdnimg.cn/8a6539ed46284c5abeaa26324d103740.png"><br>其中的l∈{1，2，3}，i是层和迭代的索引，每层的卷积核权重都由均值为0标准差为0.001的高斯分布进行初始化，每层偏置都初始化为0，η是学习率，前两层的学习率为10^-4 ，最后一层的学习率为10^-5，尤其最后一层使用小的学习率对SRCNN的收敛性能影响较大。</p>
+<p>可见，四层网络收敛的比三层的慢，但若有足够的训练时间，四层网络最终也能赶上三层的网络。论文中实验表明网络并不是越深越好，当使用越深的网络（例如四层或五层的网络），我们发现很难去设置一个合适的学习率来确保网络收敛，即使模型收敛了，也可能陷入一个不好的局部最小值，并且经过足够的训练时间，已学习的卷积核的多样性会变少。而且在图像分类领域，不适当的增加模型深度也会使得准确率的下降或退化。</p>
+<h1 id="3-实验结果"><a href="#3-实验结果" class="headerlink" title="3.实验结果"></a>3.实验结果</h1><h2 id="3-1调整参数"><a href="#3-1调整参数" class="headerlink" title="3.1调整参数"></a>3.1调整参数</h2><p>为了平衡性能和速度，我们的方法选用了f1=9, f2=5, f3=5, n1=64, n2=32,并且在ImageNet上进行训练。并且对每个放大系数∈{2, 3, 4}，都分别训练了一个相应的网络。</p>
+<p><img src="https://img-blog.csdnimg.cn/3ac54a07f1964bb1b5abc70a0ce54c30.png" alt="图5 SET5数据集上的PSNR，SSIM，IFC，NQM，WPSNR和MSSIM的平均结果"></p>
+<h2 id="3-2评价指标："><a href="#3-2评价指标：" class="headerlink" title="3.2评价指标："></a>3.2评价指标：</h2><p>①PSNR（Peak Signal to Noise Ratio）峰值信噪比：PSNR是最普遍，最广泛使用的评鉴画质的客观量测法。但这个指标只是速度快，评价效果一般；<br>②SSIM（Structural SIMilarity）结构相似性：是一种衡量两幅图像相似度的指标，用均值作为亮度的估计，标准差作为对比度的估计，协方差作为结构相似程度的度量。<br>③IFC（information fidelity criterion）信息保真度准则：通过计算待评图像与参考图像之间的互信息来衡量待评图像的质量优劣。<br>④NQM（noise quality measure）噪声质量测量<br>⑤WPSNR(Weighted Peak Signal to Noise Ratio)加权峰值信噪比<br>⑥MSSSIM（Multi Scale Structural SIMilarity ）多尺度结构相似性</p>
+<h2 id="3-3对颜色通道的实验结果："><a href="#3-3对颜色通道的实验结果：" class="headerlink" title="3.3对颜色通道的实验结果："></a>3.3对颜色通道的实验结果：</h2><p><img src="https://img-blog.csdnimg.cn/ee4d3708c9b3454ea5e9d8dda8dca498.png" alt="图6 SET5数据集上的不同通道的平均PSNR（DB）和培训策略"></p>
+<h1 id="说明："><a href="#说明：" class="headerlink" title="说明："></a>说明：</h1><p>①Y only：基线方法，是一个单通道网络（c=1），只在亮度上进行了训练。对Cb、Cr通道采用双三次插值进行了扩展。<br>②YCbCr：在YCbCr空间的三个通道上进行训练<br>③Y pre-train ：使用Y通道的MSE作为损失来对网络进行预训练。然后利用各通道的MSE对参数进行微调<br>④CbCr pre-train：使用Cb,Cr通道的MSE作为损失来对网络进行预训练，然后对所有通道的参数进行微调<br>⑤RGB：在RGB空间的三个通道上进行训练<br><img src="https://img-blog.csdnimg.cn/cda8a283a8434982a6fb13bd856e56ad.png" alt="图7 具有不同图层的映射"><br><img src="https://img-blog.csdnimg.cn/b010c0acd4a448109a2503f49df64dd0.png"><br><img src="https://img-blog.csdnimg.cn/682183b46c8a4de7b3fbe4d5fe1efbdd.png"></p>
+<h1 id="4-实验结论"><a href="#4-实验结论" class="headerlink" title="4.实验结论"></a>4.实验结论</h1><p>通过这篇论文，学习了SRCNN这种对于单图像进行超分辨率的深度学习方，通过公式演算，一步步探寻到了传统的基于稀疏编码的SR方法可以重构为一个深度卷积神经网络。我们表明，传统的基于稀疏编码的SR方法可以被重新表述为一个深度卷积神经网络。所提出的方法，即SRCNN，可以学习低分辨率和高分辨率图像之间的端到端映射，除了优化之外几乎没有额外的前/后处理。凭借轻量级的结构，SRCNN已经取得了比最先进的方法更出色的性能。我们猜想，通过探索更多的滤波器和不同的训练策略，可以进一步获得额外的性能。此外，所提出的结构具有简单和稳健的优点，可以应用于其他低层次的视觉问题，如图像去模糊化或同步SR+去噪。我们还可以研究一个网络来应对不同的放大系数。<br>SRCNN学习低分辨率和高分辨率图像之间的端到端映射，除了优化之外几乎没有额外的预处理/后处理，由于采用了轻型结构，SRCNN的性能优于目前基于实例的的方法。并进一步探索可以知道更多的卷积核和不同的训练策略，可以获得更好的性能。对于一些低质图片，可以有很大的发挥作用的空间，在人脸识别等领域大展身手。</p>
+<h1 id="参考文献："><a href="#参考文献：" class="headerlink" title="参考文献："></a>参考文献：</h1><p>[1]张俊韬. 基于注意力卷积神经网络的图像超分辨率研究[D].哈尔滨工程大学,2021.DOI:10.27060/d.cnki.ghbcu.2021.001483.<br>[2]查体博. 基于深度卷积神经网络的列车检测图像超分辨方法研究[D].西南交通大学,2021.DOI:10.27414/d.cnki.gxnju.2021.002909.<br>[3]Chao Dong,Chen Change Loy,Kaiming He,Xiaoou Tang. Image Super-Resolution Using Deep Convolutional Networks.[J]. CoRR,2015,abs/1501.00092.<br>[4]杨悦,谢辛,何蕾,胡敏.连分式插值结合卷积神经网络的超分辨率重建[J].合肥工业大学学报(自然科学版),2021,44(08):1146-1152.<br>[5]曾诗悦.基于SRCNN模型的图像压缩方法研究[J].信息技术与信息化,2020(09):98-100.</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://blogzjh.github.io/2022/07/17/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%8D%95%E5%9B%BE%E8%B6%85%E5%88%86%E8%BE%A8%E7%8E%87%E7%9A%84%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95/" data-id="cl8wv0v2u00251gta5doi2dui" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+
+
+  <nav id="page-nav">
+    
+    <a class="extend prev" rel="prev" href="/page/2/">&amp;laquo; 上一页</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/4/">下一页 &amp;raquo;</a>
+  </nav>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Java/">Java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%B8%AD%E9%97%B4%E4%BB%B6/">中间件</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%B7%A5%E4%BD%9C%E7%AC%94%E8%AE%B0/">工作笔记</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%AE%97%E6%B3%95/">数据结构算法</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%BA%90%E7%A0%81/">源码</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/HashMap/" rel="tag">HashMap</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/HashMap/" style="font-size: 10px;">HashMap</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/09/">九月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/08/">八月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/07/">七月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/06/">六月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">四月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">三月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/02/">二月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/01/">一月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/12/">十二月 2021</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2022/09/26/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%81%9A%E9%BB%91%E5%90%8D%E5%8D%95%E7%9A%84%E6%96%B9%E6%A1%88/">布隆过滤做黑名单的方案</a>
+          </li>
+        
+          <li>
+            <a href="/2022/09/15/%E6%9F%90%E8%9A%81%E9%87%91%E6%9C%8D%E7%A7%8B%E6%8B%9B9-15/">某蚁金服秋招9-15</a>
+          </li>
+        
+          <li>
+            <a href="/2022/09/15/%E4%B8%89%E7%A7%8D%E6%83%85%E5%86%B5%E7%9A%84%E5%B1%82%E5%BA%8F%E9%81%8D%E5%8E%86/">三种情况的层序遍历</a>
+          </li>
+        
+          <li>
+            <a href="/2022/09/15/%E5%87%A0%E9%81%93%E5%B2%9B%E5%B1%BF%E9%97%AE%E9%A2%98-dfs-%E5%89%AA%E6%9E%9D-%E5%9B%9E%E6%BA%AF/">几道岛屿问题:dfs+剪枝+回溯</a>
+          </li>
+        
+          <li>
+            <a href="/2022/09/15/%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%9A%E6%9B%BF%E6%8D%A2%E3%80%81%E5%B7%A6%E6%97%8B%E3%80%81%E7%BC%BA%E5%A4%B1/">字符串：替换、左旋、缺失</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
 </aside>
-<div id="post" class="index">
-    <div class="pjax">
-        <article class="index">
-            <div class="toc-ref">
-    
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BC%95%E5%AF%BC"><span class="toc-text">引导</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%A5%E5%8D%9A%E5%AE%A2%E4%B8%8B%E7%9A%84%E5%BF%AB%E6%8D%B7%E9%94%AE"><span class="toc-text">该博客下的快捷键</span></a></li></ol></li></ol>
-    
-<style>
-    .left-col .switch-btn,
-    .left-col .switch-area {
-        display: none;
-    }
-    .toc-level-3 i,
-    .toc-level-3 ol {
-        display: none !important;
-    }
-</style>
-</div>
-            <h1 id="引导"><a href="#引导" class="headerlink" title="引导"></a>引导</h1><p>点击这里切换目录与文章列表</p>
-<p><img src="https://img-blog.csdnimg.cn/2bb36e3cf82b44d5b4f895033d7f4371.png"></p>
-<h2 id="该博客下的快捷键"><a href="#该博客下的快捷键" class="headerlink" title="该博客下的快捷键"></a>该博客下的快捷键</h2><table>
-<thead>
-<tr>
-<th align="center">快捷键</th>
-<th align="center">功能</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">s/S</td>
-<td align="center">全屏/取消全屏</td>
-</tr>
-<tr>
-<td align="center">w/W</td>
-<td align="center">打开/关闭文章目录</td>
-</tr>
-<tr>
-<td align="center">i/I</td>
-<td align="center">获取搜索框焦点</td>
-</tr>
-<tr>
-<td align="center">j/J</td>
-<td align="center">向下滑动</td>
-</tr>
-<tr>
-<td align="center">k/K</td>
-<td align="center">向上滑动</td>
-</tr>
-<tr>
-<td align="center">gg/GG</td>
-<td align="center">到最顶端</td>
-</tr>
-<tr>
-<td align="center">shift+G/g</td>
-<td align="center">到最下端</td>
-</tr>
-<tr>
-<td align="center">ESC</td>
-<td align="center">1.如果输入框有内容，清除内容<br>2.如果输入框无内容，失去焦点</td>
-</tr>
-<tr>
-<td align="center">下</td>
-<td align="center">向下选择文章</td>
-</tr>
-<tr>
-<td align="center">上</td>
-<td align="center">向上选择文章</td>
-</tr>
-<tr>
-<td align="center">回车</td>
-<td align="center">打开当前选中的文章，若没有，则默认打开第一个</td>
-</tr>
-</tbody></table>
-<p>到目前为止已经写了<code class="article_number"></code>篇文章， 共<code class="site_word_count"></code>字。</p>
-<p>本站访问人数：<code class="site_uv"></code>人次 ， 访问量：<code class="site_pv"></code>次</p>
-
-        </article>
         
-        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2022 ZJH&#39;blog<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
-    <div class="copyright">
-        <p class="footer-entry">
-    ©2021 ZJH
-</p>
-<p class="footer-entry">"生命以负熵为食"
-
+  </div>
+</footer>
     </div>
-</div>
-<div class="full-toc">
-    <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
-<a class="" id="rocket" ></a>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
 
-</div>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
 </body>
-<script src="/zjh/js/jquery.pjax.js?v=1.1.0" ></script>
-
-<script src="/zjh/js/script.js?v=1.1.0" ></script>
-<script>
-    var img_resize = 'default';
-    function initArticle() {
-        /*渲染对应的表格样式*/
-        
-            $("#post .pjax table").addClass("green_title");
-        
-
-        /*渲染打赏样式*/
-        
-
-        /*高亮代码块行号*/
-        
-        $('pre code').each(function(){
-            var lines = $(this).text().trim().split('\n').length, widther='';
-            if (lines>99) {
-                widther = 'widther'
-            }
-            var $numbering = $('<ul/>').addClass('pre-numbering ' + widther).attr("unselectable","on");
-            $(this).addClass('has-numbering ' + widther)
-                    .parent()
-                    .append($numbering);
-            for(var i=1;i<=lines;i++){
-                $numbering.append($('<li/>').text(i));
-            }
-        });
-        
-
-        /*访问数量*/
-        
-        $.getScript("//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js");
-        
-
-        /*代码高亮，行号对齐*/
-        $('.pre-numbering').css('line-height',$('.has-numbering').css('line-height'));
-
-        
-        
-    }
-
-    /*打赏页面隐藏与展示*/
-    
-
-</script>
-
-<!--加入行号的高亮代码块样式-->
-
-<style>
-    pre{
-        position: relative;
-        margin-bottom: 24px;
-        border-radius: 10px;
-        border: 1px solid #e2dede;
-        background: #FFF;
-        overflow: hidden;
-    }
-    code.has-numbering{
-        margin-left: 30px;
-    }
-    code.has-numbering.widther{
-        margin-left: 35px;
-    }
-    .pre-numbering{
-        margin: 0;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 20px;
-        padding: 0.5em 3px 0.7em 5px;
-        border-right: 1px solid #C3CCD0;
-        text-align: right;
-        color: #AAA;
-        background-color: ;
-    }
-    .pre-numbering.widther {
-        width: 35px;
-    }
-</style>
-
-<!--自定义样式设置-->
-<style>
-    
-    
-    .nav {
-        width: 542px;
-    }
-    .nav.fullscreen {
-        margin-left: -542px;
-    }
-    .nav-left {
-        width: 120px;
-    }
-    
-    
-    @media screen and (max-width: 1468px) {
-        .nav {
-            width: 492px;
-        }
-        .nav.fullscreen {
-            margin-left: -492px;
-        }
-        .nav-left {
-            width: 100px;
-        }
-    }
-    
-    
-    @media screen and (max-width: 1024px) {
-        .nav {
-            width: 492px;
-            margin-left: -492px
-        }
-        .nav.fullscreen {
-            margin-left: 0;
-        }
-    }
-    
-    @media screen and (max-width: 426px) {
-        .nav {
-            width: 100%;
-        }
-        .nav-left {
-            width: 100%;
-        }
-    }
-    
-    
-    .nav-right .title-list nav a .post-title, .nav-right .title-list #local-search-result a .post-title {
-        color: #383636;
-    }
-    
-    
-    .nav-right .title-list nav a .post-date, .nav-right .title-list #local-search-result a .post-date {
-        color: #5e5e5f;
-    }
-    
-    
-    .nav-right nav a.hover, #local-search-result a.hover{
-        background-color: #e2e0e0;
-    }
-    
-    
-
-    /*列表样式*/
-    
-
-    /* 背景图样式 */
-    
-    
-
-
-    /*引用块样式*/
-    
-
-    /*文章列表背景图*/
-    
-
-    
-</style>
-
-
-
-
-
-
-
 </html>

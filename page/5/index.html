@@ -2,966 +2,2386 @@
 <html>
 <head>
   <meta charset="utf-8">
+  
+
+  
   <title>ZJH&#39;blog</title>
-  <meta name="keywords" content="">
-  <meta name="description" content="ZJH&#39;blog">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="1.已知布隆过滤有误判概率 因为hash运算后存在“假阳性”，因此做黑名单时可能把正常用户给拦截了 做白名单时一定是准确无误的 理论上做成黑名单有误判缺陷，但做白名单毫无问题，因此黑白名单结合才能实现黑名单的功能  2.黑白名单组合解决：ip黑名单问题直接列下我的设计思路：  现在有一个布隆过滤器保存了一组ip黑名单 一个正常用户ip遇到hash碰撞，被拦截了 接口直接跳转“验证真人的接口” 验证">
-<meta property="og:type" content="article">
-<meta property="og:title" content="布隆过滤做黑名单的方案">
-<meta property="og:url" content="https://blogzjh.github.io/2022/09/26/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%81%9A%E9%BB%91%E5%90%8D%E5%8D%95%E7%9A%84%E6%96%B9%E6%A1%88/index.html">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="ZJH&#39;blog">
+<meta property="og:url" content="https://blogzjh.github.io/page/5/index.html">
 <meta property="og:site_name" content="ZJH&#39;blog">
-<meta property="og:description" content="1.已知布隆过滤有误判概率 因为hash运算后存在“假阳性”，因此做黑名单时可能把正常用户给拦截了 做白名单时一定是准确无误的 理论上做成黑名单有误判缺陷，但做白名单毫无问题，因此黑白名单结合才能实现黑名单的功能  2.黑白名单组合解决：ip黑名单问题直接列下我的设计思路：  现在有一个布隆过滤器保存了一组ip黑名单 一个正常用户ip遇到hash碰撞，被拦截了 接口直接跳转“验证真人的接口” 验证">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-09-25T18:22:57.000Z">
-<meta property="article:modified_time" content="2022-09-25T18:22:44.126Z">
 <meta property="article:author" content="ZJH&#39;blog">
 <meta name="twitter:card" content="summary">
-
-
-<link rel="icon" href="/img/QQ图片20211224224200.jpg">
-
-<link href="/zjh/css/style.css?v=1.1.0" rel="stylesheet">
-
-<link href="/zjh/css/hl_theme/rainbow.css?v=1.1.0" rel="stylesheet">
-
-<link href="//cdn.jsdelivr.net/npm/animate.css@4.1.0/animate.min.css" rel="stylesheet">
-
-<script src="//cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
-<script src="/zjh/js/titleTip.js?v=1.1.0" ></script>
-
-<script src="//cdn.jsdelivr.net/npm/highlightjs@9.16.2/highlight.pack.min.js"></script>
-<script>
-    hljs.initHighlightingOnLoad();
-</script>
-
-<script src="//cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js"></script>
-
-
-
-<script src="//cdn.jsdelivr.net/npm/jquery.cookie@1.4.1/jquery.cookie.min.js" ></script>
-
-<script src="/zjh/js/iconfont.js?v=1.1.0" ></script>
+  
+    <link rel="alternate" href="/atom.xml" title="ZJH&#39;blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
 
 <meta name="generator" content="Hexo 5.4.0"></head>
-<div style="display: none">
-  <input class="theme_disqus_on" value="false">
-  <input class="theme_preload_comment" value="">
-  <input class="theme_blog_path" value="/zjh">
-  <input id="theme_shortcut" value="true" />
-  <input id="theme_highlight_on" value="true" />
-  <input id="theme_code_copy" value="true" />
-</div>
-
-
 
 <body>
-<aside class="nav mobile">
-    <div class="nav-left">
-        <a href="/zjh/"
-   class="avatar_target">
-    <img class="avatar"
-         src="/zjh/img/QQ图片20211224224200.jpg"/>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">ZJH&#39;blog</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://blogzjh.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-Java注解和反射" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2022/04/21/Java%E6%B3%A8%E8%A7%A3%E5%92%8C%E5%8F%8D%E5%B0%84/" class="article-date">
+  <time datetime="2022-04-21T01:45:15.000Z" itemprop="datePublished">2022-04-21</time>
 </a>
-<div class="author">
-    <span>ZJH&#39;blog</span>
-</div>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Java/">Java</a>
+  </div>
 
-<div class="icon">
+  </div>
+  <div class="article-inner">
     
-        
-            <a title="github"
-               href="https://github.com/BetterZJH"
-               target="_blank">
-                
-                    <svg class="iconfont-svg" aria-hidden="true">
-                        <use xlink:href="#icon-github"></use>
-                    </svg>
-                
-            </a>
-        
     
+      <header class="article-header">
         
-            <a title="csdn"
-               href="https://blog.csdn.net/m0_56079407"
-               target="_blank">
-                
-                    <svg class="iconfont-svg" aria-hidden="true">
-                        <use xlink:href="#icon-csdn"></use>
-                    </svg>
-                
-            </a>
-        
-    
-        
-            <a title="email"
-               href="mailto:847829122@qq.com"
-               target="_blank">
-                
-                    <svg class="iconfont-svg" aria-hidden="true">
-                        <use xlink:href="#icon-email"></use>
-                    </svg>
-                
-            </a>
-        
-    
-        
-            <a title="qq"
-               href="http://wpa.qq.com/msgrd?v=3&uin=847829122&site=qq&menu=yes"
-               target="_blank">
-                
-                    <svg class="iconfont-svg" aria-hidden="true">
-                        <use xlink:href="#icon-qq"></use>
-                    </svg>
-                
-            </a>
-        
-    
-</div>
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2022/04/21/Java%E6%B3%A8%E8%A7%A3%E5%92%8C%E5%8F%8D%E5%B0%84/">Java注解和反射</a>
+    </h1>
+  
 
-
-
-
-<ul>
-    <li>
-        <div class="all active" data-rel="全部文章">全部文章
-            
-                <small>(50)</small>
-            
-        </div>
-    </li>
+      </header>
     
-        
-            
-                <li>
-                    <div data-rel="数据结构算法">
-                        
-                        数据结构算法
-                        <small>(7)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="工作笔记">
-                        
-                        工作笔记
-                        <small>(12)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="机器学习">
-                        
-                        机器学习
-                        <small>(7)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="源码">
-                        
-                        源码
-                        <small>(8)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="中间件">
-                        
-                        中间件
-                        <small>(8)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
-        
-            
-                <li>
-                    <div data-rel="Java">
-                        
-                        Java
-                        <small>(7)</small>
-                        
-                    </div>
-                    
-                </li>
-            
-        
-    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="1-反射与Class类"><a href="#1-反射与Class类" class="headerlink" title="1.反射与Class类"></a>1.反射与Class类</h1><ul>
+<li>Java本是静态语言，但反射提供了动态语言的特性，<strong>通过反射可以获得任意类的所有结构，并可以任意操作类内部的属性和方法</strong></li>
 </ul>
-<div class="left-bottom">
-    <div class="menus">
-        
-            
-            
-            
-    </div>
-    <div>
-        
-        
-    </div>
-</div>
-<input type="hidden" id="yelog_site_posts_number" value="50">
-<input type="hidden" id="yelog_site_word_count" value="100.4k">
-<div style="display: none">
-    <span id="busuanzi_value_site_uv"></span>
-    <span id="busuanzi_value_site_pv"></span>
-</div>
-
-    </div>
-    <div class="nav-right">
-        <div class="friends-area">
-    <div class="friends-title">
-        友情链接
-        <i class="iconfont icon-left"></i>
-    </div>
-    <div class="friends-content">
-        <ul>
-            
-            <li><a target="_blank" href="http://yelog.org/">叶落阁</a></li>
-            
-        </ul>
-    </div>
-</div>
-        <div class="title-list">
-    <div class="right-top">
-        <div id="default-panel">
-            <i class="iconfont icon-search" data-title="搜索 快捷键 i"></i>
-            <div class="right-title">全部文章</div>
-            <i class="iconfont icon-file-tree" data-title="切换到大纲视图 快捷键 w"></i>
-        </div>
-        <div id="search-panel">
-            <i class="iconfont icon-left" data-title="返回"></i>
-            <input id="local-search-input" autocomplete="off"/>
-            <label class="border-line" for="input"></label>
-            <i class="iconfont icon-case-sensitive" data-title="大小写敏感"></i>
-            <i class="iconfont icon-tag" data-title="标签"></i>
-        </div>
-        <div id="outline-panel" style="display: none">
-            <div class="right-title">大纲</div>
-            <i class="iconfont icon-list" data-title="切换到文章列表"></i>
-        </div>
-    </div>
-
-    <div class="tags-list">
-    <input id="tag-search" />
-    <div class="tag-wrapper">
-        
-            <li class="article-tag-list-item">
-                <i class="iconfont icon-tag"></i><a>HashMap</a>
-            </li>
-        
-    </div>
-
-</div>
+<ul>
+<li>类加载完毕后，<strong>堆空间中会出现唯一的Class对象</strong>，这个对象clazz包含了该类的所有结构</li>
+<li>Class 对象是在加载类时由 Java 虚拟机以及通过调用<strong>类加载器</strong>中的defineClass 方法自动构造的</li>
+<li>通过反射的方式获取对象效率远远不如直接new，当且仅当不能直接new对象的时候用反射创建对象，在主流框架中大量使用了反射<br><img src="https://img-blog.csdnimg.cn/2da4d89222d941138ef59e2298bb4e3b.png" alt="普通方法即直接new"></li>
+</ul>
+<h1 id="2-Class对象获取"><a href="#2-Class对象获取" class="headerlink" title="2.Class对象获取"></a>2.Class对象获取</h1><p>一个类的Class对象无论用什么方式获取多少次，都是唯一的</p>
+<h2 id="new-目标类-getClass"><a href="#new-目标类-getClass" class="headerlink" title="new 目标类().getClass()"></a>new 目标类().getClass()</h2><ul>
+<li>不建议这样使用，已经可以直接new了就不要再反射获取对象了</li>
+<li>new Student()的同时也会在堆空间产生全局唯一的Student类对象</li>
+</ul>
+<pre><code>Student stu1 = new Student();//这一new 产生一个Student对象，一个Class对象。
+        Class stuClass = stu1.getClass();//获取Class对象
+        System.out.println(stuClass.getName());
+</code></pre>
+<h2 id="目标类-class"><a href="#目标类-class" class="headerlink" title="目标类.class;"></a>目标类.class;</h2><p>这种方法也不推荐，需要额外在调用处导入目标类的包，依赖过强</p>
+<pre><code>    //第二种方式获取Class对象
+    Class stuClass2 = Student.class;
 
     
-    <nav id="title-list-nav">
-        
-        <a  class="全部文章 工作笔记 "
-           href="/2022/09/26/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%81%9A%E9%BB%91%E5%90%8D%E5%8D%95%E7%9A%84%E6%96%B9%E6%A1%88/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="布隆过滤做黑名单的方案">布隆过滤做黑名单的方案</span>
-            <span class="post-date" title="2022-09-26 02:22:57">2022/09/26</span>
-        </a>
-        
-        <a  class="全部文章 数据结构算法 "
-           href="/2022/09/15/%E6%9F%90%E8%9A%81%E9%87%91%E6%9C%8D%E7%A7%8B%E6%8B%9B9-15/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="某蚁金服秋招9-15">某蚁金服秋招9-15</span>
-            <span class="post-date" title="2022-09-15 21:22:38">2022/09/15</span>
-        </a>
-        
-        <a  class="全部文章 数据结构算法 "
-           href="/2022/09/15/%E4%B8%89%E7%A7%8D%E6%83%85%E5%86%B5%E7%9A%84%E5%B1%82%E5%BA%8F%E9%81%8D%E5%8E%86/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="三种情况的层序遍历">三种情况的层序遍历</span>
-            <span class="post-date" title="2022-09-15 21:21:24">2022/09/15</span>
-        </a>
-        
-        <a  class="全部文章 数据结构算法 "
-           href="/2022/09/15/%E5%87%A0%E9%81%93%E5%B2%9B%E5%B1%BF%E9%97%AE%E9%A2%98-dfs-%E5%89%AA%E6%9E%9D-%E5%9B%9E%E6%BA%AF/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="几道岛屿问题:dfs+剪枝+回溯">几道岛屿问题:dfs+剪枝+回溯</span>
-            <span class="post-date" title="2022-09-15 21:20:58">2022/09/15</span>
-        </a>
-        
-        <a  class="全部文章 数据结构算法 "
-           href="/2022/09/15/%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%9A%E6%9B%BF%E6%8D%A2%E3%80%81%E5%B7%A6%E6%97%8B%E3%80%81%E7%BC%BA%E5%A4%B1/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="字符串：替换、左旋、缺失">字符串：替换、左旋、缺失</span>
-            <span class="post-date" title="2022-09-15 21:20:41">2022/09/15</span>
-        </a>
-        
-        <a  class="全部文章 数据结构算法 "
-           href="/2022/09/15/%E5%87%A0%E9%81%93%E4%BA%8C%E5%8F%89%E6%A0%91-dfs-%E5%9B%9E%E6%BA%AF/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="几道二叉树:dfs+回溯">几道二叉树:dfs+回溯</span>
-            <span class="post-date" title="2022-09-15 21:19:53">2022/09/15</span>
-        </a>
-        
-        <a  class="全部文章 数据结构算法 "
-           href="/2022/09/15/%E5%87%A0%E9%81%93%E5%8A%A8%E5%BD%92%E6%80%BB%E7%BB%93/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="几道动归总结">几道动归总结</span>
-            <span class="post-date" title="2022-09-15 21:18:43">2022/09/15</span>
-        </a>
-        
-        <a  class="全部文章 源码 "
-           href="/2022/09/15/BeanFactory%E5%92%8CApplicationContext/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="BeanFactory和ApplicationContext">BeanFactory和ApplicationContext</span>
-            <span class="post-date" title="2022-09-15 21:17:39">2022/09/15</span>
-        </a>
-        
-        <a  class="全部文章 中间件 "
-           href="/2022/08/28/%E4%B8%89%E7%A7%8D%E4%B8%AD%E9%97%B4%E4%BB%B6%E7%9A%84%E5%88%B7%E7%9B%98-%E6%8C%81%E4%B9%85%E5%8C%96-%E7%AD%96%E7%95%A5/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="三种中间件的刷盘(持久化)策略">三种中间件的刷盘(持久化)策略</span>
-            <span class="post-date" title="2022-08-28 13:34:20">2022/08/28</span>
-        </a>
-        
-        <a  class="全部文章 中间件 "
-           href="/2022/08/28/redis%E5%9F%BA%E7%A1%80/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="redis基础">redis基础</span>
-            <span class="post-date" title="2022-08-28 12:21:22">2022/08/28</span>
-        </a>
-        
-        <a  class="全部文章 中间件 "
-           href="/2022/08/27/RabbitMQ%E5%9F%BA%E7%A1%80/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="RabbitMQ基础">RabbitMQ基础</span>
-            <span class="post-date" title="2022-08-27 16:26:14">2022/08/27</span>
-        </a>
-        
-        <a  class="全部文章 中间件 "
-           href="/2022/08/27/RabbitMQ%E5%8F%AF%E9%9D%A0%E6%80%A7-Spring/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="RabbitMQ可靠性-Spring">RabbitMQ可靠性-Spring</span>
-            <span class="post-date" title="2022-08-27 16:02:25">2022/08/27</span>
-        </a>
-        
-        <a  class="全部文章 中间件 "
-           href="/2022/08/27/RabbitMQ%E6%AD%BB%E4%BF%A1%E9%98%9F%E5%88%97%E3%80%81%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97-Spring/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="RabbitMQ死信队列、延迟队列-Spring">RabbitMQ死信队列、延迟队列-Spring</span>
-            <span class="post-date" title="2022-08-27 01:05:35">2022/08/27</span>
-        </a>
-        
-        <a  class="全部文章 中间件 "
-           href="/2022/08/23/MySQL%E4%BA%8B%E5%8A%A1%E4%B8%8E%E9%94%81/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="MySQL事务与锁">MySQL事务与锁</span>
-            <span class="post-date" title="2022-08-23 12:49:38">2022/08/23</span>
-        </a>
-        
-        <a  class="全部文章 工作笔记 "
-           href="/2022/08/23/AOP%E5%AE%9E%E7%8E%B0%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="AOP实现分布式锁">AOP实现分布式锁</span>
-            <span class="post-date" title="2022-08-23 12:48:25">2022/08/23</span>
-        </a>
-        
-        <a  class="全部文章 源码 "
-           href="/2022/08/23/ReentrantLock%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="ReentrantLock源码剖析">ReentrantLock源码剖析</span>
-            <span class="post-date" title="2022-08-23 12:34:15">2022/08/23</span>
-        </a>
-        
-        <a  class="全部文章 源码 "
-           href="/2022/08/23/%E5%8F%8D%E5%B0%84%E8%8E%B7%E5%8F%96AQS%E4%B8%AD%E5%90%8C%E6%AD%A5%E9%98%9F%E5%88%97%E4%B8%8E%E7%AD%89%E5%BE%85%E9%98%9F%E5%88%97%E7%9A%84%E9%95%BF%E5%BA%A6/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="反射获取AQS中同步队列与等待队列的长度">反射获取AQS中同步队列与等待队列的长度</span>
-            <span class="post-date" title="2022-08-23 12:32:58">2022/08/23</span>
-        </a>
-        
-        <a  class="全部文章 Java "
-           href="/2022/08/14/Spring%E3%80%81Servlet%E7%9B%91%E5%90%AC%E5%99%A8/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Spring、Servlet监听器">Spring、Servlet监听器</span>
-            <span class="post-date" title="2022-08-14 21:01:46">2022/08/14</span>
-        </a>
-        
-        <a  class="全部文章 工作笔记 "
-           href="/2022/08/13/AOP-%E5%8F%8D%E5%B0%84%EF%BC%9A%E6%8E%A5%E5%8F%A3%E5%8F%82%E6%95%B0%E6%A0%A1%E9%AA%8C/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="AOP+反射：接口参数校验">AOP+反射：接口参数校验</span>
-            <span class="post-date" title="2022-08-13 17:12:17">2022/08/13</span>
-        </a>
-        
-        <a  class="全部文章 工作笔记 "
-           href="/2022/08/12/%E5%AF%B9dto%E6%8C%87%E5%AE%9A%E5%B1%9E%E6%80%A7%E4%B8%80%E9%94%AE%E5%8A%A0%E8%A7%A3%E5%AF%86/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="对dto指定属性一键加解密">对dto指定属性一键加解密</span>
-            <span class="post-date" title="2022-08-12 22:51:17">2022/08/12</span>
-        </a>
-        
-        <a  class="全部文章 源码 "
-           href="/2022/08/03/%E5%8F%8D%E5%B0%84%E4%BF%AE%E6%94%B9jsessionid%E5%AE%9E%E7%8E%B0session%E5%85%B1%E4%BA%AB/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="反射修改jsessionid实现session共享">反射修改jsessionid实现session共享</span>
-            <span class="post-date" title="2022-08-03 21:53:21">2022/08/03</span>
-        </a>
-        
-        <a  class="全部文章 源码 "
-           href="/2022/08/03/RestTemlate%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%8F%8A%E5%B7%A5%E5%85%B7%E7%B1%BB%E8%AE%BE%E8%AE%A1/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="RestTemlate源码分析及工具类设计">RestTemlate源码分析及工具类设计</span>
-            <span class="post-date" title="2022-08-03 21:51:57">2022/08/03</span>
-        </a>
-        
-        <a  class="全部文章 工作笔记 "
-           href="/2022/08/03/%E7%9F%AD%E4%BF%A1%E6%9C%8D%E5%8A%A1%E8%A2%AB%E6%94%BB%E5%87%BB%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="短信服务被攻击解决方案">短信服务被攻击解决方案</span>
-            <span class="post-date" title="2022-08-03 21:51:16">2022/08/03</span>
-        </a>
-        
-        <a  class="全部文章 工作笔记 "
-           href="/2022/08/03/%E5%9B%9B%E7%A7%8D%E6%96%B9%E6%B3%95Servlet%E5%AE%B9%E5%99%A8%E4%BD%BF%E7%94%A8Spring%E7%9A%84Bean%E5%AF%B9%E8%B1%A1/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="四种方法Servlet容器使用Spring的Bean对象">四种方法Servlet容器使用Spring的Bean对象</span>
-            <span class="post-date" title="2022-08-03 21:47:54">2022/08/03</span>
-        </a>
-        
-        <a  class="全部文章 Java "
-           href="/2022/07/19/%E5%86%85%E5%AD%98%E5%8C%BA%E5%9F%9F%E3%80%81%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="内存区域、类的加载">内存区域、类的加载</span>
-            <span class="post-date" title="2022-07-19 22:29:21">2022/07/19</span>
-        </a>
-        
-        <a  class="全部文章 工作笔记 "
-           href="/2022/07/19/Restful%E9%A3%8E%E6%A0%BC%E7%9C%9F%E7%9A%84%E6%9C%89%E5%BF%85%E8%A6%81%E5%90%97/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Restful风格真的有必要吗？">Restful风格真的有必要吗？</span>
-            <span class="post-date" title="2022-07-19 20:19:57">2022/07/19</span>
-        </a>
-        
-        <a  class="全部文章 机器学习 "
-           href="/2022/07/17/%E6%B0%94%E8%B1%A1cv-%E5%9C%B0%E5%9F%BA%E4%BA%91%E5%9B%BE%E4%BA%91%E7%B3%BB%E5%88%86%E5%89%B2/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="气象cv-地基云图云系分割">气象cv-地基云图云系分割</span>
-            <span class="post-date" title="2022-07-17 12:04:12">2022/07/17</span>
-        </a>
-        
-        <a  class="全部文章 机器学习 "
-           href="/2022/07/17/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA%E6%9E%A3%E7%B1%BB%E9%81%97%E4%BC%A0%E7%9A%84%E5%9B%9E%E5%BD%92%E9%A2%84%E6%B5%8B/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="支持向量机枣类遗传的回归预测">支持向量机枣类遗传的回归预测</span>
-            <span class="post-date" title="2022-07-17 11:47:04">2022/07/17</span>
-        </a>
-        
-        <a  class="全部文章 机器学习 "
-           href="/2022/07/17/%E6%B0%94%E8%B1%A1%E5%A4%A7%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="气象大数据分析">气象大数据分析</span>
-            <span class="post-date" title="2022-07-17 11:44:44">2022/07/17</span>
-        </a>
-        
-        <a  class="全部文章 机器学习 "
-           href="/2022/07/17/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%8D%95%E5%9B%BE%E8%B6%85%E5%88%86%E8%BE%A8%E7%8E%87%E7%9A%84%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="卷积神经网络单图超分辨率的深度学习方法">卷积神经网络单图超分辨率的深度学习方法</span>
-            <span class="post-date" title="2022-07-17 11:33:07">2022/07/17</span>
-        </a>
-        
-        <a  class="全部文章 机器学习 "
-           href="/2022/07/17/%E7%96%AB%E6%83%85%E6%B8%AF%E5%8F%A3%E6%8C%82%E9%9D%A0%E6%95%B0ARIMA%E6%97%B6%E5%BA%8F%E5%88%86%E6%9E%90/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="疫情港口挂靠数ARIMA时序分析">疫情港口挂靠数ARIMA时序分析</span>
-            <span class="post-date" title="2022-07-17 11:21:13">2022/07/17</span>
-        </a>
-        
-        <a  class="全部文章 工作笔记 "
-           href="/2022/07/15/OGNL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%94%B9%E9%80%A0%E4%BB%A5%E4%BD%BF%E7%94%A8%E7%B4%A2%E5%BC%95/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="OGNL表达式改造以使用索引">OGNL表达式改造以使用索引</span>
-            <span class="post-date" title="2022-07-15 22:27:54">2022/07/15</span>
-        </a>
-        
-        <a  class="全部文章 工作笔记 "
-           href="/2022/07/15/mvcc+%E6%8C%89%E5%A4%A9%E7%BC%93%E5%AD%98%E7%BB%9F%E8%AE%A1%E4%B8%A4%E4%B8%AA%E6%94%B6%E7%9B%8A/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="mvcc+按天缓存统计两个收益">mvcc+按天缓存统计两个收益</span>
-            <span class="post-date" title="2022-07-15 21:35:25">2022/07/15</span>
-        </a>
-        
-        <a  class="全部文章 工作笔记 "
-           href="/2022/07/15/%E5%8E%8B%E7%BC%A9%E6%89%93%E5%8C%85%E4%BD%86%E4%B8%8D%E5%BD%92%E6%A1%A3%EF%BC%8C%E5%88%A9%E7%94%A8response/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="压缩打包但不归档，利用response">压缩打包但不归档，利用response</span>
-            <span class="post-date" title="2022-07-15 21:26:51">2022/07/15</span>
-        </a>
-        
-        <a  class="全部文章 工作笔记 "
-           href="/2022/07/15/%E4%B8%9A%E5%8A%A1%E4%B8%ADdelete_flag%E5%AD%97%E6%AE%B5%E5%AE%B9%E6%98%93%E8%B8%A9%E7%9A%84%E5%9D%91/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="业务中delete_flag字段容易踩的坑">业务中delete_flag字段容易踩的坑</span>
-            <span class="post-date" title="2022-07-15 21:19:19">2022/07/15</span>
-        </a>
-        
-        <a  class="全部文章 工作笔记 "
-           href="/2022/07/15/%E9%9D%9E%E6%97%B6%E5%BA%8F%E6%8E%92%E5%BA%8F%E4%B8%8B%E7%9A%84%E7%80%91%E5%B8%83%E6%B5%81%E5%88%86%E9%A1%B5/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="非时序排序下的瀑布流分页">非时序排序下的瀑布流分页</span>
-            <span class="post-date" title="2022-07-15 21:15:15">2022/07/15</span>
-        </a>
-        
-        <a  class="全部文章 数据结构算法 "
-           href="/2022/06/25/%E8%A1%8C%E7%A8%8B%E7%BC%96%E7%A0%81%E5%8E%8B%E7%BC%A9%E5%9B%BE%E7%89%87/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="行程编码压缩图片">行程编码压缩图片</span>
-            <span class="post-date" title="2022-06-25 01:35:20">2022/06/25</span>
-        </a>
-        
-        <a  class="全部文章 Java "
-           href="/2022/04/21/Filter%E7%9A%84%E5%B8%B8%E8%A7%81%E7%94%A8%E6%B3%95/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Filter的常见用法">Filter的常见用法</span>
-            <span class="post-date" title="2022-04-21 09:51:40">2022/04/21</span>
-        </a>
-        
-        <a  class="全部文章 Java "
-           href="/2022/04/21/Lambda%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%92%8C%E6%96%B9%E6%B3%95%E5%BC%95%E7%94%A8/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Lambda表达式和方法引用">Lambda表达式和方法引用</span>
-            <span class="post-date" title="2022-04-21 09:50:42">2022/04/21</span>
-        </a>
-        
-        <a  class="全部文章 Java "
-           href="/2022/04/21/Mybatis%E4%B8%ADxml%E4%B8%AD%E8%B0%83java%E6%96%B9%E6%B3%95OGNL%E8%A1%A8%E8%BE%BE%E5%BC%8F/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Mybatis中xml中调java方法OGNL表达式">Mybatis中xml中调java方法OGNL表达式</span>
-            <span class="post-date" title="2022-04-21 09:47:36">2022/04/21</span>
-        </a>
-        
-        <a  class="全部文章 Java "
-           href="/2022/04/21/Java%E6%B3%A8%E8%A7%A3%E5%92%8C%E5%8F%8D%E5%B0%84/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Java注解和反射">Java注解和反射</span>
-            <span class="post-date" title="2022-04-21 09:45:15">2022/04/21</span>
-        </a>
-        
-        <a  class="全部文章 源码 "
-           href="/2022/03/21/HashMap%E4%B8%ADentrySet-%E8%AF%A6%E8%A7%A3/"
-           data-tag="HashMap"
-           data-author="" >
-            <span class="post-title" title="HashMap中entrySet()详解">HashMap中entrySet()详解</span>
-            <span class="post-date" title="2022-03-21 00:15:10">2022/03/21</span>
-        </a>
-        
-        <a  class="全部文章 源码 "
-           href="/2022/03/21/HashMap/"
-           data-tag="HashMap"
-           data-author="" >
-            <span class="post-title" title="HashMap">HashMap</span>
-            <span class="post-date" title="2022-03-21 00:13:23">2022/03/21</span>
-        </a>
-        
-        <a  class="全部文章 中间件 "
-           href="/2022/03/07/Mysql%E4%BA%8B%E5%8A%A1%E5%92%8C%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Mysql事务和存储引擎">Mysql事务和存储引擎</span>
-            <span class="post-date" title="2022-03-07 22:11:06">2022/03/07</span>
-        </a>
-        
-        <a  class="全部文章 中间件 "
-           href="/2022/03/07/Mysql-InnoDB-%E7%B4%A2%E5%BC%95%E5%8E%9F%E7%90%86%E5%8F%8A%E7%9A%84%E4%BD%BF%E7%94%A8/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Mysql(InnoDB)索引原理及的使用">Mysql(InnoDB)索引原理及的使用</span>
-            <span class="post-date" title="2022-03-07 22:10:05">2022/03/07</span>
-        </a>
-        
-        <a  class="全部文章 源码 "
-           href="/2022/02/21/LinkedList%E6%BA%90%E7%A0%81%E4%B8%AD%E4%B8%BA%E4%BD%95%E5%A4%A7%E9%87%8F%E5%87%BA%E7%8E%B0final/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="LinkedList源码中为何大量出现final">LinkedList源码中为何大量出现final</span>
-            <span class="post-date" title="2022-02-21 09:57:35">2022/02/21</span>
-        </a>
-        
-        <a  class="全部文章 机器学习 "
-           href="/2022/01/11/%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E6%B3%B0%E5%9D%A6%E5%B0%BC%E5%85%8B%E5%8F%B7%E8%8E%B7%E6%95%91%E9%A2%84%E6%B5%8B/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="随机森林——泰坦尼克号获救预测">随机森林——泰坦尼克号获救预测</span>
-            <span class="post-date" title="2022-01-11 03:06:10">2022/01/11</span>
-        </a>
-        
-        <a  class="全部文章 机器学习 "
-           href="/2022/01/01/%E5%86%B3%E7%AD%96%E6%A0%91-%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E7%94%A8%E6%88%B7%E6%B5%81%E5%A4%B1%E9%A2%84%E6%B5%8B%E7%9A%84%E6%A1%88%E4%BE%8B/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="决策树/随机森林——用户流失预测的案例">决策树/随机森林——用户流失预测的案例</span>
-            <span class="post-date" title="2022-01-01 00:41:40">2022/01/01</span>
-        </a>
-        
-        <a  class="全部文章 "
-           href="/2021/12/25/IDEA%E5%B8%B8%E7%94%A8%E5%BF%AB%E6%8D%B7%E9%94%AE/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="IDEA常用快捷键">IDEA常用快捷键</span>
-            <span class="post-date" title="2021-12-25 21:55:46">2021/12/25</span>
-        </a>
-        
-        <a  class="全部文章 Java "
-           href="/2021/12/25/Java%E5%9B%9B%E7%A7%8Dnext%E7%94%A8%E6%B3%95/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="Java四种next用法">Java四种next用法</span>
-            <span class="post-date" title="2021-12-25 01:59:30">2021/12/25</span>
-        </a>
-        
-        <div id="no-item-tips">
-
-        </div>
-    </nav>
-    <div id="outline-list">
-    </div>
-</div>
-
-    </div>
-    <div class="hide-list">
-        <div class="semicircle" data-title="切换全屏 快捷键 s">
-            <div class="brackets first"><</div>
-            <div class="brackets">&gt;</div>
-        </div>
-    </div>
-</aside>
-<div id="post" class="index">
-    <div class="pjax">
-        <article class="index">
-            <div class="toc-ref">
+</code></pre>
+<h2 id="forName-方法——最常用"><a href="#forName-方法——最常用" class="headerlink" title="forName()方法——最常用"></a>forName()方法——最常用</h2><p>一般都第三种，一个字符串<strong>可以传入也可写在配置文件中等多种方法。</strong></p>
+<pre><code>    //第三种方式获取Class对象
+    try &#123;
+        Class stuClass3 = Class.forName(&quot;com.fanshe.Student&quot;);//全类名路径
+    &#125; catch (ClassNotFoundException e) &#123;
+        e.printStackTrace();
+    &#125;
+</code></pre>
+<h2 id="基本数据类型和包装类"><a href="#基本数据类型和包装类" class="headerlink" title="基本数据类型和包装类"></a>基本数据类型和包装类</h2><p>包装类.TYPE属性 相当于 基本数据类型.class属性</p>
+<pre><code>    Class&lt;Integer&gt; c1 = int.class;
+    Class&lt;Integer&gt; c2 = Integer.TYPE;
+    System.out.println(c1==c2);//true
+</code></pre>
+<p>源码<br>    @SuppressWarnings(“unchecked”)<br>    public static final Class<Integer>  TYPE = (Class<Integer>) Class.getPrimitiveClass(“int”);</p>
+<h1 id="3-Class类常用方法"><a href="#3-Class类常用方法" class="headerlink" title="3.Class类常用方法"></a>3.Class类常用方法</h1><h2 id="3-1静态方法"><a href="#3-1静态方法" class="headerlink" title="3.1静态方法"></a>3.1静态方法</h2><h3 id="获取目标类的Class对象"><a href="#获取目标类的Class对象" class="headerlink" title="获取目标类的Class对象"></a>获取目标类的Class对象</h3><p><img src="https://img-blog.csdnimg.cn/8bfe66ffbeda44339ce388b2b1b37ac6.png"></p>
+<h2 id="3-2非静态方法"><a href="#3-2非静态方法" class="headerlink" title="3.2非静态方法"></a>3.2非静态方法</h2><p>对于：Class c1 = Class.forName(“com.zjh.User”);</p>
+<h3 id="获取目标类实例"><a href="#获取目标类实例" class="headerlink" title="获取目标类实例"></a>获取目标类实例</h3><pre><code>c1.newInstance()
+</code></pre>
+<h3 id="获取目标类全类名路径"><a href="#获取目标类全类名路径" class="headerlink" title="获取目标类全类名路径"></a>获取目标类全类名路径</h3><pre><code>c1,getName()
+</code></pre>
+<h3 id="获取父类的Class对象"><a href="#获取父类的Class对象" class="headerlink" title="获取父类的Class对象"></a>获取父类的Class对象</h3><pre><code> c1.getSuperClass().getSuperClass()....可以一直链路向上调用
+</code></pre>
+<h3 id="获取类的方法Method对象，invoke激活"><a href="#获取类的方法Method对象，invoke激活" class="headerlink" title="获取类的方法Method对象，invoke激活"></a>获取类的方法Method对象，invoke激活</h3><p>不加Declared的getMethods()<strong>包括父类的方法</strong><br><img src="https://img-blog.csdnimg.cn/d180e2460a1a4be2acf80c2e395e458e.png"></p>
+<p>先获取Method对象（无参可以不填or填null），然后invoke调用方法</p>
+<pre><code>    Class c1 = Class.forName(&quot;filter.User&quot;);
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BC%95%E5%AF%BC"><span class="toc-text">引导</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%A5%E5%8D%9A%E5%AE%A2%E4%B8%8B%E7%9A%84%E5%BF%AB%E6%8D%B7%E9%94%AE"><span class="toc-text">该博客下的快捷键</span></a></li></ol></li></ol>
+    Method tell = c1.getMethod(&quot;tell&quot;, String.class);
+    Object content = tell.invoke(new User(), &quot;说话内容&quot;);
+    System.out.println(content);//null无返回值
+</code></pre>
+<h3 id="获取类的构造器"><a href="#获取类的构造器" class="headerlink" title="获取类的构造器"></a>获取类的构造器</h3><p><strong><code>没有形参的就是获取所有,注意是否为s结尾复数，形参列表是Class对象； 没有Declared的就是只获取public修饰的</code></strong></p>
+<ul>
+<li><strong>批量</strong>的方法：返回数组<br>   public Constructor[] **getConstructors()**：所有”<strong>公有的</strong>“构造方法<pre><code>      public Constructor[] **getDeclaredConstructors()**：获取**所有**的构造方法(包括私有、受保护、默认、公有)
+</code></pre>
+</li>
+<li><strong>单个</strong>的方法，并调用：<br>  public Constructor getConstructor(**Class… parameterTypes **):获取单个的”<strong>公有的</strong>“构造方法：<br>  public Constructor getDeclaredConstructor(<strong>Class… parameterTypes</strong>):获取”某个构造方法”可以是私有的，或受保护、默认、公有；</li>
+</ul>
+<p><code>调用时使用使用newInstance()</code></p>
+<pre><code>    Class c1 = Class.forName(&quot;filter.User&quot;);
+
+    Constructor constructor = c1.getConstructor(String.class, int.class);
+    Object u = constructor.newInstance(&quot;牛逼&quot;, 12);
+    System.out.println(u);
+</code></pre>
+<h3 id="获取类的属性"><a href="#获取类的属性" class="headerlink" title="获取类的属性"></a>获取类的属性</h3><p><strong><code>没有形参的就是获取所有,注意是否为s结尾复数，形参是String类型即指定获取某属性； 没有Declared的就是只获取public修饰的</code></strong></p>
+<ul>
+<li>批量的：<br>Field[] getFields():获取所有的”<strong>公有</strong>属性”,<strong>包括父类</strong><br>Field[] get<strong>Declared</strong>Fields():获取所有字段，包括：私有、受保护、默认、公有；</li>
+<li>获取单个的：<br>public Field getField(<strong>String</strong> fieldName):获取某个”公有的”字段；<br>public Field getDeclaredField(<strong>String</strong> fieldName):获取某个字段(可以是私有的)</li>
+</ul>
+<p>————————————————————————————————————</p>
+<p>如果使用getField(“name”)会由于<strong>私有属性</strong>抛java.lang.NoSuchFieldException: name</p>
+<p>如果使用 Field name =c1.getDeclaredField(“name”);但是如果不  <strong><code>name.setAccessible(true);</code></strong> 就会抛异常<br>java.lang.IllegalAccessException</p>
+<h3 id="获取类的加载器"><a href="#获取类的加载器" class="headerlink" title="获取类的加载器"></a>获取类的加载器</h3><p>类的加载器分为：</p>
+<p>c1.getClassLoader()</p>
+<h1 id="4-反射获取注解信息"><a href="#4-反射获取注解信息" class="headerlink" title="4.反射获取注解信息"></a>4.反射获取注解信息</h1><h2 id="4-1自定义注解"><a href="#4-1自定义注解" class="headerlink" title="4.1自定义注解"></a>4.1自定义注解</h2><pre><code>@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
+public @interface MyValue &#123;
+    //给字段赋值
+    String value();
+&#125;
+
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface MyTable &#123;
+    //表名
+    String value();
+&#125;
+
+
+
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Inherited
+public @interface MyController &#123;
+    //URL
+    String value();
+&#125;
+
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
+public @interface MyColumn &#123;
+    //字段名绑定
+    String value();
+&#125;
+</code></pre>
+<h2 id="4-2待绑定的Bean"><a href="#4-2待绑定的Bean" class="headerlink" title="4.2待绑定的Bean"></a>4.2待绑定的Bean</h2><pre><code>@MyTable(&quot;table_people&quot;)
+public class PeopleBean &#123;
+
+    @MyValue(&quot;zjh&quot;)
+    @MyColumn(&quot;xx_name&quot;)
+    private String name;
+
+    @MyValue(&quot;18&quot;)
+    @MyColumn(&quot;xx_age&quot;)
+    private int age;
+
+    @Override
+    public String toString() &#123;
+        return &quot;PeopleBean&#123;&quot; +
+                &quot;name=&#39;&quot; + name + &#39;\&#39;&#39; +
+                &quot;, age=&quot; + age +
+                &#39;&#125;&#39;;
+    &#125;
+&#125;
+</code></pre>
+<h2 id="4-3测试"><a href="#4-3测试" class="headerlink" title="4.3测试"></a>4.3测试</h2><pre><code>@MyController(&quot;/com/baidu/www&quot;)
+public class MyTest &#123;
+    public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException &#123;
+
+        //1.获取当前URL
+        Class&lt;MyTest&gt; c1 = MyTest.class;
+        MyController anno1 = c1.getAnnotation(MyController.class);
+        String value1 = anno1.value();
+        System.out.println(&quot;当前URL是：&quot; + value1);
+
+
+        //2.反射获取PeopleBean，并用@value对其赋值
+        Class c2 = Class.forName(&quot;filter.PeopleBean&quot;);
+        PeopleBean people= (PeopleBean)c2.newInstance();
+
+        //3.PeopleBean直接获取的注解只有@MyTable
+        Annotation[] annotations = c2.getDeclaredAnnotations();
+        System.out.println(&quot;类级别的注解数：&quot;+annotations.length);//1
+
+        //4.获取类中所有不包括父类的属性
+        Field[] fields = c2.getDeclaredFields();
+        for (Field f : fields) &#123;
+            //@MyColumn绑定的字段信息
+            MyColumn column = f.getDeclaredAnnotation(MyColumn.class);
+            System.out.println(f.getName() + &quot;绑定的表字段是：&quot; + column.value());
+
+            //@MyValue赋值操作
+            MyValue Myvalue = f.getAnnotation(MyValue.class);
+            String toValue = Myvalue.value();
+
+            f.setAccessible(true);
+            //对@MyValue目标绑定数据类型进行判断并赋值
+            if(f.getType().getName().equals(&quot;int&quot;))&#123;//判断属性是否是int类型
+                f.set(people, Integer.parseInt(toValue));
+            &#125;else&#123;
+                f.set(people, toValue);
+            &#125;
+        &#125;
+
+        System.out.println(people);
+    &#125;
+&#125;
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/e5c480a0846449ed9e23501be167923f.png"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://blogzjh.github.io/2022/04/21/Java%E6%B3%A8%E8%A7%A3%E5%92%8C%E5%8F%8D%E5%B0%84/" data-id="cl8wv0v1n000e1gta83zaa34q" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-HashMap中entrySet-详解" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2022/03/21/HashMap%E4%B8%ADentrySet-%E8%AF%A6%E8%A7%A3/" class="article-date">
+  <time datetime="2022-03-20T16:15:10.000Z" itemprop="datePublished">2022-03-21</time>
+</a>
     
-<style>
-    .left-col .switch-btn,
-    .left-col .switch-area {
-        display: none;
-    }
-    .toc-level-3 i,
-    .toc-level-3 ol {
-        display: none !important;
-    }
-</style>
-</div>
-            <h1 id="引导"><a href="#引导" class="headerlink" title="引导"></a>引导</h1><p>点击这里切换目录与文章列表</p>
-<p><img src="https://img-blog.csdnimg.cn/2bb36e3cf82b44d5b4f895033d7f4371.png"></p>
-<h2 id="该博客下的快捷键"><a href="#该博客下的快捷键" class="headerlink" title="该博客下的快捷键"></a>该博客下的快捷键</h2><table>
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E6%BA%90%E7%A0%81/">源码</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2022/03/21/HashMap%E4%B8%ADentrySet-%E8%AF%A6%E8%A7%A3/">HashMap中entrySet()详解</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文能解决的疑惑：</p>
+<ol>
+<li><strong>idea在debug时偷偷调用toString方法</strong>，在HashMap追源码时产生的疑惑</li>
+<li><strong>HashMap的entrySet()和keySet()方法真的创建了一个存满数据的set对象吗</strong>？</li>
+<li><strong>内部类：EntrySet类没有构造器，那它是怎么初始化的呢？</strong></li>
+<li>为什么集合框架中一定要<strong>利用好迭代器iterator()来获取入口</strong>？</li>
+<li>entrySet().size()获取的值是该set的实际大小吗？</li>
+<li>……</li>
+</ol>
+<h1 id="entrySet-和keySet-详解"><a href="#entrySet-和keySet-详解" class="headerlink" title="entrySet()和keySet()详解"></a>entrySet()和keySet()详解</h1><ul>
+<li>entrySet()和keySet()方法都是返回一个set对象，并且在debug时也能看到set的值和size；但是源码中<strong>并没有利用构造器</strong>对其初始化。</li>
+<li>在此文中以entrySet()举例，来阐述entrySet和keySet的生命周期</li>
+</ul>
+<h2 id="测试代码示例，并提出问题"><a href="#测试代码示例，并提出问题" class="headerlink" title="测试代码示例，并提出问题"></a>测试代码示例，并提出问题</h2><pre><code>    HashMap hs = new HashMap();
+    hs.put(&quot;啊啊&quot;, &quot;2&quot;);
+    hs.put(&quot;2&quot;, &quot;2&quot;);
+    hs.put(&quot;3&quot;, &quot;2&quot;);
+    hs.put(&quot;4&quot;, &quot;2&quot;);
+    hs.put(&quot;5&quot;, &quot;2&quot;);
+    hs.put(&quot;6&quot;, &quot;2&quot;);
+    hs.put(&quot;7&quot;, &quot;2&quot;);
+    hs.put(&quot;8&quot;, &quot;2&quot;);
+    hs.put(&quot;9&quot;, &quot;2&quot;);
+
+    Set entrySet = hs.entrySet();//1.获取entrySet对象
+    System.out.println(entrySet );//2.结果：正确输出了上面put的内容
+    Object[] objects = entrySet .toArray();
+    System.out.println(objects[3]);//3.结果：正确打印了5=2
+
+    Iterator iterator = entrySet .iterator();//4.获取迭代器
+    while (iterator.hasNext())&#123;//5.迭代器遍历
+        Map.Entry next = (Map.Entry) iterator.next();
+        next.getKey();
+        next.getValue();
+    &#125;
+</code></pre>
+<ul>
+<li>如果在idea中使用debug对<code>Set entrySet = hs.entrySet()</code>打断点，你会发现即便是没有运行到第二步，<strong>debug信息栏中已然出现了该set全部的内容。</strong></li>
+<li>跟着debug一直step into进行分析，发现并没有任何一个方法对entrySet对象进行过赋值，那么hashMap对象中的内容是如何进入到entrySet中的呢？</li>
+</ul>
+<h2 id="1-debug分析"><a href="#1-debug分析" class="headerlink" title="1 debug分析"></a>1 debug分析</h2><h3 id="new-EntrySet"><a href="#new-EntrySet" class="headerlink" title="new EntrySet()"></a>new EntrySet()</h3><ol>
+<li>没有找到构造函数</li>
+</ol>
+<p><img src="https://img-blog.csdnimg.cn/08ff8cd5337849618e6dfc90c22b84a5.png"></p>
+<ol start="2">
+<li>AbstractSet中只有一个空参且空函数体的方法</li>
+</ol>
+<p><img src="https://img-blog.csdnimg.cn/8cc53005bae44722845836798f466b1e.png"></p>
+<h3 id="第一个结论：entrySet是空对象"><a href="#第一个结论：entrySet是空对象" class="headerlink" title="第一个结论：entrySet是空对象"></a>第一个结论：entrySet是空对象</h3><p>entrySet只是new出来了，但它是一个没有内容的空对象。</p>
+<h2 id="2第二个问题：entrySet对象调用方法时为何有值？"><a href="#2第二个问题：entrySet对象调用方法时为何有值？" class="headerlink" title="2第二个问题：entrySet对象调用方法时为何有值？"></a>2第二个问题：entrySet对象调用方法时为何有值？</h2><p>既然    <code> Set entrySet = hs.entrySet()</code>出来的entrySet 对象是个空对象，那为何<code>System.out.println(entrySet );</code><br><code>Object[] objects = entrySet .toArray();</code><br><code>  Iterator iterator = entrySet .iterator()</code><br>对entrySet对象进行调用方法的时候却能正确的执行呢？</p>
+<h2 id="2-源码分析"><a href="#2-源码分析" class="headerlink" title="2 源码分析"></a>2 源码分析</h2><h3 id="toString方法"><a href="#toString方法" class="headerlink" title="toString方法"></a>toString方法</h3><p><code>System.out.println(entrySet );</code>  显然调用的是toString方法；</p>
+<ul>
+<li>在2.5中的源码可知entrySet对象继承于<code>AbstractSet</code>类，间接实现了<code>AbstractCollection</code>接口</li>
+<li><strong>重写的</strong>toString()方法调用了<code>this.iterator()</code>即EntrySet类的iterator()方法进行输出</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/62ee4cb2c23940579532b0b9816bba61.png"></p>
+<h3 id="iterator方法"><a href="#iterator方法" class="headerlink" title="iterator方法"></a>iterator方法</h3><ol>
+<li><p>我们发现HashMap中的内部类EntrySet中重写了iterator()方法，<strong>实际调用的是EntryIterator对象</strong><br><img src="https://img-blog.csdnimg.cn/e7a3d92938864dbfa739efcbe0412b7f.png"></p>
+</li>
+<li><p>EntryIterator类继承于HashIterator类 ：nextNode方法是HashIterator中的方法<br><img src="https://img-blog.csdnimg.cn/03f2e6ca1f0b4351bd1f8e8874207bb6.png" alt="EntryIterator"></p>
+</li>
+<li><p>跟进nextNode方法，框体内容是指针的变化的判断细节，不是本论题的重点</p>
+</li>
+</ol>
+<p><img src="https://img-blog.csdnimg.cn/66322df3e3be43ac834ef9674557c2c1.png"><br>由此可知：</p>
+<p>这个EntrySet类重写的iterator()方法可以使得指针<strong>正确得指向下一个节点</strong>..</p>
+<h3 id="toArray方法"><a href="#toArray方法" class="headerlink" title="toArray方法"></a>toArray方法</h3><ul>
+<li>测试代码中也正确输出了toArray()的结果，同样的，这个方法也是重写在其父类<code>AbstractCollection</code>中的</li>
+<li>同理，其底层实现还是调用了iterator()，利用HashIterator类中的nextNode()方法对指针进行下移</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/21842f3c7f454b26aea052afb93d4961.png"></p>
+<h3 id="size、clear方法"><a href="#size、clear方法" class="headerlink" title="size、clear方法"></a>size、clear方法</h3><p>这两个方法很简单，就是直接用的当前HashMap对象的属性和方法<br><img src="https://img-blog.csdnimg.cn/ddae87f117b94c039337ca30b8df092a.png"><br><strong>hashMap.entrySet().size()的大小并不是真正这个entrySet对象的大小，而是调用了size属性的fake size</strong></p>
+<h2 id="3小总结"><a href="#3小总结" class="headerlink" title="3小总结"></a>3小总结</h2><ul>
+<li>entrySet()和keySet()都是<strong>懒汉式</strong>，调用方法，<strong>new对象的时候并没有对其进行赋值</strong>,并且其size()方法也是一个虚假的size</li>
+<li>而是在使用hashMap.entrySet().**toString()**、hashMap.entrySet(). <strong>toArray()</strong> 等方法的时候才<code>调用iterator()来获取迭代器</code></li>
+<li>EntrySet类和KeySet类也都<strong>没有构造器能进行初始化</strong></li>
+<li>不得不说HashMap的设计十分精巧，entrySet()表面上获取了一个set对象，实际上这个set对象是空的，<strong>几乎所有的方法都是先直接获取迭代器入口</strong>，<strong>节约内存的同时性能大幅提升</strong></li>
+</ul>
+<h2 id="补充：putVal-方法和entrySet-无关"><a href="#补充：putVal-方法和entrySet-无关" class="headerlink" title="补充：putVal()方法和entrySet()无关"></a>补充：putVal()方法和entrySet()无关</h2><p>在翻阅资料的时候看到很多人说是putVal()方法中调用了resize()来维护了entrySet(),在看完源码之后才会发现这种说法是没有根据的。</p>
+<p>resize()放是扩容的方法，代码中也没有出现任何的跟EntrySet相关的逻辑</p>
+<h2 id="4关于idea在debug时的问题"><a href="#4关于idea在debug时的问题" class="headerlink" title="4关于idea在debug时的问题"></a>4关于idea在debug时的问题</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/lkforce/article/details/90479650">参考</a></p>
+<ul>
+<li>DEA在debug时，当debug到某个对象时，会调用对象的toString()方法，用来在debug界面显示对象信息。</li>
+<li>IDEA调用toString()方法时，即使在toString()方法中设置了断点，该断点也不会被触发，也就是说，开发者多数情况下不会知道toString()方法被调用了。</li>
+<li>多数情况下调用一下toString()方法没有什么问题，但是也有例外，<code>比如重写了toString()方法的类，随意的调用toString()方法会导致未知的问题</code>。<strong>本案例就是因为重写toString()方法而产生了问题</strong></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://blogzjh.github.io/2022/03/21/HashMap%E4%B8%ADentrySet-%E8%AF%A6%E8%A7%A3/" data-id="cl8wv0v1k00091gta6ey0cd21" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/HashMap/" rel="tag">HashMap</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-HashMap" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2022/03/21/HashMap/" class="article-date">
+  <time datetime="2022-03-20T16:13:23.000Z" itemprop="datePublished">2022-03-21</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E6%BA%90%E7%A0%81/">源码</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2022/03/21/HashMap/">HashMap</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>参考链接</p>
+<p><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1FE411t7M7?spm_id_from=333.999.0.0">https://www.bilibili.com/video/BV1FE411t7M7?spm_id_from=333.999.0.0</a><br><a target="_blank" rel="noopener" href="https://www.html.cn/qa/other/20583.html">https://www.html.cn/qa/other/20583.html</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_41105242/article/details/106972635">https://blog.csdn.net/weixin_41105242/article/details/106972635</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/fan2012huan/article/details/51087722">https://blog.csdn.net/fan2012huan/article/details/51087722</a><br><a target="_blank" rel="noopener" href="https://segmentfault.com/q/1010000012304833">https://segmentfault.com/q/1010000012304833</a><br>………等等等等</p>
+<ul>
+<li>本文其中有一个邪门问题（entrySet和keySet方法的生命周期），作者花了十几个小时，查遍了国内外很多资料最后才总结的</li>
+<li><strong>与其他面试题相比</strong>，本文能解决的疑惑（第3个大标题）：</li>
+</ul>
+<ol>
+<li><strong>idea在debug时偷偷调用toString方法</strong>，在HashMap追源码时产生的疑惑</li>
+<li><strong>HashMap的entrySet()和keySet()方法真的创建了一个存满数据的set对象吗</strong>？</li>
+<li><strong>内部类：EntrySet类没有构造器，那它是怎么初始化的呢？</strong></li>
+<li>为什么集合框架中一定要<strong>利用好迭代器iterator()来获取入口</strong>？</li>
+<li>entrySet().size()获取的值是该set的实际大小吗？</li>
+<li>……</li>
+</ol>
+<h1 id="1-数据结构"><a href="#1-数据结构" class="headerlink" title="1.数据结构"></a>1.数据结构</h1><ul>
+<li>1.7中是：数组+单链表——头插法(多线程写可能死循环)</li>
+</ul>
+<p>1.8中是：数组+单链表——尾插法 + 红黑树</p>
+<ul>
+<li>数组默认初始大小16，负载因子默认0.75(泊松分布下的折中最佳值)<h2 id="JDK1-7：数组-单向链表"><a href="#JDK1-7：数组-单向链表" class="headerlink" title="JDK1.7：数组+单向链表"></a>JDK1.7：数组+单向链表</h2><h3 id="Q：为什么使用单向链表而不使用双向链表？"><a href="#Q：为什么使用单向链表而不使用双向链表？" class="headerlink" title="Q：为什么使用单向链表而不使用双向链表？"></a>Q：为什么使用单向链表而不使用双向链表？</h3>插入新数据or查询的时候需要<strong>遍历相同桶中的所有元素</strong>，来确保和相同hash值的所有元素调用equals方法进行比对</li>
+</ul>
+<h3 id="Q：头插法会出现什么问题？"><a href="#Q：头插法会出现什么问题？" class="headerlink" title="Q：头插法会出现什么问题？"></a>Q：头插法会出现什么问题？</h3><p><strong>并发下：同时扩容可能出现死循环：</strong></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/gongsenlin341/article/details/112582217">图解</a></p>
+<h2 id="JDK1-8：数组-单向链表-红黑树"><a href="#JDK1-8：数组-单向链表-红黑树" class="headerlink" title="JDK1.8：数组+单向链表+红黑树"></a>JDK1.8：数组+单向链表+红黑树</h2><h3 id="Q：为什么选择红黑树"><a href="#Q：为什么选择红黑树" class="headerlink" title="Q：为什么选择红黑树"></a>Q：为什么选择红黑树</h3><ul>
+<li>红黑树是一个绝对平衡的二叉树，插入、删除、查询的效果都比较平衡；</li>
+<li>单向链表过长则会导致效率降低</li>
+<li>而选择二叉树则可能在极端情况下成为链表；</li>
+</ul>
+<h3 id="Q：单链表什么时候转红黑树"><a href="#Q：单链表什么时候转红黑树" class="headerlink" title="Q：单链表什么时候转红黑树"></a>Q：单链表什么时候转红黑树</h3><ul>
+<li><strong>当同时满足</strong>：链表长度&gt;=8   且    底层数组长度&gt;=64</li>
+<li>底层数组长度不足64时，选择<strong>扩容</strong>来解决链表过长问题；</li>
+</ul>
+<h3 id="Q：JDK1-8使用尾插法"><a href="#Q：JDK1-8使用尾插法" class="headerlink" title="Q：JDK1.8使用尾插法"></a>Q：JDK1.8使用尾插法</h3><ul>
+<li>防止了头插法在并发扩容场景下可能出现的死循环</li>
+</ul>
+<h3 id="Q：底层数组的元素存储的是值还是节点？"><a href="#Q：底层数组的元素存储的是值还是节点？" class="headerlink" title="Q：底层数组的元素存储的是值还是节点？"></a>Q：底层数组的元素存储的是值还是节点？</h3><p>底层数组本身上面存储的是Node implements Map.Entry节点，有一个<strong>next指针指向下链表or红黑树的root节点</strong></p>
+<h1 id="2-源码解析"><a href="#2-源码解析" class="headerlink" title="2.源码解析"></a>2.源码解析</h1><h2 id="2-1-成员变量"><a href="#2-1-成员变量" class="headerlink" title="2.1 成员变量"></a>2.1 成员变量</h2><h3 id="内部类"><a href="#内部类" class="headerlink" title="内部类"></a>内部类</h3><p><img src="https://img-blog.csdnimg.cn/ca265c7f68b84bb78d094ff0ac5897eb.png"></p>
+<ol>
+<li>JDK7中使用的是Map.Entry存储键值对， JDK8中Node实际上只是Entry的一个套壳<br><img src="https://img-blog.csdnimg.cn/eea7d21b83f242d4acc93a294b4baa0b.png" alt="JDK8中的Node节点"></li>
+</ol>
+<ol start="2">
+<li>TreeNode就是红黑树的节点类</li>
+</ol>
+<h3 id="成员变量"><a href="#成员变量" class="headerlink" title="成员变量"></a>成员变量</h3><p>约定前面的数组结构的每一个格格称为<strong>桶</strong><br>约定桶后面存放的每一个数据称为<strong>bin</strong><br>bin这个术语来自于JDK 1.8的HashMap注释。</p>
+<p><img src="https://img-blog.csdnimg.cn/53048b3d7eb7400cad0f7c4fb48eeaf6.png"><br>由图可知：</p>
+<ol>
+<li>实现了序列化机制</li>
+<li>1&lt;&lt;&lt;4 位左移4，相当于2^4 = 16，默认底层数组容量是16</li>
+<li>1&lt;&lt;&lt;30 位左移30，相当于2^30 ，即最大底层数组容量</li>
+<li>默认加载因子：0.75，这个数是泊松分布下的折中最佳值：假设底层数组长度是默认值16，当桶数量 &gt;= 16*0.75 = 12时，则扩容</li>
+<li>单链表最大长度=8 ， 超过8则扩容 or 转红黑树</li>
+<li>当底层数组长&gt;=64时，才会选择生成红黑树，否则扩容</li>
+<li>table即底层数组本身存储的是Node&lt;K,V&gt;节点，链表or红黑树的root节点只是被Node.next指向而已，他们本身不存储在table数组中</li>
+<li>entrySet：获取所有元素的set集合（具体过程在后面有）</li>
+<li>size：注意区分capacity（数组长度），**<code>size</code>是实际k-v对的个数<strong>；</strong><code>capacity</code>是数组长度；<code>threshold</code> = capacity * loadFactory是扩容临界域**</li>
+<li>modCount：记录HashMap被修改的次数，Put、Clear等修改操作都会++modCount。并且各种操作都会判断modCount的值是否改变，以在并发场景下抛出异常。</li>
+<li>threshold：扩容临界域，桶数量超过该值则扩容</li>
+<li>loadFactor：负载因子(加载因子)：默认0.75，也可在构造函数中设置。0.75并不是统计学上的最佳，这跟不同的计算机也有关，而是JDK取了一个折中的值。</li>
+</ol>
+<h2 id="2-2-常用方法"><a href="#2-2-常用方法" class="headerlink" title="2.2 常用方法"></a>2.2 常用方法</h2><h3 id="put方法"><a href="#put方法" class="headerlink" title="put方法"></a>put方法</h3><p>put方法实际调用的是putVal：这个方法会<strong>计算hash值</strong>、**++modCount计数器<strong>、</strong>哈希碰撞的处理(链表or红黑树)<strong>、</strong>判断添加之后是否需要扩容**</p>
+<p><img src="https://img-blog.csdnimg.cn/3917fbde500544c185547ae87abb3e55.png"></p>
+<p>Q：<strong>这里为什么是<code>元素总数size</code> &gt; threshold 而不是 已使用的桶的数量 &gt; <code>threshold扩容边界值</code> 呢？</strong></p>
+<h3 id="补：size、threshold、桶的使用个数"><a href="#补：size、threshold、桶的使用个数" class="headerlink" title="补：size、threshold、桶的使用个数"></a>补：size、threshold、桶的使用个数</h3><ul>
+<li>首先，JDK源码中并没有给出<strong>桶的使用个数这个filed</strong>，只给出了threshold临界阈：例如initCapacity = 16  ，那么threshold = 12 。</li>
+<li>size是所有元素的个数，查看JDK源码的put方法可知：<strong>只要size&gt;桶临界阈threshold，就会进行扩容resize()。</strong></li>
+<li>因此可能存在一种<code>极端情况</code>：16个桶(capacity=16)，极端的哈希碰撞只使用了两个桶(一个桶7个元素，另一个桶6个元素)，<strong>但是size &gt; 12 ，扩容。</strong></li>
+</ul>
+<h3 id="hash值计算"><a href="#hash值计算" class="headerlink" title="hash值计算"></a>hash值计算</h3><p>我们在put方法中可以看到，调用了hash()方法，这个哈希方法首先计算出 key 的 hashCode 赋值给 h，然后与 h 无符号右移 16 位后的二进制进行按位异或得到最后的 hash 值<img src="https://img-blog.csdnimg.cn/4de59ef156ba4419b958f45db5289706.png" alt="hash()源码"></p>
+<h3 id="补：为什么capacity必须是2-n"><a href="#补：为什么capacity必须是2-n" class="headerlink" title="补：为什么capacity必须是2^n"></a>补：为什么capacity必须是2^n</h3><ul>
+<li>首先为了提高性能，JDK中大量使用了<code>位运算</code>，比如在计算hash值的时候，利用按位与hash&amp;(cap-1)，一个数如7（0111）的cap-1就是（0110）。那么最后一位数的按位与始终是0</li>
+<li>而一个数如8（1000）的cap-1就是（0111），低位都是1，按位与不容易出现哈希碰撞</li>
+<li>总之：<strong>2的n次幂 - 1 的二进制码<code>低位全部都是1</code>，于hash值<code>相与</code>时不会改变hash的低位值，因此减少了碰撞的概率</strong></li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/a5a7b162aedd4b4c8ba269083074ad4b.png" alt="引用"></p>
+<h3 id="补：JDK如何做到扩容时保持capacity-2-n？"><a href="#补：JDK如何做到扩容时保持capacity-2-n？" class="headerlink" title="补：JDK如何做到扩容时保持capacity=2^n？"></a>补：JDK如何做到扩容时保持capacity=2^n？</h3><p>底层也是用了位运算，效果就是：扩容后的是最接近的2^n<br><img src="https://img-blog.csdnimg.cn/772af8d5b2064ee8a4dfa338fba55fbb.png"></p>
+<h3 id="扩容时调用的resize-方法"><a href="#扩容时调用的resize-方法" class="headerlink" title="扩容时调用的resize()方法"></a>扩容时调用的resize()方法</h3><ul>
+<li>扩容是一个非常耗费资源的操作，并且在JDK7版本需要对所有元素进行hash值重新计算</li>
+<li>JDK8引入了新的算法rehash（这不是一个JDK方法，这是一个算法），在rehash算法下，可以<strong>让一部分元素待在原索引处，另一部分元素 索引 += 新增的容量数</strong></li>
+</ul>
+<h3 id="remove删除"><a href="#remove删除" class="headerlink" title="remove删除"></a>remove删除</h3><ul>
+<li>如果删除后该桶处的红黑树节点&lt;=8，则红黑树转为单链表</li>
+<li>删除也是先算hash定位，然后遍历红黑树or单链表</li>
+</ul>
+<p>同理get()方法也是先算hash定位，后在桶中遍历</p>
+<h2 id="2-3遍历的方法"><a href="#2-3遍历的方法" class="headerlink" title="2.3遍历的方法"></a>2.3遍历的方法</h2><p>一般情况下都是使用迭代器，迭代器的效率最高，<strong>阿里开发手册指出：第三种方法会遍历两次</strong></p>
+<p><img src="https://img-blog.csdnimg.cn/479cc4d297a54082b9a15b9bf5996c10.png" alt="三种方法"></p>
+<h2 id="2-4迭代器原理"><a href="#2-4迭代器原理" class="headerlink" title="2.4迭代器原理"></a>2.4迭代器原理</h2><p>可以自己写一个，然后跟着debug</p>
+<pre><code>    Set set = hs.entrySet();//重点关注entrySet怎么来的
+    Iterator iterator = set.iterator();
+
+    while (iterator.hasNext())&#123;
+        Map.Entry next = (Map.Entry) iterator.next();
+        next.getKey();
+        next.getValue();
+    &#125;
+</code></pre>
+<h3 id="iterator-next-方法"><a href="#iterator-next-方法" class="headerlink" title="iterator.next()方法"></a>iterator.next()方法</h3><ol>
+<li>调用next()方法相当于调用Iterator接口中的nextNode()方法</li>
+</ol>
+<p><img src="https://img-blog.csdnimg.cn/e154e4ee1c714bf982fa0db3e1fe159d.png"></p>
+<ol start="2">
+<li>在HashIterator类中查看nextNode()方法<br><img src="https://img-blog.csdnimg.cn/7c5b225f1a9f4f4f95e9fb0c620fe401.png" alt="1"><br><img src="https://img-blog.csdnimg.cn/d0bdaec1ce2d419984ccac8351df38c0.png" alt="2"></li>
+</ol>
+<h2 id="2-5-entrySet-、keySet-是如何获取Set的？"><a href="#2-5-entrySet-、keySet-是如何获取Set的？" class="headerlink" title="2.5 entrySet()、keySet()是如何获取Set的？"></a>2.5 entrySet()、keySet()是如何获取Set的？</h2><ul>
+<li>总所周知HashMap的底层是数组+链表+红黑树</li>
+<li>并且<strong>put方法中并没有同时构造一个entrySet、keySet</strong></li>
+<li>那么hashMap.entrySet()为何就能直接获取entry键值对的Set集合的呢？</li>
+</ul>
+<p>我们以keySet()方法为例：</p>
+<p>调用keySet()方法会 new一个keySet类对象</p>
+<pre><code>public Set&lt;K&gt; keySet() &#123;
+    Set&lt;K&gt; ks = keySet;
+    if (ks == null) &#123;
+        ks = new KeySet();//1.调用keySet()方法时就new一个KeySet对象
+        keySet = ks;
+    &#125;
+    return ks;
+&#125;
+
+
+//2.但是KeySet类中并没有一个构造方法来使得keySet被赋值
+final class KeySet extends AbstractSet&lt;K&gt; &#123;
+//3.有的也只是重写了size()方法，返回的是当前hashMap的size
+    public final int size()                 &#123; return size; &#125;
+    public final void clear()               &#123; HashMap.this.clear(); &#125;
+    //4.并且初始化时也没有调用迭代器
+    public final Iterator&lt;K&gt; iterator()     &#123; return new KeyIterator(); &#125;
+    public final boolean contains(Object o) &#123; return containsKey(o); &#125;
+    public final boolean remove(Object key) &#123;
+        return removeNode(hash(key), key, null, false, true) != null;
+    &#125;
+    public final Spliterator&lt;K&gt; spliterator() &#123;
+        return new KeySpliterator&lt;&gt;(HashMap.this, 0, -1, 0, 0);
+    &#125;
+    //5.更没有调用forEach方法
+    public final void forEach(Consumer&lt;? super K&gt; action) &#123;
+        Node&lt;K,V&gt;[] tab;
+        if (action == null)
+            throw new NullPointerException();
+        if (size &gt; 0 &amp;&amp; (tab = table) != null) &#123;
+            int mc = modCount;
+            for (int i = 0; i &lt; tab.length; ++i) &#123;
+                for (Node&lt;K,V&gt; e = tab[i]; e != null; e = e.next)
+                    action.accept(e.key);
+            &#125;
+            if (modCount != mc)
+                throw new ConcurrentModificationException();
+        &#125;
+    &#125;
+&#125;
+</code></pre>
+<p>然后我们去KeySet的父类，发现只有一个空参的空构造器，那么entrySet()和keySet()方法在调用的时候，到底是如何赋值的呢？<br><img src="https://img-blog.csdnimg.cn/e521350cff3a417482a83affd20fc406.png"></p>
+<h1 id="3-entrySet-和keySet-详解"><a href="#3-entrySet-和keySet-详解" class="headerlink" title="3.entrySet()和keySet()详解"></a>3.entrySet()和keySet()详解</h1><ul>
+<li>前面已经提到，entrySet()和keySet()方法都是返回一个set对象，并且在debug时也能看到set的值和size；但是源码中<strong>并没有利用构造器</strong>对其初始化。</li>
+<li>在此文中以entrySet()举例，来阐述entrySet和keySet的生命周期</li>
+</ul>
+<h2 id="3-1测试代码示例，并提出问题"><a href="#3-1测试代码示例，并提出问题" class="headerlink" title="3.1测试代码示例，并提出问题"></a>3.1测试代码示例，并提出问题</h2><pre><code>    HashMap hs = new HashMap();
+    hs.put(&quot;啊啊&quot;, &quot;2&quot;);
+    hs.put(&quot;2&quot;, &quot;2&quot;);
+    hs.put(&quot;3&quot;, &quot;2&quot;);
+    hs.put(&quot;4&quot;, &quot;2&quot;);
+    hs.put(&quot;5&quot;, &quot;2&quot;);
+    hs.put(&quot;6&quot;, &quot;2&quot;);
+    hs.put(&quot;7&quot;, &quot;2&quot;);
+    hs.put(&quot;8&quot;, &quot;2&quot;);
+    hs.put(&quot;9&quot;, &quot;2&quot;);
+
+    Set entrySet = hs.entrySet();//1.获取entrySet对象
+    System.out.println(entrySet );//2.结果：正确输出了上面put的内容
+    Object[] objects = entrySet .toArray();
+    System.out.println(objects[3]);//3.结果：正确打印了5=2
+
+    Iterator iterator = entrySet .iterator();//4.获取迭代器
+    while (iterator.hasNext())&#123;//5.迭代器遍历
+        Map.Entry next = (Map.Entry) iterator.next();
+        next.getKey();
+        next.getValue();
+    &#125;
+</code></pre>
+<ul>
+<li>如果在idea中使用debug对<code>Set entrySet = hs.entrySet()</code>打断点，你会发现即便是没有运行到第二步，<strong>debug信息栏中已然出现了该set全部的内容。</strong></li>
+<li>跟着debug一直step into进行分析，发现并没有任何一个方法对entrySet对象进行过赋值，那么hashMap对象中的内容是如何进入到entrySet中的呢？</li>
+</ul>
+<h2 id="3-1-debug分析"><a href="#3-1-debug分析" class="headerlink" title="3.1 debug分析"></a>3.1 debug分析</h2><h3 id="new-EntrySet"><a href="#new-EntrySet" class="headerlink" title="new EntrySet()"></a>new EntrySet()</h3><ol>
+<li>没有找到构造函数</li>
+</ol>
+<p><img src="https://img-blog.csdnimg.cn/08ff8cd5337849618e6dfc90c22b84a5.png"></p>
+<ol start="2">
+<li>AbstractSet中只有一个空参且空函数体的方法</li>
+</ol>
+<p><img src="https://img-blog.csdnimg.cn/8cc53005bae44722845836798f466b1e.png"></p>
+<h3 id="第一个结论：entrySet是空对象"><a href="#第一个结论：entrySet是空对象" class="headerlink" title="第一个结论：entrySet是空对象"></a>第一个结论：entrySet是空对象</h3><p>entrySet只是new出来了，但它是一个没有内容的空对象。</p>
+<h2 id="3-2第二个问题：entrySet对象调用方法时为何有值？"><a href="#3-2第二个问题：entrySet对象调用方法时为何有值？" class="headerlink" title="3.2第二个问题：entrySet对象调用方法时为何有值？"></a>3.2第二个问题：entrySet对象调用方法时为何有值？</h2><p>既然    <code> Set entrySet = hs.entrySet()</code>出来的entrySet 对象是个空对象，那为何<code>System.out.println(entrySet );</code><br><code>Object[] objects = entrySet .toArray();</code><br><code>  Iterator iterator = entrySet .iterator()</code><br>对entrySet对象进行调用方法的时候却能正确的执行呢？</p>
+<h2 id="3-2-源码分析"><a href="#3-2-源码分析" class="headerlink" title="3.2 源码分析"></a>3.2 源码分析</h2><h3 id="toString方法"><a href="#toString方法" class="headerlink" title="toString方法"></a>toString方法</h3><p><code>System.out.println(entrySet );</code>  显然调用的是toString方法；</p>
+<ul>
+<li>在2.5中的源码可知entrySet对象继承于<code>AbstractSet</code>类，间接实现了<code>AbstractCollection</code>接口</li>
+<li><strong>重写的</strong>toString()方法调用了<code>this.iterator()</code>即EntrySet类的iterator()方法进行输出</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/62ee4cb2c23940579532b0b9816bba61.png"></p>
+<h3 id="iterator方法"><a href="#iterator方法" class="headerlink" title="iterator方法"></a>iterator方法</h3><ol>
+<li><p>我们发现HashMap中的内部类EntrySet中重写了iterator()方法，<strong>实际调用的是EntryIterator对象</strong><br><img src="https://img-blog.csdnimg.cn/e7a3d92938864dbfa739efcbe0412b7f.png"></p>
+</li>
+<li><p>EntryIterator类继承于HashIterator类 ：nextNode方法是HashIterator中的方法<br><img src="https://img-blog.csdnimg.cn/03f2e6ca1f0b4351bd1f8e8874207bb6.png" alt="EntryIterator"></p>
+</li>
+<li><p>跟进nextNode方法，框体内容是指针的变化的判断细节，不是本论题的重点</p>
+</li>
+</ol>
+<p><img src="https://img-blog.csdnimg.cn/66322df3e3be43ac834ef9674557c2c1.png"><br>由此可知：</p>
+<p>这个EntrySet类重写的iterator()方法可以使得指针<strong>正确得指向下一个节点</strong>..</p>
+<h3 id="toArray方法"><a href="#toArray方法" class="headerlink" title="toArray方法"></a>toArray方法</h3><ul>
+<li>测试代码中也正确输出了toArray()的结果，同样的，这个方法也是重写在其父类<code>AbstractCollection</code>中的</li>
+<li>同理，其底层实现还是调用了iterator()，利用HashIterator类中的nextNode()方法对指针进行下移</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/21842f3c7f454b26aea052afb93d4961.png"></p>
+<h3 id="size、clear方法"><a href="#size、clear方法" class="headerlink" title="size、clear方法"></a>size、clear方法</h3><p>这两个方法很简单，就是直接用的当前HashMap对象的属性和方法<br><img src="https://img-blog.csdnimg.cn/ddae87f117b94c039337ca30b8df092a.png"><br><strong>hashMap.entrySet().size()的大小并不是真正这个entrySet对象的大小，而是调用了size属性的fake size</strong></p>
+<h2 id="3-3小总结"><a href="#3-3小总结" class="headerlink" title="3.3小总结"></a>3.3小总结</h2><ul>
+<li>entrySet()和keySet()都是<strong>懒汉式</strong>，调用方法，<strong>new对象的时候并没有对其进行赋值</strong></li>
+<li>而是在使用hashMap.entrySet().**toString()**、hashMap.entrySet(). <strong>toArray()</strong> 等方法的时候才<code>调用iterator()来获取迭代器</code></li>
+<li>EntrySet类和KeySet类也都<strong>没有构造器能进行初始化</strong></li>
+<li>不得不说HashMap的设计十分精巧，entrySet()表面上获取了一个set对象，实际上这个set对象是空的，<strong>几乎所有的方法都是先直接获取迭代器入口</strong>，<strong>性能大幅提升</strong></li>
+</ul>
+<h2 id="3-4关于idea在debug时的问题"><a href="#3-4关于idea在debug时的问题" class="headerlink" title="3.4关于idea在debug时的问题"></a>3.4关于idea在debug时的问题</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/lkforce/article/details/90479650">参考</a></p>
+<ul>
+<li>DEA在debug时，当debug到某个对象时，会调用对象的toString()方法，用来在debug界面显示对象信息。</li>
+<li>IDEA调用toString()方法时，即使在toString()方法中设置了断点，该断点也不会被触发，也就是说，开发者多数情况下不会知道toString()方法被调用了。</li>
+<li>多数情况下调用一下toString()方法没有什么问题，但是也有例外，<code>比如重写了toString()方法的类，随意的调用toString()方法会导致未知的问题</code>。<strong>本案例就是因为重写toString()方法而产生了问题</strong></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://blogzjh.github.io/2022/03/21/HashMap/" data-id="cl8wv0v1i00051gta625g91pa" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/HashMap/" rel="tag">HashMap</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Mysql事务和存储引擎" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2022/03/07/Mysql%E4%BA%8B%E5%8A%A1%E5%92%8C%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/" class="article-date">
+  <time datetime="2022-03-07T14:11:06.000Z" itemprop="datePublished">2022-03-07</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E4%B8%AD%E9%97%B4%E4%BB%B6/">中间件</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2022/03/07/Mysql%E4%BA%8B%E5%8A%A1%E5%92%8C%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/">Mysql事务和存储引擎</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h1><p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/9b5eb43236cc">参考</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/qlqwjy/p/8547999.html">参考</a></p>
+<h2 id="事务控制"><a href="#事务控制" class="headerlink" title="事务控制"></a>事务控制</h2><p>方式一：set autocommit = 0</p>
+<p>方式二：START TRANSACTION 或 BEGIN</p>
+<p>都是手动提交commit，手动回滚rollback</p>
+<h2 id="Springboot中事务控制"><a href="#Springboot中事务控制" class="headerlink" title="Springboot中事务控制"></a>Springboot中事务控制</h2><h3 id="Transactional注解："><a href="#Transactional注解：" class="headerlink" title="@Transactional注解："></a>@Transactional注解：</h3><p>在Spring Boot中推荐使用@Transactional注解来申明事务。</p>
+<ul>
+<li>首先需要导入JDBC依赖</li>
+<li>在<strong>Service层</strong>中添加@Transactional注解</li>
+<li>@Transactional注解<strong>既可以标注在类上也可以标注在方法上</strong></li>
+</ul>
+<h3 id="业务场景举例："><a href="#业务场景举例：" class="headerlink" title="业务场景举例："></a>业务场景举例：</h3><p>经典的银行转账问题，Dao层两个@update，一个增一个减，Service层中不光注入了转账的Dao，还注入了积分相关的Dao，这一系列操作是一个事务，所以需要在Service层or其下对应的方法使用注解@Transactional</p>
+<h3 id="注解属性"><a href="#注解属性" class="headerlink" title="注解属性"></a>注解属性</h3><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/wkl305268748/article/details/77619367?spm=1001.2014.3001.5506">常用配置参考</a></p>
+<ul>
+<li>rollbackFor：触发回滚的异常类型设定</li>
+<li>isolation：事务的隔离级别设定</li>
+<li>timeout：超时回滚<br><img src="https://img-blog.csdnimg.cn/fadee28af9584631b86082be4046fd9a.png"></li>
+</ul>
+<p>举例：<br><img src="https://img-blog.csdnimg.cn/a0f3bbb6296b4e78851a6faf049c4788.png"></p>
+<h3 id="Transactional失效"><a href="#Transactional失效" class="headerlink" title="@Transactional失效"></a>@Transactional失效</h3><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/114461128">失效参考案例</a><br>最常见的失效是：<strong>在事务内部把异常给捕获了</strong>，举个例子</p>
+<p><img src="https://img-blog.csdnimg.cn/57b35a827c5e4ea489fc87ea18af55d8.png">应该在最外层（控制层）进行异常捕获，保证事务的开启只有一条语句</p>
+<h2 id="事务四大特性"><a href="#事务四大特性" class="headerlink" title="事务四大特性"></a>事务四大特性</h2><p><img src="https://img-blog.csdnimg.cn/62d285c60c0f4d4885ed8575657a0f9d.png"></p>
+<h2 id="并发事务问题"><a href="#并发事务问题" class="headerlink" title="并发事务问题"></a>并发事务问题</h2><ul>
+<li>赃读：一个事务读到另外一个事务<strong>还没有提交</strong>的数据</li>
+<li>不可重复读：一个事务<strong>先后</strong>读取同一条记录，但两次读取的数据不同，称之为不可重复读</li>
+<li>幻读：（<strong>读时没有，插时有</strong>）一个事务按照条件查询数据时，没有对应的数据行，但是在插入数据时，又发现这行数据已经存在，好像出现了 “幻影”。</li>
+</ul>
+<h2 id="事务的4个隔离级别"><a href="#事务的4个隔离级别" class="headerlink" title="事务的4个隔离级别"></a>事务的4个隔离级别</h2><p>事务隔离级别越高，数据越安全，但是性能越低</p>
+<p><img src="https://img-blog.csdnimg.cn/bfa54d09e1ed476f8514fdfc13522988.png"></p>
+<h1 id="存储引擎"><a href="#存储引擎" class="headerlink" title="存储引擎"></a>存储引擎</h1><ul>
+<li>存储数据，建立索引，增删改查</li>
+<li>基于表，而非基于库</li>
+<li>Mysql默认引擎是InnoDB</li>
+</ul>
+<p>mysiam使用的常见被nosql：mongodb替代<br>memory也是一样被nosql：redis取代</p>
+<p><img src="https://img-blog.csdnimg.cn/ebc4baf0cebf45c18b826440bcf5809f.png"></p>
+<h2 id="查看设置引擎"><a href="#查看设置引擎" class="headerlink" title="查看设置引擎"></a>查看设置引擎</h2><p>查看：SHOW ENGINES<br>设置：CREATE TABLE xxx（）ENGIENS = MyISAM</p>
+<h2 id="默认：InnoDB"><a href="#默认：InnoDB" class="headerlink" title="默认：InnoDB"></a>默认：InnoDB</h2><ul>
+<li>可靠性(行锁+事务+外键)，高性能(B+树)</li>
+<li>支持事务，DML操作遵循ACID模型</li>
+<li>行级锁，<strong>提高并发访问性能</strong>    </li>
+<li>支持外键，保证数据完整性和正确性</li>
+</ul>
+<h2 id="早期：MyISAM"><a href="#早期：MyISAM" class="headerlink" title="早期：MyISAM"></a>早期：MyISAM</h2><p>面试题：</p>
+<p><img src="https://img-blog.csdnimg.cn/1a0de812895e4c64b62fc4fa410bc886.png"><br>足迹，评论，点赞这种非核心数据 可以用myisam，偶尔丢点数据也没事</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://blogzjh.github.io/2022/03/07/Mysql%E4%BA%8B%E5%8A%A1%E5%92%8C%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/" data-id="cl8wv0v1u000t1gta31v4ftgp" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Mysql-InnoDB-索引原理及的使用" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2022/03/07/Mysql-InnoDB-%E7%B4%A2%E5%BC%95%E5%8E%9F%E7%90%86%E5%8F%8A%E7%9A%84%E4%BD%BF%E7%94%A8/" class="article-date">
+  <time datetime="2022-03-07T14:10:05.000Z" itemprop="datePublished">2022-03-07</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E4%B8%AD%E9%97%B4%E4%BB%B6/">中间件</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2022/03/07/Mysql-InnoDB-%E7%B4%A2%E5%BC%95%E5%8E%9F%E7%90%86%E5%8F%8A%E7%9A%84%E4%BD%BF%E7%94%A8/">Mysql(InnoDB)索引原理及的使用</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="索引概述"><a href="#索引概述" class="headerlink" title="索引概述"></a>索引概述</h1><ul>
+<li>正常的业务SELECT居多，而INSERT UPDATE DELETE偏少，所以使用索引， 用空间换时间；查询变快，增删改变慢。</li>
+<li>可以选择给单个字段加索引，也可以联合几个字段加索引</li>
+<li>主键和外键默认都有索引，没有主键会自动生成rowid<h1 id="索引结构"><a href="#索引结构" class="headerlink" title="索引结构"></a>索引结构</h1>索引是存储引擎实现的，InnoDB的索引结构是B+树，<strong>大部分的引擎也都支持B+树索引</strong><br><img src="https://img-blog.csdnimg.cn/c678a3d3200c4c51bb94f79b353513bb.png"></li>
+</ul>
+<h2 id="B-树索引的优点"><a href="#B-树索引的优点" class="headerlink" title="B+树索引的优点"></a>B+树索引的优点</h2><p><img src="https://img-blog.csdnimg.cn/467a09b2cd70414dba064625da2053e5.png"></p>
+<ul>
+<li><strong>层级少</strong>，2200W的数据只有3层</li>
+<li>叶子节点存数据+指针(<strong>利于排序</strong>)</li>
+<li>支持<strong>范围查询</strong>    </li>
+<li>支持<strong>排序(区间指针)</strong></li>
+<li>索引全部出现在最下层，即便是他们作为了上层分支</li>
+</ul>
+<h2 id="InnoDB到底支持Hash索引吗？"><a href="#InnoDB到底支持Hash索引吗？" class="headerlink" title="InnoDB到底支持Hash索引吗？"></a>InnoDB到底支持Hash索引吗？</h2><p>InnoDB在特定条件下会<strong>自适应Hash索引，用户不能手动创建</strong>，可以理解为“索引的索引”，可以加快索引查询速度</p>
+<p>关于这个问题，参考<a target="_blank" rel="noopener" href="https://wenku.baidu.com/view/912836ffb5360b4c2e3f5727a5e9856a571226ef.html">https://wenku.baidu.com/view/912836ffb5360b4c2e3f5727a5e9856a571226ef.html</a></p>
+<p>相比B+树的优缺点：</p>
+<ul>
+<li>不支持范围查询，但指定查询效率更高(一般只需一次检索)</li>
+<li>哈希冲突问题使用链表解决</li>
+<li><strong>无法排序</strong>，哈希值计算结果没有顺序关系</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/igoodful/p/9361500.html">参考</a></p>
+<h1 id="索引4种分类"><a href="#索引4种分类" class="headerlink" title="索引4种分类"></a>索引4种分类</h1><p><img src="https://img-blog.csdnimg.cn/251aa1aa0c344c15a3fdc3d56e499f10.png"></p>
+<h2 id="聚集索引and二级索引"><a href="#聚集索引and二级索引" class="headerlink" title="聚集索引and二级索引"></a>聚集索引and二级索引</h2><p>聚集索引：唯一；索引处叶子节点包括<strong>行数据</strong><br>二级索引：多个：索引处叶子节点包括<strong>数据+关联的聚集索引</strong></p>
+<h3 id="聚类索引"><a href="#聚类索引" class="headerlink" title="聚类索引"></a>聚类索引</h3><ul>
+<li><strong>主键</strong>就是聚类索引</li>
+<li>没有主键就是<strong>UNIQUE</strong>作为聚类索引</li>
+<li>都没有则InnoDB<strong>自动生成rowid</strong>作为隐藏的聚类索引</li>
+</ul>
+<h3 id="二级索引及回表查询"><a href="#二级索引及回表查询" class="headerlink" title="二级索引及回表查询"></a>二级索引及回表查询</h3><ul>
+<li>每个叶子节点都包含<strong>对应行的聚类索引</strong></li>
+<li><strong>回表查询</strong>：例如当SELECT * FROM时，这种先到二级索引中查找数据，找到主键值，然后再到聚集索引中根据主键值，获取数据的方式</li>
+</ul>
+<h1 id="索引语法"><a href="#索引语法" class="headerlink" title="索引语法"></a>索引语法</h1><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_34698708/article/details/102529272?ops_request_misc=&request_id=&biz_id=102&utm_term=mysql%E5%88%9B%E5%BB%BA%E7%B4%A2%E5%BC%95%E8%AF%AD%E6%B3%95&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduweb~default-0-102529272.nonecase&spm=1018.2226.3001.4187">详细参考</a><br><img src="https://img-blog.csdnimg.cn/911a861364f3410c9527643a8754ad60.png"></p>
+<h2 id="主键和外键"><a href="#主键和外键" class="headerlink" title="主键和外键"></a>主键和外键</h2><p>主键：ALTER TABLE nxbusers ADD PRIMARY KEY ( id );<br><img src="https://img-blog.csdnimg.cn/9e729dd490024ece8da2f08eb1ae5079.png"><br>外键：ALTER TABLE nxbinfolike ADD FOREIGN KEY ( infoid ) REFERENCES nxbpushinfo ( infoid );</p>
+<p>也可以在设计表的时候直接添加。关于是否添加外键，可以参考<br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/jxl00125/p/12622969.html">https://www.cnblogs.com/jxl00125/p/12622969.html</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/bisal/article/details/50934304">https://blog.csdn.net/bisal/article/details/50934304</a></p>
+<h2 id="查看索引"><a href="#查看索引" class="headerlink" title="查看索引"></a>查看索引</h2><p><strong>SHOW INDEX FROM</strong> nxbcomments<br>一般建立的索引都是普通类型，至于索引方法还可以选择Hash，但不建议<br><img src="https://img-blog.csdnimg.cn/a544a78407cf48cbb802c94efa04bfee.png"></p>
+<h2 id="创建索引"><a href="#创建索引" class="headerlink" title="创建索引"></a>创建索引</h2><h3 id="默认：普通索引"><a href="#默认：普通索引" class="headerlink" title="默认：普通索引"></a>默认：普通索引</h3><p><strong>CREATE INDEX</strong> idx_comment_infoid <strong>ON</strong> nxbcomments <strong>(</strong> infoid <strong>)</strong></p>
+<h3 id="全文索引or唯一索引"><a href="#全文索引or唯一索引" class="headerlink" title="全文索引or唯一索引"></a>全文索引or唯一索引</h3><p>同理可以把FULLTEXT更换为UNIQUE<br>CREATE <strong>FULLTEXT</strong> INDEX idx_comment_infoid ON nxbcomments ( infoid );</p>
+<p><img src="https://img-blog.csdnimg.cn/53e1a75bbcf5412fbe5118b890cc0c3f.png"></p>
+<h3 id="联合索引"><a href="#联合索引" class="headerlink" title="联合索引"></a>联合索引</h3><p>注意索引命名方式，<strong>括号内顺序就是索引建立的顺序，关乎索引失效问题</strong><br>CREATE INDEX idx_pushinfo_topic_location ON nxbpushinfo ( topic, location );</p>
+<p>这样一来就建立了“话题”和“定位”的索引，在查询的时候可以只查询话题（索引失效的应用）</p>
+<p>在业务场景中，如果存在多个查询条件，考虑针对于查询字段建立索引时，建议建立联合索引，而非单列索引。</p>
+<h2 id="删除索引"><a href="#删除索引" class="headerlink" title="删除索引"></a>删除索引</h2><p>DROP INDEX idx_comment_infoid ON nxbcomments;<br>或者</p>
+<p>ALTER TABLE nxbcomments DROP INDEX idx_comment_infoid;</p>
+<h1 id="索引设计原则"><a href="#索引设计原则" class="headerlink" title="索引设计原则"></a>索引设计原则</h1><p>1). 针对于<strong>数据量较大</strong>，且查询比较频繁的表建立索引。<br>2). 针对于常作为<strong>查询条件（where）、排序（order by）、分组（group by）</strong>操作的字段建立索引。<br>3). 尽量选择区分度高的列作为索引，<strong>尽量建立唯一索引，区分度越高，使用索引的效率越高。</strong><br>4). 如果是字符串类型的字段，字段的长度较长，可以针对于字段的特点，建立前缀索引。<br>5). <strong>尽量使用联合索引</strong>，减少单列索引，查询时，<strong>联合索引很多时候可以覆盖索引，节省存储空间</strong>，避免回表，提高查询效率。<br>6). <strong>要控制索引的数量</strong>，索引并不是多多益善，索引越多，维护索引结构的代价也就越大，<strong>会影响增删改的效率</strong><br>7). <strong>如果索引列不能存储NULL值，请在创建表时使用NOT NULL约束它</strong>。当优化器知道每列是否包含NULL值时，它可以更好地确定哪个索引最有效地用于查询。</p>
+<h1 id="联合索引失效"><a href="#联合索引失效" class="headerlink" title="联合索引失效"></a>联合索引失效</h1><ul>
+<li>索引失效会带来一些问题，同时也可以巧妙应用</li>
+<li>索引的触发是通过where的，<strong>没有where则不触发索引</strong></li>
+<li>where的条件的顺序没有影响，有影响的是<strong>定义索引时的顺序</strong></li>
+<li><strong>总结</strong>：跳过了定义时的中间索引(后面的失效)；&lt;&gt;（后面的失效）；进行了运算（后面的失效）；字符串不加引号（后面的失效）；前缀%模糊查询（后面的失效）；or连接条件有的没索引(<strong>全失效</strong>)；查询已排序好的数据的边缘<h2 id="最左前缀法则"><a href="#最左前缀法则" class="headerlink" title="最左前缀法则"></a>最左前缀法则</h2>创建索引（topic , location , tag）即该索引在底层的建立顺序是从<strong>左到右</strong></li>
+<li>如果where条件中出现了topic = “” 则触发索引机制</li>
+<li>如果where条件中只写了topic = “” 和 tag = “” 而<strong>跳过了中间的location，则索引只对topic生效</strong></li>
+<li>如果where tag = “” and loacation = “” and topic = “”这种顺序也是可以的，<strong>只要是出现了topic就能触发索引</strong></li>
+</ul>
+<p>我们可以利用该特性实现《只定义一个联合索引，达到多方式筛选的目的》</p>
+<h2 id="范围查询"><a href="#范围查询" class="headerlink" title="范围查询"></a>范围查询</h2><p>联合索引中，出现范围查询(&gt;,&lt;)，范围查询<strong>右侧的列索引失效**。<br>当范围查询使用&gt;= 或 &lt;= 时，走联合索引了，所有的字段都是走索引<br>的。<br>**所以，在业务允许的情况下，尽可能的使用类似于 &gt;= 或 &lt;= 这类的范围查询，而避免使用 &gt; 或 &lt;</strong></p>
+<h2 id="索引列运算"><a href="#索引列运算" class="headerlink" title="索引列运算"></a>索引列运算</h2><p>例如explain select * from tb_user where <strong>substring(phone,10,2) = ‘15’;</strong><br>会导致索引失效</p>
+<p><img src="https://img-blog.csdnimg.cn/4f0a1723a4a94b0da4ca9415fccf7e2e.png"></p>
+<h2 id="字符串不加引号"><a href="#字符串不加引号" class="headerlink" title="字符串不加引号"></a>字符串不加引号</h2><p>字符串类型的数据如果不加引号，对查询结果没有影响，但是不会触发索引</p>
+<p>不触发：SELECT * FROM nxbpushinfo WHERE infoid = 1643877357315 ;</p>
+<p>触发：SELECT * FROM nxbpushinfo WHERE infoid = ‘1643877357315’ ;</p>
+<h2 id="头部模糊查询"><a href="#头部模糊查询" class="headerlink" title="头部模糊查询"></a>头部模糊查询</h2><p>尾模糊不失效，头模糊失效<br><img src="https://img-blog.csdnimg.cn/783740dede13460f8112d8de20b68e35.png"></p>
+<h2 id="or连接条件"><a href="#or连接条件" class="headerlink" title="or连接条件"></a>or连接条件</h2><p><strong>or连接的条件必须都有索引，不然都会失效；开发中可以使用UNION进行优化</strong></p>
+<p>where topic = “” or location = “”如果topic字段有索引（单独索引or联合索引）但是location没有索引，那么topic的索引也失效</p>
+<h2 id="数据分布影响"><a href="#数据分布影响" class="headerlink" title="数据分布影响"></a>数据分布影响</h2><p>如果MySQL评估使用索引比全表更慢，则不使用索引。<br>例如：已经按排序字段数据，查询倒数第10到正数第一的所有数据，不走索引<br>例如：一个表中绝大多数都是null，那么WHERE 有索引的字段 is not null也不走索引</p>
+<h1 id="EXPLAIN"><a href="#EXPLAIN" class="headerlink" title="EXPLAIN"></a>EXPLAIN</h1><p> 直接在select语句之前加上关键字 explain / desc<br>EXPLAIN SELECT 字段列表 FROM 表名 WHERE 条件 ;</p>
+<p>可以查询索引的使用情况</p>
+<h1 id="SQL提示"><a href="#SQL提示" class="headerlink" title="SQL提示"></a>SQL提示</h1><p>SQL提示，是优化数据库的一个重要手段，可以指定查询<strong>走联合索引or指定索引</strong></p>
+<h2 id="use-index建议"><a href="#use-index建议" class="headerlink" title="use index建议"></a>use index建议</h2><p>建议MySQL使用哪一个索引完成此次查询（仅仅是建议，mysql内部还会再次进行评估）</p>
+<p> select * from 表 index(指定索引) where 条件；</p>
+<h2 id="ignore-index忽略"><a href="#ignore-index忽略" class="headerlink" title="ignore index忽略"></a>ignore index忽略</h2><p>忽略指定的索引。<br>如果有其他包含的索引，则走其他索引。没有则不走索引</p>
+<h2 id="force-index强制"><a href="#force-index强制" class="headerlink" title="force index强制"></a>force index强制</h2><p>放的位置也和use index 一样，强制使用索引，不听mysql评估</p>
+<h1 id="索引覆盖-避免回表"><a href="#索引覆盖-避免回表" class="headerlink" title="索引覆盖(避免回表)"></a>索引覆盖(避免回表)</h1><p>概念：where中出现的字段都有索引，select的字段尽量是这些索引的字段，而非其他字段</p>
+<p><strong>如果超出这个范围，就需要拿到主键id，再去扫描聚集索引，再获取额外的数据（回表查询）</strong></p>
+<h1 id="前缀索引"><a href="#前缀索引" class="headerlink" title="前缀索引"></a>前缀索引</h1><p>当字段类型为字符串（varchar，text，longtext等）时，有时候需要索引很长的字符串，这会让索引变得很大，查询时，浪费大量的磁盘IO， 影响查询效率。<strong>此时可以只将字符串的一部分前缀，建立索引</strong>，这样可以大大节约索引空间，从而提高索引效率。</p>
+<p>例如：对江苏南京，四川绵阳这种location字段的省份建立索引(不考虑黑龙江是三个字)</p>
+<p>create index idx_location_province on nxbpushinfo(location(2))</p>
+<p>例如：手机号码的前缀决定了地域，也可以添加前缀索引</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://blogzjh.github.io/2022/03/07/Mysql-InnoDB-%E7%B4%A2%E5%BC%95%E5%8E%9F%E7%90%86%E5%8F%8A%E7%9A%84%E4%BD%BF%E7%94%A8/" data-id="cl8wv0v1v000v1gtaabym6sxn" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-LinkedList源码中为何大量出现final" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2022/02/21/LinkedList%E6%BA%90%E7%A0%81%E4%B8%AD%E4%B8%BA%E4%BD%95%E5%A4%A7%E9%87%8F%E5%87%BA%E7%8E%B0final/" class="article-date">
+  <time datetime="2022-02-21T01:57:35.000Z" itemprop="datePublished">2022-02-21</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E6%BA%90%E7%A0%81/">源码</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2022/02/21/LinkedList%E6%BA%90%E7%A0%81%E4%B8%AD%E4%B8%BA%E4%BD%95%E5%A4%A7%E9%87%8F%E5%87%BA%E7%8E%B0final/">LinkedList源码中为何大量出现final</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="源码中出现final的地方"><a href="#源码中出现final的地方" class="headerlink" title="源码中出现final的地方"></a>源码中出现final的地方</h1><ul>
+<li>所有的link有关的方法（增删操作）add remove</li>
+<li>需要保存中间变量的节点（prev和next指针需要修改的节点）</li>
+<li>像clear get这种不涉及“更改指针指向”的方法不需要对中间变量定义final</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/8205fb2b21234a24a8f79d42bc9ca406.png" alt="linkFirst"><br><img src="https://img-blog.csdnimg.cn/e59b57429ad34923b07be9a51fda4c53.png" alt="unlink"></p>
+<h1 id="final的作用"><a href="#final的作用" class="headerlink" title="final的作用"></a>final的作用</h1><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/chhyan-dream/p/10685878.html">final关键字的作用</a><br><img src="https://img-blog.csdnimg.cn/1b4bfe04d9a54f7ba8de7ee622f9b5a7.png"></p>
+<p>LinkedList中Node是一个对象，因此适用于第二条<strong>引用数据类型</strong>，举个例子：</p>
+<h2 id="有无final修饰的浅拷贝"><a href="#有无final修饰的浅拷贝" class="headerlink" title="有无final修饰的浅拷贝"></a>有无final修饰的浅拷贝</h2><pre><code>People p1 = new People(18,&quot;张三&quot;);
+People p2 = p1;
+</code></pre>
+<ol>
+<li><p>当：p1 = null;或者p1 = new People(20,”李四”);<br>实际上是栈中的p1存储的地址改变，但堆空间中之前 new People(18,”张三”);的对象仍然存在。因此p2不受影响</p>
+</li>
+<li><p>当：p1.setAge(21); 此时操作的是堆空间中的唯一对象，p2会受到影响</p>
+</li>
+</ol>
+<p>在源码中：</p>
+<pre><code>    final E element = x.item;
+    final Node&lt;E&gt; next = x.next;
+    final Node&lt;E&gt; prev = x.prev;
+</code></pre>
+<p>使得element  next    prev三个属性<strong>栈空间保存的地址不可再被重定向</strong>，但可以修改值，例如：next.prev = prev和prev.next=next <strong>可以对栈所指向的堆成员变量进行修改</strong></p>
+<h1 id="使用final初始化的优点"><a href="#使用final初始化的优点" class="headerlink" title="使用final初始化的优点"></a>使用final初始化的优点</h1><p>参考链接：</p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/noteless/p/10416678.html">https://www.cnblogs.com/noteless/p/10416678.html</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/noteless/p/10410368.html">https://www.cnblogs.com/noteless/p/10410368.html</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/mianlaoshu/articles/3648403.html">https://www.cnblogs.com/mianlaoshu/articles/3648403.html</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/maxiaopao/p/9212903.html">https://www.cnblogs.com/maxiaopao/p/9212903.html</a><br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/88775601">https://zhuanlan.zhihu.com/p/88775601</a><br><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/21762917/answer/19239387">https://www.zhihu.com/question/21762917/answer/19239387</a><br>第四条链接中讲final的优点很详细<br>第五条讲到了重排序<br>第六条是JVM对方法中的final变量性能调优</p>
+<h2 id="安全性分析"><a href="#安全性分析" class="headerlink" title="安全性分析"></a>安全性分析</h2><ul>
+<li>LinkedList本身是不安全，但这并不影响，因为每次事务初始化的都不是同一个Node对象，如果多线程并发并同时add，那么即便是源码定义了final，也可能会出现错误，因此LinkedList在并发场景下需要自行同步</li>
+<li><strong>但多线程并发对于方法中局部变量是不存在冲突的</strong></li>
+<li><strong>排除安全性的可能</strong></li>
+</ul>
+<h2 id="性能分析"><a href="#性能分析" class="headerlink" title="性能分析"></a>性能分析</h2><ul>
+<li><strong>在能够通过编译的前提下，无论局部变量声明时带不带final关键字修饰，对其访问的效率都一样。</strong></li>
+<li>既然一样，那性能上没影响了。排除</li>
+</ul>
+<h2 id="规范"><a href="#规范" class="headerlink" title="规范"></a>规范</h2><p>参考阿里巴巴的开发手册<br><img src="https://img-blog.csdnimg.cn/6039ed0d6c4c41f0b0dccf8451657ef2.png"><br>不允许修改的局部变量声明为final更多的是一种规范，在实质作用上加与不加没有区别，但他就是个规范。<strong>排除任何可能对这个变量进行修改的可能性</strong></p>
+<p>本问题花了我14个小时，查阅了无数资料，问了无数的人，最后能总结出来的答案就是：规范<br>hhhh浪费了我一天的宝贵时间</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ul>
+<li>方法内部初始化的final变量是局部变量</li>
+<li>没有多线程冲突问题</li>
+<li>局部静态基本数据变量定义final才有JVM优化，而引用类型则没有</li>
+<li>final可以避免误操作可能带来的问题，因此对所有不会修改的局部变量都用final定义</li>
+<li>LikedList仍然是线程不安全的，需要手动上锁</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://blogzjh.github.io/2022/02/21/LinkedList%E6%BA%90%E7%A0%81%E4%B8%AD%E4%B8%BA%E4%BD%95%E5%A4%A7%E9%87%8F%E5%87%BA%E7%8E%B0final/" data-id="cl8wv0v1q000j1gta1a35947u" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-随机森林——泰坦尼克号获救预测" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2022/01/11/%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E6%B3%B0%E5%9D%A6%E5%B0%BC%E5%85%8B%E5%8F%B7%E8%8E%B7%E6%95%91%E9%A2%84%E6%B5%8B/" class="article-date">
+  <time datetime="2022-01-10T19:06:10.000Z" itemprop="datePublished">2022-01-11</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2022/01/11/%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E6%B3%B0%E5%9D%A6%E5%B0%BC%E5%85%8B%E5%8F%B7%E8%8E%B7%E6%95%91%E9%A2%84%E6%B5%8B/">随机森林——泰坦尼克号获救预测</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="解决思路"><a href="#解决思路" class="headerlink" title="解决思路"></a>解决思路</h1><p>定义问题——&gt;数据收集——&gt;数据清洗——&gt;分析——&gt;建模——&gt;验证——&gt;优化</p>
+<p>该问题下前两步已经完成，本文从数据清洗开始</p>
+<h1 id="数据集的特征解读"><a href="#数据集的特征解读" class="headerlink" title="数据集的特征解读"></a>数据集的特征解读</h1><table>
 <thead>
 <tr>
-<th align="center">快捷键</th>
-<th align="center">功能</th>
+<th align="center">英</th>
+<th align="center">中</th>
+<th align="center">分析</th>
 </tr>
 </thead>
 <tbody><tr>
-<td align="center">s/S</td>
-<td align="center">全屏/取消全屏</td>
+<td align="center">PassengeID</td>
+<td align="center">乘客ID</td>
+<td align="center">乘客ID不影响Survive与否，但可标识身份</td>
 </tr>
 <tr>
-<td align="center">w/W</td>
-<td align="center">打开/关闭文章目录</td>
+<td align="center">Pclass</td>
+<td align="center">船舱等级</td>
+<td align="center">高等船舱靠近甲板，更容易Survive</td>
 </tr>
 <tr>
-<td align="center">i/I</td>
-<td align="center">获取搜索框焦点</td>
+<td align="center">Name</td>
+<td align="center">姓名</td>
+<td align="center">标记</td>
 </tr>
 <tr>
-<td align="center">j/J</td>
-<td align="center">向下滑动</td>
+<td align="center">Sex</td>
+<td align="center">性别</td>
+<td align="center">男女生理差别，对Survive有影响</td>
 </tr>
 <tr>
-<td align="center">k/K</td>
-<td align="center">向上滑动</td>
+<td align="center">Age</td>
+<td align="center">年龄</td>
+<td align="center">同上</td>
 </tr>
 <tr>
-<td align="center">gg/GG</td>
-<td align="center">到最顶端</td>
+<td align="center">SibSp</td>
+<td align="center">兄弟配偶数</td>
+<td align="center">有无同行兄弟or配偶，同行会影响决策</td>
 </tr>
 <tr>
-<td align="center">shift+G/g</td>
-<td align="center">到最下端</td>
+<td align="center">Parch</td>
+<td align="center">父母孩子数</td>
+<td align="center">有无同行父母or孩子，从而影响Survive</td>
 </tr>
 <tr>
-<td align="center">ESC</td>
-<td align="center">1.如果输入框有内容，清除内容<br>2.如果输入框无内容，失去焦点</td>
+<td align="center">Ticket</td>
+<td align="center">船票信息</td>
+<td align="center">/</td>
 </tr>
 <tr>
-<td align="center">下</td>
-<td align="center">向下选择文章</td>
+<td align="center">Fare</td>
+<td align="center">票价</td>
+<td align="center">票价跟Pclass也是正相关</td>
 </tr>
 <tr>
-<td align="center">上</td>
-<td align="center">向上选择文章</td>
+<td align="center">Cabin</td>
+<td align="center">船舱信息</td>
+<td align="center">/</td>
 </tr>
 <tr>
-<td align="center">回车</td>
-<td align="center">打开当前选中的文章，若没有，则默认打开第一个</td>
+<td align="center">Embarked</td>
+<td align="center">港口</td>
+<td align="center">/</td>
+</tr>
+<tr>
+<td align="center">Survived</td>
+<td align="center">存活与否</td>
+<td align="center">/</td>
 </tr>
 </tbody></table>
-<p>到目前为止已经写了<code class="article_number"></code>篇文章， 共<code class="site_word_count"></code>字。</p>
-<p>本站访问人数：<code class="site_uv"></code>人次 ， 访问量：<code class="site_pv"></code>次</p>
+<p>以上信息中</p>
+<ul>
+<li>有些特征对分析没什么意义，建模时可以不扔进算法</li>
+<li>有些特征之间互相有关联，可以多特征线性合并</li>
+<li>部分数据需要清洗</li>
+<li>Train集中的Survived变量要放入模型训练</li>
+<li>Test集中的Survived变量作为验证标准</li>
+</ul>
+<h1 id="库和数据导入，简单分析"><a href="#库和数据导入，简单分析" class="headerlink" title="库和数据导入，简单分析"></a>库和数据导入，简单分析</h1><pre><code>import pandas as pd
+import numpy as np
+import time
+import sklearn
 
-        </article>
-        
-        
+from sklearn import ensemble#集成学习，包括了随机森林，SVM等集成学习算法
+from sklearn import feature_selection#特征值选择，分类回归都需要的特征值如F和P
+from sklearn import model_selection#模型选择，包括了交叉验证，网格搜索等
+from sklearn import metrics#包括了多个计算模型评估的算法
+from sklearn.preprocessing import LabelEncoder#将Label标准化，如：字符串——&gt;数字，以便代入模型
+##绘图
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import seaborn as sns#一个封装好的matplotlib，底层是matplotlib，使用更方便
+
+#mpl.style_use(&quot;ggplot&quot;)#设置matplotlib的绘图风格，可有可无
+
+data_train = pd.read_csv(&quot;train.csv&quot;)
+data_test  = pd.read_csv(&quot;test.csv&quot;)
+#显示数据集信息
+print(data_train.info())
+print(data_test.head(10))
+</code></pre>
+<h2 id="完整显示数据集统计信息（完整描述）set-option"><a href="#完整显示数据集统计信息（完整描述）set-option" class="headerlink" title="完整显示数据集统计信息（完整描述）set_option"></a>完整显示数据集统计信息（完整描述）set_option</h2><pre><code>pd.set_option(&#39;display.max_columns&#39;,11)
+#train集中有11列属性，设置最大列数为11
+print(data_train.describe())
+</code></pre>
+<ul>
+<li>同样的，pd.set_option(‘display.max_columns’,10)也可以让原本显示不全的head()显示全</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/5cef01f2bb72055365b892b39b01cdfb.png" alt="info和head输出结果"></p>
+<pre><code>count:有效值个数（非空值）
+unique:特征值的种类数
+top：出现最多的特征
+freq: top出现的次数
+mean：均值
+std : 标准差
+min ：最小值
+25%：四分之一位
+50%：中位数
+75%：四分之三位
+max：最大值
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/aadde03b94c0c0ced9033806d8fa540f.png" alt="describe输出结果"></p>
+<ul>
+<li><strong>一共有891行数据，但Age、Cabin属性明显缺失，此案例下的缺失值暂时用中位数代替</strong></li>
+</ul>
+<h1 id="数据清洗"><a href="#数据清洗" class="headerlink" title="数据清洗"></a>数据清洗</h1><p>数据清洗是数据分析中耗时最长最麻烦的阶段</p>
+<h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><pre><code>#列名小写,方便后续
+data_test.columns = data_test.columns.str.lower()
+data_train.columns = data_train.columns.str.lower()
+data_train.info()#查看属性小写后的info
+
+#合并Train和Test以便统一数据清洗
+data_sum = [data_train , data_test]
+#但由于这个sum是一个list，会缺少很多原本train和test能用的属性or方法，如columns
+#注意：此处的合并不是直接合并数据集，而是创建一个list，实现一键操作
+#一定是先分别lower再合并成sum
+</code></pre>
+<p>   <strong>要想调用方法，需要使用for循环</strong></p>
+<h3 id="查看survived的统计直方图"><a href="#查看survived的统计直方图" class="headerlink" title="查看survived的统计直方图"></a>查看survived的统计直方图</h3><pre><code>#查看属性统计量seaborn下的countplot，绘制图像
+sns.countplot(x = data_train[&#39;survived&#39;] )
+#sns.coutplot(x = &quot;survived&quot; , data = data_train)
+#两种表达方式
+plt.show()#olt.show()是生成图的操作，必不可少
+</code></pre>
+<h2 id="补全缺失值fillna"><a href="#补全缺失值fillna" class="headerlink" title="补全缺失值fillna"></a>补全缺失值fillna</h2><pre><code>#分别查看train和test集中为null值的汇总
+print(data_train.isnull().sum())
+print(&#39;\n&#39;)
+print(data_test.isnull().sum())
+</code></pre>
+<ul>
+<li><strong>age embarked的缺失值占比比较少，可以替换值</strong></li>
+<li><strong>cabin的缺失值占比很高，建模时直接把cabin属性全扔掉</strong></li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/6608f6f8d8f17032998fd2e2801c213b.png" alt="左：null汇总  右：contplot直方图"></p>
+<h3 id="利用for循环对样本集一键纠正"><a href="#利用for循环对样本集一键纠正" class="headerlink" title="利用for循环对样本集一键纠正"></a>利用for循环对样本集一键纠正</h3><pre><code>for dataset in data_sum:
+    dataset[&#39;age&#39;].fillna(dataset[&#39;age&#39;].median() , inplace=True)
+    dataset[&#39;fare&#39;].fillna(dataset[&#39;fare&#39;].median() , inplace=True)
+    ###因为age、fare都是数字类型，因此可以调用median中位数
+    ###而像属性值位字符串的特征则不能调用median
+    dataset[&#39;embarked&#39;].fillna(dataset[&#39;embarked&#39;].mode()[0] , inplace=True)
+    #mode返回的是 众数，因为即便是字符串，也可以调用
+</code></pre>
+<ul>
+<li><p>注意：mode和median的用法场景区别</p>
+</li>
+<li><p>注意fillna的使用格式</p>
+</li>
+<li><p>inplace=True表示更改原数据集，而不是返回一个新的数据集</p>
+</li>
+<li><p>mode是pandas下的一个方法，返回按索引号排序的众数，<strong>mode()[索引号]的索引号很重要，如果省略则不填充</strong></p>
+<h2 id="删除无用字段-特征-drop"><a href="#删除无用字段-特征-drop" class="headerlink" title="删除无用字段(特征)drop"></a>删除无用字段(特征)drop</h2><p>  drop_columns = [‘cabin’,’passengerid’,’ticket’]#创建一个list<br>  #分析认为：cabin缺失值太多，需要删除<br>  #passengerid无关survive，删除<br>  #ticket都是编号，删除</p>
+<p>  data_train.drop(drop_columns,axis=1,inplace=True)<br>  data_test.drop(drop_columns,axis=1,inplace=True)<br>  #drop参数的意义(行or列 , axis=0删行 axis=1删列 ， inplace=True直接更改调用者数据集本身)</p>
+</li>
+<li><p>注意：drop的参数含义</p>
+</li>
+<li><p>可以构建for循环 + drop_columns一次操作</p>
+</li>
+</ul>
+<h2 id="纠正异常值"><a href="#纠正异常值" class="headerlink" title="纠正异常值"></a>纠正异常值</h2><h3 id="利用for循环的样本集一键纠正"><a href="#利用for循环的样本集一键纠正" class="headerlink" title="利用for循环的样本集一键纠正"></a>利用for循环的样本集一键纠正</h3><p>因为这个案例中信息来源准确，可以认为没有异常值，故在此案例中不做处理</p>
+<h2 id="构建新特征"><a href="#构建新特征" class="headerlink" title="构建新特征"></a>构建新特征</h2><ul>
+<li>连续值用cut或者qcut来划分</li>
+<li>离散值直接划分，合并数量少的值<h3 id="同行规模"><a href="#同行规模" class="headerlink" title="同行规模"></a>同行规模</h3><pre><code>  #同行规模 = 配偶 + 兄弟姐妹 + 1(自己)
+  dataset[&#39;together_size&#39;] =  dataset[&#39;sibsp&#39;] + dataset[&#39;parch&#39;] + 1
+</code></pre>
+</li>
+</ul>
+<h3 id="是否单身"><a href="#是否单身" class="headerlink" title="是否单身"></a>是否单身</h3><pre><code>    #是否单身：单身可以不顾别人，会影响survive
+    dataset[&#39;isSingle&#39;] = 0
+    dataset[&#39;isSingle&#39;].loc[dataset[&#39;together_size&#39;] &gt; 1] = 1
+</code></pre>
+<h3 id="票价分段：cut"><a href="#票价分段：cut" class="headerlink" title="票价分段：cut"></a>票价分段：cut</h3><pre><code>    #票价分段fare_bin:票价的离散值太多，应该划分为几个集
+    #数据集中票价0~512，并且绝大多数都是便宜票，所以用cut等宽划分
+    dataset[&#39;fare_bin&#39;] = pd.cut(dataset[&#39;fare&#39;] , 4)
+</code></pre>
+<h3 id="年龄分段：qcut"><a href="#年龄分段：qcut" class="headerlink" title="年龄分段：qcut"></a>年龄分段：qcut</h3><pre><code>    #年龄分段age_bin
+    dataset[&#39;age_bin&#39;] = pd.qcut(dataset[&#39;age&#39;] , 4)
+</code></pre>
+<h3 id="身份分类：合少为1"><a href="#身份分类：合少为1" class="headerlink" title="身份分类：合少为1"></a>身份分类：合少为1</h3><pre><code>    #身份 status:因为英国人的名字会加入跟身份有关的职业，身份也会影响获救概率
+    dataset[&#39;status&#39;] = dataset[&#39;name&#39;].str.split(&#39;, &#39; , expand = True)[1].str.split(&#39;.&#39; , expand = True)[0]
+    ###参数含义：str是返回字符串，expand要为True值
+    ###按引号中的符号进行split拆分，[0]表示取前半段，[1]表示取后半段
+    print(dataset[&#39;status&#39;].value_counts())#查看统计
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/6a4e973ba6174e63a9514db8712abbc3.png" alt="可以把少的分为一类other"></p>
+<pre><code>   #把少的分为一类other
+    othersSum = dataset[&#39;status&#39;].value_counts() &lt; 10
+    #other对象 = 小于10的
+    dataset[&#39;status&#39;] = dataset[&#39;status&#39;].apply(lambda x : &#39;ohter&#39; if othersSum[x] else x)
+    #更新后的status属性 = 之前的status.aooly(lambda x : &#39;新的名字&#39; if other对象[x] else x)
+    print(dataset[&#39;status&#39;].value_counts())
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/2629dc2066e64987b95896a87db5dd6c.png" alt="少的被分到了other组"></p>
+<h2 id="新特征分析：评估新特征划分的好坏"><a href="#新特征分析：评估新特征划分的好坏" class="headerlink" title="新特征分析：评估新特征划分的好坏"></a>新特征分析：评估新特征划分的好坏</h2><p>以不同的特征分类计算各属性值的均值，以标签survived的均值为参考，不同特征值的标签均值差别越大越好</p>
+<pre><code>#简单分析上述构建特征是否有效:groupby根据属性值分组
+print(data_train[&#39;survived&#39;].groupby(data_train[&#39;status&#39;]).mean())
+#查看按这样构建的特征status的不同值survived对应的均值
+print(data_train[&#39;survived&#39;].groupby(data_train[&#39;age_bin&#39;]).mean())
+print(data_train[&#39;survived&#39;].groupby(data_train[&#39;fare_bin&#39;]).mean())
+print(data_train[&#39;survived&#39;].groupby(data_train[&#39;isSingle&#39;]).mean())
+print(data_train[&#39;survived&#39;].groupby(data_train[&#39;together_size&#39;]).mean())
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/7fb4dcd3150d4be886223a0af1715d6d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_19,color_FFFFFF,t_70,g_se,x_16" alt="新特征分析">于是对age_bin进行修改，最终尝试结果是qcut改cut，区分度提升最明显</p>
+<h1 id="格式替换-构建新字段，"><a href="#格式替换-构建新字段，" class="headerlink" title="格式替换,构建新字段，"></a>格式替换,构建新字段，</h1><p>1，基于scikit-learn中的LabelEncoder()<br>把属性值为字符串的特征转化为“特征_code”，字符串——&gt;数字，以便放入模型中跑<br><strong>机器学习模型只能处理int和float的数据</strong></p>
+<pre><code>#实例化
+label = LabelEncoder()
+#字符串——&gt;数字
+for dataset in data_sum:
+    # （1）新字段：sex_code
+    dataset[&#39;sex_code&#39;] = label.fit_transform(dataset[&#39;sex&#39;])
+    # （2）新字段：embarked_code
+    dataset[&#39;embarked_code&#39;] = label.fit_transform(dataset[&#39;embarked&#39;])
+    # （3）新字段：status_code
+    dataset[&#39;status_code&#39;] = label.fit_transform(dataset[&#39;status&#39;])
+    # （4）新字段：age_bin_code
+    dataset[&#39;age_bin_code&#39;] = label.fit_transform(dataset[&#39;age_bin&#39;])
+    # （5）新字段：fare_bin_code
+    dataset[&#39;fare_bin_code&#39;] = label.fit_transform(dataset[&#39;fare_bin&#39;])
+
+print(data_train.columns.to_list)
+    
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/e20dfbee4e5b4bb7992cfb15aaeae6ac.png" alt="新的列名"><br><img src="https://img-blog.csdnimg.cn/cda97a956c634886b678242a3a315ec8.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16"><br>2，通过Pandas中的get_dummies() 进行编码</p>
+<h1 id="建模"><a href="#建模" class="headerlink" title="建模"></a>建模</h1><h2 id="标签、特征选择"><a href="#标签、特征选择" class="headerlink" title="标签、特征选择"></a>标签、特征选择</h2><h3 id="标签选择"><a href="#标签选择" class="headerlink" title="标签选择"></a>标签选择</h3><pre><code>target = [&#39;survived&#39;]    
+</code></pre>
+<h3 id="特征选择"><a href="#特征选择" class="headerlink" title="特征选择"></a>特征选择</h3><pre><code>data_feature_one = [&#39;sex&#39;, &#39;pclass&#39;, &#39;embarked&#39;, &#39;status&#39;, &#39;sibsp&#39;, &#39;parch&#39;, &#39;age&#39;, &#39;fare&#39;, &#39;together_size&#39;,
+                    &#39;isSingle&#39;]
+</code></pre>
+<h3 id="通过Pandas中的get-dummies-进行编码"><a href="#通过Pandas中的get-dummies-进行编码" class="headerlink" title="通过Pandas中的get_dummies() 进行编码"></a>通过Pandas中的get_dummies() 进行编码</h3><p>这是一个暴力转码（字符串——&gt;数字代号）的方法，十分简单，且更好用</p>
+<pre><code>data_one_dummy = pd.get_dummies(data_train[data_feature_one])
+#把data_feature_one中需要转码的如：status、embarked转为数字代号
+data_one_dummy_list = data_one_dummy.columns.tolist()
+#转list，以便放入网格搜索的形参中去跑
+</code></pre>
+<h2 id="把train集拆分为训练集和测试"><a href="#把train集拆分为训练集和测试" class="headerlink" title="把train集拆分为训练集和测试"></a>把train集拆分为训练集和测试</h2><pre><code>X_train_one, X_test_one, y_train_one, y_test_one = model_selection.train_test_split(data_one_dummy[data_one_dummy_list],#转码后的list格式的train[feature]
+                                                                    data_train[target],#标签
+                                                                    random_state = 0)#随机种子
+
+print(X_train_one.shape)
+print(X_test_one.shape)
+#shape查看分割的大小，也可以通过size参数自己设置分割比例,数据量很大时通常使用2 8分，train_size=0.8
+print(y_train_one.shape)
+print(y_test_one.shape)
+#大X表示：特征  小y表示：标签
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/f70f693e524f4c75bfdb6ccfe37883b4.png" alt="左：数据量(行)  右：特征数(列)"></p>
+<h2 id="网格搜索：寻找最优"><a href="#网格搜索：寻找最优" class="headerlink" title="网格搜索：寻找最优"></a>网格搜索：寻找最优</h2><h3 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h3><pre><code>from sklearn.model_selection import GridSearchCV   #网格搜索
+from sklearn.ensemble import RandomForestClassifier #随机森林分类器
+
+rfc = RandomForestClassifier(max_features=&#39;auto&#39; , random_state= 0 , n_jobs=-1 )
+#实例化一个RandomForestClassifier对象
+#简单选取所有特征 ， 随机种子=0  ， 利用所有线程
+
+#这里实例化RandomForestClassifier时可以不用写入太多参数，参数可以放进网格里面自己跑出最优的
+</code></pre>
+<h3 id="搜索"><a href="#搜索" class="headerlink" title="搜索"></a>搜索</h3><pre><code>param_gird = &#123;#需要最优化的参数对象
+    &#39;criterion&#39; : [&#39;gini&#39;, &#39;entropy&#39;],#标准选择
+    &#39;min_samples_leaf&#39; : [ 1,3,5, 10],#最小子叶数
+    &#39;min_samples_split&#39; : [10, 12, 16,20,24],#最小样本数
+    &#39;n_estimators&#39; : [20,35,50,100]#决策树的个数选择
+&#125;
+
+gscv = GridSearchCV(#网格搜索交叉验证对象
+                estimator=rfc,#rf带入网格算
+                param_grid=param_gird,#需要最优化的参数带入
+                scoring= &#39;accuracy&#39;, #得分评判————准确度
+                cv=3,#交叉验证次数
+                n_jobs=-1)#-1 利用CPU所有线程
+
+
+gs = gscv.fit(X_train_one , y_train_one.values.ravel())#自动训练，两个参数都是train集
+#.values.ravel()是为了防止warning
+#自动训练的所有结果返回在gs中，这个
+
+print(gs.best_score_)#最高分数
+
+print(gs.best_params_)#最佳组合
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/7b7e4e2ba989488b8e4d553f025731fc.png"></p>
+<h3 id="网格搜索调参"><a href="#网格搜索调参" class="headerlink" title="网格搜索调参"></a>网格搜索调参</h3><ul>
+<li>如果某特征的最优值是在罗列的数的中间，那么认为比较优秀</li>
+<li>如果在边上，就需要往那个方向调参重新跑</li>
+<li>同时有多个参数需要调时，先调差距最大的</li>
+<li>即使是位于中间的参数也可以细分调整</li>
+<li>类似高中生物实验探究题《寻找最佳浓度》的思想</li>
+</ul>
+<h2 id="用最优参数训练随机森林"><a href="#用最优参数训练随机森林" class="headerlink" title="用最优参数训练随机森林"></a>用最优参数训练随机森林</h2><pre><code>#实例化RandomForestClassifier对象
+rfc2 = RandomForestClassifier(criterion=&#39;entropy&#39;,
+                             min_samples_leaf=5,
+                             min_samples_split=16,
+                             n_estimators=35,
+                             n_jobs=-1,
+                             random_state=1)
+
+#训练
+rfc2.fit(X_train_one, y_train_one.values.ravel())
+</code></pre>
+<p>此时训练完成，等待后续用<strong>split分割出来的测试集test来测试</strong></p>
+<h3 id="根据特征的重要性排序"><a href="#根据特征的重要性排序" class="headerlink" title="根据特征的重要性排序"></a>根据特征的重要性排序</h3><pre><code>print(pd.concat((pd.DataFrame(X_train_one.iloc[:, 1:].columns, columns=[&#39;Variable&#39;]),
+           pd.DataFrame(rfc2.feature_importances_, columns=[&#39;importance&#39;])),
+           axis=1).sort_values(by=&#39;importance&#39;, ascending=False))
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/1583b73b3f2845c2b203ded785146e72.png"></p>
+<ul>
+<li><strong>重要性</strong>：重要性是特征在模型中的决定能力，而不是越高就代表标签越接近1</li>
+</ul>
+<h2 id="在test上预测：是split分割出来的test"><a href="#在test上预测：是split分割出来的test" class="headerlink" title="在test上预测：是split分割出来的test"></a>在test上预测：是split分割出来的test</h2><pre><code>predict_test = rfc2.predict(X_test_one)#test集中的特征数据X
+
+pred_df = pd.DataFrame(predict_test, columns=[&#39;survived&#39;])#预测结果表
+
+print(pred_df)#test集的验证结果
+
+print(&#39;随机森林 AUC...&#39;)
+fpr_test, tpr_test, th_test = metrics.roc_curve(predict_test, y_test_one)
+# 构造 roc 曲线
+print(&#39;AUC = %.4f&#39; %metrics.auc(fpr_test, tpr_test))#参考意义最大的就是AUC
+print(&#39;随机森林精确度...&#39;)
+print(metrics.classification_report(predict_test, y_test_one))#精准度表格
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/04fabbe4baed47c68ad12214800bf1d0.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_19,color_FFFFFF,t_70,g_se,x_16"></p>
+<h2 id="验证：不是split分割出来的test，而是test-csv"><a href="#验证：不是split分割出来的test，而是test-csv" class="headerlink" title="验证：不是split分割出来的test，而是test.csv"></a>验证：不是split分割出来的test，而是test.csv</h2><pre><code>data_val_dummy = pd.get_dummies(data_test[data_feature_one])#转码
+data_val_dummy_list = data_val_dummy.columns.tolist()
+print(data_val_dummy_list)#查看转码后的列名，拿着这些列名预测
+
+pred_val = rfc2.predict(data_val_dummy[[#根据上一条语句的结果，copy了列名
+                                        &#39;pclass&#39;, &#39;sibsp&#39;, &#39;parch&#39;, &#39;age&#39;,
+                                        &#39;fare&#39;, &#39;together_size&#39;, &#39;isSingle&#39;,
+                                        &#39;sex_female&#39;, &#39;sex_male&#39;, &#39;embarked_C&#39;,
+                                        &#39;embarked_Q&#39;, &#39;embarked_S&#39;, &#39;status_Master&#39;,
+                                        &#39;status_Miss&#39;, &#39;status_Mr&#39;, &#39;status_Mrs&#39;,
+                                        &#39;status_ohter&#39;]])
+
+
+pred_val_df = pd.DataFrame(pred_val, columns=[&#39;survived&#39;])
+
+print(pred_val_df.head(10))#展示前10个数据
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/348435ac3b974dfd827f256ee10998f0.png"></p>
+
+      
     </div>
-    <div class="copyright">
-        <p class="footer-entry">
-    ©2021 ZJH
-</p>
-<p class="footer-entry">"生命以负熵为食"
+    <footer class="article-footer">
+      <a data-url="https://blogzjh.github.io/2022/01/11/%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E6%B3%B0%E5%9D%A6%E5%B0%BC%E5%85%8B%E5%8F%B7%E8%8E%B7%E6%95%91%E9%A2%84%E6%B5%8B/" data-id="cl8wv0v34002x1gtagqby8ml9" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
 
+
+  
+    <article id="post-决策树-随机森林——用户流失预测的案例" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2022/01/01/%E5%86%B3%E7%AD%96%E6%A0%91-%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E7%94%A8%E6%88%B7%E6%B5%81%E5%A4%B1%E9%A2%84%E6%B5%8B%E7%9A%84%E6%A1%88%E4%BE%8B/" class="article-date">
+  <time datetime="2021-12-31T16:41:40.000Z" itemprop="datePublished">2022-01-01</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2022/01/01/%E5%86%B3%E7%AD%96%E6%A0%91-%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E7%94%A8%E6%88%B7%E6%B5%81%E5%A4%B1%E9%A2%84%E6%B5%8B%E7%9A%84%E6%A1%88%E4%BE%8B/">决策树/随机森林——用户流失预测的案例</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="决策树"><a href="#决策树" class="headerlink" title="决策树"></a>决策树</h1><p><strong>摘要</strong>：<br><br>从决策树的定义，优缺点等宏观角度入题，逐步从数学原理过渡到代码实现，最后总结</p>
+<p><strong>关键词</strong>:<br><br>决策树、信息熵、基尼系数、ID3、CART</p>
+<h2 id="决策树是什么"><a href="#决策树是什么" class="headerlink" title="决策树是什么"></a>决策树是什么</h2><blockquote>
+<p>一个根节点，若干个内部节点和叶节点<br><br> 非参数学习算法<br><br> 天然的分类器<br></p>
+</blockquote>
+<h2 id="决策树的目标"><a href="#决策树的目标" class="headerlink" title="决策树的目标"></a>决策树的目标</h2><p>解决<strong>分类</strong>和<strong>回归</strong>问题</p>
+<h2 id="决策树的优点"><a href="#决策树的优点" class="headerlink" title="决策树的优点"></a>决策树的优点</h2><blockquote>
+<ul>
+<li>决策树易于理解和实现，人们在在学习过程中不需要使用者了解很多的背景知识，这同时是它的能够直接体现数据的特点，只要通过解释后都有能力去理解决策树所表达的意义。</li>
+<li>对于决策树，数据的准备往往是简单或者是不必要的，而且能够同时处理数据型和常规型属性，在相对短的时间内能够对大型数据源做出可行且效果良好的结果。</li>
+<li>准确性高: 挖掘出来的分类规则准确性高, 便于理解, 决策树可以清晰的显示哪些字段比较重要, 即可以生成可以理解的规则.</li>
+<li>适合处理有缺失属性的样本，对缺失值不敏感</li>
+</ul>
+</blockquote>
+<h2 id="决策树的缺点"><a href="#决策树的缺点" class="headerlink" title="决策树的缺点"></a>决策树的缺点</h2><blockquote>
+<ul>
+<li>容易发生过拟合（剪枝 随机森林）</li>
+<li>分类过程中每一步都依据单一特征，忽视了特征之间的关联性，在处理特征关联性强的数据时表现不好</li>
+<li>对于样本不均衡的数据集表现不好，欠拟合。在特征选择时ID3算法偏好于选取可取值数目较多的属性,C4.5算法偏向选取可取值数目较少的属性（实际中是在算法中采用启发式原则，先从候选属性中选出信息增益高于平均水平的属性，再从中选择增益率最高的属性）</li>
+</ul>
+</blockquote>
+<h1 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h1><p>根据<strong>信息熵</strong>(entropy) or <strong>基尼系数</strong>(gini)的大小决定下一个节点怎么分枝，最后生成决策树，而<strong>随机森林</strong>就是多个决策树的组合</p>
+<h2 id="信息熵entropy"><a href="#信息熵entropy" class="headerlink" title="信息熵entropy"></a>信息熵entropy</h2><p><a target="_blank" rel="noopener" href="https://www.zhihu.com/search?q=yjango%E4%BF%A1%E6%81%AF%E7%86%B5&utm_content=search_suggestion&type=content">超链接：Yjango:什么是信息熵？</a></p>
+<p><em>熵在信息论中代表随机变量的不确定性的度量</em></p>
+<p>熵越小，数据不确定性越低<br>熵越大，数据不确定性越高</p>
+<p>信息熵<br>H=$-\displaystyle \sum^{k}_{i = 1}{Pi}$${log_2{(Pi)}}$</p>
+<h2 id="基尼系数"><a href="#基尼系数" class="headerlink" title="基尼系数"></a>基尼系数</h2><ul>
+<li>基尼值<br>G = 1 $-\displaystyle \sum^{k}_{i = 1}{Pi^2}$</li>
+</ul>
+<p>以基尼指数为指标时，应该选择Gini指数最<strong>小</strong>的</p>
+<p>CART决策树使用“基尼指数”来选择划分属性</p>
+<ul>
+<li>  基尼指数<br>G_index = $-\displaystyle \sum^{V}_{v = 1}{\frac{|D^v|}{|D|}Gini(D^v)}$</li>
+</ul>
+<p><strong>基尼指数到0时，即到叶节点，不能再往下划分</strong></p>
+<h2 id="AUC-ROC-tpr-fpr"><a href="#AUC-ROC-tpr-fpr" class="headerlink" title="AUC ROC tpr fpr"></a>AUC ROC tpr fpr</h2><ul>
+<li>tpr：Recall，召回率，即当前被分到正样本类别中，真实的正样本占所有正样本的比例，即召回率（召回了多少正样本比例）</li>
+<li>fpr：Precision，正例率，即当前划分到正样本类别中，被正确分类的比例（即正式正样本所占比例），就是我们一般理解意义上所关心的正样本的分类准确率；</li>
+<li>ROC：tpr和fpr决定的曲线</li>
+<li>AUC：ROC曲线下包围的面积，最大值为1，越大拟合性能越好</li>
+</ul>
+<h2 id="过拟合的原因及如何防止"><a href="#过拟合的原因及如何防止" class="headerlink" title="过拟合的原因及如何防止"></a>过拟合的原因及如何防止</h2><p>对于过拟合现象产生的原因，有以下几个方面，</p>
+<blockquote>
+<ul>
+<li>第一：在决策树构建的过程中，对决策树的生长没有进行合理的限制（<strong>剪枝</strong>）；</li>
+<li>第二：在建模过程中使用了<strong>较多的输出变量</strong>，变量较多也容易产生过拟合；</li>
+<li>第三：样本中有一些<strong>噪声数据</strong>，噪声数据对决策树的构建的干扰很多，没有对噪声数据进行有效的剔除。</li>
+</ul>
+</blockquote>
+<p>对于过拟合现象的预防措施，有以下一些方法，</p>
+<blockquote>
+<ul>
+<li>第一：选择合理的参数进行<strong>剪枝</strong>，可以分为预剪枝后剪枝，我们一般用后剪枝的方法来做；</li>
+<li>第二：<strong>K-folds交叉验证</strong>，将训练集分为K份，然后进行K次的交叉验证，每次使用K-1份作为训练样本数据集，另外的一份作为测试集合（作者说反了，应该是份作为测试集，其余k-1份作为训练集）；</li>
+<li>第三：减少特征，计算每一个特征和相应变量的<strong>相关性</strong>，常见的为皮尔逊相关系数，将相关性较小的变量剔除，当然还有一些其他的方法来进行特征筛选，比如基于决策树的特征筛选，通过正则化的方式来进行特征选取等。</li>
+</ul>
+</blockquote>
+<h2 id="预剪枝：生成决策树的过程中剪枝"><a href="#预剪枝：生成决策树的过程中剪枝" class="headerlink" title="预剪枝：生成决策树的过程中剪枝"></a>预剪枝：生成决策树的过程中剪枝</h2><pre><code>基于“贪心”本质，能剪则剪。
+</code></pre>
+<p>如果某个分支的存在并没有提高准确率，or降低了准确率，则剪掉</p>
+<blockquote>
+<p>降低了过拟合风险；<br><br>显著减少了决策树训练时间；<br><br>但带来了欠拟合的风险</p>
+</blockquote>
+<h2 id="后剪枝：生成决策树之后剪枝"><a href="#后剪枝：生成决策树之后剪枝" class="headerlink" title="后剪枝：生成决策树之后剪枝"></a>后剪枝：生成决策树之后剪枝</h2><pre><code>能不剪，则不剪，剪前后若准确率相等，则保留
+</code></pre>
+<blockquote>
+<p>同样的训练模型，后剪枝的决策树保留了更多的分支<br><br>后剪枝的欠拟合风险很小<br><br>泛化性能往往优于预剪枝(分的更细，在面对陌生数据时判断更准确)<br><br>训练时间长的多(生成决策树之后需要自底向上逐一考察，计算开销大)<br></p>
+</blockquote>
+<pre><code>“在有噪声的情况下，剪枝操作甚至能将泛化性能提高25%”
+</code></pre>
+<h2 id="连续值：可取连续值的属性"><a href="#连续值：可取连续值的属性" class="headerlink" title="连续值：可取连续值的属性"></a>连续值：可取连续值的属性</h2><p>例如：脐部{凹陷，平坦，稍凹}这种是离散值；而密度，xx含量等很多属性值都是连续的</p>
+<p>因此在划分分支的时候，需要有一个间断点</p>
+<p>间断点的划分方法：二分法，例如有17个排序后的点集，两两之间算中位数，一共算16次，生成16个t值，组成一个t的集合T，用T中的划分点代入Gain算法，计算Gain(D，该属性，t为划分点)，取Gain最大值，对应的t即为最终确定的划分点<br>划分完t之后，如果子分支还需用到更细的判断， 可以使用t的子集：例如：一个节点判断“密度&lt;=0.381”那么后续的子节点可以使用任何”密度&lt;0.381”范围的判断依据</p>
+<h2 id="缺失值：某些数据的其中某个数据缺失，若全部弃用则会很浪费"><a href="#缺失值：某些数据的其中某个数据缺失，若全部弃用则会很浪费" class="headerlink" title="缺失值：某些数据的其中某个数据缺失，若全部弃用则会很浪费"></a>缺失值：某些数据的其中某个数据缺失，若全部弃用则会很浪费</h2><p>属性a缺失值处理方法：</p>
+<p>西瓜书上p88：跳过该属性a的判断，直接判断下一节点的所有可能性，但需要加上训练集中的比例权重</p>
+<pre><code>(离散值)：众数填充、相关性最高的列(属性b总是与属性a的取值几乎一一对应)填充
+(连续值)：中位数、相关性最高的列(同上)做线性回归估计
+</code></pre>
+<h2 id="多变量决策树：用线性关系替代多个变量"><a href="#多变量决策树：用线性关系替代多个变量" class="headerlink" title="多变量决策树：用线性关系替代多个变量"></a>多变量决策树：用线性关系替代多个变量</h2><p>有些属性之间有一定的线性关系，例如：密度和含糖量之间存在着线性关系，那么就把密度和含糖量分别乘上各自的权重系数，用他俩组成的一个式子&lt;=t 或 &gt;=t 作为分界点来判断</p>
+<pre><code>多变量决策树算法：贪心寻找每个属性的最优权值，线性分类器的最小二乘法
+</code></pre>
+<h2 id="随机森林"><a href="#随机森林" class="headerlink" title="随机森林"></a>随机森林</h2><p>擅长于解决数据不平衡的分类</p>
+<h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><h3 id="1，导包"><a href="#1，导包" class="headerlink" title="1，导包"></a>1，导包</h3><pre><code>import pandas as pd
+import numpy as np
+</code></pre>
+<h3 id="2，读取、初步查看分析数据"><a href="#2，读取、初步查看分析数据" class="headerlink" title="2，读取、初步查看分析数据"></a>2，读取、初步查看分析数据</h3><pre><code>df = pd.read_csv(&#39;broadband.csv&#39;)
+df.rename(str.lower, axis=&#39;columns&#39;, inplace=True)#列名全换小写，方便看
+
+print(df.head())#空参则显示前5行数据
+# broadband 即可：0-离开(否)，1-留存(是)
+df.info() #输出行列信息（总体数据特征）
+print(df.sample()) # 随机查看一个样本数据
+
+# 查看因变量 broadband 分布情况，看是否存在不平衡
+from collections import Counter
+print(&#39;Broadband: &#39;, Counter(df[&#39;broadband&#39;])) 
+    #输出结果是Broadband:  Counter(&#123;0: 131, 1: 49&#125;)，数据并不平衡
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/6a2b7fea48b04223b402fb145f80d793.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16" alt="前5行信息and随机查看样本数据"></p>
+<p><img src="https://img-blog.csdnimg.cn/30820d3df1b24efb98664f1347d2109d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_19,color_FFFFFF,t_70,g_se,x_16" alt="info输出信息"></p>
+<h3 id="3，划分训练集-测试集"><a href="#3，划分训练集-测试集" class="headerlink" title="3，划分训练集 测试集"></a>3，划分训练集 测试集</h3><p>由于步骤2中info()发现数据集的第一列是用户ID，最后一列是判断标准Broadband，故这两列都不用做数据分析</p>
+<pre><code>y = df[&#39;broadband&#39;] # y就是标签(结果)
+X = df.iloc[:, 1:-1] # 客户 id 没有用，故丢弃 cust_id；标签y也要去掉，故1：-1
+#左边冒号左右端为空，表示所有行数据全部都取到X中
+
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4, random_state=123)
+#40%划分为test集，
+# 这里的random_state就是为了保证程序每次运行都分割一样的训练集和测试集。
+# 否则，同样的算法模型在不同的训练集和测试集上的效果不一样。
+# 因此具体取值多少无所谓，但对结果有影响
+</code></pre>
+<h3 id="4，决策树建模"><a href="#4，决策树建模" class="headerlink" title="4，决策树建模"></a>4，决策树建模</h3><h4 id="网格搜索："><a href="#网格搜索：" class="headerlink" title="网格搜索："></a>网格搜索：</h4><p>因为决策树算法是非参数学习算法，需要自行调参，利用网格搜索则可以自动调参，择优选取<br><br>把自己认为好的参数都扔进去，让网格搜索自己跑</p>
+<pre><code>import sklearn.tree as tree
+
+# 1. 直接使用交叉网格搜索来优化决策树模型，边训练边优化
+from sklearn.model_selection import GridSearchCV
+
+# 2. 网格搜索参数，选择最优参数,该param_grid作为评价指标用于下面的训练模型
+param_grid = &#123;&#39;criterion&#39;: [&#39;entropy&#39;, &#39;gini&#39;], # 树的深度评估指标,信息熵or基尼
+            &#39;max_depth&#39;: [2, 3, 4, 5, 6, 7, 8], # 可选树的深度
+            &#39;min_samples_split&#39;: [4, 8, 12, 16, 20, 24, 28]&#125; # 可选最小拆分的叶子样本数
+</code></pre>
+<h4 id="模型训练"><a href="#模型训练" class="headerlink" title="模型训练"></a>模型训练</h4><pre><code># 3. 定义一棵树对象
+clf = tree.DecisionTreeClassifier()  
+
+# 4. 传入模型，网格搜索的参数，评估指标，cv交叉验证的次数
+clfcv = GridSearchCV(estimator=clf, param_grid=param_grid, scoring=&#39;roc_auc&#39;,cv=4) 
+# roc曲线和auc面积值作为评价标准（一般都用auc直接比较面积）
+# cv=？表示交叉验证的次数
+
+# 5. 训练模型
+clfcv.fit(X_train, y_train)
+
+# 6. 使用模型来对测试集进行预测
+test_result = clfcv.predict(X_test)
+</code></pre>
+<h4 id="模型评估"><a href="#模型评估" class="headerlink" title="模型评估"></a>模型评估</h4><pre><code># 7. 模型评估
+import sklearn.metrics as metrics
+
+print(&quot;决策树 AUC:&quot;)
+fpr_test, tpr_test, th_test = metrics.roc_curve(y_test, test_result)
+#主要是为了得到fpr，tpr，代入AUC计算公式
+print(&#39;AUC = %.4f&#39; %metrics.auc(fpr_test, tpr_test))
+#输出AUC的值
+
+print(&quot;决策树准确度:&quot;)
+print(metrics.classification_report(y_test,test_result))
+#输出准确度表格，参考价值不是很大，一般还是以AUC为准
+
+
+# 9. 求网格搜索后的最优参数
+print(clfcv.best_params_)
+#输出最优参数组合，但这个最优并非完全最优，可能还需要在开始的地方再重新调参，可能
+#算出的最后参数结果还不同
+#假设“最小样本设置&#123;4，5，6，7，8&#125;”，而最优结果是4 或 8，处于边缘，
+#就需要往边缘调参
+
+#因为该样本结果是：
+#&#123;&#39;criterion&#39;: &#39;entropy&#39;, &#39;max_depth&#39;: 3, &#39;min_samples_split&#39;: 12&#125;
+#都不是设置的边缘只，所以可以认为这些参数还不错，暂时不调参
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/16e8639fe87447e1b9f205219401708c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16" alt="决策树AUC" title="决策树AUC"></p>
+<h3 id="5，决策树生成"><a href="#5，决策树生成" class="headerlink" title="5，决策树生成"></a>5，决策树生成</h3><h4 id="选择最优参数重新训练"><a href="#选择最优参数重新训练" class="headerlink" title="选择最优参数重新训练"></a>选择最优参数重新训练</h4><pre><code># 将最优参数代入到模型中，重新训练、预测
+#&#123;&#39;criterion&#39;: &#39;entropy&#39;, &#39;max_depth&#39;: 3, &#39;min_samples_split&#39;: 12&#125;
+
+clf2 = tree.DecisionTreeClassifier(criterion=&#39;entropy&#39;, max_depth=3, min_samples_split=12)
+
+clf2.fit(X_train, y_train)
+test_res2 = clf2.predict(X_test)
+</code></pre>
+<h4 id="绘制决策树，在同目录下生成pdf"><a href="#绘制决策树，在同目录下生成pdf" class="headerlink" title="绘制决策树，在同目录下生成pdf"></a>绘制决策树，在同目录下生成pdf</h4><pre><code>#  绘制图形 pip3 install graphviz
+
+import graphviz
+
+dot_data = tree.export_graphviz(clf2, out_file=None)
+graph = graphviz.Source(dot_data)
+graph.render(&#39;决策树&#39;)#生成文件名为决策树的pdf图片
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/bac26eaf8ba04751a8308ddf86301246.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16" alt="决策树生成" title="决策树生成"></p>
+<h2 id="随机森林-1"><a href="#随机森林-1" class="headerlink" title="随机森林"></a>随机森林</h2><p>由于上述决策树生成的AUC值还不到0.7，认为拟合效果不够好，因此尝试使用随机森林算法</p>
+<h3 id="1-网格搜索"><a href="#1-网格搜索" class="headerlink" title="1,网格搜索"></a>1,网格搜索</h3><pre><code>param_grid = &#123;
+    &#39;criterion&#39;:[&#39;entropy&#39;,&#39;gini&#39;],# 衡量标准
+    &#39;max_depth&#39;:[5, 6, 7, 8],    # 每棵决策树的深度
+    &#39;n_estimators&#39;:[11,13,15],  # 决策树个数 - 随机森林特有参数
+    &#39;max_features&#39;:[0.3,0.4,0.5], # 每棵决策树使用的变量占比 - 随机森林特有参数
+    &#39;min_samples_split&#39;:[4,8,12,16]  # 叶子的最小拆分样本量
+&#125;
+</code></pre>
+<h3 id="2-集成学习：随机森林训练"><a href="#2-集成学习：随机森林训练" class="headerlink" title="2,集成学习：随机森林训练"></a>2,集成学习：随机森林训练</h3><pre><code>import sklearn.ensemble as ensemble # ensemble learning: 集成学习
+
+rfc = ensemble.RandomForestClassifier()
+rfc_cv = GridSearchCV(estimator=rfc, param_grid=param_grid,
+                    scoring=&#39;roc_auc&#39;, cv=4)
+rfc_cv.fit(X_train, y_train)
+</code></pre>
+<h3 id="3-使用随机森林对结果预测，并求AUC（一般都高于决策树）"><a href="#3-使用随机森林对结果预测，并求AUC（一般都高于决策树）" class="headerlink" title="3,使用随机森林对结果预测，并求AUC（一般都高于决策树）"></a>3,使用随机森林对结果预测，并求AUC（一般都高于决策树）</h3><pre><code>predict_test = rfc_cv.predict(X_test)
+#训练，预测结束之后，方可查看最佳参数配置
+print(rfc_cv.best_params_)
+
+#输出AUC和精度表格
+print(&#39;随机森林 AUC...&#39;)
+fpr_test, tpr_test, th_test = metrics.roc_curve(predict_test, y_test) 
+# 构造 roc 曲线
+print(&#39;AUC = %.4f&#39; %metrics.auc(fpr_test, tpr_test))
+print(&#39;随机森林精确度...&#39;)
+print(metrics.classification_report(predict_test, y_test))
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/f0a64f28f5004c82bc2914efde97415c.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16" alt="随机森林AUC结果"></p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>调参的思想类似于高中生物实验探究题中的 <strong>“寻找最佳浓度”</strong></p>
+<p>衡量决策树 or 随机森林 <strong>模型好坏的标准一般用AUC的值来判断</strong></p>
+<p><strong>非参数学习一般都用网格搜索</strong><br><br>例如在进行网格搜索时，有很多参数，哪怕最优结果表明只需要调整一个参数，调整之后其他最优结果可能也会改变（牵一发动全身）<br><em>当然，如果电脑性能足够好，可以直接放很多参数去跑，省去了大量的调参花费的精力</em></p>
+<p><strong>网格搜索的参数范围一开始要间隔比较大才好</strong></p>
+<p>其他参数相同时，同一个 random_state=？保证了算出来的结果相同</p>
+<h1 id="附："><a href="#附：" class="headerlink" title="附："></a>附：</h1><h2 id="树模型的参数"><a href="#树模型的参数" class="headerlink" title="树模型的参数"></a>树模型的参数</h2><pre><code># 
+# -  1.criterion  gini  or  entropy
+# 
+# -  2.splitter  best or random 前者是在所有特征中找最好的切分点 后者是在部分特征中（数据量大的时候）
+# 
+# -  3.max_features  None（所有），log2，sqrt，N  特征小于50的时候一般使用所有的
+# 
+# -  4.max_depth  数据少或者特征少的时候可以不管这个值，如果模型样本量多，特征也多的情况下，可以尝试限制下
+# 
+# -  5.min_samples_split  如果某节点的样本数少于min_samples_split，则不会继续再尝试选择最优特征来进行划分如果样本量不大，不需要管这个值。如果样本量数量级非常大，则推荐增大这个值。
+# 
+# -  6.min_samples_leaf  这个值限制了叶子节点最少的样本数，如果某叶子节点数目小于样本数，则会和兄弟节点一起被剪枝，如果样本量不大，不需要管这个值，大些如10W可是尝试下5
+# 
+# -  7.min_weight_fraction_leaf 这个值限制了叶子节点所有样本权重和的最小值，如果小于这个值，则会和兄弟节点一起被剪枝默认是0，就是不考虑权重问题。一般来说，如果我们有较多样本有缺失值，或者分类树样本的分布类别偏差很大，就会引入样本权重，这时我们就要注意这个值了。
+# 
+# -  8.max_leaf_nodes 通过限制最大叶子节点数，可以防止过拟合，默认是&quot;None”，即不限制最大的叶子节点数。如果加了限制，算法会建立在最大叶子节点数内最优的决策树。如果特征不多，可以不考虑这个值，但是如果特征分成多的话，可以加以限制具体的值可以通过交叉验证得到。
+# 
+# -  9.class_weight 指定样本各类别的的权重，主要是为了防止训练集某些类别的样本过多导致训练的决策树过于偏向这些类别。这里可以自己指定各个样本的权重如果使用“balanced”，则算法会自己计算权重，样本量少的类别所对应的样本权重会高。
+# 
+# - 10.min_impurity_split 这个值限制了决策树的增长，如果某节点的不纯度(基尼系数，信息增益，均方差，绝对差)小于这个阈值则该节点不再生成子节点。即为叶子节点 。
+# - n_estimators:要建立树的个数
+</code></pre>
+
+      
     </div>
-</div>
-<div class="full-toc">
-    <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
-<a class="" id="rocket" ></a>
+    <footer class="article-footer">
+      <a data-url="https://blogzjh.github.io/2022/01/01/%E5%86%B3%E7%AD%96%E6%A0%91-%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E7%94%A8%E6%88%B7%E6%B5%81%E5%A4%B1%E9%A2%84%E6%B5%8B%E7%9A%84%E6%A1%88%E4%BE%8B/" data-id="cl8wv0v2q001v1gtabqgdhogv" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
 
-</div>
 
+  
+    <article id="post-IDEA常用快捷键" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2021/12/25/IDEA%E5%B8%B8%E7%94%A8%E5%BF%AB%E6%8D%B7%E9%94%AE/" class="article-date">
+  <time datetime="2021-12-25T13:55:46.000Z" itemprop="datePublished">2021-12-25</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/12/25/IDEA%E5%B8%B8%E7%94%A8%E5%BF%AB%E6%8D%B7%E9%94%AE/">IDEA常用快捷键</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>摘自： <a target="_blank" rel="noopener" href="https://blog.csdn.net/cold___play/article/details/100178346?ops_request_misc=&request_id=&biz_id=102&utm_term=idea%E5%B8%B8%E7%94%A8%E5%BF%AB%E6%8D%B7%E9%94%AE&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduweb~default-0-100178346.nonecase&spm=1018.2226.3001.4187" title="来自：CSDN"> IDEA常用命令 ,侵删</a></p>
+<h3 id="1-自动代码"><a href="#1-自动代码" class="headerlink" title="1. 自动代码"></a>1. 自动代码</h3><p>常用的有fori/sout/psvm+Tab即可生成循环、System.out、main方法等boilerplate样板代码 。<br>例如要输入for(User user : users)只需输入user.for+Tab。</p>
+<p>再比如，要输入Date birthday = user.getBirthday();只需输入user.getBirthday().var+Tab即可。代码标签输入完成后，按Tab，生成代码。</p>
+<table>
+<thead>
+<tr>
+<th align="center">快捷键</th>
+<th align="center">指令</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">Ctrl+Alt+O</td>
+<td align="center">优化导入的类和包</td>
+</tr>
+<tr>
+<td align="center">Alt+Insert</td>
+<td align="center">生成代码(如get,set方法,构造函数等) 或者右键（Generate）</td>
+</tr>
+<tr>
+<td align="center">Ctrl+Alt+T</td>
+<td align="center">生成try catch 或者 Alt+enter</td>
+</tr>
+<tr>
+<td align="center">CTRL+ALT+T</td>
+<td align="center">把选中的代码放在 TRY{} IF{} ELSE{} 里</td>
+</tr>
+<tr>
+<td align="center">Ctrl + O</td>
+<td align="center">重写方法</td>
+</tr>
+<tr>
+<td align="center">Ctrl + I</td>
+<td align="center">实现方法</td>
+</tr>
+<tr>
+<td align="center">Ctr+shift+U</td>
+<td align="center">大小写转化</td>
+</tr>
+<tr>
+<td align="center">ALT+回车</td>
+<td align="center">导入包,自动修正</td>
+</tr>
+<tr>
+<td align="center">ALT+/</td>
+<td align="center">代码提示</td>
+</tr>
+<tr>
+<td align="center">CTRL+J</td>
+<td align="center">自动代码</td>
+</tr>
+<tr>
+<td align="center">Ctrl+Shift+J</td>
+<td align="center">整合两行为一行</td>
+</tr>
+<tr>
+<td align="center">CTRL+空格</td>
+<td align="center">代码提示</td>
+</tr>
+<tr>
+<td align="center">CTRL+SHIFT+SPACE</td>
+<td align="center">自动补全代码</td>
+</tr>
+<tr>
+<td align="center">CTRL+ALT+L</td>
+<td align="center">格式化代码</td>
+</tr>
+<tr>
+<td align="center">CTRL+ALT+I</td>
+<td align="center">自动缩进</td>
+</tr>
+<tr>
+<td align="center">CTRL+ALT+O</td>
+<td align="center">优化导入的类和包</td>
+</tr>
+<tr>
+<td align="center">ALT+INSERT</td>
+<td align="center">生成代码(如GET,SET方法,构造函数等)</td>
+</tr>
+<tr>
+<td align="center">CTRL+E</td>
+<td align="center">最近更改的代码</td>
+</tr>
+<tr>
+<td align="center">CTRL+ALT+SPACE</td>
+<td align="center">类名或接口名提示</td>
+</tr>
+<tr>
+<td align="center">CTRL+P</td>
+<td align="center">方法参数提示</td>
+</tr>
+<tr>
+<td align="center">CTRL+Q</td>
+<td align="center">可以看到当前方法的声明</td>
+</tr>
+<tr>
+<td align="center">Shift+F6</td>
+<td align="center">重构-重命名 (包、类、方法、变量、甚至注释等)</td>
+</tr>
+<tr>
+<td align="center">Ctrl+Alt+V</td>
+<td align="center">提取变量</td>
+</tr>
+</tbody></table>
+<h3 id="2-查询快捷键"><a href="#2-查询快捷键" class="headerlink" title="2. 查询快捷键"></a>2. 查询快捷键</h3><table>
+<thead>
+<tr>
+<th align="center">快捷键</th>
+<th align="center">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">Ctrl＋Shift＋Backspace</td>
+<td align="center">可以跳转到上次编辑的地</td>
+</tr>
+<tr>
+<td align="center">CTRL+ALT+ left/right</td>
+<td align="center">前后导航编辑过的地方</td>
+</tr>
+<tr>
+<td align="center">ALT+7</td>
+<td align="center">靠左窗口显示当前文件的结构</td>
+</tr>
+<tr>
+<td align="center">Ctrl+F12</td>
+<td align="center">浮动显示当前文件的结构</td>
+</tr>
+<tr>
+<td align="center">ALT+F7</td>
+<td align="center">找到你的函数或者变量或者类的所有引用到的地方</td>
+</tr>
+<tr>
+<td align="center">CTRL+ALT+F7</td>
+<td align="center">找到你的函数或者变量或者类的所有引用到的地方</td>
+</tr>
+<tr>
+<td align="center">Ctrl+Shift+Alt+N</td>
+<td align="center">查找类中的方法或变量</td>
+</tr>
+<tr>
+<td align="center">双击SHIFT</td>
+<td align="center">在项目的所有目录查找文件</td>
+</tr>
+<tr>
+<td align="center">Ctrl+N</td>
+<td align="center">查找类</td>
+</tr>
+<tr>
+<td align="center">Ctrl+Shift+N</td>
+<td align="center">查找文件</td>
+</tr>
+<tr>
+<td align="center">CTRL+G</td>
+<td align="center">定位行</td>
+</tr>
+<tr>
+<td align="center">CTRL+F</td>
+<td align="center">在当前窗口查找文本</td>
+</tr>
+<tr>
+<td align="center">CTRL+SHIFT+F</td>
+<td align="center">在指定窗口查找文本</td>
+</tr>
+<tr>
+<td align="center">CTRL+R</td>
+<td align="center">在当前窗口替换文本</td>
+</tr>
+<tr>
+<td align="center">CTRL+SHIFT+R</td>
+<td align="center">在指定窗口替换文本</td>
+</tr>
+<tr>
+<td align="center">ALT+SHIFT+C</td>
+<td align="center">查找修改的文件</td>
+</tr>
+<tr>
+<td align="center">CTRL+E</td>
+<td align="center">最近打开的文件</td>
+</tr>
+<tr>
+<td align="center">F3</td>
+<td align="center">向下查找关键字出现位置</td>
+</tr>
+<tr>
+<td align="center">SHIFT+F3</td>
+<td align="center">向上一个关键字出现位置</td>
+</tr>
+<tr>
+<td align="center">选中文本，按Alt+F3</td>
+<td align="center">高亮相同文本，F3逐个往下查找相同文本</td>
+</tr>
+<tr>
+<td align="center">F4</td>
+<td align="center">查找变量来源</td>
+</tr>
+<tr>
+<td align="center">CTRL+SHIFT+O</td>
+<td align="center">弹出显示查找内容</td>
+</tr>
+<tr>
+<td align="center">Ctrl+W</td>
+<td align="center">选中代码，连续按会有其他效果</td>
+</tr>
+<tr>
+<td align="center">F2 或Shift+F2</td>
+<td align="center">高亮错误或警告快速定位</td>
+</tr>
+<tr>
+<td align="center">Ctrl+Up/Down</td>
+<td align="center">光标跳转到第一行或最后一行下</td>
+</tr>
+<tr>
+<td align="center">Ctrl+B</td>
+<td align="center">快速打开光标处的类或方法</td>
+</tr>
+<tr>
+<td align="center">CTRL+ALT+B</td>
+<td align="center">找所有的子类</td>
+</tr>
+<tr>
+<td align="center">CTRL+SHIFT+B</td>
+<td align="center">找变量的类</td>
+</tr>
+<tr>
+<td align="center">Ctrl+Shift+上下键</td>
+<td align="center">上下移动代码</td>
+</tr>
+<tr>
+<td align="center">Ctrl+Alt+ left/right</td>
+<td align="center">返回至上次浏览的位置</td>
+</tr>
+<tr>
+<td align="center">Ctrl+X</td>
+<td align="center">删除行</td>
+</tr>
+<tr>
+<td align="center">Ctrl+D</td>
+<td align="center">复制行</td>
+</tr>
+<tr>
+<td align="center">Ctrl+/ 或 Ctrl+Shift+/</td>
+<td align="center">注释（// 或者/…/ ）</td>
+</tr>
+<tr>
+<td align="center">Ctrl+H</td>
+<td align="center">显示类结构图</td>
+</tr>
+<tr>
+<td align="center">Ctrl+Q</td>
+<td align="center">显示注释文档</td>
+</tr>
+<tr>
+<td align="center">Alt+F1</td>
+<td align="center">查找代码所在位置</td>
+</tr>
+<tr>
+<td align="center">Alt+1</td>
+<td align="center">快速打开或隐藏工程面板</td>
+</tr>
+<tr>
+<td align="center">Alt+ left/right</td>
+<td align="center">切换代码视图</td>
+</tr>
+<tr>
+<td align="center">ALT+ ↑/↓</td>
+<td align="center">在方法间快速移动定位</td>
+</tr>
+<tr>
+<td align="center">CTRL+ALT+ left/right</td>
+<td align="center">前后导航编辑过的地方</td>
+</tr>
+<tr>
+<td align="center">Ctrl＋Shift＋Backspace</td>
+<td align="center">可以跳转到上次编辑的地</td>
+</tr>
+<tr>
+<td align="center">Alt+6</td>
+<td align="center">查找TODO</td>
+</tr>
+</tbody></table>
+<h3 id="3-其它快捷键"><a href="#3-其它快捷键" class="headerlink" title="3. 其它快捷键"></a>3. 其它快捷键</h3><table>
+<thead>
+<tr>
+<th align="center">快捷键</th>
+<th align="center">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">SHIFT+ENTER</td>
+<td align="center">另起一行</td>
+</tr>
+<tr>
+<td align="center">CTRL+Z</td>
+<td align="center">倒退(撤销)</td>
+</tr>
+<tr>
+<td align="center">CTRL+SHIFT+Z</td>
+<td align="center">向前(取消撤销)</td>
+</tr>
+<tr>
+<td align="center">CTRL+ALT+F12</td>
+<td align="center">资源管理器打开文件夹</td>
+</tr>
+<tr>
+<td align="center">ALT+F1</td>
+<td align="center">查找文件所在目录位置</td>
+</tr>
+<tr>
+<td align="center">SHIFT+ALT+INSERT</td>
+<td align="center">竖编辑模式</td>
+</tr>
+<tr>
+<td align="center">CTRL+F4</td>
+<td align="center">关闭当前窗口</td>
+</tr>
+<tr>
+<td align="center">Ctrl+Alt+V</td>
+<td align="center">可以引入变量。例如：new String(); 自动导入变量定义</td>
+</tr>
+<tr>
+<td align="center">Ctrl+~</td>
+<td align="center">快速切换方案（界面外观、代码风格、快捷键映射等菜单）</td>
+</tr>
+</tbody></table>
+<h3 id="4-svn快捷键"><a href="#4-svn快捷键" class="headerlink" title="4. svn快捷键"></a>4. svn快捷键</h3><table>
+<thead>
+<tr>
+<th align="center">快捷键</th>
+<th align="center">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">ctrl+k</td>
+<td align="center">提交代码到SVN</td>
+</tr>
+<tr>
+<td align="center">ctrl+t</td>
+<td align="center">更新代码</td>
+</tr>
+</tbody></table>
+<h3 id="5-调试快捷键"><a href="#5-调试快捷键" class="headerlink" title="5. 调试快捷键"></a>5. 调试快捷键</h3><p>其实常用的 就是F8 F7 F9 最值得一提的 就是Drop Frame 可以让运行过的代码从头再来</p>
+<table>
+<thead>
+<tr>
+<th align="center">快捷键</th>
+<th align="center">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">alt+F8</td>
+<td align="center">debug时选中查看值</td>
+</tr>
+<tr>
+<td align="center">Alt+Shift+F9</td>
+<td align="center">选择 Debug</td>
+</tr>
+<tr>
+<td align="center">Alt+Shift+F10</td>
+<td align="center">选择 Run</td>
+</tr>
+<tr>
+<td align="center">Ctrl+Shift+F9</td>
+<td align="center">编译</td>
+</tr>
+<tr>
+<td align="center">Ctrl+Shift+F8</td>
+<td align="center">查看断点</td>
+</tr>
+<tr>
+<td align="center">F7</td>
+<td align="center">步入</td>
+</tr>
+<tr>
+<td align="center">Shift+F7</td>
+<td align="center">智能步入</td>
+</tr>
+<tr>
+<td align="center">Alt+Shift+F7</td>
+<td align="center">强制步入</td>
+</tr>
+<tr>
+<td align="center">F8</td>
+<td align="center">步过</td>
+</tr>
+<tr>
+<td align="center">Shift+F8</td>
+<td align="center">步出</td>
+</tr>
+<tr>
+<td align="center">Alt+Shift+F8</td>
+<td align="center">强制步过</td>
+</tr>
+<tr>
+<td align="center">Alt+F9</td>
+<td align="center">运行至光标处</td>
+</tr>
+<tr>
+<td align="center">Ctrl+Alt+F9</td>
+<td align="center">强制运行至光标处</td>
+</tr>
+<tr>
+<td align="center">F9</td>
+<td align="center">恢复程序</td>
+</tr>
+<tr>
+<td align="center">Alt+F10</td>
+<td align="center">定位到断点</td>
+</tr>
+</tbody></table>
+<h3 id="6-重构"><a href="#6-重构" class="headerlink" title="6. 重构"></a>6. 重构</h3><table>
+<thead>
+<tr>
+<th align="center">快捷键</th>
+<th align="center">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">Ctrl+Alt+Shift+T</td>
+<td align="center">弹出重构菜单</td>
+</tr>
+<tr>
+<td align="center">Shift+F6</td>
+<td align="center">重命名</td>
+</tr>
+<tr>
+<td align="center">F6</td>
+<td align="center">移动</td>
+</tr>
+<tr>
+<td align="center">F5</td>
+<td align="center">复制</td>
+</tr>
+<tr>
+<td align="center">Alt+Delete</td>
+<td align="center">安全删除</td>
+</tr>
+<tr>
+<td align="center">Ctrl+Alt+N</td>
+<td align="center">内联</td>
+</tr>
+</tbody></table>
+<h1 id="十大IntelliJ-IDEA快捷键"><a href="#十大IntelliJ-IDEA快捷键" class="headerlink" title="十大IntelliJ IDEA快捷键"></a>十大IntelliJ IDEA快捷键</h1><p>Intellij IDEA中有很多快捷键让人爱不释手，stackoverflow上也有一些有趣的讨论。每个人都有自己的最爱，想排出个理想的榜单还真是困难。<br>以前也整理过Intellij的快捷键，这次就按照我日常开发时的使用频率，简单分类列一下我最喜欢的十大快捷-神-键吧。</p>
+<h3 id="智能提示："><a href="#智能提示：" class="headerlink" title="智能提示："></a>智能提示：</h3><p>Intellij首当其冲的当然就是Intelligence智能！基本的代码提示用Ctrl+Space，还有更智能地按类型信息提示Ctrl+Shift+Space，但因为Intellij总是随着我们敲击而自动提示，所以很多时候都不会手动敲这两个快捷键(除非提示框消失了)。用F2/ Shift+F2移动到有错误的代码，Alt+Enter快速修复(即Eclipse中的Quick Fix功能)。当智能提示为我们自动补全方法名时，我们通常要自己补上行尾的反括号和分号，当括号嵌套很多层时会很麻烦，这时我们只需敲Ctrl+Shift+Enter就能自动补全末尾的字符。而且不只是括号，例如敲完if/for时也可以自动补上{}花括号。<br>最后要说一点，Intellij能够智能感知Spring、Hibernate等主流框架的配置文件和类，以静制动，在看似“静态”的外表下，智能地扫描理解你的项目是如何构造和配置的。</p>
+<h3 id="重构："><a href="#重构：" class="headerlink" title="重构："></a>重构：</h3><p>Intellij重构是另一完爆Eclipse的功能，其智能程度令人瞠目结舌，比如提取变量时自动检查到所有匹配同时提取成一个变量等。尤其看过《重构-改善既有代码设计》之后，有了Intellij的配合简直是令人大呼过瘾！也正是强大的智能和重构功能，使Intellij下的TDD开发非常顺畅。<br>切入正题，先说一个无敌的重构功能大汇总快捷键Ctrl+Shift+Alt+T，叫做Refactor This。按法有点复杂，但也符合Intellij的风格，很多快捷键都要双手完成，而不像Eclipse不少最有用的快捷键可以潇洒地单手完成(不知道算不算Eclipse的一大优点)，但各位用过Emacs的话就会觉得也没什么了(非Emacs黑)。此外，还有些最常用的重构技巧，因为太常用了，若每次都在Refactor This菜单里选的话效率有些低。比如Shift+F6直接就是改名，Ctrl+Alt+V则是提取变量。</p>
+<h3 id="代码生成："><a href="#代码生成：" class="headerlink" title="代码生成："></a>代码生成：</h3><p>这一点类似Eclipse，虽不是独到之处，但因为日常使用频率极高，所以还是罗列在榜单前面。常用的有fori/sout/psvm+Tab即可生成循环、System.out、main方法等boilerplate样板代码，用Ctrl+J可以查看所有模板。后面“辅助”一节中将会讲到Alt+Insert，在编辑窗口中点击可以生成构造函数、toString、getter/setter、重写父类方法等。这两个技巧实在太常用了，几乎每天都要生成一堆main、System.out和getter/setter。<br>另外，Intellij IDEA 13中加入了后缀自动补全功能(Postfix Completion)，比模板生成更加灵活和强大。例如要输入for(User user : users)只需输入user.for+Tab。再比如，要输入Date birthday = user.getBirthday();只需输入user.getBirthday().var+Tab即可。</p>
+<h3 id="编辑："><a href="#编辑：" class="headerlink" title="编辑："></a>编辑：</h3><p>编辑中不得不说的一大神键就是能够自动按语法选中代码的Ctrl+W以及反向的Ctrl+Shift+W了。此外，Ctrl+Left/Right移动光标到前/后单词，Ctrl+[/]移动到前/后代码块，这些类Vim风格的光标移动也是一大亮点。以上Ctrl+Left/Right/[]加上Shift的话就能选中跳跃范围内的代码。Alt+Forward/Backward移动到前/后方法。还有些非常普通的像Ctrl+Y删除行、Ctrl+D复制行、Ctrl+&lt;/&gt;折叠代码就不多说了。<br>关于光标移动再多扩展一点，除了Intellij本身已提供的功能外，我们还可以安装ideaVim或者emacsIDEAs享受到Vim的快速移动和Emacs的AceJump功能(超爽！)。另外，Intellij的书签功能也是不错的，用Ctrl+Shift+Num定义1-10书签(再次按这组快捷键则是删除书签)，然后通过Ctrl+Num跳转。这避免了多次使用前/下一编辑位置Ctrl+Left/Right来回跳转的麻烦，而且此快捷键默认与Windows热键冲突(默认多了Alt，与Windows改变显示器显示方向冲突，一不小心显示器就变成倒着显式的了，冏啊)。</p>
+<h3 id="查找打开："><a href="#查找打开：" class="headerlink" title="查找打开："></a>查找打开：</h3><p>类似Eclipse，Intellij的Ctrl+N/Ctrl+Shift+N可以打开类或资源，但Intellij更加智能一些，我们输入的任何字符都将看作模糊匹配，省却了Eclipse中还有输入*的麻烦。最新版本的IDEA还加入了Search Everywhere功能，只需按Shift+Shift即可在一个弹出框中搜索任何东西，包括类、资源、配置项、方法等等。<br>类的继承关系则可用Ctrl+H打开类层次窗口，在继承层次上跳转则用Ctrl+B/Ctrl+Alt+B分别对应父类或父方法定义和子类或子方法实现，查看当前类的所有方法用Ctrl+F12。<br>要找类或方法的使用也很简单，Alt+F7。要查找文本的出现位置就用Ctrl+F/Ctrl+Shift+F在当前窗口或全工程中查找，再配合F3/Shift+F3前后移动到下一匹配处。<br>Intellij更加智能的又一佐证是在任意菜单或显示窗口，都可以直接输入你要找的单词，Intellij就会自动为你过滤。</p>
+<h3 id="其他辅助："><a href="#其他辅助：" class="headerlink" title="其他辅助："></a>其他辅助：</h3><p>以上这些神键配上一些辅助快捷键，即可让你的双手90%以上的时间摆脱鼠标，专注于键盘仿佛在进行钢琴表演。这些不起眼却是至关重要的最后一块拼图有：</p>
+<ul>
+<li>命令：Ctrl+Shift+A可以查找所有Intellij的命令，并且每个命令后面还有其快捷键。所以它不仅是一大神键，也是查找学习快捷键的工具。</li>
+<li>新建：Alt+Insert可以新建类、方法等任何东西。</li>
+<li>格式化代码：格式化import列表Ctrl+Alt+O，格式化代码Ctrl+Alt+L。</li>
+<li>切换窗口：Alt+Num，常用的有1-项目结构，3-搜索结果，4/5-运行调试。Ctrl+Tab切换标签页，Ctrl+E/Ctrl+Shift+E打开最近打开过的或编辑过的文件。</li>
+<li>单元测试：Ctrl+Alt+T创建单元测试用例。</li>
+<li>运行：Alt+Shift+F10运行程序，Shift+F9启动调试，Ctrl+F2停止。</li>
+<li>调试：F7/F8/F9分别对应Step into，Step over，Continue。</li>
+</ul>
+<p>此外还有些我自定义的，例如水平分屏Ctrl+|等，和一些神奇的小功能Ctrl+Shift+V粘贴很早以前拷贝过的，Alt+Shift+Insert进入到列模式进行按列选中。</p>
+<ul>
+<li>Top #10切来切去：Ctrl+Tab</li>
+<li>Top #9选你所想：Ctrl+W</li>
+<li>Top #8代码生成：Template/Postfix +Tab</li>
+<li>Top #7发号施令：Ctrl+Shift+A</li>
+<li>Top #6无处藏身：Shift+Shift</li>
+<li>Top #5自动完成：Ctrl+Shift+Enter</li>
+<li>Top #4创造万物：Alt+Insert</li>
+<li>Top #1智能补全：Ctrl+Shift+Space</li>
+<li>Top #1自我修复：Alt+Enter</li>
+<li>Top #1重构一切：Ctrl+Shift+Alt+T</li>
+</ul>
+<p>CTRL+ALT+ left/right 前后导航编辑过的地方。<br>Ctrl＋Shift＋Backspace可以跳转到上次编辑的地。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://blogzjh.github.io/2021/12/25/IDEA%E5%B8%B8%E7%94%A8%E5%BF%AB%E6%8D%B7%E9%94%AE/" data-id="cl8wv0v1l000c1gtafl9q6jcc" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Java四种next用法" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2021/12/25/Java%E5%9B%9B%E7%A7%8Dnext%E7%94%A8%E6%B3%95/" class="article-date">
+  <time datetime="2021-12-24T17:59:30.000Z" itemprop="datePublished">2021-12-25</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Java/">Java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/12/25/Java%E5%9B%9B%E7%A7%8Dnext%E7%94%A8%E6%B3%95/">Java四种next用法</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在查阅了大量网上相关资料都没有一个完整的解释，并且我查的几篇高赞回答都是错误的时候，我决定用一整天的时间来精细写下这篇文章，希望对你有帮助。</p>
+<pre><code>大多数人对hasNext的印象停留在“判断是否有下一个值”上，而该方法还是一个阻塞式的方法
+</code></pre>
+<h1 id="hasNext和hasNextLine的区别"><a href="#hasNext和hasNextLine的区别" class="headerlink" title="hasNext和hasNextLine的区别"></a>hasNext和hasNextLine的区别</h1><p>二者都是用于判断“有无键盘输入”的，有则返回true，没有则阻塞！一定记住是阻塞而不是返回false，很多人都说是返回false，但你查源码会发现是不会返回false的，他会让你一直阻塞在判断阶段，二者只是在细节上有不同</p>
+<pre><code>hasNext()方法会判断接下来是否有非空字符.如果有,则返回true，没有则阻塞。例如一直敲回车相当于一直判断为空字符，但是不会返回false，而是一直阻塞在判断阶段，直到你输入了非空字符
+hasNextLine() 方法会根据行匹配模式去判断接下来是否有一行(包括空行),如果有,则返回true。这个没什么特别的，只要是你敲了回车那都是true并且不会阻塞
+</code></pre>
+<p>例如像这种if语句是永远不可能执行到内部方法体的</p>
+<pre><code>if(scan.hasNext()==false)&#123;
+    System.out.println(&quot;hasNext和hasNextLine不会返回false&quot;);
+&#125;
+</code></pre>
+<p> 再举一个例子加深理解：</p>
+<pre><code>Scanner scan = new Scanner(System.in);
+System.out.println(scan.hasNextLine());
+System.out.println(scan.hasNext());
+</code></pre>
+<p> 运行该代码，一直不停敲回车键，第一次回车会直接输出true，而后面一直敲都会阻塞在hasNext语句上，运行如下图</p>
+<p><img src="https://img-blog.csdnimg.cn/20211001130739982.png"></p>
+<p>首先，在看用法和解释之前，有以下几个点必须时刻牢记</p>
+<blockquote>
+<p>next方法不能录入空格，在特定情况下会把空格当作回车，nextLine方法可以识录入空格<br>hasNext和hasNextLine的返回值都是boolean类型，但只有可能返回true，不可能返回false，并且都默认以回车键为结束（hasNext可以设置为任意符号为结束键，不在本文研究范围之内）<br>hasNext、next不能直接识别裸回车，而hasNextLine和nextLine都可以直接识别裸回车。换句话讲：对于不输入符号而直接裸敲一个回车的操作，只有后两个能识别<br>hasNext、hasNextLine在返回一个boolean类型结果true的同时，会在堆空间中开辟一块专门用于存放刚刚输入的字符串，用于下次next或者nextLine：即下次next或者nextLine不需要再从键盘输入，相当于系统自动把刚刚输入的字符串再原封不动的输入了一遍。同时这个存储寿命＝调用对象的寿命<br>对于hasNext来说，每次敲击回车都相当于在堆空间中开辟一行，敲几次回车就会直接给后续next、nextLine方法赋值几次<br>hasNext是线程阻塞的，对于hasNext来说，如果一直不输入字符，反而一直敲回车的话，整个线程会卡在这个输入的地方，直到有字符输入</p>
+</blockquote>
+<p>在知道 hasNext的方法用于判断和存储，next的方法用于输入之后，来做如下预备工作</p>
+<blockquote>
+<p>因为hasNext、hasNextLine与next、nextLine有2X2种组合方式，所以我们用4段代码做4次实验就可以大体上了解他们的特性</p>
+</blockquote>
+<p>以下4段代码希望看客们能亲自复制粘贴了试一试，以便更深理解</p>
+<h2 id="hasNext-和-next组合"><a href="#hasNext-和-next组合" class="headerlink" title="hasNext 和 next组合"></a>hasNext 和 next组合</h2><pre><code>Scanner scan = new Scanner(System.in);
+System.out.println(&quot;请输入字符串，并多混入空格回车尝试不同结果&quot;);
+if(scan.hasNext() ) &#123;
+    System.out.println(&quot;第一次&quot;+scan.next());
+    System.out.println(&quot;第二次&quot;+scan.next());
+    System.out.println(&quot;第三次&quot;+scan.next());
+&#125;
+</code></pre>
+<p>尝试输入：空格aaa空格bbb空格ccc回车<br><img src="https://img-blog.csdnimg.cn/20211001131608748.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_18,color_FFFFFF,t_70,g_se,x_16"><br>解释：<br><img src="https://img-blog.csdnimg.cn/20211001125303907.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_15,color_FFFFFF,t_70,g_se,x_16"></p>
+<h2 id="hasNext-和-NextLine组合"><a href="#hasNext-和-NextLine组合" class="headerlink" title="hasNext 和 NextLine组合"></a>hasNext 和 NextLine组合</h2><pre><code>Scanner scan = new Scanner(System.in);
+System.out.println(&quot;请输入字符串，并多混入空格回车尝试不同结果&quot;);
+if(scan.hasNext() ) &#123;
+    System.out.println(&quot;第一次&quot;+scan.nextLine());
+    System.out.println(&quot;第二次&quot;+scan.nextLine());
+    System.out.println(&quot;第三次&quot;+scan.nextLine());
+&#125;
+</code></pre>
+<p>解释：光标仍然闪烁，证明堆空间中的  aaa bbb ccc只赋值给了第一个，这也验证了nextLine可以录入空格。此时线程正在等待用户输入第二个nextLine<br>hasNextLine 和 next组合</p>
+<pre><code>Scanner scan = new Scanner(System.in);
+System.out.println(&quot;请输入字符串，并多混入空格回车尝试不同结果&quot;);
+if(scan.hasNextLine() ) &#123;
+    System.out.println(&quot;第一次&quot;+scan.next());
+    System.out.println(&quot;第二次&quot;+scan.next());
+    System.out.println(&quot;第三次&quot;+scan.next());
+&#125;
+</code></pre>
+<h2 id="hasNextLine-和-nextLine组合"><a href="#hasNextLine-和-nextLine组合" class="headerlink" title="hasNextLine 和 nextLine组合"></a>hasNextLine 和 nextLine组合</h2><pre><code>Scanner scan = new Scanner(System.in);
+System.out.println(&quot;请输入字符串，并多混入空格回车尝试不同结果&quot;);
+if(scan.hasNextLine() ) &#123;
+    System.out.println(&quot;第一次&quot;+scan.nextLine());
+    System.out.println(&quot;第二次&quot;+scan.nextLine());
+    System.out.println(&quot;第三次&quot;+scan.nextLine());
+&#125;
+</code></pre>
+<p>发现规律了吗<br><img src="https://img-blog.csdnimg.cn/20211001132037981.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_18,color_FFFFFF,t_70,g_se,x_16"></p>
+<p><strong>如果直接连续敲回车，那么hasNextLine会判断为true，同时进入if语句执行，并且输入了三个空行也会输出三个空行</strong></p>
+<p>验证hasNext、hasNextLine对输入代码的存储寿命</p>
+<p>hasNextLine在if语句内，我们将验证语句next放在if语句之外，输入aaa bbb ccc ddd测试</p>
+<pre><code>Scanner scan = new Scanner(System.in);
+System.out.println(&quot;请输入字符串，并多混入空格回车尝试不同结果&quot;);
+if(scan.hasNextLine() ) &#123;
+    System.out.println(&quot;第一次&quot;+scan.next());
+    System.out.println(&quot;第二次&quot;+scan.next());
+    System.out.println(&quot;第三次&quot;+scan.next());
+&#125;
+        System.out.println(&quot;验证存储寿命是否＝scan对象寿命&quot;+scan.next());
+</code></pre>
+<p> <img src="https://img-blog.csdnimg.cn/20211001132824820.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_17,color_FFFFFF,t_70,g_se,x_16"></p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>hasNext、hasNextLine不可能返回false，只有true和阻塞两种结果</p>
+<p>hasNext、hasNextLine会判断有无输入，并且hasNext一直敲回车而不输入字符会导致线程阻塞</p>
+<p>hasNext、hasNextLine也有存储功能，从“开始输入”到“判断结束”的过程中的所有输入都将储存，直到之后遇到需要键盘输入的next、nextLine，这些存储的字符串和空格会自动填写给后面的next、nextLine。而空格再next和nextLine上有不同的表现</p>
+<p>查看API还有很多同类型的不同方法，按照这个思路可以一通百通<br><img src="https://img-blog.csdnimg.cn/2021100113530823.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16"><br><img src="https://img-blog.csdnimg.cn/20211001135328579.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5Y-k57uG5Lqa,size_20,color_FFFFFF,t_70,g_se,x_16"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://blogzjh.github.io/2021/12/25/Java%E5%9B%9B%E7%A7%8Dnext%E7%94%A8%E6%B3%95/" data-id="cl8wv0v1h00041gtagvbx0wac" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+
+
+  <nav id="page-nav">
+    
+    <a class="extend prev" rel="prev" href="/page/4/">&amp;laquo; 上一页</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span>
+  </nav>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Java/">Java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%B8%AD%E9%97%B4%E4%BB%B6/">中间件</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%B7%A5%E4%BD%9C%E7%AC%94%E8%AE%B0/">工作笔记</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%AE%97%E6%B3%95/">数据结构算法</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%BA%90%E7%A0%81/">源码</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/HashMap/" rel="tag">HashMap</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/HashMap/" style="font-size: 10px;">HashMap</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/09/">九月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/08/">八月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/07/">七月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/06/">六月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">四月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">三月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/02/">二月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/01/">一月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/12/">十二月 2021</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2022/09/26/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%81%9A%E9%BB%91%E5%90%8D%E5%8D%95%E7%9A%84%E6%96%B9%E6%A1%88/">布隆过滤做黑名单的方案</a>
+          </li>
+        
+          <li>
+            <a href="/2022/09/15/%E6%9F%90%E8%9A%81%E9%87%91%E6%9C%8D%E7%A7%8B%E6%8B%9B9-15/">某蚁金服秋招9-15</a>
+          </li>
+        
+          <li>
+            <a href="/2022/09/15/%E4%B8%89%E7%A7%8D%E6%83%85%E5%86%B5%E7%9A%84%E5%B1%82%E5%BA%8F%E9%81%8D%E5%8E%86/">三种情况的层序遍历</a>
+          </li>
+        
+          <li>
+            <a href="/2022/09/15/%E5%87%A0%E9%81%93%E5%B2%9B%E5%B1%BF%E9%97%AE%E9%A2%98-dfs-%E5%89%AA%E6%9E%9D-%E5%9B%9E%E6%BA%AF/">几道岛屿问题:dfs+剪枝+回溯</a>
+          </li>
+        
+          <li>
+            <a href="/2022/09/15/%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%9A%E6%9B%BF%E6%8D%A2%E3%80%81%E5%B7%A6%E6%97%8B%E3%80%81%E7%BC%BA%E5%A4%B1/">字符串：替换、左旋、缺失</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2022 ZJH&#39;blog<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
 </body>
-<script src="/zjh/js/jquery.pjax.js?v=1.1.0" ></script>
-
-<script src="/zjh/js/script.js?v=1.1.0" ></script>
-<script>
-    var img_resize = 'default';
-    function initArticle() {
-        /*渲染对应的表格样式*/
-        
-            $("#post .pjax table").addClass("green_title");
-        
-
-        /*渲染打赏样式*/
-        
-
-        /*高亮代码块行号*/
-        
-        $('pre code').each(function(){
-            var lines = $(this).text().trim().split('\n').length, widther='';
-            if (lines>99) {
-                widther = 'widther'
-            }
-            var $numbering = $('<ul/>').addClass('pre-numbering ' + widther).attr("unselectable","on");
-            $(this).addClass('has-numbering ' + widther)
-                    .parent()
-                    .append($numbering);
-            for(var i=1;i<=lines;i++){
-                $numbering.append($('<li/>').text(i));
-            }
-        });
-        
-
-        /*访问数量*/
-        
-        $.getScript("//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js");
-        
-
-        /*代码高亮，行号对齐*/
-        $('.pre-numbering').css('line-height',$('.has-numbering').css('line-height'));
-
-        
-        
-    }
-
-    /*打赏页面隐藏与展示*/
-    
-
-</script>
-
-<!--加入行号的高亮代码块样式-->
-
-<style>
-    pre{
-        position: relative;
-        margin-bottom: 24px;
-        border-radius: 10px;
-        border: 1px solid #e2dede;
-        background: #FFF;
-        overflow: hidden;
-    }
-    code.has-numbering{
-        margin-left: 30px;
-    }
-    code.has-numbering.widther{
-        margin-left: 35px;
-    }
-    .pre-numbering{
-        margin: 0;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 20px;
-        padding: 0.5em 3px 0.7em 5px;
-        border-right: 1px solid #C3CCD0;
-        text-align: right;
-        color: #AAA;
-        background-color: ;
-    }
-    .pre-numbering.widther {
-        width: 35px;
-    }
-</style>
-
-<!--自定义样式设置-->
-<style>
-    
-    
-    .nav {
-        width: 542px;
-    }
-    .nav.fullscreen {
-        margin-left: -542px;
-    }
-    .nav-left {
-        width: 120px;
-    }
-    
-    
-    @media screen and (max-width: 1468px) {
-        .nav {
-            width: 492px;
-        }
-        .nav.fullscreen {
-            margin-left: -492px;
-        }
-        .nav-left {
-            width: 100px;
-        }
-    }
-    
-    
-    @media screen and (max-width: 1024px) {
-        .nav {
-            width: 492px;
-            margin-left: -492px
-        }
-        .nav.fullscreen {
-            margin-left: 0;
-        }
-    }
-    
-    @media screen and (max-width: 426px) {
-        .nav {
-            width: 100%;
-        }
-        .nav-left {
-            width: 100%;
-        }
-    }
-    
-    
-    .nav-right .title-list nav a .post-title, .nav-right .title-list #local-search-result a .post-title {
-        color: #383636;
-    }
-    
-    
-    .nav-right .title-list nav a .post-date, .nav-right .title-list #local-search-result a .post-date {
-        color: #5e5e5f;
-    }
-    
-    
-    .nav-right nav a.hover, #local-search-result a.hover{
-        background-color: #e2e0e0;
-    }
-    
-    
-
-    /*列表样式*/
-    
-
-    /* 背景图样式 */
-    
-    
-
-
-    /*引用块样式*/
-    
-
-    /*文章列表背景图*/
-    
-
-    
-</style>
-
-
-
-
-
-
-
 </html>
