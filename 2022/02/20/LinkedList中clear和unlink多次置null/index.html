@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>三种中间件的刷盘(持久化)策略 | 张家豪的博客</title>
+  <title>LinkedList中clear和unlink方法为什么多次置null | 张家豪的博客</title>
   <meta name="keywords" content="">
-  <meta name="description" content="三种中间件的刷盘(持久化)策略 | 张家豪的博客">
+  <meta name="description" content="LinkedList中clear和unlink方法为什么多次置null | 张家豪的博客">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="description" content="1.已知布隆过滤有误判概率 因为hash运算后存在“假阳性”，因此做黑名单时可能把正常用户给拦截了 做白名单时一定是准确无误的 理论上做成黑名单有误判缺陷，但做白名单毫无问题，因此黑白名单结合才能实现黑名单的功能  2.黑白名单组合解决：ip黑名单问题直接列下我的设计思路：  现在有一个布隆过滤器保存了一组ip黑名单 一个正常用户ip遇到hash碰撞，被拦截了 接口直接跳转“验证真人的接口” 验证">
 <meta property="og:type" content="article">
@@ -719,9 +719,9 @@
 </aside>
 <div id="post">
     <div class="pjax">
-        <article id="post-三种中间件的刷盘-持久化-策略" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-LinkedList中clear和unlink多次置null" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">三种中间件的刷盘(持久化)策略</h1>
+        <h1 class="article-title">LinkedList中clear和unlink方法为什么多次置null</h1>
     
     <div class="article-meta">
         
@@ -731,7 +731,7 @@
             <i class="iconfont icon-category"></i>
             
             
-            <a  data-rel="中间件">中间件</a>
+            <a  data-rel="源码">源码</a>
             
         </span>
         
@@ -739,12 +739,12 @@
     </div>
     <div class="article-meta">
         
-            发布时间 : <time class="date" title='最后更新: 2022-09-15 21:15:51'>2022-08-28 13:34</time>
+            发布时间 : <time class="date" title='最后更新: 2022-09-26 02:34:18'>2022-02-20 00:25</time>
         
     </div>
     <div class="article-meta">
         
-        <span>字数:623</span>
+        <span>字数:700</span>
         
         
         <span id="busuanzi_container_page_pv">
@@ -763,7 +763,7 @@
     
     <div class="toc-ref">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-Mysql"><span class="toc-text">1.Mysql</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1redolog"><span class="toc-text">1.1redolog</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2buffer-pool"><span class="toc-text">1.2buffer pool</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-Redis"><span class="toc-text">2.Redis</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1AOF"><span class="toc-text">2.1AOF</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2AOF%E7%BC%93%E5%86%B2%E6%B1%A0"><span class="toc-text">2.2AOF缓冲池</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-RabbitMQ"><span class="toc-text">3.RabbitMQ</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1%E6%B6%88%E6%81%AF%E6%8C%81%E4%B9%85%E5%8C%96"><span class="toc-text">3.1消息持久化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2Buffer"><span class="toc-text">3.2Buffer</span></a></li></ol></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BE%8B%E5%A6%82clear%E7%9A%84%E6%BA%90%E7%A0%81"><span class="toc-text">例如clear的源码</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%B3%A8%E9%87%8A%E7%BF%BB%E8%AF%91%EF%BC%9A"><span class="toc-text">注释翻译：</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B3%A8%E8%A7%A3%E8%A7%A3%E8%AF%BB%EF%BC%9A"><span class="toc-text">注解解读：</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E4%B8%AA"><span class="toc-text">第一个</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E4%B8%AA"><span class="toc-text">第二个</span></a></li></ol></li></ol></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -779,45 +779,27 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <ul>
-<li>这里讨论Mysql（redolog）、Redis（AOF）、RabbitMQ（消息持久化）</li>
-<li>三者的共同点都是：<strong>先在<code>内存缓冲池</code>中追加记录、以一定的频率刷盘持久化、批量刷盘都存在数据丢失的风险</strong></li>
-<li>刷盘（从内存到磁盘）的过程中可能出现问题，因此中间件<strong>需要提供其他的辅助安全方案</strong></li>
-<li>redolog和AOF的刷盘都是同步的（master线程），但<strong>RabbitMQ是异步的且不能指定刷盘频率</strong>，<a target="_blank" rel="noopener" href="https://www.rabbitmq.com/persistence-conf.html">参考官网文档</a></li>
-<li>中间件重启时从磁盘读取持久化文件恢复（以上三种追加记录恢复较慢，文件较大）</li>
+        <p>今天在看LinkedList源码的时候发现clear和unlink源码都对Node的前后和itme进行了<strong>分别置空</strong>，我之前的想法是直接把所有的Node本身直接置空，x.prev=null和x.next=null，直接x = null也可以使得所有节点为空啊</p>
+<p>但在参考了很多资料后发现，如果单纯的x=null而不x.prev=null和x.next=null，可能不会正常触发GC，事情远远没有那么简单……</p>
+<p>阅读本文需要有JVM垃圾回收机制的知识储备</p>
+<p>参考资料：<br><a target="_blank" rel="noopener" href="https://www.iteye.com/problems/71569">https://www.iteye.com/problems/71569</a><br><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1AE411E7uj?p=1">https://www.bilibili.com/video/BV1AE411E7uj?p=1</a><br><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1yE411Z7AP?spm_id_from=333.999.0.0">https://www.bilibili.com/video/BV1yE411Z7AP?spm_id_from=333.999.0.0</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/chenpt/p/9803298.html">https://www.cnblogs.com/chenpt/p/9803298.html</a><br><a target="_blank" rel="noopener" href="https://www.iteye.com/problems/71569">https://www.iteye.com/problems/71569</a><br><a target="_blank" rel="noopener" href="https://codingdict.com/questions/113892">https://codingdict.com/questions/113892</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/dmzna/archive/2020/05/18/12913458.html">https://www.cnblogs.com/dmzna/archive/2020/05/18/12913458.html</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/shouyaya/p/13524476.html">https://www.cnblogs.com/shouyaya/p/13524476.html</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/mccand1234/article/details/52078645">https://blog.csdn.net/mccand1234/article/details/52078645</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_41701956/article/details/81664921">https://blog.csdn.net/qq_41701956/article/details/81664921</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/yubujian_l/article/details/80804708">https://blog.csdn.net/yubujian_l/article/details/80804708</a></p>
+<h1 id="例如clear的源码"><a href="#例如clear的源码" class="headerlink" title="例如clear的源码"></a>例如clear的源码</h1><p><img src="https://img-blog.csdnimg.cn/2569150ae8b14450b59c58678e2c33d1.png"><br>x.next = null，即表示下一个节点对象=null，为什么还要分成3步写来把属性=null呢？为什么不仅仅是把首尾节点=null让链表找不到入口呢？</p>
+<h1 id="注释翻译："><a href="#注释翻译：" class="headerlink" title="注释翻译："></a>注释翻译：</h1><ul>
+<li><pre><code>is sure to free memory even if there is a reachable Iterator 即便是有迭代器指针此时正在访问中间的节点，也会置空。
+</code></pre>
+</li>
+<li>helps a generational GC if the discarded nodes inhabit more than one generation有多个节点时，这样做有助于GC垃圾回收</li>
 </ul>
-<h1 id="1-Mysql"><a href="#1-Mysql" class="headerlink" title="1.Mysql"></a>1.Mysql</h1><p>对于Mysql就来探究下redolog的刷盘策略</p>
-<h2 id="1-1redolog"><a href="#1-1redolog" class="headerlink" title="1.1redolog"></a>1.1redolog</h2><ul>
-<li>重做日志，记录物理级别上的修改</li>
-<li>追加写入（批量时是顺序写入，比随机IO快）</li>
-<li>可以自定义刷盘频率<code>innodb_flush_log_at_trx_commit=0、1、2</code>，一般用1保证最安全（每次事务提交前即刷盘）</li>
+<h2 id="注解解读："><a href="#注解解读：" class="headerlink" title="注解解读："></a>注解解读：</h2><h3 id="第一个"><a href="#第一个" class="headerlink" title="第一个"></a>第一个</h3><p>如果仅仅是把首尾置空，中间的链表虽然找不到首尾入口，但若此时：</p>
+<ul>
+<li>有迭代器正好访问到中间，取到了中间的node对象</li>
+<li>中间的某个node已被<strong>强引用</strong></li>
 </ul>
-<h2 id="1-2buffer-pool"><a href="#1-2buffer-pool" class="headerlink" title="1.2buffer pool"></a>1.2buffer pool</h2><ul>
-<li>每次变更都需要先修改Buffer Pool，然后master线程（同步、阻塞）以一定频率刷入磁盘</li>
-</ul>
-<p><img src="https://img-blog.csdnimg.cn/63a03ebe859341208c8d8c6ed631c457.png"></p>
-<h1 id="2-Redis"><a href="#2-Redis" class="headerlink" title="2.Redis"></a>2.Redis</h1><ul>
-<li>Redis两个持久化策略，RDB（默认、全量）和AOF（增量、更完整、大且慢）</li>
-<li><strong>RDB是异步非阻塞的（fork子进程）、而AOF是同步的（更大程度保证数据不丢失</strong>）</li>
-</ul>
-<h2 id="2-1AOF"><a href="#2-1AOF" class="headerlink" title="2.1AOF"></a>2.1AOF</h2><ul>
-<li>和Mysql的redolog类似，我们可以选择刷盘频率<code>appendfsync ： always、everysec、no</code></li>
-<li>并且也是同步的（不会开辟新的线程来备份，不同于RDB）</li>
-<li>都有一个缓冲池</li>
-</ul>
-<p><img src="https://img-blog.csdnimg.cn/0b463077bdad46bea54169917cbaa8c9.png"></p>
-<h2 id="2-2AOF缓冲池"><a href="#2-2AOF缓冲池" class="headerlink" title="2.2AOF缓冲池"></a>2.2AOF缓冲池</h2><p>由上图可知Redis每次写操作都会追加一条记录到AOF缓冲池，根据刷盘频率决定持久化的时机</p>
-<h1 id="3-RabbitMQ"><a href="#3-RabbitMQ" class="headerlink" title="3.RabbitMQ"></a>3.RabbitMQ</h1><ul>
-<li>RabbitMQ有 队列、交换机持久化 和 消息持久化，<strong>只有消息持久化和redolog、AOF类似，是做一个增量备份</strong></li>
-</ul>
-<h2 id="3-1消息持久化"><a href="#3-1消息持久化" class="headerlink" title="3.1消息持久化"></a>3.1消息持久化</h2><ul>
-<li>当RabbitMQ的<strong>内存紧张</strong>时、或<strong>生产者发消息指定了消息持久化</strong>时，消息会写入磁盘</li>
-</ul>
-<h2 id="3-2Buffer"><a href="#3-2Buffer" class="headerlink" title="3.2Buffer"></a>3.2Buffer</h2><p>官网没有明确给出这个Buffer叫啥名字，，但是具体策略跟前两个差不多</p>
-<ol>
-<li>写入文件前会有一个Buffer,大小为1M(1048576),数据在写入文件时，首先会写入到这个Buffer,如果Buffert已满，则会将Buffer写入到文件（未必刷到磁盘）：</li>
-<li><strong>有个固定的刷盘时间</strong>：25ms,也就是不管Buffer满不满，每隔25ms,Buffer里的数据及未刷新到磁盘的文件内容必定会刷到磁盘；</li>
-</ol>
+<h3 id="第二个"><a href="#第二个" class="headerlink" title="第二个"></a>第二个</h3><p>倘若JDK版本在8以上，可以忽略这一条，但老版本的gc机制，所用的垃圾收集器可能使用的算法是<strong>引用计数器算法</strong>，该算法不能解决相互引用情况下的垃圾回收</p>
+<p>例如：没有迭代器访问，中间节点对象也没有被强引用，但是他们之间是互相调用的，引用计数器算法不能回收这样的对象，即便是他们没有入口</p>
+<p>而在JDK的流行高版本中一般不使用引用计数器算法，而使用可达性分析算法，当他们都没有被强引用时，便没有了GC Roots根对象，因此会被垃圾回收，但引用计数器算法也并未被淘汰，在著名的单进程高并发缓存Redis中依然采用这种算法来进行内存回收</p>
+<p>综上：第二个注释“<strong>help GC</strong>”所表达的含义是防止因为JDK版本低，垃圾回收算法所导致的“无法回收循环引用”的情况</p>
+<p>同样 对于remove方法调用了unlink，注解也说了help GC<br><img src="https://img-blog.csdnimg.cn/b8137bccbd6943c69eaa21c3a5343348.png"></p>
 
       
        <hr><span style="font-style: italic;color: gray;"> 生命以负熵为食，归整以抵抗熵增； </span>
