@@ -9,7 +9,7 @@
 <meta name="description" content="1.已知布隆过滤有误判概率 因为hash运算后存在“假阳性”，因此做黑名单时可能把正常用户给拦截了 做白名单时一定是准确无误的 理论上做成黑名单有误判缺陷，但做白名单毫无问题，因此黑白名单结合才能实现黑名单的功能  2.黑白名单组合解决：ip黑名单问题直接列下我的设计思路：  现在有一个布隆过滤器保存了一组ip黑名单 一个正常用户ip遇到hash碰撞，被拦截了 接口直接跳转“验证真人的接口” 验证">
 <meta property="og:type" content="article">
 <meta property="og:title" content="布隆过滤做黑名单的方案">
-<meta property="og:url" content="https://zjhblog.gitee.io/2022/09/26/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%81%9A%E9%BB%91%E5%90%8D%E5%8D%95%E7%9A%84%E6%96%B9%E6%A1%88/index.html">
+<meta property="og:url" content="https://blogzjh.github.io/2022/09/26/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%81%9A%E9%BB%91%E5%90%8D%E5%8D%95%E7%9A%84%E6%96%B9%E6%A1%88/index.html">
 <meta property="og:site_name" content="ZJH&#39;blog">
 <meta property="og:description" content="1.已知布隆过滤有误判概率 因为hash运算后存在“假阳性”，因此做黑名单时可能把正常用户给拦截了 做白名单时一定是准确无误的 理论上做成黑名单有误判缺陷，但做白名单毫无问题，因此黑白名单结合才能实现黑名单的功能  2.黑白名单组合解决：ip黑名单问题直接列下我的设计思路：  现在有一个布隆过滤器保存了一组ip黑名单 一个正常用户ip遇到hash碰撞，被拦截了 接口直接跳转“验证真人的接口” 验证">
 <meta property="og:locale" content="zh_CN">
@@ -767,7 +767,7 @@
 <li>本案例包括4个核心类：<br>AopUtils：抽取出来的公共方法<br>@ValidateGroup<br>@ValidateField<br>ValidateAspectJHandler</li>
 <li>功能包括：长度、值范围、正则匹配、非空校验</li>
 <li>以下是设计思路、最终代码、测试结果</li>
-<li>后续扩展只需要修改@ValidateField 和 ValidateAspectJHandler；例如如果是按照我第一份实习时候的代码架构，可以在AspectJ中添加<a href="https://zjhblog.gitee.io/zjh/2022/08/12/%E5%AF%B9dto%E6%8C%87%E5%AE%9A%E5%B1%9E%E6%80%A7%E4%B8%80%E9%94%AE%E5%8A%A0%E8%A7%A3%E5%AF%86/">对dto指定属性一键加解密</a>的逻辑。</li>
+<li>后续扩展只需要修改@ValidateField 和 ValidateAspectJHandler；例如如果是按照我第一份实习时候的代码架构，可以在AspectJ中添加<a target="_blank" rel="noopener" href="https://zjhblog.gitee.io/zjh/2022/08/12/%E5%AF%B9dto%E6%8C%87%E5%AE%9A%E5%B1%9E%E6%80%A7%E4%B8%80%E9%94%AE%E5%8A%A0%E8%A7%A3%E5%AF%86/">对dto指定属性一键加解密</a>的逻辑。</li>
 </ul>
 <h1 id="1-演示-最终使用方法"><a href="#1-演示-最终使用方法" class="headerlink" title="1.演示: 最终使用方法"></a>1.演示: 最终使用方法</h1><p>以注册功能为例</p>
 <pre><code>@RestController
@@ -1127,7 +1127,7 @@ public class ValidateController &#123;
 </code></pre>
 <p><img src="https://img-blog.csdnimg.cn/e5f4ac9d44474348ba35f74fc9263209.png"><br>如果参数错误，则会直接抛异常终止请求<br><img src="https://img-blog.csdnimg.cn/09ae76ac260b4970a236069c7e020fa6.png"></p>
 <p>如果参数都正确就可以通过校验，如下：<br><img src="https://img-blog.csdnimg.cn/1f5e188fef6142eca85c1074208832ee.png"></p>
-<h1 id="6-可扩展的点"><a href="#6-可扩展的点" class="headerlink" title="6.可扩展的点"></a>6.可扩展的点</h1><p>传入的参数是加密后的，那么可以再写一个拦截器对入参dto中的属性进行解密，这里可以参考<br><a href="https://zjhblog.gitee.io/zjh/2022/08/12/%E5%AF%B9dto%E6%8C%87%E5%AE%9A%E5%B1%9E%E6%80%A7%E4%B8%80%E9%94%AE%E5%8A%A0%E8%A7%A3%E5%AF%86/">对dto指定属性一键加解密</a></p>
+<h1 id="6-可扩展的点"><a href="#6-可扩展的点" class="headerlink" title="6.可扩展的点"></a>6.可扩展的点</h1><p>传入的参数是加密后的，那么可以再写一个拦截器对入参dto中的属性进行解密，这里可以参考<br><a target="_blank" rel="noopener" href="https://zjhblog.gitee.io/zjh/2022/08/12/%E5%AF%B9dto%E6%8C%87%E5%AE%9A%E5%B1%9E%E6%80%A7%E4%B8%80%E9%94%AE%E5%8A%A0%E8%A7%A3%E5%AF%86/">对dto指定属性一键加解密</a></p>
 <p>也可以调用这个工具类直接写在这个AspectJ里面</p>
 
       

@@ -9,7 +9,7 @@
 <meta name="description" content="1.已知布隆过滤有误判概率 因为hash运算后存在“假阳性”，因此做黑名单时可能把正常用户给拦截了 做白名单时一定是准确无误的 理论上做成黑名单有误判缺陷，但做白名单毫无问题，因此黑白名单结合才能实现黑名单的功能  2.黑白名单组合解决：ip黑名单问题直接列下我的设计思路：  现在有一个布隆过滤器保存了一组ip黑名单 一个正常用户ip遇到hash碰撞，被拦截了 接口直接跳转“验证真人的接口” 验证">
 <meta property="og:type" content="article">
 <meta property="og:title" content="布隆过滤做黑名单的方案">
-<meta property="og:url" content="https://zjhblog.gitee.io/2022/09/26/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%81%9A%E9%BB%91%E5%90%8D%E5%8D%95%E7%9A%84%E6%96%B9%E6%A1%88/index.html">
+<meta property="og:url" content="https://blogzjh.github.io/2022/09/26/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%81%9A%E9%BB%91%E5%90%8D%E5%8D%95%E7%9A%84%E6%96%B9%E6%A1%88/index.html">
 <meta property="og:site_name" content="ZJH&#39;blog">
 <meta property="og:description" content="1.已知布隆过滤有误判概率 因为hash运算后存在“假阳性”，因此做黑名单时可能把正常用户给拦截了 做白名单时一定是准确无误的 理论上做成黑名单有误判缺陷，但做白名单毫无问题，因此黑白名单结合才能实现黑名单的功能  2.黑白名单组合解决：ip黑名单问题直接列下我的设计思路：  现在有一个布隆过滤器保存了一组ip黑名单 一个正常用户ip遇到hash碰撞，被拦截了 接口直接跳转“验证真人的接口” 验证">
 <meta property="og:locale" content="zh_CN">
@@ -779,7 +779,7 @@
 </ul>
 <h3 id="1-3-1为何不复用公共项目的Filter"><a href="#1-3-1为何不复用公共项目的Filter" class="headerlink" title="1.3.1为何不复用公共项目的Filter"></a>1.3.1为何不复用公共项目的Filter</h3><ul>
 <li>因为涉及远程调用，两次调用的jsessionid其实是不一样的，也就不能共享公共平台中的session域进行校验。。</li>
-<li>虽然后续自己复盘的时候通过反射小改了以下web框架获取session的逻辑，但是业务复杂度提升了————链接: <a href="https://zjhblog.gitee.io/zjh/2022/08/03/%E5%8F%8D%E5%B0%84%E4%BF%AE%E6%94%B9jsessionid%E5%AE%9E%E7%8E%B0session%E5%85%B1%E4%BA%AB/">共享Session的方案</a></li>
+<li>虽然后续自己复盘的时候通过反射小改了以下web框架获取session的逻辑，但是业务复杂度提升了————链接: <a target="_blank" rel="noopener" href="https://zjhblog.gitee.io/zjh/2022/08/03/%E5%8F%8D%E5%B0%84%E4%BF%AE%E6%94%B9jsessionid%E5%AE%9E%E7%8E%B0session%E5%85%B1%E4%BA%AB/">共享Session的方案</a></li>
 </ul>
 <h3 id="1-3-2防止XSS攻击"><a href="#1-3-2防止XSS攻击" class="headerlink" title="1.3.2防止XSS攻击"></a>1.3.2防止XSS攻击</h3><ul>
 <li>开放平台使用Java volatile，可能会收到<code>XSS攻击</code>，例如<code>#if($!session.getAttribute(&quot;Key&quot;))</code>从而直接获取到图片验证码的答案</li>
@@ -792,10 +792,10 @@
 <li><code>ApplicationContext.getBean()</code>将指定的Bean对象地址交给Servlet</li>
 <li>在@Config类中利用Servlet<code>构造函数 or Set</code>方法，将Bean的地址传给Servlet</li>
 </ul>
-<p>链接: <a href="https://zjhblog.gitee.io/zjh/2022/08/03/%E5%9B%9B%E7%A7%8D%E6%96%B9%E6%B3%95Servlet%E5%AE%B9%E5%99%A8%E4%BD%BF%E7%94%A8Spring%E7%9A%84Bean%E5%AF%B9%E8%B1%A1/">四种方法Servlet容器使用Spring的Bean对象</a></p>
+<p>链接: <a target="_blank" rel="noopener" href="https://zjhblog.gitee.io/zjh/2022/08/03/%E5%9B%9B%E7%A7%8D%E6%96%B9%E6%B3%95Servlet%E5%AE%B9%E5%99%A8%E4%BD%BF%E7%94%A8Spring%E7%9A%84Bean%E5%AF%B9%E8%B1%A1/">四种方法Servlet容器使用Spring的Bean对象</a></p>
 <h1 id="2-远程调用方：开放平台的解决方案"><a href="#2-远程调用方：开放平台的解决方案" class="headerlink" title="2.远程调用方：开放平台的解决方案"></a>2.远程调用方：开放平台的解决方案</h1><p>因为涉及到远程调用，临时学了下RestTemplate的用法，后续复盘的时候补充了一个工具类</p>
 <h2 id="2-1撸了一个RestTemplateUtils工具类"><a href="#2-1撸了一个RestTemplateUtils工具类" class="headerlink" title="2.1撸了一个RestTemplateUtils工具类"></a>2.1撸了一个RestTemplateUtils工具类</h2><p>远程调用获取图片，并取出响应Header中的图片验证码答案，存入本地session，用于后续校验</p>
-<p>链接: <a href="https://zjhblog.gitee.io/zjh/2022/08/03/RestTemlate%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%8F%8A%E5%B7%A5%E5%85%B7%E7%B1%BB%E8%AE%BE%E8%AE%A1/">RestTemplateUtils工具类及源码分析</a></p>
+<p>链接: <a target="_blank" rel="noopener" href="https://zjhblog.gitee.io/zjh/2022/08/03/RestTemlate%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%8F%8A%E5%B7%A5%E5%85%B7%E7%B1%BB%E8%AE%BE%E8%AE%A1/">RestTemplateUtils工具类及源码分析</a></p>
 <h2 id="2-2接口复用"><a href="#2-2接口复用" class="headerlink" title="2.2接口复用"></a>2.2接口复用</h2><p>因为注册、忘记密码、编辑、验证旧号、验证新号逻辑大体一致，因此在一个接口上进行处理，<strong>通过URI的不同</strong>，<strong>设置的手机验证码的key不同</strong></p>
 <h1 id="3-小结"><a href="#3-小结" class="headerlink" title="3.小结"></a>3.小结</h1><ul>
 <li>开放平台 请求 公共服务，同时获取二进制流与响应header中的加密答案</li>
@@ -804,7 +804,7 @@
 </ul>
 <h1 id="4-复盘反思"><a href="#4-复盘反思" class="headerlink" title="4.复盘反思"></a>4.复盘反思</h1><ul>
 <li>如果让我来写，非对称加密的方案不应该把密钥写死在前后端，应该每次会话自动生成一对密钥，降低XSS攻击风险。</li>
-<li>用户请求服务器A，调用服务器B的接口，调用两次是两个不同的session，如果想要共享session内容需要通过反射改造session获取逻辑 <a href="https://zjhblog.gitee.io/zjh/2022/08/03/%E5%8F%8D%E5%B0%84%E4%BF%AE%E6%94%B9jsessionid%E5%AE%9E%E7%8E%B0session%E5%85%B1%E4%BA%AB/">共享Session的方案</a></li>
+<li>用户请求服务器A，调用服务器B的接口，调用两次是两个不同的session，如果想要共享session内容需要通过反射改造session获取逻辑 <a target="_blank" rel="noopener" href="https://zjhblog.gitee.io/zjh/2022/08/03/%E5%8F%8D%E5%B0%84%E4%BF%AE%E6%94%B9jsessionid%E5%AE%9E%E7%8E%B0session%E5%85%B1%E4%BA%AB/">共享Session的方案</a></li>
 <li>公共服务不应该用Servlet写，应该更换目前的开源MVC组件，用Servlet写的功能在Spring项目中维护起来有点恶心。。。</li>
 <li>相似功能，相同逻辑的服务可以写为一个MVC方法，通过url来进行细微的命名区分</li>
 <li>涉及到图片验证码这种类似的功能，每次请求需要覆盖以前的答案</li>
