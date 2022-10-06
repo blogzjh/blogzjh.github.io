@@ -5,13 +5,13 @@
   
 
   
-  <title>ReentrantLock源码剖析 | ZJH&#39;blog</title>
+  <title>ReentrantLock源码剖析 | 张家豪的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="1.源码分析总结这里把结论提前放这里：  AQS是一个抽象类，包含了Node（用于维护同步队列）、ConditionObject（也用Node维护了等待队列，给ReentrantLock提供更高的自由度，可由reentrantLock.newCondition()创建） CAS（乐观锁的一种实现，本身与自旋锁无关）是通过比较属性的offset偏移量来实现原子性操作，一般配合while()或者for">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ReentrantLock源码剖析">
 <meta property="og:url" content="https://blogzjh.github.io/2022/08/23/ReentrantLock%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/index.html">
-<meta property="og:site_name" content="ZJH&#39;blog">
+<meta property="og:site_name" content="张家豪的博客">
 <meta property="og:description" content="1.源码分析总结这里把结论提前放这里：  AQS是一个抽象类，包含了Node（用于维护同步队列）、ConditionObject（也用Node维护了等待队列，给ReentrantLock提供更高的自由度，可由reentrantLock.newCondition()创建） CAS（乐观锁的一种实现，本身与自旋锁无关）是通过比较属性的offset偏移量来实现原子性操作，一般配合while()或者for">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://img-blog.csdnimg.cn/0cd0d31e4b724f7e904b697d3b60b078.png">
@@ -41,11 +41,11 @@
 <meta property="og:image" content="https://img-blog.csdnimg.cn/087978696280470f977253c723f770a7.png">
 <meta property="article:published_time" content="2022-08-23T04:34:15.000Z">
 <meta property="article:modified_time" content="2022-08-23T04:46:49.502Z">
-<meta property="article:author" content="ZJH&#39;blog">
+<meta property="article:author" content="张家豪">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://img-blog.csdnimg.cn/0cd0d31e4b724f7e904b697d3b60b078.png">
   
-    <link rel="alternate" href="/atom.xml" title="ZJH&#39;blog" type="application/atom+xml">
+    <link rel="alternate" href="/atom.xml" title="张家豪的博客" type="application/atom+xml">
   
   
     <link rel="icon" href="/favicon.png">
@@ -66,7 +66,7 @@
   <div id="header-outer" class="outer">
     <div id="header-title" class="inner">
       <h1 id="logo-wrap">
-        <a href="/" id="logo">ZJH&#39;blog</a>
+        <a href="/" id="logo">张家豪的博客</a>
       </h1>
       
     </div>
@@ -368,7 +368,7 @@ new Thread(()-&gt;&#123;
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://blogzjh.github.io/2022/08/23/ReentrantLock%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/" data-id="cl8wv0v1y00151gtah4t905ix" class="article-share-link">Share</a>
+      <a data-url="https://blogzjh.github.io/2022/08/23/ReentrantLock%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/" data-id="cl8wvrz920014kktagu2j5mbe" class="article-share-link">Share</a>
       
       
     </footer>
@@ -478,7 +478,7 @@ new Thread(()-&gt;&#123;
   
   <div class="outer">
     <div id="footer-info" class="inner">
-      &copy; 2022 ZJH&#39;blog<br>
+      &copy; 2022 张家豪<br>
       Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>

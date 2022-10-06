@@ -5,13 +5,13 @@
   
 
   
-  <title>RabbitMQ死信队列、延迟队列-Spring | ZJH&#39;blog</title>
+  <title>RabbitMQ死信队列、延迟队列-Spring | 张家豪的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="1.死信队列 当queue中的消息无法被消费时，消息成为死信，产生条件如下三个： 消息TTL过期（TTL一般生产者每次发消息都单独指定） queue满了而无法添加 消息被拒or否定 且不重新入队（basic.reject拒绝 或 basic.nack否定）并且requeue &#x3D; false不重新入队     失败消息如何转发到（绑定到）死信队列 需要单独声明：死信交换机 和 死信队列 需要设置参数">
 <meta property="og:type" content="article">
 <meta property="og:title" content="RabbitMQ死信队列、延迟队列-Spring">
 <meta property="og:url" content="https://blogzjh.github.io/2022/08/27/RabbitMQ%E6%AD%BB%E4%BF%A1%E9%98%9F%E5%88%97%E3%80%81%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97-Spring/index.html">
-<meta property="og:site_name" content="ZJH&#39;blog">
+<meta property="og:site_name" content="张家豪的博客">
 <meta property="og:description" content="1.死信队列 当queue中的消息无法被消费时，消息成为死信，产生条件如下三个： 消息TTL过期（TTL一般生产者每次发消息都单独指定） queue满了而无法添加 消息被拒or否定 且不重新入队（basic.reject拒绝 或 basic.nack否定）并且requeue &#x3D; false不重新入队     失败消息如何转发到（绑定到）死信队列 需要单独声明：死信交换机 和 死信队列 需要设置参数">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://img-blog.csdnimg.cn/43d6570bc26b4df1a8600254b8edbd6d.png">
@@ -25,11 +25,11 @@
 <meta property="og:image" content="https://img-blog.csdnimg.cn/e4ae02ae2ffd42ceb76840e2c690171a.png">
 <meta property="article:published_time" content="2022-08-26T17:05:35.000Z">
 <meta property="article:modified_time" content="2022-09-15T13:15:34.762Z">
-<meta property="article:author" content="ZJH&#39;blog">
+<meta property="article:author" content="张家豪">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://img-blog.csdnimg.cn/43d6570bc26b4df1a8600254b8edbd6d.png">
   
-    <link rel="alternate" href="/atom.xml" title="ZJH&#39;blog" type="application/atom+xml">
+    <link rel="alternate" href="/atom.xml" title="张家豪的博客" type="application/atom+xml">
   
   
     <link rel="icon" href="/favicon.png">
@@ -50,7 +50,7 @@
   <div id="header-outer" class="outer">
     <div id="header-title" class="inner">
       <h1 id="logo-wrap">
-        <a href="/" id="logo">ZJH&#39;blog</a>
+        <a href="/" id="logo">张家豪的博客</a>
       </h1>
       
     </div>
@@ -314,7 +314,7 @@ public class ConsumerService &#123;
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://blogzjh.github.io/2022/08/27/RabbitMQ%E6%AD%BB%E4%BF%A1%E9%98%9F%E5%88%97%E3%80%81%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97-Spring/" data-id="cl8wv0v1x00121gtaf8fq62b9" class="article-share-link">Share</a>
+      <a data-url="https://blogzjh.github.io/2022/08/27/RabbitMQ%E6%AD%BB%E4%BF%A1%E9%98%9F%E5%88%97%E3%80%81%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97-Spring/" data-id="cl8wvrz910012kkta4zg6etdh" class="article-share-link">Share</a>
       
       
     </footer>
@@ -424,7 +424,7 @@ public class ConsumerService &#123;
   
   <div class="outer">
     <div id="footer-info" class="inner">
-      &copy; 2022 ZJH&#39;blog<br>
+      &copy; 2022 张家豪<br>
       Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>

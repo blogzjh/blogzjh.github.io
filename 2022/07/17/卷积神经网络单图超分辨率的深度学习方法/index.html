@@ -5,13 +5,13 @@
   
 
   
-  <title>卷积神经网络单图超分辨率的深度学习方法 | ZJH&#39;blog</title>
+  <title>卷积神经网络单图超分辨率的深度学习方法 | 张家豪的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="摘要我们提出了一种用于单图像超分辨率（SR）的深度学习方法。 我们的方法直接学习低或高分辨率图像之间的端到端映射。 映射被表示为深度卷积神经网络（CNN），其将低分辨率图像作为输入和输出高分辨率。我们进一步表明，还可以将传统的稀疏编码的SR方法视为深卷积网络。 但与传统方法不同，这些方法单独处理每个组件，我们的方法都会共同优化所有层。 我们的深层卷积神经网络具有轻量级结构，但展示了最先进的恢复质量">
 <meta property="og:type" content="article">
 <meta property="og:title" content="卷积神经网络单图超分辨率的深度学习方法">
 <meta property="og:url" content="https://blogzjh.github.io/2022/07/17/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%8D%95%E5%9B%BE%E8%B6%85%E5%88%86%E8%BE%A8%E7%8E%87%E7%9A%84%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95/index.html">
-<meta property="og:site_name" content="ZJH&#39;blog">
+<meta property="og:site_name" content="张家豪的博客">
 <meta property="og:description" content="摘要我们提出了一种用于单图像超分辨率（SR）的深度学习方法。 我们的方法直接学习低或高分辨率图像之间的端到端映射。 映射被表示为深度卷积神经网络（CNN），其将低分辨率图像作为输入和输出高分辨率。我们进一步表明，还可以将传统的稀疏编码的SR方法视为深卷积网络。 但与传统方法不同，这些方法单独处理每个组件，我们的方法都会共同优化所有层。 我们的深层卷积神经网络具有轻量级结构，但展示了最先进的恢复质量">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://img-blog.csdnimg.cn/d6f664b731e942f68e464da586d23829.png">
@@ -30,11 +30,11 @@
 <meta property="og:image" content="https://img-blog.csdnimg.cn/682183b46c8a4de7b3fbe4d5fe1efbdd.png">
 <meta property="article:published_time" content="2022-07-17T03:33:07.000Z">
 <meta property="article:modified_time" content="2022-07-17T03:33:26.870Z">
-<meta property="article:author" content="ZJH&#39;blog">
+<meta property="article:author" content="张家豪">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://img-blog.csdnimg.cn/d6f664b731e942f68e464da586d23829.png">
   
-    <link rel="alternate" href="/atom.xml" title="ZJH&#39;blog" type="application/atom+xml">
+    <link rel="alternate" href="/atom.xml" title="张家豪的博客" type="application/atom+xml">
   
   
     <link rel="icon" href="/favicon.png">
@@ -55,7 +55,7 @@
   <div id="header-outer" class="outer">
     <div id="header-title" class="inner">
       <h1 id="logo-wrap">
-        <a href="/" id="logo">ZJH&#39;blog</a>
+        <a href="/" id="logo">张家豪的博客</a>
       </h1>
       
     </div>
@@ -139,7 +139,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://blogzjh.github.io/2022/07/17/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%8D%95%E5%9B%BE%E8%B6%85%E5%88%86%E8%BE%A8%E7%8E%87%E7%9A%84%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95/" data-id="cl8wv0v2u00251gta5doi2dui" class="article-share-link">Share</a>
+      <a data-url="https://blogzjh.github.io/2022/07/17/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%8D%95%E5%9B%BE%E8%B6%85%E5%88%86%E8%BE%A8%E7%8E%87%E7%9A%84%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95/" data-id="cl8wvrz9k0021kktag6g7g8mw" class="article-share-link">Share</a>
       
       
     </footer>
@@ -249,7 +249,7 @@
   
   <div class="outer">
     <div id="footer-info" class="inner">
-      &copy; 2022 ZJH&#39;blog<br>
+      &copy; 2022 张家豪<br>
       Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>

@@ -5,13 +5,13 @@
   
 
   
-  <title>Mysql(InnoDB)索引原理及的使用 | ZJH&#39;blog</title>
+  <title>Mysql(InnoDB)索引原理及的使用 | 张家豪的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="索引概述 正常的业务SELECT居多，而INSERT UPDATE DELETE偏少，所以使用索引， 用空间换时间；查询变快，增删改变慢。 可以选择给单个字段加索引，也可以联合几个字段加索引 主键和外键默认都有索引，没有主键会自动生成rowid索引结构索引是存储引擎实现的，InnoDB的索引结构是B+树，大部分的引擎也都支持B+树索引  B+树索引的优点  层级少，2200W的数据只有3层 叶子节">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Mysql(InnoDB)索引原理及的使用">
 <meta property="og:url" content="https://blogzjh.github.io/2022/03/07/Mysql-InnoDB-%E7%B4%A2%E5%BC%95%E5%8E%9F%E7%90%86%E5%8F%8A%E7%9A%84%E4%BD%BF%E7%94%A8/index.html">
-<meta property="og:site_name" content="ZJH&#39;blog">
+<meta property="og:site_name" content="张家豪的博客">
 <meta property="og:description" content="索引概述 正常的业务SELECT居多，而INSERT UPDATE DELETE偏少，所以使用索引， 用空间换时间；查询变快，增删改变慢。 可以选择给单个字段加索引，也可以联合几个字段加索引 主键和外键默认都有索引，没有主键会自动生成rowid索引结构索引是存储引擎实现的，InnoDB的索引结构是B+树，大部分的引擎也都支持B+树索引  B+树索引的优点  层级少，2200W的数据只有3层 叶子节">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://img-blog.csdnimg.cn/c678a3d3200c4c51bb94f79b353513bb.png">
@@ -25,11 +25,11 @@
 <meta property="og:image" content="https://img-blog.csdnimg.cn/783740dede13460f8112d8de20b68e35.png">
 <meta property="article:published_time" content="2022-03-07T14:10:05.000Z">
 <meta property="article:modified_time" content="2022-09-15T13:16:34.054Z">
-<meta property="article:author" content="ZJH&#39;blog">
+<meta property="article:author" content="张家豪">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://img-blog.csdnimg.cn/c678a3d3200c4c51bb94f79b353513bb.png">
   
-    <link rel="alternate" href="/atom.xml" title="ZJH&#39;blog" type="application/atom+xml">
+    <link rel="alternate" href="/atom.xml" title="张家豪的博客" type="application/atom+xml">
   
   
     <link rel="icon" href="/favicon.png">
@@ -50,7 +50,7 @@
   <div id="header-outer" class="outer">
     <div id="header-title" class="inner">
       <h1 id="logo-wrap">
-        <a href="/" id="logo">ZJH&#39;blog</a>
+        <a href="/" id="logo">张家豪的博客</a>
       </h1>
       
     </div>
@@ -185,7 +185,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://blogzjh.github.io/2022/03/07/Mysql-InnoDB-%E7%B4%A2%E5%BC%95%E5%8E%9F%E7%90%86%E5%8F%8A%E7%9A%84%E4%BD%BF%E7%94%A8/" data-id="cl8wv0v1v000v1gtaabym6sxn" class="article-share-link">Share</a>
+      <a data-url="https://blogzjh.github.io/2022/03/07/Mysql-InnoDB-%E7%B4%A2%E5%BC%95%E5%8E%9F%E7%90%86%E5%8F%8A%E7%9A%84%E4%BD%BF%E7%94%A8/" data-id="cl8wvrz8x000pkktabwvi0zx0" class="article-share-link">Share</a>
       
       
     </footer>
@@ -295,7 +295,7 @@
   
   <div class="outer">
     <div id="footer-info" class="inner">
-      &copy; 2022 ZJH&#39;blog<br>
+      &copy; 2022 张家豪<br>
       Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>

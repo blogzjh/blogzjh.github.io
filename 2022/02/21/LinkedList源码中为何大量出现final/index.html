@@ -5,13 +5,13 @@
   
 
   
-  <title>LinkedList源码中为何大量出现final | ZJH&#39;blog</title>
+  <title>LinkedList源码中为何大量出现final | 张家豪的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="源码中出现final的地方 所有的link有关的方法（增删操作）add remove 需要保存中间变量的节点（prev和next指针需要修改的节点） 像clear get这种不涉及“更改指针指向”的方法不需要对中间变量定义final   final的作用final关键字的作用 LinkedList中Node是一个对象，因此适用于第二条引用数据类型，举个例子： 有无final修饰的浅拷贝People">
 <meta property="og:type" content="article">
 <meta property="og:title" content="LinkedList源码中为何大量出现final">
 <meta property="og:url" content="https://blogzjh.github.io/2022/02/21/LinkedList%E6%BA%90%E7%A0%81%E4%B8%AD%E4%B8%BA%E4%BD%95%E5%A4%A7%E9%87%8F%E5%87%BA%E7%8E%B0final/index.html">
-<meta property="og:site_name" content="ZJH&#39;blog">
+<meta property="og:site_name" content="张家豪的博客">
 <meta property="og:description" content="源码中出现final的地方 所有的link有关的方法（增删操作）add remove 需要保存中间变量的节点（prev和next指针需要修改的节点） 像clear get这种不涉及“更改指针指向”的方法不需要对中间变量定义final   final的作用final关键字的作用 LinkedList中Node是一个对象，因此适用于第二条引用数据类型，举个例子： 有无final修饰的浅拷贝People">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://img-blog.csdnimg.cn/8205fb2b21234a24a8f79d42bc9ca406.png">
@@ -20,11 +20,11 @@
 <meta property="og:image" content="https://img-blog.csdnimg.cn/6039ed0d6c4c41f0b0dccf8451657ef2.png">
 <meta property="article:published_time" content="2022-02-21T01:57:35.000Z">
 <meta property="article:modified_time" content="2022-02-21T01:57:51.230Z">
-<meta property="article:author" content="ZJH&#39;blog">
+<meta property="article:author" content="张家豪">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://img-blog.csdnimg.cn/8205fb2b21234a24a8f79d42bc9ca406.png">
   
-    <link rel="alternate" href="/atom.xml" title="ZJH&#39;blog" type="application/atom+xml">
+    <link rel="alternate" href="/atom.xml" title="张家豪的博客" type="application/atom+xml">
   
   
     <link rel="icon" href="/favicon.png">
@@ -45,7 +45,7 @@
   <div id="header-outer" class="outer">
     <div id="header-title" class="inner">
       <h1 id="logo-wrap">
-        <a href="/" id="logo">ZJH&#39;blog</a>
+        <a href="/" id="logo">张家豪的博客</a>
       </h1>
       
     </div>
@@ -144,7 +144,7 @@ People p2 = p1;
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://blogzjh.github.io/2022/02/21/LinkedList%E6%BA%90%E7%A0%81%E4%B8%AD%E4%B8%BA%E4%BD%95%E5%A4%A7%E9%87%8F%E5%87%BA%E7%8E%B0final/" data-id="cl8wv0v1q000j1gta1a35947u" class="article-share-link">Share</a>
+      <a data-url="https://blogzjh.github.io/2022/02/21/LinkedList%E6%BA%90%E7%A0%81%E4%B8%AD%E4%B8%BA%E4%BD%95%E5%A4%A7%E9%87%8F%E5%87%BA%E7%8E%B0final/" data-id="cl8wvrz8r000ikkta25vs3cxu" class="article-share-link">Share</a>
       
       
     </footer>
@@ -254,7 +254,7 @@ People p2 = p1;
   
   <div class="outer">
     <div id="footer-info" class="inner">
-      &copy; 2022 ZJH&#39;blog<br>
+      &copy; 2022 张家豪<br>
       Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>

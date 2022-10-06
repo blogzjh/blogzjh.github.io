@@ -5,21 +5,21 @@
   
 
   
-  <title>mvcc+按天缓存统计两个收益 | ZJH&#39;blog</title>
+  <title>mvcc+按天缓存统计两个收益 | 张家豪的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="这是上一段电商实习时做的一个需求，也是我第一次实习时思考最多的一个需求，场景如下： 1.场景用户实时收益表：存在虚拟收益、现金收益的当前值用户收益记录表：存在虚拟收益、现金收益的记录值 要求：统计截止某天00:00时，用户的虚拟收益和现金收益 很显然，可以直接用 实时表的数据 减去 记录表的数据的总和 但是电商业务数据量很大，每次请求简单的都去查两次库然后相减合适吗？不合适。 2.幂等方案设计——">
 <meta property="og:type" content="article">
 <meta property="og:title" content="mvcc+按天缓存统计两个收益">
 <meta property="og:url" content="https://blogzjh.github.io/2022/07/15/mvcc+%E6%8C%89%E5%A4%A9%E7%BC%93%E5%AD%98%E7%BB%9F%E8%AE%A1%E4%B8%A4%E4%B8%AA%E6%94%B6%E7%9B%8A/index.html">
-<meta property="og:site_name" content="ZJH&#39;blog">
+<meta property="og:site_name" content="张家豪的博客">
 <meta property="og:description" content="这是上一段电商实习时做的一个需求，也是我第一次实习时思考最多的一个需求，场景如下： 1.场景用户实时收益表：存在虚拟收益、现金收益的当前值用户收益记录表：存在虚拟收益、现金收益的记录值 要求：统计截止某天00:00时，用户的虚拟收益和现金收益 很显然，可以直接用 实时表的数据 减去 记录表的数据的总和 但是电商业务数据量很大，每次请求简单的都去查两次库然后相减合适吗？不合适。 2.幂等方案设计——">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-07-15T13:35:25.000Z">
 <meta property="article:modified_time" content="2022-07-15T14:26:54.044Z">
-<meta property="article:author" content="ZJH&#39;blog">
+<meta property="article:author" content="张家豪">
 <meta name="twitter:card" content="summary">
   
-    <link rel="alternate" href="/atom.xml" title="ZJH&#39;blog" type="application/atom+xml">
+    <link rel="alternate" href="/atom.xml" title="张家豪的博客" type="application/atom+xml">
   
   
     <link rel="icon" href="/favicon.png">
@@ -40,7 +40,7 @@
   <div id="header-outer" class="outer">
     <div id="header-title" class="inner">
       <h1 id="logo-wrap">
-        <a href="/" id="logo">ZJH&#39;blog</a>
+        <a href="/" id="logo">张家豪的博客</a>
       </h1>
       
     </div>
@@ -168,7 +168,7 @@ FROM
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://blogzjh.github.io/2022/07/15/mvcc+%E6%8C%89%E5%A4%A9%E7%BC%93%E5%AD%98%E7%BB%9F%E8%AE%A1%E4%B8%A4%E4%B8%AA%E6%94%B6%E7%9B%8A/" data-id="cl8wv0v23001d1gtag0bte819" class="article-share-link">Share</a>
+      <a data-url="https://blogzjh.github.io/2022/07/15/mvcc+%E6%8C%89%E5%A4%A9%E7%BC%93%E5%AD%98%E7%BB%9F%E8%AE%A1%E4%B8%A4%E4%B8%AA%E6%94%B6%E7%9B%8A/" data-id="cl8wvrz9e001ikktah79t9d5r" class="article-share-link">Share</a>
       
       
     </footer>
@@ -278,7 +278,7 @@ FROM
   
   <div class="outer">
     <div id="footer-info" class="inner">
-      &copy; 2022 ZJH&#39;blog<br>
+      &copy; 2022 张家豪<br>
       Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>
