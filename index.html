@@ -2,2242 +2,966 @@
 <html>
 <head>
   <meta charset="utf-8">
-  
-
-  
   <title>张家豪的博客</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="张家豪的博客">
-<meta property="og:url" content="https://blogzjh.github.io/index.html">
+  <meta name="keywords" content="">
+  <meta name="description" content="张家豪的博客">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="description" content="1.已知布隆过滤有误判概率 因为hash运算后存在“假阳性”，因此做黑名单时可能把正常用户给拦截了 做白名单时一定是准确无误的 理论上做成黑名单有误判缺陷，但做白名单毫无问题，因此黑白名单结合才能实现黑名单的功能  2.黑白名单组合解决：ip黑名单问题直接列下我的设计思路：  现在有一个布隆过滤器保存了一组ip黑名单 一个正常用户ip遇到hash碰撞，被拦截了 接口直接跳转“验证真人的接口” 验证">
+<meta property="og:type" content="article">
+<meta property="og:title" content="布隆过滤做黑名单的方案">
+<meta property="og:url" content="https://blogzjh.github.io/2022/09/26/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%81%9A%E9%BB%91%E5%90%8D%E5%8D%95%E7%9A%84%E6%96%B9%E6%A1%88/index.html">
 <meta property="og:site_name" content="张家豪的博客">
+<meta property="og:description" content="1.已知布隆过滤有误判概率 因为hash运算后存在“假阳性”，因此做黑名单时可能把正常用户给拦截了 做白名单时一定是准确无误的 理论上做成黑名单有误判缺陷，但做白名单毫无问题，因此黑白名单结合才能实现黑名单的功能  2.黑白名单组合解决：ip黑名单问题直接列下我的设计思路：  现在有一个布隆过滤器保存了一组ip黑名单 一个正常用户ip遇到hash碰撞，被拦截了 接口直接跳转“验证真人的接口” 验证">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-09-25T18:22:57.000Z">
+<meta property="article:modified_time" content="2022-09-25T18:22:44.126Z">
 <meta property="article:author" content="张家豪">
 <meta name="twitter:card" content="summary">
-  
-    <link rel="alternate" href="/atom.xml" title="张家豪的博客" type="application/atom+xml">
-  
-  
-    <link rel="icon" href="/favicon.png">
-  
-  
-    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
-  
-  
-<link rel="stylesheet" href="/css/style.css">
+
+
+<link rel="icon" href="/img/QQ图片20211224224200.jpg">
+
+<link href="/css/style.css?v=1.1.0" rel="stylesheet">
+
+<link href="/css/hl_theme/rainbow.css?v=1.1.0" rel="stylesheet">
+
+<link href="//cdn.jsdelivr.net/npm/animate.css@4.1.0/animate.min.css" rel="stylesheet">
+
+<script src="//cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+<script src="/js/titleTip.js?v=1.1.0" ></script>
+
+<script src="//cdn.jsdelivr.net/npm/highlightjs@9.16.2/highlight.pack.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+<script src="//cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js"></script>
+
+
+
+<script src="//cdn.jsdelivr.net/npm/jquery.cookie@1.4.1/jquery.cookie.min.js" ></script>
+
+<script src="/js/iconfont.js?v=1.1.0" ></script>
 
 <meta name="generator" content="Hexo 5.4.0"></head>
+<div style="display: none">
+  <input class="theme_disqus_on" value="false">
+  <input class="theme_preload_comment" value="">
+  <input class="theme_blog_path" value="">
+  <input id="theme_shortcut" value="true" />
+  <input id="theme_highlight_on" value="true" />
+  <input id="theme_code_copy" value="true" />
+</div>
+
+
 
 <body>
-  <div id="container">
-    <div id="wrap">
-      <header id="header">
-  <div id="banner"></div>
-  <div id="header-outer" class="outer">
-    <div id="header-title" class="inner">
-      <h1 id="logo-wrap">
-        <a href="/" id="logo">张家豪的博客</a>
-      </h1>
-      
-    </div>
-    <div id="header-inner" class="inner">
-      <nav id="main-nav">
-        <a id="main-nav-toggle" class="nav-icon"></a>
-        
-          <a class="main-nav-link" href="/">Home</a>
-        
-          <a class="main-nav-link" href="/archives">Archives</a>
-        
-      </nav>
-      <nav id="sub-nav">
-        
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
-        
-        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
-      </nav>
-      <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://blogzjh.github.io"></form>
-      </div>
-    </div>
-  </div>
-</header>
-      <div class="outer">
-        <section id="main">
-  
-    <article id="post-布隆过滤做黑名单的方案" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2022/09/26/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%81%9A%E9%BB%91%E5%90%8D%E5%8D%95%E7%9A%84%E6%96%B9%E6%A1%88/" class="article-date">
-  <time datetime="2022-09-25T18:22:57.000Z" itemprop="datePublished">2022-09-26</time>
+<aside class="nav mobile">
+    <div class="nav-left">
+        <a href="/"
+   class="avatar_target">
+    <img class="avatar"
+         src="/img/QQ图片20211224224200.jpg"/>
 </a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/%E5%B7%A5%E4%BD%9C%E7%AC%94%E8%AE%B0/">工作笔记</a>
-  </div>
+<div class="author">
+    <span>张家豪</span>
+</div>
 
-  </div>
-  <div class="article-inner">
+<div class="icon">
     
-    
-      <header class="article-header">
         
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2022/09/26/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%81%9A%E9%BB%91%E5%90%8D%E5%8D%95%E7%9A%84%E6%96%B9%E6%A1%88/">布隆过滤做黑名单的方案</a>
-    </h1>
-  
-
-      </header>
+            <a title="github"
+               href="https://github.com/blogzjh"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-github"></use>
+                    </svg>
+                
+            </a>
+        
     
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="1-已知布隆过滤有误判概率"><a href="#1-已知布隆过滤有误判概率" class="headerlink" title="1.已知布隆过滤有误判概率"></a>1.已知布隆过滤有误判概率</h1><ul>
-<li>因为hash运算后存在“假阳性”，因此<strong>做黑名单时可能把正常用户给拦截了</strong></li>
-<li><strong>做白名单时一定是准确无误的</strong></li>
-<li>理论上做成黑名单有误判缺陷，但做白名单毫无问题，因此黑白名单结合才能实现黑名单的功能</li>
-</ul>
-<h1 id="2-黑白名单组合解决：ip黑名单问题"><a href="#2-黑白名单组合解决：ip黑名单问题" class="headerlink" title="2.黑白名单组合解决：ip黑名单问题"></a>2.黑白名单组合解决：ip黑名单问题</h1><p>直接列下我的设计思路：</p>
-<ol>
-<li>现在有一个布隆过滤器保存了一组ip黑名单</li>
-<li>一个正常用户ip遇到hash碰撞，被拦截了</li>
-<li>接口直接跳转“验证真人的接口”</li>
-<li>验证成功后，该ip加入白名单</li>
-</ol>
-<p>因此我们在（伪）代码中体现如下</p>
-<p>_if ( <code>黑名单BloomFilter.contain( ip )</code> ){//1.在黑名单中</p>
-<p>___if( <code>白名单BloomFilter.contain( ip )</code> ){//2.但是又同时在白名单中</p>
-<p>______//donothing啥都不做</p>
-<p>___} else{</p>
-<p>______    //<strong>在黑名单 但不在白名单中，跳转到验证真人的接口</strong></p>
-<p>______    redirect—&gt;验证真人的接口，<strong>验证成功后加入白名单</strong></p>
-<p>___}</p>
-<p>_}</p>
-<p>//到这里就是正常的业务逻辑了</p>
-<h1 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h1><h2 id="1-离散数据去重"><a href="#1-离散数据去重" class="headerlink" title="1.离散数据去重"></a>1.离散数据去重</h2><p>以下几种场景的数据去重：<code>离散的、无范围限制的</code></p>
+        
+            <a title="csdn"
+               href="https://blog.csdn.net/m0_56079407"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-csdn"></use>
+                    </svg>
+                
+            </a>
+        
+    
+        
+            <a title="email"
+               href="mailto:2225674545@qq.com"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-email"></use>
+                    </svg>
+                
+            </a>
+        
+    
+        
+            <a title="qq"
+               href="http://wpa.qq.com/msgrd?v=3&uin=2225674545&site=qq&menu=yes"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-qq"></use>
+                    </svg>
+                
+            </a>
+        
+    
+</div>
+
+
+
+
 <ul>
-<li>爬虫爬取url</li>
-<li>大量邮件中筛选出垃圾邮件</li>
-</ul>
-<h2 id="2-连续数据不适合用布隆过滤"><a href="#2-连续数据不适合用布隆过滤" class="headerlink" title="2.连续数据不适合用布隆过滤"></a>2.连续数据不适合用布隆过滤</h2><ul>
-<li>如果数据是离散且有限的（例如用户id），用布隆过滤做<code>白名单</code>没有任何问题（用户注册后同步更新布隆过滤器）</li>
-<li>但如果待查数据是一个float或double类型，是连续的（具体业务场景我想不出来），我们<strong>无法为每一个浮点类型数据加入布隆过滤的白名单</strong>，因此这样的布隆过滤器是无意义的</li>
-</ul>
-<h2 id="3-布隆过滤器的维护"><a href="#3-布隆过滤器的维护" class="headerlink" title="3.布隆过滤器的维护"></a>3.布隆过滤器的维护</h2><ul>
-<li>定时任务：参考copyOnWrite的思想，按一定频率直接重构这个布隆过滤器</li>
-<li>同步更新：如果布隆过滤器中的集合一万年都不变，大可做成同步的，效率肯定比上面那个高</li>
-</ul>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://blogzjh.github.io/2022/09/26/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%81%9A%E9%BB%91%E5%90%8D%E5%8D%95%E7%9A%84%E6%96%B9%E6%A1%88/" data-id="cl8wvrz9q002lkktaaoore5k3" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-某蚁金服秋招9-15" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2022/09/15/%E6%9F%90%E8%9A%81%E9%87%91%E6%9C%8D%E7%A7%8B%E6%8B%9B9-15/" class="article-date">
-  <time datetime="2022-09-15T13:22:38.000Z" itemprop="datePublished">2022-09-15</time>
-</a>
+    <li>
+        <div class="all active" data-rel="全部文章">全部文章
+            
+                <small>(50)</small>
+            
+        </div>
+    </li>
     
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%AE%97%E6%B3%95/">数据结构算法</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
         
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2022/09/15/%E6%9F%90%E8%9A%81%E9%87%91%E6%9C%8D%E7%A7%8B%E6%8B%9B9-15/">某蚁金服秋招9-15</a>
-    </h1>
-  
-
-      </header>
+            
+                <li>
+                    <div data-rel="数据结构算法">
+                        
+                        数据结构算法
+                        <small>(7)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
     
-    <div class="article-entry" itemprop="articleBody">
-      
+        
+            
+                <li>
+                    <div data-rel="工作笔记">
+                        
+                        工作笔记
+                        <small>(12)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="机器学习">
+                        
+                        机器学习
+                        <small>(7)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="源码">
+                        
+                        源码
+                        <small>(8)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="中间件">
+                        
+                        中间件
+                        <small>(8)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="Java">
+                        
+                        Java
+                        <small>(7)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+</ul>
+<div class="left-bottom">
+    <div class="menus">
+        
+            
+            
+            
+    </div>
+    <div>
+        
+        
+    </div>
+</div>
+<input type="hidden" id="yelog_site_posts_number" value="50">
+<input type="hidden" id="yelog_site_word_count" value="100.4k">
+<div style="display: none">
+    <span id="busuanzi_value_site_uv"></span>
+    <span id="busuanzi_value_site_pv"></span>
+</div>
+
+    </div>
+    <div class="nav-right">
+        <div class="friends-area">
+    <div class="friends-title">
+        友情链接
+        <i class="iconfont icon-left"></i>
+    </div>
+    <div class="friends-content">
         <ul>
-<li>因为入行很晚，一直没刷过题，上上周面快手问答部分还不错，一面算法题没做出来但是给过了；二面算法题还是没做出来，拖到了70min，挂了。</li>
-<li>痛定思痛！</li>
-<li>这两周狂刷了34道力扣终于刷出了一点感觉，刚刚某蚁金服A了两道题（第二题要建树，A不出来），考完在群里写了两个题解，居然有人不信我是新手！不过第一次因为算法被人夸有天赋，发自内心的高兴哈哈哈哈哈哈哈哈哈哈。</li>
-</ul>
-<p><img src="https://img-blog.csdnimg.cn/1911d614650749c09c111a27d36e2006.png" alt="1"><br><img src="https://img-blog.csdnimg.cn/16896850d08c405dbc9d3981df65e15b.png" alt="2"><br><img src="https://img-blog.csdnimg.cn/3b426aa82dd34eb0b4c7d0330a771a91.png" alt="3"></p>
-<h1 id="第一题：字符分裂"><a href="#第一题：字符分裂" class="headerlink" title="第一题：字符分裂"></a>第一题：字符分裂</h1><h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>字符可以分裂为两个更小的；例如’c’=bb=aaaa（最小的就是’a’），问：给一个长度为x的’a’，最短能合并成什么？如：x=5 &gt;&gt;&gt; ca 或 ac</p>
-<h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><pre><code>import java.util.Scanner;
-public class Main &#123;
-    public static void main(String[] args) &#123;
-    Scanner sc = new Scanner(System.in);
-    //减少一半 （可能会剩下一个）
-    int x = sc.nextInt();
-    StringBuffer str = new StringBuffer();
-    //每轮都+1
-    for(char curr = &#39;a&#39; ; x &gt; 0 ; curr+= 1)&#123;
-      int num = x &gt;&gt;&gt; 2;//下一轮剩下的
-      int flag = x &amp; 1;//如果是1就添加str
-      if(flag == 1)&#123;
-        str.append(curr);
-      &#125;
-      x = num;
-    &#125;
-    System.out.println(str.toString());
-&#125;
-&#125;
-</code></pre>
-<h1 id="第三题：字符串奇偶规则"><a href="#第三题：字符串奇偶规则" class="headerlink" title="第三题：字符串奇偶规则"></a>第三题：字符串奇偶规则</h1><h2 id="题目描述-1"><a href="#题目描述-1" class="headerlink" title="题目描述"></a>题目描述</h2><p> 给定字符串，从中统计满足要求的子串个数；子串有规则（同一个字符要么为奇数or偶数，奇数的字符有且只有一个，其他的全部为偶数）：例如：aabbbccdd满足，则计数器+1</p>
-<h2 id="题解-1"><a href="#题解-1" class="headerlink" title="题解"></a>题解</h2><p>做完了之后下细想了下，这个HashMap其实都可以不用维护，因为只需要判断奇偶性，用一个长度为26的char[]维护，1代表奇数，0代表偶数</p>
-<pre><code>import java.util.Scanner;
-import java.util.HashMap;
-public class Main &#123;
-    public static void main(String[] args) &#123;
-        
-         Scanner sc  = new Scanner(System.in);
-    String  s   = sc.nextLine();
-    char[]  arr = s.toCharArray();
-    int     len = arr.length;
-    HashMap&lt;Character, Integer&gt; countMap = new HashMap&lt;&gt;();//计数器
-    int                         count    = 0;
-    //左右指针
-    for (int right = 1; right &lt; len; right++) &#123;
-      for (int left = 0; left &lt; right; left++) &#123;
-        countMap.clear();
-        int flag = right - left;//奇数的计数器，每次减去1
-        for (int curr = left; curr &lt;= right; curr++) &#123;
-          //不包含则添加
-          if (!countMap.containsKey(arr[curr])) &#123;
-            countMap.put(arr[curr], 1);
-          &#125; else &#123;//如果包含
-            Integer value = countMap.get(arr[curr]);
-            if (value % 2 == 1) &#123;//如果是奇数
-              flag--;//计数器减去1
-            &#125; else &#123;
-              flag++;
-            &#125;
-            countMap.put(arr[curr], value + 1);
-          &#125;
-
-        &#125;
-
-        //用flag判断是否==1，是否满足
-        if (flag == 1) &#123;
-          count++;
-        &#125;
-
-        //移动指针
-
-      &#125;
-    &#125;
-    System.out.println(count);
-
-    &#125;   
-    &#125;
-</code></pre>
-<h1 id="补充一题同天笔试：按排名颁发奖品"><a href="#补充一题同天笔试：按排名颁发奖品" class="headerlink" title="补充一题同天笔试：按排名颁发奖品"></a>补充一题同天笔试：按排名颁发奖品</h1><h2 id="题目描述-2"><a href="#题目描述-2" class="headerlink" title="题目描述"></a>题目描述</h2><p>n个员工，每个人都有评分，按顺序排，相邻的员工评分高的获得奖品多一个，且每位员工至少一个奖品</p>
-<p>输入：1,2,2<br>输出：4</p>
-<h2 id="题解-2"><a href="#题解-2" class="headerlink" title="题解"></a>题解</h2><p>刚刚反应过来是求最小的颁奖总数，自己写了一个Math.max()。。。只A了83%</p>
-<ul>
-<li>输入值用split分割，然后for遍历给int[]，</li>
-<li>同时需要保存一个数组中的最小值，只从这个最小值开始遍历（该位置颁奖数为1）</li>
-<li>状态转移方程：就是两个规则</li>
-</ul>
-<pre><code>    import java.util.Scanner;
-
-    /**
-    * @author zjh
-    * @create 2022-09-15 19:19
-    */
-    public class Test &#123;
-
-    public static void main(String[] args) &#123;
-        Scanner scan = new Scanner(System.in);
-        String  s    = scan.nextLine();
-        //得分
-        String[] scoreArr = s.split(&quot;,&quot;);
-        //转int数组
-        int[] arr = new int[scoreArr.length];
-        //重要：维护一个最小值，该数组的最小值，以这个最小值为起点左右遍历
-        int temp = Integer.MAX_VALUE;
-        for (int i = 0; i &lt; scoreArr.length; i++) &#123;
-        arr[i] = Integer.parseInt(scoreArr[i]);
-        temp = Math.min(arr[i],temp);
-        &#125;
-        //状态转移方程(dp即i号同事分的奖品数)
-        int[] dp = new int[arr.length];
-        //最大奖品总数，空间换时间
-        int min = Integer.MAX_VALUE;
-        //暴力解法，分别以每个人开始分配奖品数为1
-        for (int i = 0; i &lt; arr.length; i++) &#123;
-        //必须要考虑是不是周围相邻最小的
-        if(arr[i] == temp) &#123;
-            dp[i] = 1;
-        &#125;
-        else &#123;
-            continue;
-        &#125;
-        int sum = 1;
-        //左右指针
-        int left  = i;
-        int right = i;
-        //左边
-        while (left &gt; 0) &#123;
-            if (arr[left - 1] &gt; arr[left]) &#123;
-            dp[left - 1] = dp[left] + 1;
-            sum += dp[left] + 1;
-            &#125; else &#123;
-            dp[left - 1] = 1;
-            sum++;
-            &#125;
-            left--;
-        &#125;
-        //右边
-        while (right &lt; arr.length - 1) &#123;
-            if (arr[right + 1] &gt; arr[right]) &#123;
-            dp[right + 1] = dp[right] + 1;
-            sum += dp[right] + 1;
-            &#125; else &#123;
-            dp[right + 1] = 1;
-            sum++;
-            &#125;
-            right++;
-        &#125;
-        //每轮取最大值
-        min = Math.min(min,sum);
-
-        &#125;
-
-        System.out.println(min);
-
-    &#125;
-
-    &#125;
-</code></pre>
-
-      
+            
+            <li><a target="_blank" href="http://yelog.org/">叶落阁</a></li>
+            
+        </ul>
     </div>
-    <footer class="article-footer">
-      <a data-url="https://blogzjh.github.io/2022/09/15/%E6%9F%90%E8%9A%81%E9%87%91%E6%9C%8D%E7%A7%8B%E6%8B%9B9-15/" data-id="cl8wvrz9o002fkkta92wl7djq" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-三种情况的层序遍历" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2022/09/15/%E4%B8%89%E7%A7%8D%E6%83%85%E5%86%B5%E7%9A%84%E5%B1%82%E5%BA%8F%E9%81%8D%E5%8E%86/" class="article-date">
-  <time datetime="2022-09-15T13:21:24.000Z" itemprop="datePublished">2022-09-15</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%AE%97%E6%B3%95/">数据结构算法</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2022/09/15/%E4%B8%89%E7%A7%8D%E6%83%85%E5%86%B5%E7%9A%84%E5%B1%82%E5%BA%8F%E9%81%8D%E5%8E%86/">三种情况的层序遍历</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="1-连续遍历"><a href="#1-连续遍历" class="headerlink" title="1.连续遍历"></a>1.连续遍历</h1><h2 id="1-1题目描述"><a href="#1-1题目描述" class="headerlink" title="1.1题目描述"></a>1.1题目描述</h2><p><img src="https://img-blog.csdnimg.cn/4161f56620434b5bae127fdcd7fde2cf.png"></p>
-<p><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/cong-shang-dao-xia-da-yin-er-cha-shu-lcof/solution/mian-shi-ti-32-i-cong-shang-dao-xia-da-yin-er-ch-4/">参考答案</a></p>
-<h2 id="1-2解题思路"><a href="#1-2解题思路" class="headerlink" title="1.2解题思路"></a>1.2解题思路</h2><ul>
-<li><p><strong>层序遍历BFS一般都是需要用<code>队列</code>来辅助实现</strong>，不同于深度优先DFS，BFS一般是不用递归的。递归会导致越来越深入，不符合广度优先</p>
-</li>
-<li><p>第一行入队————》pop取queue中的node——》取值——》node的left  right 入队</p>
-</li>
-<li><p>此时队列中的顺序符合BFS</p>
-</li>
-<li><p>循环，queue继续pop取node——》取值——》该node的left right继续入队</p>
-</li>
-<li><p>如此循环pop并入队，队列中的顺序一直符合BFS</p>
-</li>
-</ul>
-<h3 id="1-2-1创建Queue的技巧"><a href="#1-2-1创建Queue的技巧" class="headerlink" title="1.2.1创建Queue的技巧"></a>1.2.1创建Queue的技巧</h3><ul>
-<li>Queue是一个接口，不能直接实例化</li>
-<li>因为LinkedList实现了Queue接口，可以用其实例化</li>
-<li>{<code>外部这个大括号表示匿名对象,可以在这一层进行@Overide</code>  {<code>内部这个大括号相当于在外面调用this.add()</code>}   }</li>
-</ul>
-<pre><code>    LinkedList&lt;Integer&gt; integers = new LinkedList&lt;Integer&gt;() &#123;//匿名对象
-
-        @Override public boolean add(Integer integer) &#123;
-            return super.add(66666);//这会导致所有的add都是添加66666
-        &#125;
-
-        &#123;//这一层的&#123;&#125;相当于在外层写add
-            add(1);
-            add(2);
-            add(3);
-        &#125;
-    &#125;;
-    integers.add(4);
-    integers.add(5);
-    integers.add(6);
-    integers.add(7);
-    System.out.println(integers);//一共有3+4=7条
-    //[66666, 66666, 66666, 66666, 66666, 66666, 66666]
-</code></pre>
-<p>因此我们可以直接</p>
-<pre><code>    Queue&lt;TreeNode&gt; queue = new LinkedList&lt;&gt;()&#123;
-        &#123;
-            add(root);
-        &#125;
-    &#125;;
-</code></pre>
-<h3 id="1-2-2需要注意的点"><a href="#1-2-2需要注意的点" class="headerlink" title="1.2.2需要注意的点"></a>1.2.2需要注意的点</h3><ul>
-<li>返回一个空int[ ] 是直接<code>return new int[]&#123;&#125;</code>；</li>
-<li>队列的弹出API是 queue.<code>poll()</code></li>
-</ul>
-<p>最终代码</p>
-<pre><code>/**
- * Definition for a binary tree node.
- * public class TreeNode &#123;
- *     int val;
- *     TreeNode left;
- *     TreeNode right;
- *     TreeNode(int x) &#123; val = x; &#125;
- * &#125;
- */
-class Solution &#123;
-    public int[] levelOrder(TreeNode root) &#123;
-        //第一步永远是判断是否空
-        if(root == null) return new int[]&#123;&#125;;
-        //ArrayList方便添加元素，最后转int[]即可
-        ArrayList&lt;Integer&gt; list = new ArrayList&lt;Integer&gt;();
-        //用Queue来存储BFS的节点,利用匿名对象内部&#123;&#125;初始化
-        Queue&lt;TreeNode&gt; queue = new LinkedList&lt;TreeNode&gt;()&#123;
-            &#123;
-                add(root);
-            &#125;
-        &#125;;
-        //因为最开始 每次循环只pop一次，但是可能会添加多次
-        //最后一次pop时早已没有添加的
-        //所以可以用!queue.isEmpty()作为判断条件
-        while(!queue.isEmpty())&#123;
-            TreeNode now = queue.poll();//当前节点
-            list.add(now.val);
-            //添加完成当前节点值后，往queue增加节点
-            if(now.left != null) queue.add(now.left);
-            if(now.right != null) queue.add(now.right);
-        &#125;
-        int[] dest = new int[list.size()];
-        for(int i = 0 ; i &lt; list.size() ; i++)&#123;
-            dest[i] = list.get(i);
-        &#125;
-        return dest;
-
-    &#125;
-&#125;
-</code></pre>
-<h1 id="2-分层遍历"><a href="#2-分层遍历" class="headerlink" title="2.分层遍历"></a>2.分层遍历</h1><h2 id="2-1题目描述"><a href="#2-1题目描述" class="headerlink" title="2.1题目描述"></a>2.1题目描述</h2><p><img src="https://img-blog.csdnimg.cn/120db7e3decd449d88728c5146bfc183.png"></p>
-<p>与上一题不同，这一题需要一层一行，最终返回一个二维list<br><img src="https://img-blog.csdnimg.cn/c75421394cdb445dad9d613a44ec8f0b.png"><br>其内层的每个List，都是二叉树的一整层</p>
-<p><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/cong-shang-dao-xia-da-yin-er-cha-shu-ii-lcof/solution/mian-shi-ti-32-ii-cong-shang-dao-xia-da-yin-er-c-5/">参考答案</a></p>
-<h2 id="2-2解题思路"><a href="#2-2解题思路" class="headerlink" title="2.2解题思路"></a>2.2解题思路</h2><ul>
-<li><p>while每次循环都必须要new一个内层List</p>
-</li>
-<li><p>while每次循环都要把这个new出来的内层List填满</p>
-<h3 id="2-2-1分析和第一题的差异"><a href="#2-2-1分析和第一题的差异" class="headerlink" title="2.2.1分析和第一题的差异"></a>2.2.1分析和第一题的差异</h3></li>
-<li><p>第一题中，while中没有new 一个List</p>
-<pre><code>      while(!queue.isEmpty())&#123;
-          TreeNode now = queue.poll();//当前节点
-          list.add(now.val);
-          //添加完成当前节点值后，往queue增加节点
-          if(now.left != null) queue.add(now.left);
-          if(now.right != null) queue.add(now.right);
-      &#125;
-</code></pre>
-</li>
-<li><p>第一次改造，发现每次while循环只往temp中添加了一个元素</p>
-<pre><code>      while(!queue.isEmpty())&#123;
-  ——————————》    ArrayList&lt;Integer&gt; temp = new ArrayList&lt;Integer&gt;();
-          TreeNode now = queue.poll();//当前节点
-   ——————————》       temp.add(now.val);
-          if(now.left != null) queue.add(now.left);
-          if(now.right != null) queue.add(now.right);
-      &#125;
-</code></pre>
-</li>
-<li><p>第二次改造，每次把<strong>当前queue</strong>中的元素全部poll到temp中<code>要先固定for循环的次数</code></p>
-<pre><code>      while(!queue.isEmpty())&#123;
-          ArrayList&lt;Integer&gt; temp = new ArrayList&lt;Integer&gt;();
-     ————》 for(int i = 0 ; i &lt; queue.size() ; i++)&#123;//因为for循环的内部会往queue添加元素，所以要先固定for循环的次数
-          TreeNode now = queue.poll();//当前节点
-            temp.add(now.val);
-          if(now.left != null) queue.add(now.left);
-          if(now.right != null) queue.add(now.right);
-     ————》     &#125;
-      &#125;
-</code></pre>
-<p><img src="https://img-blog.csdnimg.cn/7cc91d44855f43f3983541ac049ae43e.png"></p>
-</li>
-</ul>
-<h3 id="2-2-2需要注意的点（集合for循环的开始条件）"><a href="#2-2-2需要注意的点（集合for循环的开始条件）" class="headerlink" title="2.2.2需要注意的点（集合for循环的开始条件）"></a>2.2.2需要注意的点（集合for循环的开始条件）</h3><p><img src="https://img-blog.csdnimg.cn/e1adac2f5dcd47b78bfdf4d368ec20cc.png"></p>
-<p>所有跟集合相关的for循环开始条件，都必须先<code>int i = size()</code>，因为size可能会在for循环的过程中变动</p>
-<h3 id="2-2-3最终结果"><a href="#2-2-3最终结果" class="headerlink" title="2.2.3最终结果"></a>2.2.3最终结果</h3><pre><code>/**
- * Definition for a binary tree node.
- * public class TreeNode &#123;
- *     int val;
- *     TreeNode left;
- *     TreeNode right;
- *     TreeNode(int x) &#123; val = x; &#125;
- * &#125;
- */
-class Solution &#123;
-    public List&lt;List&lt;Integer&gt;&gt; levelOrder(TreeNode root) &#123;
-
-        List&lt;List&lt;Integer&gt;&gt; destList =  new ArrayList&lt;List&lt;Integer&gt;&gt;();
-        //先判断root==null的情况
-        if(root == null) return destList;
-
-        //创建TreeNode的队列
-        Queue&lt;TreeNode&gt; queue = new LinkedList&lt;TreeNode&gt;()&#123;
-            &#123;
-                add(root);//初始化
-            &#125;
-        &#125;;
-
-        //while循环 内层for循环填满每个temp
-        while(!queue.isEmpty())&#123;
-            ArrayList&lt;Integer&gt; temp = new ArrayList&lt;Integer&gt;();
-
-          //  for(int i = 0 ; i &lt; queue.size() ; i++)&#123;queue.size()在随元素弹出的过程中动态变化
-            for(int i = queue.size() ; i &gt; 0 ; i--)&#123;//固定for循环的次数,保证循环的是本层
-            TreeNode now = queue.poll();
-            temp.add(now.val);
-
-            //往queue中添加下一层的元素（完整的for循环之后，queue中刚好只有下一层的所有元素）
-            if(now.left != null) queue.add(now.left);//防止被这两条影响temp长度
-            if(now.right != null) queue.add(now.right);//防止被这两条影响temp长度
-            &#125;
-
-            destList.add(temp);
-        &#125;
-        return destList;
-
-    &#125;
-&#125;
-</code></pre>
-<p><img src="https://img-blog.csdnimg.cn/7d43a9c2faed4360a0c2d4cfb11a5571.png"></p>
-<h1 id="3-分层交叉遍历"><a href="#3-分层交叉遍历" class="headerlink" title="3.分层交叉遍历"></a>3.分层交叉遍历</h1><p><img src="https://img-blog.csdnimg.cn/7adcfa2252c0464992ef60c07d002163.png"></p>
-<h2 id="3-1简单粗暴直接reverse"><a href="#3-1简单粗暴直接reverse" class="headerlink" title="3.1简单粗暴直接reverse()"></a>3.1简单粗暴直接reverse()</h2><h3 id="3-1-1取余位运算"><a href="#3-1-1取余位运算" class="headerlink" title="3.1.1取余位运算"></a>3.1.1取余位运算</h3><p><code>当x=2^n(n为自然数)时，</code></p>
-<p><code>a % x = a &amp; (x  - 1 )</code></p>
-<h3 id="3-1-2Collections-reverse"><a href="#3-1-2Collections-reverse" class="headerlink" title="3.1.2Collections.reverse()"></a>3.1.2Collections.reverse()</h3><p><img src="https://img-blog.csdnimg.cn/e3ac409d55fa4ff3a6120ce9c2eed88d.png"></p>
-<p>但是leetcode中用不了Collections工具包</p>
-<h2 id="3-2最终写法-链表（双端队列）"><a href="#3-2最终写法-链表（双端队列）" class="headerlink" title="3.2最终写法:链表（双端队列）"></a>3.2最终写法:链表（双端队列）</h2><p><img src="https://img-blog.csdnimg.cn/70470ac93bbf4ae89b65aa2c87c04029.png"></p>
-
-      
+</div>
+        <div class="title-list">
+    <div class="right-top">
+        <div id="default-panel">
+            <i class="iconfont icon-search" data-title="搜索 快捷键 i"></i>
+            <div class="right-title">全部文章</div>
+            <i class="iconfont icon-file-tree" data-title="切换到大纲视图 快捷键 w"></i>
+        </div>
+        <div id="search-panel">
+            <i class="iconfont icon-left" data-title="返回"></i>
+            <input id="local-search-input" autocomplete="off"/>
+            <label class="border-line" for="input"></label>
+            <i class="iconfont icon-case-sensitive" data-title="大小写敏感"></i>
+            <i class="iconfont icon-tag" data-title="标签"></i>
+        </div>
+        <div id="outline-panel" style="display: none">
+            <div class="right-title">大纲</div>
+            <i class="iconfont icon-list" data-title="切换到文章列表"></i>
+        </div>
     </div>
-    <footer class="article-footer">
-      <a data-url="https://blogzjh.github.io/2022/09/15/%E4%B8%89%E7%A7%8D%E6%83%85%E5%86%B5%E7%9A%84%E5%B1%82%E5%BA%8F%E9%81%8D%E5%8E%86/" data-id="cl8wvrz9f001okkta3kzn2dmh" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
 
-
-  
-    <article id="post-几道岛屿问题-dfs-剪枝-回溯" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2022/09/15/%E5%87%A0%E9%81%93%E5%B2%9B%E5%B1%BF%E9%97%AE%E9%A2%98-dfs-%E5%89%AA%E6%9E%9D-%E5%9B%9E%E6%BA%AF/" class="article-date">
-  <time datetime="2022-09-15T13:20:58.000Z" itemprop="datePublished">2022-09-15</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%AE%97%E6%B3%95/">数据结构算法</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
+    <div class="tags-list">
+    <input id="tag-search" />
+    <div class="tag-wrapper">
         
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2022/09/15/%E5%87%A0%E9%81%93%E5%B2%9B%E5%B1%BF%E9%97%AE%E9%A2%98-dfs-%E5%89%AA%E6%9E%9D-%E5%9B%9E%E6%BA%AF/">几道岛屿问题:dfs+剪枝+回溯</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <ul>
-<li><strong>深度优先搜索</strong>： 可以理解为暴力法遍历矩阵中所有字符串可能性。DFS 通过递归，先朝一个方向搜到底，再回溯至上个节点，沿另一个方向搜索，以此类推。</li>
-<li><strong>剪枝</strong>： 在搜索中，遇到 这条路不可能和目标字符串匹配成功 的情况（例如：<code>此矩阵元素和目标字符不同、此元素已被访问</code>），则应立即返回，称之为 可行性剪枝 。</li>
-<li>在矩阵深度优先算法中，DFS方法总有参数：<strong>横坐标 i 、 纵坐标 j 、待匹配的参数</strong>，这样才可以进行自由地深度优先算法（<strong>方便指定方向、指定待匹配参数</strong>）</li>
-<li>在矩阵深度优先算法中，<strong>每个位置都可以作为递归的起点，因此<code>main方法中</code>需要两层for循环来实现</strong></li>
-</ul>
-<p>一些区别：</p>
-<ul>
-<li><strong>虽然都涉及标记已经遍历过的位置</strong>，但 是否存在的匹配问题，每轮（不同起点）执行后都需要恢复；而像“岛屿数量”这种计数问题，则不能恢复</li>
-<li>**虽然都要遍历上下左右(调用4个方向的dfs)**，但“是否存在匹配”的问题只要一个匹配就算成功，所以涉及到回溯，用 || 连接四个方向的dfs结果</li>
-</ul>
-<h1 id="1-剑指12"><a href="#1-剑指12" class="headerlink" title="1.剑指12"></a>1.剑指12</h1><h2 id="1-1题目描述"><a href="#1-1题目描述" class="headerlink" title="1.1题目描述"></a>1.1题目描述</h2><p>给定一个 m x n 二维字符网格 board 和一个字符串单词 word 。如果 word 存在于网格中，返回 true ；否则，返回 false 。<br>单词必须按照字母顺序，通过相邻的单元格内的字母构成，其中“相邻”单元格是那些水平相邻或垂直相邻的单元格。同一个单元格内的字母不允许被重复使用。<br><img src="https://img-blog.csdnimg.cn/881c0a71318e4299bd635e2cddc00b4f.png"></p>
-<h2 id="1-2题解"><a href="#1-2题解" class="headerlink" title="1.2题解"></a>1.2题解</h2><ul>
-<li>每轮(以不同元素为起点)的标记行为，不能影响其他轮次，因此顺序必须是<code>标记-DFS-恢复</code> </li>
-<li>DFS中先考虑边界条件：4个边界(false)  or  字符串到末尾了(true)</li>
-</ul>
-<p>。</p>
-<pre><code>class Solution &#123;
-    public boolean exist(char[][] board, String word) &#123;
-            char[] arr = word.toCharArray();
-            for(int i = 0 ; i &lt; board.length ; i++)&#123;
-                for(int j = 0 ; j &lt; board[0].length ; j++)&#123;
-                    if( dfs(board, i ,j , arr, 0) )&#123; return true&#125;;
-                &#125;
-            &#125;
-            return false;
-    &#125;
-
-    //判断i j位置上word的第index号元素是否匹配
-    public boolean dfs(char[][] board , int i , int j , char[] word,int index)&#123;
-        /**因为涉及递归，条件需要写全 */
-        //矩阵边界 false
-        if(i&lt;0 || j&lt;0 || i&gt;=board.length || j&gt;=board[0].length)&#123;return false;&#125;
-        //当前不匹配 false
-        if(word[index] != board[i][j])&#123;return false;&#125;
-        //字符串匹配到了末尾 true
-        if(index == word.length-1)&#123;return true;&#125;
-        /**如果没到末尾，就先标记当前位置，再往四个方向递归 */
-        board[i][j] = &#39;\0&#39;;//只要不是A~Z 字母就行，注意转义  &#39;.&#39;也可以
-
-        //因为是递归，如果存在匹配成功，总有一个DFS的末端返回true，回溯都返回true
-        //所以用||来处理回溯结果
-        boolean currentRes = dfs(board, i+1 ,j ,word , index+1) ||
-                            dfs(board, i ,j+1 ,word , index+1) ||
-                            dfs(board, i-1 ,j ,word , index+1) ||
-                            dfs(board, i ,j-1 ,word , index+1) ;
-        board[i][j] = word[index];
-        return currentRes;
-
-    &#125;
-&#125;
-</code></pre>
-<h1 id="2-力扣200"><a href="#2-力扣200" class="headerlink" title="2.力扣200"></a>2.力扣200</h1><h2 id="2-1题目描述"><a href="#2-1题目描述" class="headerlink" title="2.1题目描述"></a>2.1题目描述</h2><p>给你一个由 ‘1’（陆地）和 ‘0’（水）组成的的二维网格，请你计算网格中岛屿的数量。</p>
-<p>岛屿总是被水包围，并且每座岛屿只能由<strong>水平方向和/或竖直方向上</strong>相邻的陆地连接形成。</p>
-<p>此外，你可以假设该网格的四条边均被水包围。</p>
-<p> <img src="https://img-blog.csdnimg.cn/b081b0c5e51e4340a88a65dcdb26a464.png"></p>
-<h2 id="2-2题解"><a href="#2-2题解" class="headerlink" title="2.2题解"></a>2.2题解</h2><pre><code>class Solution &#123;
-    public int numIslands(char[][] grid) &#123;
-        //空值
-        if(grid == null || grid.length == 0 || grid[0].length == 0)&#123; return 0;&#125;
-        int sum = 0;
-        //以每个位置为起点，每次都dfs将当前岛屿全部置为0
-        for(int i = 0 ; i &lt; grid.length ; i++)&#123;
-            for(int j = 0 ; j &lt; grid[0].length ; j++)&#123;
-                if(grid[i][j] == &#39;1&#39;)&#123;
-                    //当前位置为1时，计数+1，相邻所有1变为0
-                    sum++;
-                    dfs(grid , i , j);
-                &#125;
-            &#125;
-        &#125;
-        return sum;
-    &#125;
-
-    //将相邻的所有1变为0，每次递归都对上下左右暴力置0
-    public void dfs(char[][] grid, int i, int j)&#123;
-        //越界直接返回
-        if(i &lt; 0 || j &lt; 0 || i &gt;= grid.length || j &gt;= grid[0].length)&#123;return;&#125;
-        //本来就是0也直接返回
-        if(grid[i][j] == &#39;0&#39;)&#123;return;&#125;
-        //当前是1，置为0后上下左右dfs
-        grid[i][j] = &#39;0&#39;;
-        dfs(grid , i+1 , j);
-        dfs(grid , i-1 , j);
-        dfs(grid , i , j+1);
-        dfs(grid , i , j-1);
-    &#125;
-&#125;
-</code></pre>
-<h1 id="3-力扣463"><a href="#3-力扣463" class="headerlink" title="3.力扣463"></a>3.力扣463</h1><h2 id="3-1题目描述"><a href="#3-1题目描述" class="headerlink" title="3.1题目描述"></a>3.1题目描述</h2><p>给定一个 row x col 的二维网格地图 grid ，其中：grid[i][j] = 1 表示陆地， grid[i][j] = 0 表示水域。</p>
-<p>网格中的格子 水平和垂直 方向相连（对角线方向不相连）。整个网格被水完全包围，但其中恰好有一个岛屿（或者说，一个或多个表示陆地的格子相连组成的岛屿）。</p>
-<p>岛屿中没有“湖”（“湖” 指水域在岛屿内部且不和岛屿周围的水相连）。格子是边长为 1 的正方形。网格为长方形，且宽度和高度均不超过 100 。计算这个岛屿的周长。</p>
-<p><img src="https://img-blog.csdnimg.cn/6a48c609290247ecbe4208d1f5a79ddc.png"></p>
-<h2 id="3-2题解"><a href="#3-2题解" class="headerlink" title="3.2题解"></a>3.2题解</h2><p>核心就是：陆地（1）旁边如果越界、或者是海洋（0），那么计数+1<br>我们可以将DFS算法返回值为void，直接对静态变量进行操作；也可以将DFS方法返回值设为int，用回溯来做</p>
-<h3 id="3-2-1操作静态变量"><a href="#3-2-1操作静态变量" class="headerlink" title="3.2.1操作静态变量"></a>3.2.1操作静态变量</h3><pre><code>class Solution &#123;
-    static int sum = 0;
-    public int islandPerimeter(int[][] grid) &#123;
-        if(grid == null || grid.length == 0 || grid[0].length == 0)&#123;return 0;&#125;
-        for(int i = 0 ; i &lt; grid.length ; i++)&#123;
-            for(int j = 0 ; j &lt; grid[0].length ; j++)&#123;
-                if(grid[i][j] == 1)&#123;
-                    dfs(grid , i , j);
-                &#125;
-            &#125;
-        &#125;
-        return sum;
-    &#125;
-
-
-
-    public void dfs(int[][] grid , int i , int j )&#123;
-        //若当前位置不是陆地，那么周长+1
-        if(i &lt; 0 || j &lt; 0 || i &gt;= grid.length || j &gt;= grid[0].length || grid[i][j] == 0)&#123;
-            sum++;
-            return;
-            &#125;
+            <li class="article-tag-list-item">
+                <i class="iconfont icon-tag"></i><a>HashMap</a>
+            </li>
         
-        //如果当前是陆地，那么周长总计不变，继续上下左右遍历
-        //所到之处标为2：需要标记，且不能标记为0,  0会被计数
-        if(grid[i][j] == 1)&#123;
-            grid[i][j] = 2;
-            dfs(grid, i+1 , j );
-            dfs(grid, i-1 , j );
-            dfs(grid, i , j+1 );
-            dfs(grid, i , j-1 );
-        &#125;
-    &#125;
-&#125;
-</code></pre>
-<h3 id="3-2-2用回溯"><a href="#3-2-2用回溯" class="headerlink" title="3.2.2用回溯"></a>3.2.2用回溯</h3><pre><code>class Solution &#123;
-    public int islandPerimeter(int[][] grid) &#123;
-        if(grid == null || grid.length == 0 || grid[0].length == 0)&#123;return 0;&#125;
-        for(int i = 0 ; i &lt; grid.length ; i++)&#123;
-            for(int j = 0 ; j &lt; grid[0].length ; j++)&#123;
-                if(grid[i][j] == 1)&#123;
-                   return dfs(grid , i , j);
-                &#125;
-            &#125;
-        &#125;
-        return 0;
-    &#125;
-
-    public int dfs(int[][] grid , int i , int j )&#123;
-        //若当前位置越界，那么周长+1，且需要返回
-        if(i &lt; 0 || j &lt; 0 || i &gt;= grid.length || j &gt;= grid[0].length )&#123;
-            return 1;
-            &#125;
-        if( grid[i][j] == 0)&#123;
-            return 1;
-        &#125;
-        
-        //如果当前是陆地，那么周长总计不变，继续上下左右遍历
-        //所到之处标为2：需要标记，且不能标记为0,  0会被计数
-        if(grid[i][j] == 1)&#123;
-            grid[i][j] = 2;
-            return
-            dfs(grid, i+1 , j )+
-            dfs(grid, i-1 , j )+
-            dfs(grid, i , j+1 )+
-            dfs(grid, i , j-1 );
-        &#125;
-        return 0;
-    &#125;
-&#125;
-</code></pre>
-<h1 id="4-力扣695"><a href="#4-力扣695" class="headerlink" title="4.力扣695"></a>4.力扣695</h1><h2 id="4-1题目描述"><a href="#4-1题目描述" class="headerlink" title="4.1题目描述"></a>4.1题目描述</h2><p>给你一个大小为 m x n 的二进制矩阵 grid 。</p>
-<p>岛屿 是由一些相邻的 1 (代表土地) 构成的组合，这里的「相邻」要求两个 1 必须在 水平或者竖直的四个方向上 相邻。你可以假设 grid 的四个边缘都被 0（代表水）包围着。</p>
-<p>岛屿的面积是岛上值为 1 的单元格的数目。</p>
-<p>计算并返回 grid 中最大的岛屿面积。如果没有岛屿，则返回面积为 0 。</p>
-<p><img src="https://img-blog.csdnimg.cn/7c5880fe8f2841e5897cdd357fa37d7a.png"></p>
-<h2 id="4-2题解"><a href="#4-2题解" class="headerlink" title="4.2题解"></a>4.2题解</h2><p>同样的DFS+回溯统计结果</p>
-<pre><code>class Solution &#123;
-    public int maxAreaOfIsland(int[][] grid) &#123;
-       //空值
-        if(grid == null || grid.length == 0 ||grid[0].length == 0)&#123;
-            return 0;
-        &#125;
-        //最大面积
-        int max = 0;
-        int temp = 0;
-        for(int i = 0 ; i &lt; grid.length ; i++)&#123;
-            for(int j = 0 ; j &lt; grid[0].length ; j++)&#123;
-                if(grid[i][j] == 1)&#123;
-                    //该轮dfs的面积值
-                   temp = dfs(grid,i,j);
-                   if(temp &gt; max)&#123;
-                       max = temp;
-                   &#125;
-                &#125;
-            &#125;
-        &#125;
-        return max;
-    &#125;
-
-    public int dfs(int[][] grid , int i , int j )&#123;
-        //越界or海洋  则返回0
-        if(i &lt; 0 || j &lt; 0 || i &gt;= grid.length || j &gt;= grid[0].length || grid[i][j] == 0)&#123;
-            return 0;
-        &#125;
-        //每轮dfs的返回值总
-        if(grid[i][j] == 1)&#123;
-            grid[i][j] = 2;
-            //回溯，注意要加上自身（+1）
-            return 1+
-            dfs(grid , i+1 , j )+
-            dfs(grid , i-1 , j )+
-            dfs(grid , i , j+1 )+
-            dfs(grid , i , j-1 );
-        &#125;
-        return 0;
-    &#125;
-&#125;
-</code></pre>
-
-      
     </div>
-    <footer class="article-footer">
-      <a data-url="https://blogzjh.github.io/2022/09/15/%E5%87%A0%E9%81%93%E5%B2%9B%E5%B1%BF%E9%97%AE%E9%A2%98-dfs-%E5%89%AA%E6%9E%9D-%E5%9B%9E%E6%BA%AF/" data-id="cl8wvrz9k0023kkta60o2b8to" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
 
+</div>
 
-  
-    <article id="post-字符串：替换、左旋、缺失" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2022/09/15/%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%9A%E6%9B%BF%E6%8D%A2%E3%80%81%E5%B7%A6%E6%97%8B%E3%80%81%E7%BC%BA%E5%A4%B1/" class="article-date">
-  <time datetime="2022-09-15T13:20:41.000Z" itemprop="datePublished">2022-09-15</time>
-</a>
     
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%AE%97%E6%B3%95/">数据结构算法</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
+    <nav id="title-list-nav">
         
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2022/09/15/%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%9A%E6%9B%BF%E6%8D%A2%E3%80%81%E5%B7%A6%E6%97%8B%E3%80%81%E7%BC%BA%E5%A4%B1/">字符串：替换、左旋、缺失</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="1-替换空格"><a href="#1-替换空格" class="headerlink" title="1.替换空格"></a>1.替换空格</h1><pre><code>请实现一个函数，把字符串 s 中的每个空格替换成&quot;%20&quot;。
-
-
-
-示例 1：
-
-输入：s = &quot;We are happy.&quot;
-输出：&quot;We%20are%20happy.&quot;
-
-
-
-限制：
-
-0 &lt;= s 的长度 &lt;= 10000
-</code></pre>
-<h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><pre><code>class Solution &#123;
-    public String replaceSpace(String s) &#123;
-        StringBuffer dest = new StringBuffer();
-        for(int i = 0 ; i &lt; s.length() ; i++)&#123;
-            if(s.charAt(i) != &#39; &#39;)
-    
-            dest.append(s.charAt(i));
-            else
-                    dest.append(&quot;%20&quot;);
-    &#125;
-        return dest.toString();
-    &#125;
-&#125;
-</code></pre>
-<h1 id="2-0-n-1缺失数字"><a href="#2-0-n-1缺失数字" class="headerlink" title="2.    0~n-1缺失数字"></a>2.    0~n-1缺失数字</h1><pre><code>一个长度为n-1的递增排序数组中的所有数字都是唯一的，并且每个数字都在范围0～n-1之内。在范围0～n-1内的n个数字中有且只有一个数字不在该数组中，请找出这个数字。
-
-
-
-示例 1:
-
-输入: [0,1,3]
-输出: 2
-
-示例 2:
-
-输入: [0,1,2,3,4,5,6,7,9]
-输出: 8
-</code></pre>
-<h2 id="二分思想"><a href="#二分思想" class="headerlink" title="二分思想"></a>二分思想</h2><pre><code>class Solution &#123;
-    public int missingNumber(int[] nums) &#123;
-        int left = 0 ;
-        int right = nums.length - 1 ;
-        int middle;
-        while(left &lt;= right)&#123;
-            middle = (left + right)&gt;&gt;1;
-            if(nums[middle] == middle)&#123;//那就是后半段的问题
-                left  = middle+1;//范围缩小到右边
-            &#125;else&#123;//前半段出错
-                right  = middle-1;//范围缩小到左边
-            &#125;
-        &#125;
-        return left;
-
-    &#125;
-&#125;
-</code></pre>
-<h1 id="3-左旋转字符串"><a href="#3-左旋转字符串" class="headerlink" title="3.左旋转字符串"></a>3.左旋转字符串</h1><pre><code>字符串的左旋转操作是把字符串前面的若干个字符转移到字符串的尾部。请定义一个函数实现字符串左旋转操作的功能。比如，输入字符串&quot;abcdefg&quot;和数字2，该函数将返回左旋转两位得到的结果&quot;cdefgab&quot;。
-
-
-
-示例 1：
-
-输入: s = &quot;abcdefg&quot;, k = 2
-输出: &quot;cdefgab&quot;
-
-示例 2：
-
-输入: s = &quot;lrloseumgh&quot;, k = 6
-输出: &quot;umghlrlose&quot;
-</code></pre>
-<h2 id="暴力split"><a href="#暴力split" class="headerlink" title="暴力split"></a>暴力split</h2><pre><code>class Solution &#123;
-    public String reverseLeftWords(String s, int n) &#123;
-        StringBuffer rep = new StringBuffer();
-        for(int i = 0 ; i &lt; n ; i++)&#123;
-            rep.append(s.charAt(i));
-        &#125;
-        return rep.insert(0,s.split(rep.toString(),2)[1]).toString();
-    &#125;
-&#125;
-</code></pre>
-<h2 id="（耗时短）两次for，不用split"><a href="#（耗时短）两次for，不用split" class="headerlink" title="（耗时短）两次for，不用split"></a>（耗时短）两次for，不用split</h2><pre><code>class Solution &#123;
-    public String reverseLeftWords(String s, int n) &#123;
-        StringBuffer rep = new StringBuffer();
-        for(int i = n ; i &lt; s.length() ; i++)&#123;
-            rep.append(s.charAt(i));
-        &#125;
-        for(int i = 0 ; i &lt; n ; i++)&#123;
-            rep.append(s.charAt(i));
-        &#125;
-        return rep.toString();
+        <a  class="全部文章 工作笔记 "
+           href="/2022/09/26/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%81%9A%E9%BB%91%E5%90%8D%E5%8D%95%E7%9A%84%E6%96%B9%E6%A1%88/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="布隆过滤做黑名单的方案">布隆过滤做黑名单的方案</span>
+            <span class="post-date" title="2022-09-26 02:22:57">2022/09/26</span>
+        </a>
         
-    &#125;
-&#125;
-</code></pre>
+        <a  class="全部文章 数据结构算法 "
+           href="/2022/09/15/%E6%9F%90%E8%9A%81%E9%87%91%E6%9C%8D%E7%A7%8B%E6%8B%9B9-15/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="某蚁金服秋招9-15">某蚁金服秋招9-15</span>
+            <span class="post-date" title="2022-09-15 21:22:38">2022/09/15</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/2022/09/15/%E4%B8%89%E7%A7%8D%E6%83%85%E5%86%B5%E7%9A%84%E5%B1%82%E5%BA%8F%E9%81%8D%E5%8E%86/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="三种情况的层序遍历">三种情况的层序遍历</span>
+            <span class="post-date" title="2022-09-15 21:21:24">2022/09/15</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/2022/09/15/%E5%87%A0%E9%81%93%E5%B2%9B%E5%B1%BF%E9%97%AE%E9%A2%98-dfs-%E5%89%AA%E6%9E%9D-%E5%9B%9E%E6%BA%AF/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="几道岛屿问题:dfs+剪枝+回溯">几道岛屿问题:dfs+剪枝+回溯</span>
+            <span class="post-date" title="2022-09-15 21:20:58">2022/09/15</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/2022/09/15/%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%9A%E6%9B%BF%E6%8D%A2%E3%80%81%E5%B7%A6%E6%97%8B%E3%80%81%E7%BC%BA%E5%A4%B1/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="字符串：替换、左旋、缺失">字符串：替换、左旋、缺失</span>
+            <span class="post-date" title="2022-09-15 21:20:41">2022/09/15</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/2022/09/15/%E5%87%A0%E9%81%93%E4%BA%8C%E5%8F%89%E6%A0%91-dfs-%E5%9B%9E%E6%BA%AF/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="几道二叉树:dfs+回溯">几道二叉树:dfs+回溯</span>
+            <span class="post-date" title="2022-09-15 21:19:53">2022/09/15</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/2022/09/15/%E5%87%A0%E9%81%93%E5%8A%A8%E5%BD%92%E6%80%BB%E7%BB%93/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="几道动归总结">几道动归总结</span>
+            <span class="post-date" title="2022-09-15 21:18:43">2022/09/15</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/2022/09/15/BeanFactory%E5%92%8CApplicationContext/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="BeanFactory和ApplicationContext">BeanFactory和ApplicationContext</span>
+            <span class="post-date" title="2022-09-15 21:17:39">2022/09/15</span>
+        </a>
+        
+        <a  class="全部文章 中间件 "
+           href="/2022/08/28/%E4%B8%89%E7%A7%8D%E4%B8%AD%E9%97%B4%E4%BB%B6%E7%9A%84%E5%88%B7%E7%9B%98-%E6%8C%81%E4%B9%85%E5%8C%96-%E7%AD%96%E7%95%A5/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="三种中间件的刷盘(持久化)策略">三种中间件的刷盘(持久化)策略</span>
+            <span class="post-date" title="2022-08-28 13:34:20">2022/08/28</span>
+        </a>
+        
+        <a  class="全部文章 中间件 "
+           href="/2022/08/28/redis%E5%9F%BA%E7%A1%80/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="redis基础">redis基础</span>
+            <span class="post-date" title="2022-08-28 12:21:22">2022/08/28</span>
+        </a>
+        
+        <a  class="全部文章 中间件 "
+           href="/2022/08/27/RabbitMQ%E5%9F%BA%E7%A1%80/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="RabbitMQ基础">RabbitMQ基础</span>
+            <span class="post-date" title="2022-08-27 16:26:14">2022/08/27</span>
+        </a>
+        
+        <a  class="全部文章 中间件 "
+           href="/2022/08/27/RabbitMQ%E5%8F%AF%E9%9D%A0%E6%80%A7-Spring/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="RabbitMQ可靠性-Spring">RabbitMQ可靠性-Spring</span>
+            <span class="post-date" title="2022-08-27 16:02:25">2022/08/27</span>
+        </a>
+        
+        <a  class="全部文章 中间件 "
+           href="/2022/08/27/RabbitMQ%E6%AD%BB%E4%BF%A1%E9%98%9F%E5%88%97%E3%80%81%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97-Spring/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="RabbitMQ死信队列、延迟队列-Spring">RabbitMQ死信队列、延迟队列-Spring</span>
+            <span class="post-date" title="2022-08-27 01:05:35">2022/08/27</span>
+        </a>
+        
+        <a  class="全部文章 中间件 "
+           href="/2022/08/23/MySQL%E4%BA%8B%E5%8A%A1%E4%B8%8E%E9%94%81/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="MySQL事务与锁">MySQL事务与锁</span>
+            <span class="post-date" title="2022-08-23 12:49:38">2022/08/23</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/2022/08/23/AOP%E5%AE%9E%E7%8E%B0%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="AOP实现分布式锁">AOP实现分布式锁</span>
+            <span class="post-date" title="2022-08-23 12:48:25">2022/08/23</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/2022/08/23/ReentrantLock%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="ReentrantLock源码剖析">ReentrantLock源码剖析</span>
+            <span class="post-date" title="2022-08-23 12:34:15">2022/08/23</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/2022/08/23/%E5%8F%8D%E5%B0%84%E8%8E%B7%E5%8F%96AQS%E4%B8%AD%E5%90%8C%E6%AD%A5%E9%98%9F%E5%88%97%E4%B8%8E%E7%AD%89%E5%BE%85%E9%98%9F%E5%88%97%E7%9A%84%E9%95%BF%E5%BA%A6/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="反射获取AQS中同步队列与等待队列的长度">反射获取AQS中同步队列与等待队列的长度</span>
+            <span class="post-date" title="2022-08-23 12:32:58">2022/08/23</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/2022/08/14/Spring%E3%80%81Servlet%E7%9B%91%E5%90%AC%E5%99%A8/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Spring、Servlet监听器">Spring、Servlet监听器</span>
+            <span class="post-date" title="2022-08-14 21:01:46">2022/08/14</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/2022/08/13/AOP-%E5%8F%8D%E5%B0%84%EF%BC%9A%E6%8E%A5%E5%8F%A3%E5%8F%82%E6%95%B0%E6%A0%A1%E9%AA%8C/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="AOP+反射：接口参数校验">AOP+反射：接口参数校验</span>
+            <span class="post-date" title="2022-08-13 17:12:17">2022/08/13</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/2022/08/12/%E5%AF%B9dto%E6%8C%87%E5%AE%9A%E5%B1%9E%E6%80%A7%E4%B8%80%E9%94%AE%E5%8A%A0%E8%A7%A3%E5%AF%86/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="对dto指定属性一键加解密">对dto指定属性一键加解密</span>
+            <span class="post-date" title="2022-08-12 22:51:17">2022/08/12</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/2022/08/03/%E5%8F%8D%E5%B0%84%E4%BF%AE%E6%94%B9jsessionid%E5%AE%9E%E7%8E%B0session%E5%85%B1%E4%BA%AB/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="反射修改jsessionid实现session共享">反射修改jsessionid实现session共享</span>
+            <span class="post-date" title="2022-08-03 21:53:21">2022/08/03</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/2022/08/03/RestTemlate%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%8F%8A%E5%B7%A5%E5%85%B7%E7%B1%BB%E8%AE%BE%E8%AE%A1/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="RestTemlate源码分析及工具类设计">RestTemlate源码分析及工具类设计</span>
+            <span class="post-date" title="2022-08-03 21:51:57">2022/08/03</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/2022/08/03/%E7%9F%AD%E4%BF%A1%E6%9C%8D%E5%8A%A1%E8%A2%AB%E6%94%BB%E5%87%BB%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="短信服务被攻击解决方案">短信服务被攻击解决方案</span>
+            <span class="post-date" title="2022-08-03 21:51:16">2022/08/03</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/2022/08/03/%E5%9B%9B%E7%A7%8D%E6%96%B9%E6%B3%95Servlet%E5%AE%B9%E5%99%A8%E4%BD%BF%E7%94%A8Spring%E7%9A%84Bean%E5%AF%B9%E8%B1%A1/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="四种方法Servlet容器使用Spring的Bean对象">四种方法Servlet容器使用Spring的Bean对象</span>
+            <span class="post-date" title="2022-08-03 21:47:54">2022/08/03</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/2022/07/19/%E5%86%85%E5%AD%98%E5%8C%BA%E5%9F%9F%E3%80%81%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="内存区域、类的加载">内存区域、类的加载</span>
+            <span class="post-date" title="2022-07-19 22:29:21">2022/07/19</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/2022/07/19/Restful%E9%A3%8E%E6%A0%BC%E7%9C%9F%E7%9A%84%E6%9C%89%E5%BF%85%E8%A6%81%E5%90%97/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Restful风格真的有必要吗？">Restful风格真的有必要吗？</span>
+            <span class="post-date" title="2022-07-19 20:19:57">2022/07/19</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/2022/07/17/%E6%B0%94%E8%B1%A1cv-%E5%9C%B0%E5%9F%BA%E4%BA%91%E5%9B%BE%E4%BA%91%E7%B3%BB%E5%88%86%E5%89%B2/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="气象cv-地基云图云系分割">气象cv-地基云图云系分割</span>
+            <span class="post-date" title="2022-07-17 12:04:12">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/2022/07/17/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA%E6%9E%A3%E7%B1%BB%E9%81%97%E4%BC%A0%E7%9A%84%E5%9B%9E%E5%BD%92%E9%A2%84%E6%B5%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="支持向量机枣类遗传的回归预测">支持向量机枣类遗传的回归预测</span>
+            <span class="post-date" title="2022-07-17 11:47:04">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/2022/07/17/%E6%B0%94%E8%B1%A1%E5%A4%A7%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="气象大数据分析">气象大数据分析</span>
+            <span class="post-date" title="2022-07-17 11:44:44">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/2022/07/17/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%8D%95%E5%9B%BE%E8%B6%85%E5%88%86%E8%BE%A8%E7%8E%87%E7%9A%84%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="卷积神经网络单图超分辨率的深度学习方法">卷积神经网络单图超分辨率的深度学习方法</span>
+            <span class="post-date" title="2022-07-17 11:33:07">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/2022/07/17/%E7%96%AB%E6%83%85%E6%B8%AF%E5%8F%A3%E6%8C%82%E9%9D%A0%E6%95%B0ARIMA%E6%97%B6%E5%BA%8F%E5%88%86%E6%9E%90/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="疫情港口挂靠数ARIMA时序分析">疫情港口挂靠数ARIMA时序分析</span>
+            <span class="post-date" title="2022-07-17 11:21:13">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/2022/07/15/OGNL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%94%B9%E9%80%A0%E4%BB%A5%E4%BD%BF%E7%94%A8%E7%B4%A2%E5%BC%95/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="OGNL表达式改造以使用索引">OGNL表达式改造以使用索引</span>
+            <span class="post-date" title="2022-07-15 22:27:54">2022/07/15</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/2022/07/15/mvcc+%E6%8C%89%E5%A4%A9%E7%BC%93%E5%AD%98%E7%BB%9F%E8%AE%A1%E4%B8%A4%E4%B8%AA%E6%94%B6%E7%9B%8A/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="mvcc+按天缓存统计两个收益">mvcc+按天缓存统计两个收益</span>
+            <span class="post-date" title="2022-07-15 21:35:25">2022/07/15</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/2022/07/15/%E5%8E%8B%E7%BC%A9%E6%89%93%E5%8C%85%E4%BD%86%E4%B8%8D%E5%BD%92%E6%A1%A3%EF%BC%8C%E5%88%A9%E7%94%A8response/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="压缩打包但不归档，利用response">压缩打包但不归档，利用response</span>
+            <span class="post-date" title="2022-07-15 21:26:51">2022/07/15</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/2022/07/15/%E4%B8%9A%E5%8A%A1%E4%B8%ADdelete_flag%E5%AD%97%E6%AE%B5%E5%AE%B9%E6%98%93%E8%B8%A9%E7%9A%84%E5%9D%91/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="业务中delete_flag字段容易踩的坑">业务中delete_flag字段容易踩的坑</span>
+            <span class="post-date" title="2022-07-15 21:19:19">2022/07/15</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/2022/07/15/%E9%9D%9E%E6%97%B6%E5%BA%8F%E6%8E%92%E5%BA%8F%E4%B8%8B%E7%9A%84%E7%80%91%E5%B8%83%E6%B5%81%E5%88%86%E9%A1%B5/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="非时序排序下的瀑布流分页">非时序排序下的瀑布流分页</span>
+            <span class="post-date" title="2022-07-15 21:15:15">2022/07/15</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/2022/06/25/%E8%A1%8C%E7%A8%8B%E7%BC%96%E7%A0%81%E5%8E%8B%E7%BC%A9%E5%9B%BE%E7%89%87/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="行程编码压缩图片">行程编码压缩图片</span>
+            <span class="post-date" title="2022-06-25 01:35:20">2022/06/25</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/2022/04/21/Filter%E7%9A%84%E5%B8%B8%E8%A7%81%E7%94%A8%E6%B3%95/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Filter的常见用法">Filter的常见用法</span>
+            <span class="post-date" title="2022-04-21 09:51:40">2022/04/21</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/2022/04/21/Lambda%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%92%8C%E6%96%B9%E6%B3%95%E5%BC%95%E7%94%A8/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Lambda表达式和方法引用">Lambda表达式和方法引用</span>
+            <span class="post-date" title="2022-04-21 09:50:42">2022/04/21</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/2022/04/21/Mybatis%E4%B8%ADxml%E4%B8%AD%E8%B0%83java%E6%96%B9%E6%B3%95OGNL%E8%A1%A8%E8%BE%BE%E5%BC%8F/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Mybatis中xml中调java方法OGNL表达式">Mybatis中xml中调java方法OGNL表达式</span>
+            <span class="post-date" title="2022-04-21 09:47:36">2022/04/21</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/2022/04/21/Java%E6%B3%A8%E8%A7%A3%E5%92%8C%E5%8F%8D%E5%B0%84/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Java注解和反射">Java注解和反射</span>
+            <span class="post-date" title="2022-04-21 09:45:15">2022/04/21</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/2022/03/21/HashMap%E4%B8%ADentrySet-%E8%AF%A6%E8%A7%A3/"
+           data-tag="HashMap"
+           data-author="" >
+            <span class="post-title" title="HashMap中entrySet()详解">HashMap中entrySet()详解</span>
+            <span class="post-date" title="2022-03-21 00:15:10">2022/03/21</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/2022/03/21/HashMap/"
+           data-tag="HashMap"
+           data-author="" >
+            <span class="post-title" title="HashMap">HashMap</span>
+            <span class="post-date" title="2022-03-21 00:13:23">2022/03/21</span>
+        </a>
+        
+        <a  class="全部文章 中间件 "
+           href="/2022/03/07/Mysql%E4%BA%8B%E5%8A%A1%E5%92%8C%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Mysql事务和存储引擎">Mysql事务和存储引擎</span>
+            <span class="post-date" title="2022-03-07 22:11:06">2022/03/07</span>
+        </a>
+        
+        <a  class="全部文章 中间件 "
+           href="/2022/03/07/Mysql-InnoDB-%E7%B4%A2%E5%BC%95%E5%8E%9F%E7%90%86%E5%8F%8A%E7%9A%84%E4%BD%BF%E7%94%A8/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Mysql(InnoDB)索引原理及的使用">Mysql(InnoDB)索引原理及的使用</span>
+            <span class="post-date" title="2022-03-07 22:10:05">2022/03/07</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/2022/02/21/LinkedList%E6%BA%90%E7%A0%81%E4%B8%AD%E4%B8%BA%E4%BD%95%E5%A4%A7%E9%87%8F%E5%87%BA%E7%8E%B0final/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="LinkedList源码中为何大量出现final">LinkedList源码中为何大量出现final</span>
+            <span class="post-date" title="2022-02-21 09:57:35">2022/02/21</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/2022/01/11/%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E6%B3%B0%E5%9D%A6%E5%B0%BC%E5%85%8B%E5%8F%B7%E8%8E%B7%E6%95%91%E9%A2%84%E6%B5%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="随机森林——泰坦尼克号获救预测">随机森林——泰坦尼克号获救预测</span>
+            <span class="post-date" title="2022-01-11 03:06:10">2022/01/11</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/2022/01/01/%E5%86%B3%E7%AD%96%E6%A0%91-%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E7%94%A8%E6%88%B7%E6%B5%81%E5%A4%B1%E9%A2%84%E6%B5%8B%E7%9A%84%E6%A1%88%E4%BE%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="决策树/随机森林——用户流失预测的案例">决策树/随机森林——用户流失预测的案例</span>
+            <span class="post-date" title="2022-01-01 00:41:40">2022/01/01</span>
+        </a>
+        
+        <a  class="全部文章 "
+           href="/2021/12/25/IDEA%E5%B8%B8%E7%94%A8%E5%BF%AB%E6%8D%B7%E9%94%AE/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="IDEA常用快捷键">IDEA常用快捷键</span>
+            <span class="post-date" title="2021-12-25 21:55:46">2021/12/25</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/2021/12/25/Java%E5%9B%9B%E7%A7%8Dnext%E7%94%A8%E6%B3%95/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Java四种next用法">Java四种next用法</span>
+            <span class="post-date" title="2021-12-25 01:59:30">2021/12/25</span>
+        </a>
+        
+        <div id="no-item-tips">
 
-      
+        </div>
+    </nav>
+    <div id="outline-list">
     </div>
-    <footer class="article-footer">
-      <a data-url="https://blogzjh.github.io/2022/09/15/%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%9A%E6%9B%BF%E6%8D%A2%E3%80%81%E5%B7%A6%E6%97%8B%E3%80%81%E7%BC%BA%E5%A4%B1/" data-id="cl8wvrz9o002dkktaab2kgjqv" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
+</div>
 
-
-  
-    <article id="post-几道二叉树-dfs-回溯" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2022/09/15/%E5%87%A0%E9%81%93%E4%BA%8C%E5%8F%89%E6%A0%91-dfs-%E5%9B%9E%E6%BA%AF/" class="article-date">
-  <time datetime="2022-09-15T13:19:53.000Z" itemprop="datePublished">2022-09-15</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%AE%97%E6%B3%95/">数据结构算法</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2022/09/15/%E5%87%A0%E9%81%93%E4%BA%8C%E5%8F%89%E6%A0%91-dfs-%E5%9B%9E%E6%BA%AF/">几道二叉树:dfs+回溯</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="dfs方法如何定义"><a href="#dfs方法如何定义" class="headerlink" title="dfs方法如何定义"></a>dfs方法如何定义</h1><h2 id="回溯"><a href="#回溯" class="headerlink" title="回溯"></a>回溯</h2><ul>
-<li>dfs一般会搭配回溯（dfs有返回值），本文中力扣114、226因为dfs返回值是void，所以不涉及回溯；</li>
-<li>从root根节点出发：dfs递归的最内层是二叉树的最底层；回溯的起点是递归的最内层，root所在这一层的dfs</li>
-<li>像力扣22题（括号生成），括号成对出现，<strong>只要能对应左右子树的，都可以抽象看作二叉树</strong></li>
-</ul>
-<h2 id="前中后序遍历"><a href="#前中后序遍历" class="headerlink" title="前中后序遍历"></a>前中后序遍历</h2><p>这三种遍历其实都是dfs，只是递归的位置不同，一般二叉树用到dfs的都是这种区别（递归在前还是再后）</p>
-<ul>
-<li>前序：101对称二叉树、617合并二叉树、98验证二叉树；<strong>都是先保证当前节点的事情做完了，再去下一层</strong></li>
-<li>中序：</li>
-<li>后序：236二叉树公共祖先；<strong>需要先递归深入到最底层，然后从最底层开始找</strong></li>
-</ul>
-<h2 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h2><ul>
-<li>dfs的参数如何设置很重要，一般是：<strong>节点</strong>(如果涉及同时操作多个节点就多个形参) + <strong>限制条件</strong>(如果有的话)</li>
-<li>如果是在原方法上进行操作，<strong>方法名 和 形参中的root</strong> 很可能会误导思路</li>
-<li>通常可以通过自定义dfs来实现参数的自由限制（需要的话）</li>
-</ul>
-<h1 id="力扣236二叉树公共祖先"><a href="#力扣236二叉树公共祖先" class="headerlink" title="力扣236二叉树公共祖先"></a>力扣236二叉树公共祖先</h1><p>这个题就是典型的前序遍历思想了：</p>
-<ul>
-<li>先dfs深入到最下层，终止条件是：<strong>匹配到p或者q、null到底了</strong></li>
-<li>然后回溯，把p或者q带出去分别给<strong>当前递归的left或right</strong></li>
-<li>如果left right都不为null，那就返回当前的节点；否则返回不为null的：假设存在场景<img src="https://img-blog.csdnimg.cn/adfd0e5ce5204d71a6c3b6b92373f4f0.png"></li>
-</ul>
-<h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p><img src="https://img-blog.csdnimg.cn/edd867732c0549aabcb0e3563965175a.png"></p>
-<h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><pre><code>class Solution &#123;
-    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) &#123;
-        //当且仅当递归的底层会成立：此出root理解为：最下面的p或q节点，然后回溯
-        if(root == null || root == p || root == q)&#123;return root;&#125;
-        /**当不是最底层，就 前序：先深入到最底层 */
-        //当前的左节点是否能匹配上p或q，匹配不上返回null
-        TreeNode left = lowestCommonAncestor(root.left, p, q);
-        //当前的右节点是否能匹配上p或q，匹配不上返回null
-        TreeNode right = lowestCommonAncestor(root.right, p, q);
-        /**此时的left和right，如果匹配不上就是null（参考第一行代码），匹配上了因为回溯会返回p或q */
-        /**此时考虑场景：最顶层、接近底层 一共三个场景*/
-        //左右都找到了匹配：那最近父节点一定是这个root节点
-        if(left != null &amp;&amp; right != null)&#123;return root;&#125;
-        /**左边or右边匹配：回溯的是p或q的其中一个，
-            回溯到上面两句left和right那里
-            例如：left==p，right==q。但是判断时只需要判断左右不为空，那返回root
-            跟回溯究竟返回的是谁没关系，只要不是null就是匹配到了
-        */
-        if(right == null)&#123;return left;&#125;
-        if(left == null)&#123;return right;&#125;
-        return root;
-    &#125;
-&#125;
-</code></pre>
-<h1 id="力扣98验证二叉搜索树"><a href="#力扣98验证二叉搜索树" class="headerlink" title="力扣98验证二叉搜索树"></a>力扣98验证二叉搜索树</h1><p>普通的二叉树与 二叉搜索树的区别在于：</p>
-<ul>
-<li>普通二叉树只需要保证<strong>节点的左小右大</strong></li>
-<li>而搜索树需要保证节点<strong>整个左子树小，整个右子树大</strong></li>
-</ul>
-<h2 id="题目描述-1"><a href="#题目描述-1" class="headerlink" title="题目描述"></a>题目描述</h2><p><img src="https://img-blog.csdnimg.cn/02b23d1ae43a4aad9cff635a6872bc99.png"></p>
-<h2 id="题解-1"><a href="#题解-1" class="headerlink" title="题解"></a>题解</h2><p>因为需要保证“整个子树更小or更大”，所以需要自定义一个dfs方法，形参中携带max和min；</p>
-<pre><code>class Solution &#123;
-    public boolean isValidBST(TreeNode root) &#123;
-        return dfs(root,Long.MAX_VALUE,Long.MIN_VALUE);
-    &#125;
-
-
-    public boolean dfs(TreeNode curr , long max , long min)&#123;
-        if(curr == null)&#123;return true;&#125;
-        if(curr.val &gt;= max || curr.val &lt;= min)&#123;return false;&#125;
-        return dfs(curr.left, curr.val, min) &amp;&amp; dfs(curr.right, max ,curr.val);
-       
-    &#125;
-
-&#125;
-</code></pre>
-<h1 id="力扣114二叉树展开为链表"><a href="#力扣114二叉树展开为链表" class="headerlink" title="力扣114二叉树展开为链表"></a>力扣114二叉树展开为链表</h1><p>这个题如果是用前序遍历（DFS）先存储结果到list中，空间复杂度为O(n)，还有一种方法不用DFS空间复杂度为O(1)<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/flatten-binary-tree-to-linked-list/solution/er-cha-shu-zhan-kai-wei-lian-biao-by-leetcode-solu/">参考解答</a></p>
-<h2 id="题目描述-2"><a href="#题目描述-2" class="headerlink" title="题目描述"></a>题目描述</h2><p><img src="https://img-blog.csdnimg.cn/fa442fcc29c6465e83b559b8406ca29c.png"></p>
-<h2 id="题解-2"><a href="#题解-2" class="headerlink" title="题解"></a>题解</h2><p>既然提到了前序遍历，那直接把前序遍历的结果存储在list中，然后再循环恢复就好</p>
-<pre><code>class Solution &#123;
-    public void flatten(TreeNode root) &#123;
-        List&lt;TreeNode&gt; list = new ArrayList&lt;TreeNode&gt;(); 
-        preorderTraversal(root,list);
-        //此时list中有前序遍历的结果了
-        for(int i = 0 ; i &lt; list.size() - 1 ; i++)&#123;
-            list.get(i).right = list.get(i+1);
-            list.get(i).left = null;
-        &#125;
-        //因为最后一个节点本身left和right都是null，所以不用处理
-    &#125;
-
-    //前序遍历的同时把值存入list
-    public void preorderTraversal(TreeNode curr,List&lt;TreeNode&gt; list)&#123;
-       if(curr == null)&#123;return;&#125;
-       list.add(curr);
-       preorderTraversal(curr.left,list);
-       preorderTraversal(curr.right,list);
-        
-    &#125;
-&#125;
-</code></pre>
-<h1 id="力扣104二叉树最大深度"><a href="#力扣104二叉树最大深度" class="headerlink" title="力扣104二叉树最大深度"></a>力扣104二叉树最大深度</h1><p>一个简单题</p>
-<h2 id="题目描述-3"><a href="#题目描述-3" class="headerlink" title="题目描述"></a>题目描述</h2><p><img src="https://img-blog.csdnimg.cn/c48c9d31678747cd8132e65d12aecb94.png"></p>
-<h2 id="题解-3"><a href="#题解-3" class="headerlink" title="题解"></a>题解</h2><pre><code>class Solution &#123;
-    public int maxDepth(TreeNode root) &#123;
-        if(root == null)&#123;return 0;&#125;
-        //左右子树分别递归，最终结果取Max + 1
-        return Math.max( maxDepth(root.left) , maxDepth(root.right) ) + 1;
-    &#125;
-&#125;
-</code></pre>
-<h1 id="力扣617合并二叉树"><a href="#力扣617合并二叉树" class="headerlink" title="力扣617合并二叉树"></a>力扣617合并二叉树</h1><h2 id="题目描述-4"><a href="#题目描述-4" class="headerlink" title="题目描述"></a>题目描述</h2><p>给你两棵二叉树： root1 和 root2 。</p>
-<p>想象一下，当你将其中一棵覆盖到另一棵之上时，两棵树上的一些节点将会重叠（而另一些不会）。你需要将这两棵树合并成一棵新二叉树。合并的规则是：如果两个节点重叠，那么将这两个节点的值相加作为合并后节点的新值；否则，不为 null 的节点将直接作为新二叉树的节点。</p>
-<p>返回合并后的二叉树。</p>
-<p>注意: 合并过程必须从两个树的根节点开始。</p>
-<p><img src="https://img-blog.csdnimg.cn/30573d098445414f871470be5c12be77.png"></p>
-<h2 id="题解-4"><a href="#题解-4" class="headerlink" title="题解"></a>题解</h2><pre><code>class Solution &#123;
-    public TreeNode mergeTrees(TreeNode root1, TreeNode root2) &#123;
-        if(root1 == null &amp;&amp; root2 == null)&#123;return null;&#125;
-        int v1 = root1 != null ? root1.val : 0 ;
-        int v2 = root2 != null ? root2.val : 0 ;
-        TreeNode curr = new TreeNode(v1+v2);
-        //这里面还要写三目运算符主要是排除空指针问题
-        curr.left = mergeTrees(root1 != null ? root1.left : null, root2 != null ? root2.left : null);
-        curr.right = mergeTrees(root1 != null ? root1.right : null, root2 != null ? root2.right : null);
-        return curr;
-    &#125;
-&#125;
-</code></pre>
-<h1 id="力扣226反转二叉树"><a href="#力扣226反转二叉树" class="headerlink" title="力扣226反转二叉树"></a>力扣226反转二叉树</h1><h2 id="题目描述-5"><a href="#题目描述-5" class="headerlink" title="题目描述"></a>题目描述</h2><p><img src="https://img-blog.csdnimg.cn/949b8c6730aa439fa8f5554b1fc4c393.png"></p>
-<h2 id="题解-5"><a href="#题解-5" class="headerlink" title="题解"></a>题解</h2><pre><code>class Solution &#123;
-    public TreeNode invertTree(TreeNode root) &#123;
-        TreeNode res = root;
-        reverse(root);
-        return res;
-    &#125;
-
-    public void reverse(TreeNode curr)&#123;
-        if(curr == null) return;
-        TreeNode temp = curr.left;
-        curr.left = curr.right;
-        curr.right = temp;
-        reverse(curr.left);
-        reverse(curr.right);
-    &#125;
-&#125;
-</code></pre>
-<h1 id="力扣101对称二叉树"><a href="#力扣101对称二叉树" class="headerlink" title="力扣101对称二叉树"></a>力扣101对称二叉树</h1><h2 id="题目描述-6"><a href="#题目描述-6" class="headerlink" title="题目描述"></a>题目描述</h2><p><img src="https://img-blog.csdnimg.cn/0de9c5cdad3c41daae8ed518ecaf1b2b.png"></p>
-<h2 id="题解-6"><a href="#题解-6" class="headerlink" title="题解"></a>题解</h2><pre><code>class Solution &#123;
-    public boolean isSymmetric(TreeNode root) &#123;
-        if(root == null)&#123;return false;&#125;
-        return check(root.left, root.right);
-    &#125;
-
-    public boolean check(TreeNode left , TreeNode right)&#123;
-        if(left == null &amp;&amp; right == null)&#123;return true;&#125;
-        if(left == null || right == null)&#123;return false;&#125;
-        if(left.val != right.val)&#123;return false;&#125;
-        //这里一定是左左 比 右右   &amp;&amp;   右右  比  左左
-        return check(left.left, right.right) &amp;&amp; check(right.left, left.right);
-    &#125;
-&#125;
-</code></pre>
-<h1 id="力扣22括号生成"><a href="#力扣22括号生成" class="headerlink" title="力扣22括号生成"></a>力扣22括号生成</h1><p>这看起来是一个字符串问题，但实际上可以用二叉树dfs，因为很明显<strong>（）可以分别对应左子树、右子树</strong></p>
-<h2 id="题目描述-7"><a href="#题目描述-7" class="headerlink" title="题目描述"></a>题目描述</h2><p><img src="https://img-blog.csdnimg.cn/bd543a1a2f074b0da1b5e1072ac6e6c1.png"></p>
-<h2 id="题解-7"><a href="#题解-7" class="headerlink" title="题解"></a>题解</h2><p><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/generate-parentheses/solution/hui-su-suan-fa-by-liweiwei1419/">参考解答</a><br>    <img src="https://img-blog.csdnimg.cn/4bb3dfa46f9949039a52976bb8dccdde.png"></p>
-<pre><code>    public class Solution &#123;
-        // 做减法
-        public List&lt;String&gt; generateParenthesis(int n) &#123;
-            List&lt;String&gt; res = new ArrayList&lt;&gt;();
-            // 特判
-            if (n == 0) &#123;
-                return res;
-            &#125;
-    
-            // 执行深度优先遍历，搜索可能的结果
-            dfs(&quot;&quot;, n, n, res);
-            return res;
-        &#125;
-    
-    /**
-     * @param curStr 当前递归得到的结果
-     * @param left   左括号还有几个可以使用
-     * @param right  右括号还有几个可以使用
-     * @param res    结果集
-     */
-    private void dfs(String curStr, int left, int right, List&lt;String&gt; res) &#123;
-        // 因为每一次尝试，都使用新的字符串变量，所以无需回溯
-        // 在递归终止的时候，直接把它添加到结果集即可，注意与「力扣」第 46 题、第 39 题区分
-        if (left == 0 &amp;&amp; right == 0) &#123;
-            res.add(curStr);
-            return;
-        &#125;
-
-        // 剪枝（如图，左括号可以使用的个数严格大于右括号可以使用的个数，才剪枝，注意这个细节）
-        if (left &gt; right) &#123;
-            return;
-        &#125;
-
-        if (left &gt; 0) &#123;
-            dfs(curStr + &quot;(&quot;, left - 1, right, res);
-        &#125;
-
-        if (right &gt; 0) &#123;
-            dfs(curStr + &quot;)&quot;, left, right - 1, res);
-        &#125;
-    &#125;
-&#125;
-</code></pre>
-
-      
     </div>
-    <footer class="article-footer">
-      <a data-url="https://blogzjh.github.io/2022/09/15/%E5%87%A0%E9%81%93%E4%BA%8C%E5%8F%89%E6%A0%91-dfs-%E5%9B%9E%E6%BA%AF/" data-id="cl8wvrz9i001wkkta1z97b1mo" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-几道动归总结" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2022/09/15/%E5%87%A0%E9%81%93%E5%8A%A8%E5%BD%92%E6%80%BB%E7%BB%93/" class="article-date">
-  <time datetime="2022-09-15T13:18:43.000Z" itemprop="datePublished">2022-09-15</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%AE%97%E6%B3%95/">数据结构算法</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2022/09/15/%E5%87%A0%E9%81%93%E5%8A%A8%E5%BD%92%E6%80%BB%E7%BB%93/">几道动归总结</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="动归个人理解"><a href="#动归个人理解" class="headerlink" title="动归个人理解"></a>动归个人理解</h1><ul>
-<li>一般来说<strong>求i到j的范围数据，需要参考前面的</strong>，必须new int[][]维护dp数组；</li>
-<li>如果只是<strong>单纯的求xx最大值</strong>，就只需要维护一个int maxXxx来作为状态转移即可</li>
-<li>一般递归都能改成dp，就像是递归的方法名<strong>必须要明确其含义</strong>（输入xx和yy，来得到zz），dp数组的<strong>含义也必须明确</strong>（dp[i][j]代表例如：i天买入，j天卖出的收益）</li>
-<li>dp[][]数组的状态转移方程，<strong>所依赖的位置必须事先已经遍历过</strong>，否则可能因为new数组时默认赋值而产生问题（力扣5题）</li>
-</ul>
-<h1 id="力扣5最长回文子串"><a href="#力扣5最长回文子串" class="headerlink" title="力扣5最长回文子串"></a>力扣5最长回文子串</h1><h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>超经典的一道题，用二维数组维护状态转移方程，有一个细节点就是<strong>到底维护dp[][]的右上角还是左下角</strong></p>
-<h2 id="状态转移方程"><a href="#状态转移方程" class="headerlink" title="状态转移方程"></a>状态转移方程</h2><p>dp[i][j]表示i到j是回文串，为true <code>=</code> 当前arr[i]等于arr[j]  <code>且</code>  内层dp[i+1][j-1]为true <code>或</code> 长度小于3( j-i&lt;=2 )</p>
-<h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><ul>
-<li>因为<img src="https://img-blog.csdnimg.cn/4cb8f38c71a6479c92959651c36b6016.png"></li>
-<li>所以这是错的，<strong>状态转移参考的是dp数组默认的false</strong><img src="https://img-blog.csdnimg.cn/95c8d9006add4bcead473fc356a0064f.png"></li>
-<li>这是对的<img src="https://img-blog.csdnimg.cn/ba1ce62ea95f4f62b0869094dfecd779.png"></li>
-</ul>
-<p>最终实现</p>
-<pre><code>class Solution &#123;
-    public String longestPalindrome(String s) &#123;
-        if(s == null || s.length() &lt;= 1)&#123;return s;&#125;
-        char[] arr = s.toCharArray();
-        int len = s.length();
-        //保留最长回文串的前后指针
-        int left = 0;
-        int right = 0;
-        //dp保存i到j是否是回文串:状态转移方程是：i+1~~j-1也是true
-        boolean[][] dp = new boolean[len][len];//默认都是false
-        for(int i = 0 ; i &lt; len ; i++)&#123;
-            dp[i][i] = true;//自身是一个回文串
-        &#125;
-        //i到j是否是回文串
-        for(int j = 1 ; j &lt; len ; j++)&#123;//左i
-            for(int i = 0 ; i &lt; j ;i++)&#123;//右j
-                //首尾不同 不是回文串
-                if(arr[i] != arr[j])&#123;continue;&#125;
-                //首尾相同，要参考内部是不是回文串
-                if( j-i &lt;= 2 || dp[i+1][j-1] )&#123;//长度小于3 or 内层(dp左下角是true)
-                    dp[i][j] = true;
-                    if(right-left &lt; j-i)&#123;
-                        right = j;
-                        left = i;
-                    &#125;
-                &#125;
-            &#125;
-        &#125;
-        return s.substring(left,right+1);
-    &#125;
-&#125;
-</code></pre>
-<h1 id="同程秋招"><a href="#同程秋招" class="headerlink" title="同程秋招"></a>同程秋招</h1><p>趁着回忆出来记录一下，不过感觉这个题状态转移方程没那么强的像动归，更像是一个普通的字符串问题</p>
-<h2 id="题目描述-1"><a href="#题目描述-1" class="headerlink" title="题目描述"></a>题目描述</h2><p>若输入字符串s = “level” ，返回”l”，即<strong>最长相同前后缀</strong>。（前缀：l、le、lev、leve）（后缀：e、ev、eve、evel）（不包括s自身）</p>
-<p>若输入字符串s = “ababab” 则返回”abab”</p>
-<h2 id="题解-1"><a href="#题解-1" class="headerlink" title="题解"></a>题解</h2><pre><code>public class Solution &#123;
-
-  public static void main(String[] args) &#123;
-    Solution solution = new Solution();
-    String   level    = solution.longestPrefix(&quot;ababab&quot;);
-    System.out.println(level);
-
-  &#125;
-
-
-  public String longestPrefix (String s) &#123;
-    //最长、既是前缀、也是后缀
-    //1.空串
-    if(s == null || s.length() == 0)&#123;
-      return &quot;&quot;;
-    &#125;
-    int len = s.length();
-    char[] arr =  s.toCharArray();
-    //长度1一定是
-    if(len == 1)&#123;
-      return s;
-    &#125;
-    //题目说不能包括s自身，所以特殊情况
-    if(len == 2 &amp;&amp; arr[0] == arr[1])&#123;
-      return &quot;&quot; + arr[0];
-    &#125;
-
-    //指定一个跨度
-    int gap = 1;
-    String dest = &quot;&quot;;
-    //前gap 和 后gap是否相同
-    while(gap &lt; len)&#123;
-      //前缀
-      String leftString = s.substring(0,gap);
-      //后缀
-      String rightString = s.substring(len-gap,len);
-      gap++;//gap扩大
-      if( !leftString.equals(rightString) )&#123;
-        continue;//不能用break
-      &#125;else&#123;
-        dest = leftString;
-      &#125;
-    &#125;
-    return dest;
-  &#125;
-&#125;
-</code></pre>
-<h1 id="力扣55跳跃游戏"><a href="#力扣55跳跃游戏" class="headerlink" title="力扣55跳跃游戏"></a>力扣55跳跃游戏</h1><h2 id="题目描述-2"><a href="#题目描述-2" class="headerlink" title="题目描述"></a>题目描述</h2><p><img src="https://img-blog.csdnimg.cn/67452586d1c54145a507b349930cb268.png"></p>
-<h2 id="状态转移方程-1"><a href="#状态转移方程-1" class="headerlink" title="状态转移方程"></a>状态转移方程</h2><p>最大能达到的角标 = 遍历到的i位置 + i位置上的跳跃距离</p>
-<h2 id="题解-2"><a href="#题解-2" class="headerlink" title="题解"></a>题解</h2><pre><code>class Solution &#123;
-    public boolean canJump(int[] nums) &#123;
-        if(nums == null)&#123;return true;&#125;
-        
-        int remote = 0;//最远的角标（状态转移方程：= Math.max）
-        for(int i = 0 ; i &lt; nums.length; i++)&#123;
-            //跳不到i这来
-            if(remote &lt; i)&#123;return false;&#125;
-            //当前角标 + 跳跃长度
-            remote = Math.max(remote, i+nums[i]);
-            if(remote &gt;= nums.length - 1)&#123;return true;&#125;
-        &#125;
-        return false;
-    &#125;
-&#125;
-</code></pre>
-<h1 id="力扣139单词拆分"><a href="#力扣139单词拆分" class="headerlink" title="力扣139单词拆分"></a>力扣139单词拆分</h1><h2 id="题目描述-3"><a href="#题目描述-3" class="headerlink" title="题目描述"></a>题目描述</h2><p><img src="https://img-blog.csdnimg.cn/1adf56a442f14f6e87a59727ad81c39b.png"></p>
-<h2 id="状态转移方程-2"><a href="#状态转移方程-2" class="headerlink" title="状态转移方程"></a>状态转移方程</h2><p>dp[x]表示x位置之前都能被字典匹配 = 当前角标i + 用String::<code>startsWith(String word ; int offset)</code>匹配到的字符串长度</p>
-<h2 id="题解-3"><a href="#题解-3" class="headerlink" title="题解"></a>题解</h2><pre><code>class Solution &#123;
-    public boolean wordBreak(String s, List&lt;String&gt; wordDict) &#123;
-        if(&quot;&quot;.equals(s) || s == null)&#123;return true;&#125;
-        int len = s.length();
-        //创建一个dp数组，boolean类型，保证第一个为true（最开始就能匹配）
-        //然后用这个 被匹配到的字典长度+原来角标———再去匹配
-        //每次匹配都会去遍历wordDict字典
-        boolean[] dp = new boolean[len + 1];//因为最后是判断dp[len] == true，保证指针不越界
-        dp[0] = true;//认为字符串s前面还拼接了一个&quot;&quot;，dp的长度位len+1，0号位是&quot;&quot;一定能被匹配，dp[1]对应的是s的0号位
-        for(int i = 0 ; i &lt; len ; i++)&#123;
-            if( !dp[i] )&#123;continue;&#125;
-            //i位置，遍历匹配字典
-            for(String word : wordDict)&#123;
-                //不越界 &amp;&amp; s从i开始能匹配上word
-                if( i + word.length() &lt;= len &amp;&amp; s.startsWith(word,i) )&#123;
-                    dp[i + word.length()] = true; 
-                &#125;
-            &#125;
-        &#125;
-        return dp[len];
-    &#125;
-
-&#125;
-</code></pre>
-<h1 id="力扣62不同路径"><a href="#力扣62不同路径" class="headerlink" title="力扣62不同路径"></a>力扣62不同路径</h1><h2 id="题目描述-4"><a href="#题目描述-4" class="headerlink" title="题目描述"></a>题目描述</h2><p>一个机器人位于一个 m x n 网格的左上角 （起始点在下图中标记为 “Start” ）。</p>
-<p>机器人每次只能向下或者向右移动一步。机器人试图达到网格的右下角（在下图中标记为 “Finish” ）。</p>
-<p>问总共有多少条不同的路径？</p>
-<p><img src="https://img-blog.csdnimg.cn/36a1c99cb9de4a599a4d62880fa78a42.png"></p>
-<h2 id="题解1：递归"><a href="#题解1：递归" class="headerlink" title="题解1：递归"></a>题解1：递归</h2><p>太暴力了，容易爆栈</p>
-<pre><code>class Solution &#123;
-    public int uniquePaths(int m, int n) &#123;
-        if(m == 1 || n == 1)&#123;return 1;&#125;
-        return uniquePaths(m-1,n) + uniquePaths(m,n-1);
-    &#125;
-&#125;
-</code></pre>
-<h2 id="题解2：dp"><a href="#题解2：dp" class="headerlink" title="题解2：dp"></a>题解2：dp</h2><h2 id="状态转移方程-3"><a href="#状态转移方程-3" class="headerlink" title="状态转移方程"></a>状态转移方程</h2><p>dp[i][j] = dp[i-1][j] + dp[i][j-1];左边路径数 + 上边路径数</p>
-<pre><code>class Solution &#123;
-    public int uniquePaths(int m, int n) &#123;
-    
-        int[][] dp = new int[m][n];
-        for(int i = 0 ; i &lt; m ; i++)&#123;
-            dp[i][0] = 1;
-        &#125;
-        for(int j = 0 ; j &lt; n ; j++)&#123;
-            dp[0][j] = 1;
-        &#125;
-        for(int i = 1 ; i &lt; m ; i++)&#123;
-            for(int j = 1 ; j &lt; n ; j++)&#123;
-                dp[i][j] = dp[i-1][j] + dp[i][j-1];
-            &#125;
-        &#125;
-        return dp[m-1][n-1];
-    &#125;
-&#125;
-</code></pre>
-<h2 id="力扣64最小路径和"><a href="#力扣64最小路径和" class="headerlink" title="力扣64最小路径和"></a>力扣64最小路径和</h2><p>上面这道题的延申</p>
-<p>给定一个包含非负整数的 m x n 网格 grid ，请找出一条从左上角到右下角的路径，使得路径上的数字总和为最小。</p>
-<p>说明：每次只能向下或者向右移动一步。</p>
-<p><img src="https://img-blog.csdnimg.cn/a0639ea1e30f425c834eca94796919d8.png"></p>
-<h2 id="状态转移方程-4"><a href="#状态转移方程-4" class="headerlink" title="状态转移方程"></a>状态转移方程</h2><p>维护一个dp[i][j]表示该位置上的路径 = Math.min（ 上or左路径 ） +  自身路径grid[i][j]</p>
-<h2 id="题解-4"><a href="#题解-4" class="headerlink" title="题解"></a>题解</h2><p>其实可以发现这里不用新建一个dp[][]，可以直接在原有的grid上进行修改</p>
-<pre><code>class Solution &#123;
-    public int minPathSum(int[][] grid) &#123;
-        int row = grid.length;
-        int len = grid[0].length;
-        int[][] dp = new int[row][len];
-        dp[0][0] = grid[0][0];
-        for(int i = 1 ; i &lt; row ; i++)&#123;
-            dp[i][0] = grid[i][0] + dp[i-1][0];
-        &#125;
-        for(int j = 1 ; j &lt; len ; j++)&#123;
-            dp[0][j] = grid[0][j] + dp[0][j-1];
-        &#125;
-        for(int i = 1 ; i &lt; row ; i++)&#123;
-            for(int j = 1 ; j &lt; len ; j++)&#123;
-                dp[i][j] = Math.min( dp[i-1][j] , dp[i][j-1])  +   grid[i][j];
-            &#125;
-        &#125;
-        return dp[row-1][len-1];
-    &#125;
-&#125;
-</code></pre>
-<h1 id="力扣121买卖股票最佳时机"><a href="#力扣121买卖股票最佳时机" class="headerlink" title="力扣121买卖股票最佳时机"></a>力扣121买卖股票最佳时机</h1><p>简单题</p>
-<p><img src="https://img-blog.csdnimg.cn/64de6e1b19b54cd399e4bc7fa0803e28.png"></p>
-<h2 id="状态转移方程-5"><a href="#状态转移方程-5" class="headerlink" title="状态转移方程"></a>状态转移方程</h2><p>因为我们只是求最大值，所以不用维护dp[][]，直接维护一个maxProfit用Math.max()来更新最大值即可</p>
-<h2 id="题解-5"><a href="#题解-5" class="headerlink" title="题解"></a>题解</h2><pre><code>class Solution &#123;
-    public int maxProfit(int[] prices) &#123;
-        int len = prices.length;
-        int maxProfit = 0;
-        for(int i = 0 ; i &lt; len-1 ; i++)&#123;
-            for(int j = i+1 ; j &lt; len ; j++)&#123;
-                maxProfit = Math.max(maxProfit, prices[j]-prices[i]);
-            &#125;
-        &#125;
-      return maxProfit;
-
-    &#125;
-&#125;
-</code></pre>
-<h1 id="青蛙跳台、斐波那契、爬楼梯"><a href="#青蛙跳台、斐波那契、爬楼梯" class="headerlink" title="青蛙跳台、斐波那契、爬楼梯"></a>青蛙跳台、斐波那契、爬楼梯</h1><p>随便参考一个，用一维dp[]来保存前两位的值</p>
-<h2 id="递归"><a href="#递归" class="headerlink" title="递归"></a>递归</h2><p>递归老问题，容易超时、爆栈</p>
-<pre><code>class Solution &#123;
-    public int climbStairs(int n) &#123;
-        if(n == 1 ) return 1;
-        if(n == 2 ) return 2;
-        return climbStairs(n-1) + climbStairs(n-2);
-    &#125;
-&#125;
-</code></pre>
-<h2 id="动归"><a href="#动归" class="headerlink" title="动归"></a>动归</h2><pre><code>class Solution &#123;
-    public int climbStairs(int n) &#123;
-        if(n == 1)return 1;
-        if(n == 2)return 2;
-        int[] dp = new int[n+1];
-        dp[1] = 1;
-        dp[2] = 2;
-        for(int i = 3 ; i &lt;= n ; i++)&#123;
-            dp[i] = dp[i-1] + dp[i-2];
-        &#125;
-        return dp[n];
-    &#125;
-&#125;
-</code></pre>
-
-      
+    <div class="hide-list">
+        <div class="semicircle" data-title="切换全屏 快捷键 s">
+            <div class="brackets first"><</div>
+            <div class="brackets">&gt;</div>
+        </div>
     </div>
-    <footer class="article-footer">
-      <a data-url="https://blogzjh.github.io/2022/09/15/%E5%87%A0%E9%81%93%E5%8A%A8%E5%BD%92%E6%80%BB%E7%BB%93/" data-id="cl8wvrz9j001zkktagjsmfy02" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-BeanFactory和ApplicationContext" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2022/09/15/BeanFactory%E5%92%8CApplicationContext/" class="article-date">
-  <time datetime="2022-09-15T13:17:39.000Z" itemprop="datePublished">2022-09-15</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/%E6%BA%90%E7%A0%81/">源码</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2022/09/15/BeanFactory%E5%92%8CApplicationContext/">BeanFactory和ApplicationContext</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><strong>本案例中没有用<code>SpringApplication.run</code>来直接启动Spring，而是通过自己new一个Bean工厂，逐步添加后置处理器来实现解析Bean对象的功能</strong>，大体上包括如下内容：</p>
-<ul>
-<li><p>BeanFactory的功能很弱，<strong>后置处理器BeanFactoryPostProcessors和BeanPostProcessors如何添加、如何解析、如何调整顺序</strong>?</p>
-</li>
-<li><p>ApplicationContext的四大通用功能（<strong>国际化、通配符、读取配置文件、事件发布与监听</strong>）</p>
-</li>
-<li><p>ApplicationContext的几种常用实现，内部都是<strong>调用了对应的BeanDefinationReader进行读取定义信息，自动注入并解析后置处理器（refresh()方法）</strong>用于在不同的阶段解析@Configuration、@Bean、@Autowired、@Resource等</p>
-</li>
-<li><p>如果不用SpringBoot，该如何准备一个简单的web环境：配置：（内嵌容器<code>ServletWebServerFactory</code> 、接口路由<code>DispatcherServlet</code>、路由注册到web环境<code>DispatcherServletRegistrationBean</code>）</p>
-<h1 id="1-BeanFactory和ApplicationContext的关系"><a href="#1-BeanFactory和ApplicationContext的关系" class="headerlink" title="1.BeanFactory和ApplicationContext的关系"></a>1.BeanFactory和ApplicationContext的关系</h1></li>
-<li><p>其实这个<code>BeanFactory</code>(接口)才是真正的Spring IOC容器（<strong>但是像控制反转，依赖注入，Bean生命周期的各种功能，具体都是由<code>DefaultListableBeanFactory</code>实现的</strong>），而<code>ApplicationContext</code>(接口)是对其组合、横向扩展（例如如何去读取注解、配置文件等）；<img src="https://img-blog.csdnimg.cn/f6326b71fed245719669ecddecd92c4f.png" alt="继承图"></p>
-</li>
-<li><p><code>ApplicationContext</code>(接口)下又有很多的实现类，且他们用的都是这个唯一的<code>DefaultListableBeanFactory</code>(类对象，保存的IOC中的bean，实现了BeanFactory)；<br><img src="https://img-blog.csdnimg.cn/e6071ddb19e34defa0f9c45d74be3e3f.png" alt="继承图"></p>
-</li>
-<li><p><code>ApplicationContext</code>下的抽象实现类<code>AbstractApplicationContext</code>(其下有很多实现类)可以调用getBean(String name)，且底层是先获取BeanFactory再getBean<img src="https://img-blog.csdnimg.cn/0b98a3db98414a72a8bfa9ecd9efb0eb.png" alt="继承图"></p>
-</li>
-</ul>
-<h1 id="2-IOC管理者：DefaultListableBeanFactory"><a href="#2-IOC管理者：DefaultListableBeanFactory" class="headerlink" title="2.IOC管理者：DefaultListableBeanFactory"></a>2.IOC管理者：DefaultListableBeanFactory</h1><p>这玩意是Spring中实际的IOC容器，我们可以自己new一个<code>DefaultListableBeanFactory</code></p>
-<h2 id="2-1大体流程"><a href="#2-1大体流程" class="headerlink" title="2.1大体流程"></a>2.1大体流程</h2><h3 id="2-1-0准备两个Bean"><a href="#2-1-0准备两个Bean" class="headerlink" title="2.1.0准备两个Bean"></a>2.1.0准备两个Bean</h3><pre><code>@Configuration//本案例中可以省略（这个注解本身也只是为了被发现）
-public class MyConfig &#123;
-
-    @Bean//需要用BeanFactoryPostProcessors来解析
-    public Bean2 bean2()&#123;//Bean2中用@Autowired注入了Bean1，需要用BeanPostProcessors解析
-        return new Bean2();
-    &#125;
-
-    @Bean
-    public Bean1 bean1()&#123;
-        return new Bean1();
-    &#125;
-&#125;
-</code></pre>
-<hr>
-<pre><code>public class Bean2 &#123;
-    @Autowired
-    Bean1 bean1;
-
-    public Bean2() &#123;
-        System.out.println(&quot;bean2初始化&quot;);
-    &#125;
-</code></pre>
-<h3 id="2-1-1基本的注册Bean"><a href="#2-1-1基本的注册Bean" class="headerlink" title="2.1.1基本的注册Bean"></a>2.1.1基本的注册Bean</h3><p>@Component及其下面的几个注解本身只是为了被Spring启动的时候发现（本案例中因为是手动，即便是不写@Component也可以正常注入），且BeanFactory本身没有提供解析@Bean、@Autowired等注解的功能（需要后置处理器<code>BeanFactoryPostProcessors、BeanPostProcessors</code>来实现解析）</p>
-<ul>
-<li>用<code>BeanDefinitionBuilder.genericBeanDefinition( MyConfig.class)...getBeanDefinition()</code><strong>获取Bean的定义信息</strong></li>
-<li>然后用<code>defaultListableBeanFactory.registerBeanDefinition(&quot;myConfig&quot;,beanDefinition)</code>通过<strong>bean定义信息注册到bean工厂（IOC容器）中</strong></li>
-</ul>
-<p>此时只能解析这个myConfig，而<strong>不能解析其下的@Bean</strong></p>
-<pre><code>public static void main(String[] args) &#123;
-    //1.创建一个bean工厂（实际的）
-    DefaultListableBeanFactory defaultListableBeanFactory = new DefaultListableBeanFactory();
-    //2.生成bean定义信息：读取MyConfig本身，设置为singleton（创建一个单例myConfig对象）
-    AbstractBeanDefinition beanDefinition = BeanDefinitionBuilder
-            .genericBeanDefinition(MyConfig.class)
-            .setScope(&quot;singleton&quot;).getBeanDefinition();
-    defaultListableBeanFactory.registerBeanDefinition(&quot;myConfig&quot;,beanDefinition);
-</code></pre>
-<h3 id="2-1-2添加常用的BeanFactoryPostProcessors"><a href="#2-1-2添加常用的BeanFactoryPostProcessors" class="headerlink" title="2.1.2添加常用的BeanFactoryPostProcessors"></a>2.1.2添加常用的BeanFactoryPostProcessors</h3><ul>
-<li>使用Spring提供的工具包来注入到容器，用于解析不同的Bean生命周期<code>AnnotationConfigUtils.registerAnnotationConfigProcessors(defaultListableBeanFactory)</code></li>
-<li>这个工具一共注入5个bean，其中两个是BeanFactoryPostProcessors的实现类，通过Debug可以发现这两个分别是<code>ConfigurationClassPostProcessor</code>(用于解析@Configuration和@Bean) 和<code>EventListenerMethodProcessor</code></li>
-<li>在XML中通过标签<img src="https://img-blog.csdnimg.cn/ab3aa453bd634dad96f12681efc3b395.png">注入，效果相同</li>
-</ul>
-<pre><code>    //4. 给 BeanFactory添加一些常用的工厂后置处理器，让它具备解析@Configuration、@Bean等注解的能力(还需要再注册)
-            //IOC容器中会多出来5个Bean，包括两个BeanFactoryPostProcessor的实现类
-    AnnotationConfigUtils.registerAnnotationConfigProcessors(defaultListableBeanFactory);
-</code></pre>
-<p><img src="https://img-blog.csdnimg.cn/87058b60e5d14e049bf96540b20c6775.png"></p>
-<p>看下源码部分<br><img src="https://img-blog.csdnimg.cn/5f24b3c48fe24026a9954e47f9c2d31f.png">关于先后顺序的order值相差1（这是一个Spring源码写的不规范的地方，二者用了不同的表示方法）<br><img src="https://img-blog.csdnimg.cn/6501759e401244f0ac104180da9bab97.png">在这个工具类中<code>AnnotationConfigUtils</code>，通过order设置了解析顺序（例如会影响@Autowired和@Resource谁生效）<br><img src="https://img-blog.csdnimg.cn/a3aff3c1d91f434db46665a6e12895a6.png"></p>
-<h3 id="2-1-3BeanFactoryPostProcessors：解析-Configuration和-Bean"><a href="#2-1-3BeanFactoryPostProcessors：解析-Configuration和-Bean" class="headerlink" title="2.1.3BeanFactoryPostProcessors：解析@Configuration和@Bean"></a>2.1.3BeanFactoryPostProcessors：解析@Configuration和@Bean</h3><p>因为上一步已经注入了<code>ConfigurationClassPostProcessor</code>，但是只是作为bean注入的，没有执行解析的步骤</p>
-<pre><code>    //5. 从bean工厂中取出BeanFactory的后处理器，并且执行这些后处理器
-          // BeanFactory 后处理器BeanFactoryPostProcessor主要功能，补充了一些 bean 的定义
-    defaultListableBeanFactory.getBeansOfType(BeanFactoryPostProcessor.class)
-            .values().forEach(beanFactoryPostProcessor -&gt; &#123;
-        //一共2种bean工厂后置处理器，注册到bean工厂去
-        beanFactoryPostProcessor.postProcessBeanFactory(defaultListableBeanFactory);
-    &#125;);
-    Bean2 bean2 = defaultListableBeanFactory.getBean(Bean2.class);//默认的懒汉式，所以需要手动获取一下
-</code></pre>
-<p>此时解析到了@Bean，但@Autowired还没有被解析，bean2中的bean1=null<img src="https://img-blog.csdnimg.cn/2b70f11501b9481fbe2e9854ec7bbd1b.png"><br><img src="https://img-blog.csdnimg.cn/716e43455ef643918350913fc4476baa.png"></p>
-<h3 id="2-1-4BeanPostProcessor：解析-Autowired、-Resource等注解"><a href="#2-1-4BeanPostProcessor：解析-Autowired、-Resource等注解" class="headerlink" title="2.1.4BeanPostProcessor：解析@Autowired、@Resource等注解"></a>2.1.4BeanPostProcessor：解析@Autowired、@Resource等注解</h3><ul>
-<li>可以针对Bean的生命周期的各个阶段提供扩展</li>
-<li>对于@Autowired、@Resource的增强这个过程是发生在<strong>依赖注入阶段</strong>的</li>
-<li></li>
-</ul>
-<pre><code>   //7.要想@Autowired、@Resource等注解被解析，还要添加Bean的后处理器（非Bean工厂后置处理器），
-    defaultListableBeanFactory
-            .getBeansOfType(BeanPostProcessor.class)
-            .values()
-            .forEach(defaultListableBeanFactory::addBeanPostProcessor);
-  Bean2 bean2 = defaultListableBeanFactory.getBean(Bean2.class);
-</code></pre>
-<p>可以看到@Autowired解析成功<br><img src="https://img-blog.csdnimg.cn/69cec33758a94d9186922a4412c35fe6.png"></p>
-<h2 id="2-2关于BeanFactoryPostProcessors的先后顺序（order）"><a href="#2-2关于BeanFactoryPostProcessors的先后顺序（order）" class="headerlink" title="2.2关于BeanFactoryPostProcessors的先后顺序（order）"></a>2.2关于BeanFactoryPostProcessors的先后顺序（order）</h2><h3 id="2-2-0准备一个接口和两个Bean"><a href="#2-2-0准备一个接口和两个Bean" class="headerlink" title="2.2.0准备一个接口和两个Bean"></a>2.2.0准备一个接口和两个Bean</h3><pre><code>interface Inter &#123;  &#125;
-
-static class Bean3 implements Inter &#123;
-    public Bean3() &#123;
-        System.out.println(&quot;构造 Bean3()&quot;);
-    &#125;
-&#125;
-
-
-static class Bean4 implements Inter &#123;
-    public Bean4() &#123;
-        System.out.println(&quot;构造 Bean4()&quot;);
-    &#125;
-&#125;
-</code></pre>
-<p>然后再Bean5中注入Inter</p>
-<pre><code>    static class Bean5&#123;
-        //@Autowired、@Resource（不指定名字的话）都是根据参数名匹配bean对象
-//        @Autowired
-//        @Resource
-//        Inter bean3; 
-    &#125;
-</code></pre>
-<p>MyConfig注入@Bean</p>
-<pre><code>    @Bean
-    public Bean5 bean5()&#123;
-        return new Bean5();
-    &#125;
-</code></pre>
-<h3 id="2-2-1注入规则"><a href="#2-2-1注入规则" class="headerlink" title="2.2.1注入规则"></a>2.2.1注入规则</h3><ul>
-<li><p>@Autowired、@Resource（不指定名字的话）都是根据参数名匹配bean对象</p>
-</li>
-<li><p>@Resource(“beanName”)可以指定注入</p>
-</li>
-<li><p>默认情况下：二者同时存在时@Autowired生效，例如    </p>
-<pre><code>      static class Bean5&#123;
-              //注入的是bean3
-              @Autowired
-              @Resource(name = &quot;bean4&quot;)
-              Inter bean3;
-          &#125;
-</code></pre>
-</li>
-</ul>
-<h3 id="2-2-2改变后置处理器的顺序：3种方法"><a href="#2-2-2改变后置处理器的顺序：3种方法" class="headerlink" title="2.2.2改变后置处理器的顺序：3种方法"></a>2.2.2改变后置处理器的顺序：3种方法</h3><ul>
-<li><p>方法1：反转后手动添加</p>
-<pre><code>ArrayList&lt;BeanPostProcessor&gt; list = new ArrayList&lt;&gt;(beanFactory
-                    .getBeansOfType(BeanPostProcessor.class).values());
-   Collections.reverse(list);
-   beanFactory.addBeanPostProcessors(list);
-</code></pre>
-</li>
-<li><p>方法2：Stream利用原生order顺序</p>
-<pre><code>    beanFactory.addBeanPostProcessors(beanFactory
-      .getBeansOfType(BeanPostProcessor.class).values()
-        .stream()
-        .sorted(beanFactory.getDependencyComparator())
-        .collect(Collectors.toCollection(ArrayList::new)));
-</code></pre>
-</li>
-<li><p>方法3：直接利用order顺序</p>
-</li>
-</ul>
-<pre><code>    beanFactory.getBeansOfType(BeanPostProcessor.class).values()
-    .forEach(beanFactory::addBeanPostProcessor);
-    或者
-    beanFactory.addBeanPostProcessors
-    (beanFactory.getBeansOfType(BeanPostProcessor.class).values());
-</code></pre>
-<h1 id="3-ApplicationContext的4大功能"><a href="#3-ApplicationContext的4大功能" class="headerlink" title="3.ApplicationContext的4大功能"></a>3.ApplicationContext的4大功能</h1><p>先看继承图，可以看到有如下几个功能（见名知意）<br><img src="https://img-blog.csdnimg.cn/d7d35e52143243ae871ad87ca5e80791.png"></p>
-<h2 id="3-1MessageSource国际化"><a href="#3-1MessageSource国际化" class="headerlink" title="3.1MessageSource国际化"></a>3.1MessageSource国际化</h2><ul>
-<li>先准备好不同语言的配置文件，写键值对例如在zh中hi=你好<img src="https://img-blog.csdnimg.cn/1579d33c5e494a93af9d9a164de07300.png"></li>
-<li>使用的时候直接<code>context.getMessage(&quot;hi&quot;,null,Local.CHINA);</code>就会打印”你好”</li>
-<li>一般是从请求头获取需要什么语言，然后做一个判断就行了</li>
-</ul>
-<h2 id="3-2ResourcePatternResolver通配符获取资源路径"><a href="#3-2ResourcePatternResolver通配符获取资源路径" class="headerlink" title="3.2ResourcePatternResolver通配符获取资源路径"></a>3.2ResourcePatternResolver通配符获取资源路径</h2><h3 id="3-2-1类路径下找：url"><a href="#3-2-1类路径下找：url" class="headerlink" title="3.2.1类路径下找：url"></a>3.2.1类路径下找：url</h3><pre><code>        //1. :是只在类路径下找 [classpath:application.properties]
-        Resource[] resources = context.getResources(&quot;classpath:application.properties&quot;);    
-        for (Resource res : resources) &#123;
-            if(res.exists())
-            System.out.println(res);
-        &#125;
-</code></pre>
-<h3 id="3-2-2jar包中找-：url"><a href="#3-2-2jar包中找-：url" class="headerlink" title="3.2.2jar包中找*：url"></a>3.2.2jar包中找*：url</h3><pre><code>        //2. *:可以找到引入依赖的jar包中，通配符匹配多个
-//        URL [jar:file:/D:/apache-maven-3.8.3/maven-repo/org/springframework/boot/spring-boot/2.7.3/spring-boot-2.7.3.jar!/META-INF/spring.factories]
-//        URL [jar:file:/D:/apache-maven-3.8.3/maven-repo/org/springframework/boot/spring-boot-autoconfigure/2.7.3/spring-boot-autoconfigure-2.7.3.jar!/META-INF/spring.factories]
-//        URL [jar:file:/D:/apache-maven-3.8.3/maven-repo/org/springframework/spring-beans/5.3.22/spring-beans-5.3.22.jar!/META-INF/spring.factories]
-        Resource[] resources1 = context.getResources(&quot;classpath*:META-INF/spring.factories&quot;);
-        for (Resource res : resources1) &#123;
-            if(res.exists())
-            System.out.println(res);
-        &#125;
-</code></pre>
-<h2 id="3-3EnvironmentCapable读取具体配置文件中的信息or环境变量"><a href="#3-3EnvironmentCapable读取具体配置文件中的信息or环境变量" class="headerlink" title="3.3EnvironmentCapable读取具体配置文件中的信息or环境变量"></a>3.3EnvironmentCapable读取具体配置文件中的信息or环境变量</h2><pre><code>    //在application.properties中配过hi=hello
-    System.out.println(context.getEnvironment().getProperty(&quot;hi&quot;));
-    //系统变量，直接读取
-    System.out.println(context.getEnvironment().getProperty(&quot;java_home&quot;));
-</code></pre>
-<h2 id="3-4ApplicationEventPublisher发布事件与监听"><a href="#3-4ApplicationEventPublisher发布事件与监听" class="headerlink" title="3.4ApplicationEventPublisher发布事件与监听"></a>3.4ApplicationEventPublisher发布事件与监听</h2><ul>
-<li>其实这个就是个监听器，Spring内置的监听器监听的事件也是继承了<code>ApplicationEvent</code></li>
-<li>可以用于解耦（<strong>分布式环境用MQ解耦，本地用事件可以解耦</strong>）</li>
-</ul>
-<h3 id="3-4-1定义事件"><a href="#3-4-1定义事件" class="headerlink" title="3.4.1定义事件"></a>3.4.1定义事件</h3><pre><code>public class MyEvent extends ApplicationEvent &#123;
-
-    public MyEvent(Object source) &#123;//source就是事件源（谁发的这个事件，我们可以传入一个context参数）
-        super(source);
-    &#125;
-
-&#125;
-</code></pre>
-<h3 id="3-4-2发布事件"><a href="#3-4-2发布事件" class="headerlink" title="3.4.2发布事件"></a>3.4.2发布事件</h3><pre><code>    //context发布事件MyEvent，其中发布源是：context
-    context.publishEvent(new MyEvent(context));
-</code></pre>
-<h3 id="3-4-3监听事件"><a href="#3-4-3监听事件" class="headerlink" title="3.4.3监听事件"></a>3.4.3监听事件</h3><p>API使用上类似于Spring整合RabbitMQ</p>
-<pre><code>@Component
-public class MyListener &#123;
-    @EventListener
-    public void listen(MyEvent event)&#123;
-        System.out.println(&quot;收到了消息&quot;+new Date());
-    &#125;
-
-&#125;
-</code></pre>
-<h1 id="4-ApplicationContext的4种常用实现"><a href="#4-ApplicationContext的4种常用实现" class="headerlink" title="4.ApplicationContext的4种常用实现"></a>4.ApplicationContext的4种常用实现</h1><ul>
-<li>其实我个人更想从Bean的生命周期最开始：读取bean定义信息来讲，因为配置Bean方式不同，Spring做了一个BeanDefinitionReader的抽象，ApplicationContext的实现类也是基于Reader的，用<code>XmlWebApplicationContext</code>举例：<img src="https://img-blog.csdnimg.cn/33667662387f47dc9ab90dcc612f3847.png"></li>
-<li>ApplicationContext的实现类<strong>封装了Bean的读取及初始化</strong>、<strong>会自动加上5个后处理器</strong>、<strong>自动解析</strong></li>
-</ul>
-<h2 id="4-1基于xml文件"><a href="#4-1基于xml文件" class="headerlink" title="4.1基于xml文件"></a>4.1基于xml文件</h2><p><img src="https://img-blog.csdnimg.cn/c3b7022ddae849c1a74fdd3cbe486513.png"></p>
-<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
-       xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
-       xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
-       xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd&quot;&gt;
-
-    &lt;!--
-    &lt;context:annotation-config /&gt;
-     把5个后处理器加进来
-         等价于：AnnotationConfigUtils.registerAnnotationConfigProcessors(beanFactory);
- --&gt;
-    &lt;context:annotation-config /&gt;
-    &lt;bean id=&quot;bean1&quot; class=&quot;com.example.demo23.Bean1&quot; /&gt;
-    &lt;bean id=&quot;bean2&quot; class=&quot;com.example.demo23.Bean2&quot;&gt;
-        &lt;property name=&quot;bean1&quot; ref=&quot;bean1&quot;/&gt;
-    &lt;/bean&gt;
-
-&lt;/beans&gt;
-</code></pre>
-<h3 id="4-1-1xml基于classpath的相对路径"><a href="#4-1-1xml基于classpath的相对路径" class="headerlink" title="4.1.1xml基于classpath的相对路径"></a>4.1.1xml基于classpath的相对路径</h3><p>这个容器中就有5个后置处理器 和 两个bean</p>
-<pre><code> ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(&quot;spring_bean.xml&quot;);
-</code></pre>
-<h3 id="4-1-2xml基于磁盘的绝对路径"><a href="#4-1-2xml基于磁盘的绝对路径" class="headerlink" title="4.1.2xml基于磁盘的绝对路径"></a>4.1.2xml基于磁盘的绝对路径</h3><pre><code>FileSystemXmlApplicationContext context = new FileSystemXmlApplicationContext
-(&quot;C:\Users\Administrator\IdeaProjects\demo23\src\main\resources\spring_bean.xml&quot;);
-</code></pre>
-<p>也可以简化为</p>
-<pre><code>FileSystemXmlApplicationContext context = new FileSystemXmlApplicationContext
-(&quot;src\main\resources\spring_bean.xml&quot;);
-</code></pre>
-<h2 id="4-2基于Java配置类"><a href="#4-2基于Java配置类" class="headerlink" title="4.2基于Java配置类"></a>4.2基于Java配置类</h2><p>这一步包括了注入MyConfig，和其下的所有@Bean、相关的@Autowired等；<br>相比XML配置法会多出一个myConfig的bean对象</p>
-<pre><code> AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(MyConfig.class);
-</code></pre>
-<h2 id="4-3基于Web容器：支持Java配置类和Servlet"><a href="#4-3基于Web容器：支持Java配置类和Servlet" class="headerlink" title="4.3基于Web容器：支持Java配置类和Servlet"></a>4.3基于Web容器：支持Java配置类和Servlet</h2><p>因为要支持Servlet，所以要在WebConfig中至少配置这三个：</p>
-<ul>
-<li><code>ServletWebServerFactory</code> ：WebServer工厂（Spring的web容器，可以选Tomcat、Jetty等）</li>
-<li><code>DispatcherServlet</code>：web项目必备的DispatcherServlet（所有的请求路由分发）</li>
-<li><code>DispatcherServletRegistrationBean</code> ：将DispatcherServlet注册到WebServer上</li>
-</ul>
-<p>还需要提供一个接口用于测试：实现Controller接口的Bean<br>（是 org.springframework.web.servlet.mvc.Controller接口，不是注解，需要实现<code>handleRequest()</code>方法）</p>
-<pre><code>@Configuration
-class WebConfig &#123;
-    @Bean
-    // 1. WebServer工厂，这里用Tomcat
-    public ServletWebServerFactory servletWebServerFactory() &#123;
-        return new TomcatServletWebServerFactory();
-    &#125;
-
-    @Bean
-    // 2. web项目必备的DispatcherServlet
-    public DispatcherServlet dispatcherServlet() &#123;
-        return new DispatcherServlet();
-    &#125;
-
-    @Bean
-    // 3. 将DispatcherServlet注册到WebServer上
-    public DispatcherServletRegistrationBean dispatcherServletRegistrationBean(DispatcherServlet dispatcherServlet) &#123;
-        return new DispatcherServletRegistrationBean(dispatcherServlet, &quot;/&quot;);
-    &#125;
-
-    @Bean(&quot;/hello&quot;)//必须以/开头才能被识别为路径
-    public Controller controller1() &#123;
-    //重写匿名
-        return (request, response) -&gt; &#123;
-            response.getWriter().println(&quot;hello&quot;);
-            return null;
-        &#125;;
-    &#125;
-&#125;
-</code></pre>
-<p><img src="https://img-blog.csdnimg.cn/79af4cd63e8c48dc978336facc8de805.png"></p>
-<h2 id="4-4补充"><a href="#4-4补充" class="headerlink" title="4.4补充"></a>4.4补充</h2><p><code>AbstractApplicationContext</code>中的refresh()方法对bean生命周期的各个阶段进行了增强，本文不细讲</p>
-<p><img src="https://img-blog.csdnimg.cn/54efdd82397446bb83cee599ac96b395.png"></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://blogzjh.github.io/2022/09/15/BeanFactory%E5%92%8CApplicationContext/" data-id="cl8wvrz8g0004kkta1ixb8lfh" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-三种中间件的刷盘-持久化-策略" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2022/08/28/%E4%B8%89%E7%A7%8D%E4%B8%AD%E9%97%B4%E4%BB%B6%E7%9A%84%E5%88%B7%E7%9B%98-%E6%8C%81%E4%B9%85%E5%8C%96-%E7%AD%96%E7%95%A5/" class="article-date">
-  <time datetime="2022-08-28T05:34:20.000Z" itemprop="datePublished">2022-08-28</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/%E4%B8%AD%E9%97%B4%E4%BB%B6/">中间件</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2022/08/28/%E4%B8%89%E7%A7%8D%E4%B8%AD%E9%97%B4%E4%BB%B6%E7%9A%84%E5%88%B7%E7%9B%98-%E6%8C%81%E4%B9%85%E5%8C%96-%E7%AD%96%E7%95%A5/">三种中间件的刷盘(持久化)策略</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <ul>
-<li>这里讨论Mysql（redolog）、Redis（AOF）、RabbitMQ（消息持久化）</li>
-<li>三者的共同点都是：<strong>先在<code>内存缓冲池</code>中追加记录、以一定的频率刷盘持久化、批量刷盘都存在数据丢失的风险</strong></li>
-<li>刷盘（从内存到磁盘）的过程中可能出现问题，因此中间件<strong>需要提供其他的辅助安全方案</strong></li>
-<li>redolog和AOF的刷盘都是同步的（master线程），但<strong>RabbitMQ是异步的且不能指定刷盘频率</strong>，<a target="_blank" rel="noopener" href="https://www.rabbitmq.com/persistence-conf.html">参考官网文档</a></li>
-<li>中间件重启时从磁盘读取持久化文件恢复（以上三种追加记录恢复较慢，文件较大）</li>
-</ul>
-<h1 id="1-Mysql"><a href="#1-Mysql" class="headerlink" title="1.Mysql"></a>1.Mysql</h1><p>对于Mysql就来探究下redolog的刷盘策略</p>
-<h2 id="1-1redolog"><a href="#1-1redolog" class="headerlink" title="1.1redolog"></a>1.1redolog</h2><ul>
-<li>重做日志，记录物理级别上的修改</li>
-<li>追加写入（批量时是顺序写入，比随机IO快）</li>
-<li>可以自定义刷盘频率<code>innodb_flush_log_at_trx_commit=0、1、2</code>，一般用1保证最安全（每次事务提交前即刷盘）</li>
-</ul>
-<h2 id="1-2buffer-pool"><a href="#1-2buffer-pool" class="headerlink" title="1.2buffer pool"></a>1.2buffer pool</h2><ul>
-<li>每次变更都需要先修改Buffer Pool，然后master线程（同步、阻塞）以一定频率刷入磁盘</li>
-</ul>
-<p><img src="https://img-blog.csdnimg.cn/63a03ebe859341208c8d8c6ed631c457.png"></p>
-<h1 id="2-Redis"><a href="#2-Redis" class="headerlink" title="2.Redis"></a>2.Redis</h1><ul>
-<li>Redis两个持久化策略，RDB（默认、全量）和AOF（增量、更完整、大且慢）</li>
-<li><strong>RDB是异步非阻塞的（fork子进程）、而AOF是同步的（更大程度保证数据不丢失</strong>）</li>
-</ul>
-<h2 id="2-1AOF"><a href="#2-1AOF" class="headerlink" title="2.1AOF"></a>2.1AOF</h2><ul>
-<li>和Mysql的redolog类似，我们可以选择刷盘频率<code>appendfsync ： always、everysec、no</code></li>
-<li>并且也是同步的（不会开辟新的线程来备份，不同于RDB）</li>
-<li>都有一个缓冲池</li>
-</ul>
-<p><img src="https://img-blog.csdnimg.cn/0b463077bdad46bea54169917cbaa8c9.png"></p>
-<h2 id="2-2AOF缓冲池"><a href="#2-2AOF缓冲池" class="headerlink" title="2.2AOF缓冲池"></a>2.2AOF缓冲池</h2><p>由上图可知Redis每次写操作都会追加一条记录到AOF缓冲池，根据刷盘频率决定持久化的时机</p>
-<h1 id="3-RabbitMQ"><a href="#3-RabbitMQ" class="headerlink" title="3.RabbitMQ"></a>3.RabbitMQ</h1><ul>
-<li>RabbitMQ有 队列、交换机持久化 和 消息持久化，<strong>只有消息持久化和redolog、AOF类似，是做一个增量备份</strong></li>
-</ul>
-<h2 id="3-1消息持久化"><a href="#3-1消息持久化" class="headerlink" title="3.1消息持久化"></a>3.1消息持久化</h2><ul>
-<li>当RabbitMQ的<strong>内存紧张</strong>时、或<strong>生产者发消息指定了消息持久化</strong>时，消息会写入磁盘</li>
-</ul>
-<h2 id="3-2Buffer"><a href="#3-2Buffer" class="headerlink" title="3.2Buffer"></a>3.2Buffer</h2><p>官网没有明确给出这个Buffer叫啥名字，，但是具体策略跟前两个差不多</p>
-<ol>
-<li>写入文件前会有一个Buffer,大小为1M(1048576),数据在写入文件时，首先会写入到这个Buffer,如果Buffert已满，则会将Buffer写入到文件（未必刷到磁盘）：</li>
-<li><strong>有个固定的刷盘时间</strong>：25ms,也就是不管Buffer满不满，每隔25ms,Buffer里的数据及未刷新到磁盘的文件内容必定会刷到磁盘；</li>
-</ol>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://blogzjh.github.io/2022/08/28/%E4%B8%89%E7%A7%8D%E4%B8%AD%E9%97%B4%E4%BB%B6%E7%9A%84%E5%88%B7%E7%9B%98-%E6%8C%81%E4%B9%85%E5%8C%96-%E7%AD%96%E7%95%A5/" data-id="cl8wvrz9e001kkktadcyc7rco" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-redis基础" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2022/08/28/redis%E5%9F%BA%E7%A1%80/" class="article-date">
-  <time datetime="2022-08-28T04:21:22.000Z" itemprop="datePublished">2022-08-28</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/%E4%B8%AD%E9%97%B4%E4%BB%B6/">中间件</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2022/08/28/redis%E5%9F%BA%E7%A1%80/">redis基础</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="1-数据类型"><a href="#1-数据类型" class="headerlink" title="1.数据类型"></a>1.数据类型</h1><h2 id="1-1Geospatial地理位置"><a href="#1-1Geospatial地理位置" class="headerlink" title="1.1Geospatial地理位置"></a>1.1Geospatial地理位置</h2><ul>
-<li>存储地理位置（经度、纬度、名称）</li>
-<li>城市距离计算、附近的人</li>
-<li>Geo的底层其实就是ZSet实现</li>
-</ul>
-<h2 id="1-2Hyperloglog基数统计"><a href="#1-2Hyperloglog基数统计" class="headerlink" title="1.2Hyperloglog基数统计"></a>1.2Hyperloglog基数统计</h2><ul>
-<li>Hyperloglog在Redis中是基数统计的算法，基数就是不重复的元素</li>
-<li>比如一个人访问一个网站多次，但还是算一个人，<strong>Hyperloglog优点就是占用内存非常小，比set去重方法远远小</strong>，是首选，Hyperloglog常常用于计数。<strong>但它错误率有0.81%<strong>，</strong>如果允许容错就用Hyperloglog，一点都不允许就用set（例如保存用户id）</strong></li>
-</ul>
-<h2 id="1-3Bitmaps位图"><a href="#1-3Bitmaps位图" class="headerlink" title="1.3Bitmaps位图"></a>1.3Bitmaps位图</h2><ul>
-<li>个人理解每一位都相当于一个Boolean判断，<strong>所有只有两种状态的都可以用Bitmaps</strong></li>
-<li>例如疫情14e人就直接存储14e个0，如果感染就设置为1</li>
-<li>其他场景如：活跃用户、用户是否登录、某用户365天内打卡天数（key是用户id，365天就是365位，365/8≈46B，也就是说一个用户一年只要46B存储就够了，十分小，省内存。）</li>
-</ul>
-<h2 id="1-3String"><a href="#1-3String" class="headerlink" title="1.3String"></a>1.3String</h2><ul>
-<li>可以细分为3种  String、int、float，<strong>对于字符串是用byte[]存储</strong>，<strong>对于int和float是直接转化为二进制存储，节省空间</strong></li>
-<li><strong>int和float支持自增自减</strong></li>
-<li>如果愿意的话可以把图片本身转为byte[]存入redis，但不建议，一般还是存储一个地址</li>
-</ul>
-<h2 id="1-5Hash"><a href="#1-5Hash" class="headerlink" title="1.5Hash"></a>1.5Hash</h2><ul>
-<li>哈希表<img src="https://img-blog.csdnimg.cn/6204b989efc24130b9080209957363cd.png"></li>
-<li>相比String存一个json，存Hash更方便修改某一个特定的字段，但是也看业务场景需不需要频繁修改</li>
-</ul>
-<h2 id="1-6List"><a href="#1-6List" class="headerlink" title="1.6List"></a>1.6List</h2><p>最后一个是阻塞获取，等到list中有元素时获取，当然不能超过最大超时时间</p>
-<p><img src="https://img-blog.csdnimg.cn/4371d2ca605c4f6593ab678608cf7e52.png"><img src="https://img-blog.csdnimg.cn/638baf4228874922a753573e72d249f0.png"></p>
-<h2 id="1-7Set"><a href="#1-7Set" class="headerlink" title="1.7Set"></a>1.7Set</h2><p>底层用到了<strong>散列值</strong>，Set可以有如下功能。可通过集合交并差的运算来实现例如：共同好友等功能</p>
-<p><img src="https://img-blog.csdnimg.cn/9bc420ccfe5141a2bb32d140b46af6ed.png"></p>
-<h2 id="1-8SortedSet"><a href="#1-8SortedSet" class="headerlink" title="1.8SortedSet"></a>1.8SortedSet</h2><ul>
-<li>与Java中的TreeSet的红黑树实现不同，<strong>SortedSet的排序依据是每个元素的score属性</strong>，其底层是跳表（增加查询速度）+hash表（保证不重复）</li>
-<li>元素少的时候是压缩表ZipList  元素多的时候是跳表SkipList<br><img src="https://img-blog.csdnimg.cn/c76dbe193a72465898f01fa938582b5f.png"><br><img src="https://img-blog.csdnimg.cn/5e6601f43b06471784615a21a62fcf31.png" alt="在这里插入图片描述"></li>
-</ul>
-<h1 id="2-Redis事务？"><a href="#2-Redis事务？" class="headerlink" title="2.Redis事务？"></a>2.Redis事务？</h1><ul>
-<li><p><strong>准确来说Redis不支持事务</strong>，因为事务需要满足ACID原则，而Redis是单线程，没有隔离性；运行错误时不保证原子性。Reids事务本质只是一串连续执行的命令</p>
-</li>
-<li><p><strong>Java没有相关Redis事务的API</strong>，因此一般在Java中也是用的lua脚本</p>
-</li>
-<li><p>开启事务<code>multi</code> 、 执行业务、提交<code>exec</code>或放弃<code>discard</code></p>
-</li>
-</ul>
-<h2 id="2-1语句错误（类似编译错误）"><a href="#2-1语句错误（类似编译错误）" class="headerlink" title="2.1语句错误（类似编译错误）"></a>2.1语句错误（类似编译错误）</h2><p>比如在事务中途get一个不存在的值，<strong>会导致整个事务回滚</strong></p>
-<h2 id="2-2运行错误"><a href="#2-2运行错误" class="headerlink" title="2.2运行错误"></a>2.2运行错误</h2><ul>
-<li><p>比如对String类型做自增操作，语法上没有问题，<strong>事务提交后除了这一句其他的全部成功</strong></p>
-</li>
-<li><p>这也是跟Mysql不一样的地方，Mysql绝不允许事务的原子性出现问题</p>
-</li>
-</ul>
-<h2 id="2-3watch监视（乐观锁）"><a href="#2-3watch监视（乐观锁）" class="headerlink" title="2.3watch监视（乐观锁）"></a>2.3watch监视（乐观锁）</h2><ul>
-<li><p>该命令可以为 Redis事务提供 check-and-set （CAS）行为。</p>
-</li>
-<li><p>我们可以使用 watch命令来监视一个 或多个key，<strong>如果被监视的 key在事务执行前被修改过那么本次事务将会被取消，也就是所谓的回滚</strong></p>
-</li>
-<li><p>只有确保被监视的 key，在事务开始前到执行 这段时间内未被修改过事务才会执行成功（类似乐观锁）</p>
-</li>
-<li><p>如果一次事务中存在被监视的 key，无论此次事务执行成功与否，该 key的监视都将会在执行后失效 <strong>也就是说监视是一次性的。</strong></p>
-</li>
-</ul>
-<p><img src="https://img-blog.csdnimg.cn/62743b039ff14b19b6803ae06e202acb.png"></p>
-<h1 id="3-Redis持久化"><a href="#3-Redis持久化" class="headerlink" title="3.Redis持久化"></a>3.Redis持久化</h1><ul>
-<li>如果redis只做缓存，数据敏感性不高，可以不选择持久化，直接性能拉满</li>
-<li>如果同时开启两种持久化方案，<strong>优先AOF增量恢复</strong>（更完整）（<strong>重启redis即恢复</strong>）</li>
-<li>一般<strong>Master节点用AOF尽可能保证完整性，Slave节点用RDB保证高效性</strong>(通常十几分钟备份一次就够了)</li>
-<li><strong>RDB是通过主进程创建的fork子进程先写入临时文件再持久化；而AOF是同步的，每次写操作先写入缓冲区，到达刷盘频率后持久化</strong>；</li>
-</ul>
-<p>redis<strong>持久化</strong>是指在指定的时间间隔内将内存中的数据集快照(snapshotting)写入磁盘<br><strong>恢复</strong>时是将快照文件读入内存 redis提供了两种持久化方式</p>
-<ol>
-<li>RDB(Redis DataBase)（<strong>默认</strong>）</li>
-<li>AOF(Append of File)<br><img src="https://img-blog.csdnimg.cn/e71921eff23c4b8e89b70cb63ef73aee.png"></li>
-</ol>
-<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/m0_43424329/article/details/124364120">参考详细文章</a></p>
-<h2 id="3-1RDB全量备份"><a href="#3-1RDB全量备份" class="headerlink" title="3.1RDB全量备份"></a>3.1RDB全量备份</h2><ul>
-<li><strong>redis会单独创建一个子进程(使用fork函数)来进行持久化，会先将数据写入到一个临时文件中，待持久化过程都结束了，再用这个临时文件替换上次持久化好的文件</strong>。整个过程中，主进程是不进行任何IO操作的，这就确保了极高的性能</li>
-<li>RDB的缺点是<strong>最后一次持久化后的数据可能丢失</strong>；优点是<strong>大规模恢复数据速度快</strong></li>
-</ul>
-<h3 id="3-1-1触发方式"><a href="#3-1-1触发方式" class="headerlink" title="3.1.1触发方式"></a>3.1.1触发方式</h3><ul>
-<li>可以手动触发<code>save</code>(会阻塞Redis)或<code>bgsave</code>(fork子进程)</li>
-<li>也可以在Redis配置文件中设置自动触发，如<code>save 20 3</code> 表示在20秒内如果至少有3个key发生变化，则保存</li>
-</ul>
-<h3 id="3-1-2其他配置"><a href="#3-1-2其他配置" class="headerlink" title="3.1.2其他配置"></a>3.1.2其他配置</h3><ul>
-<li><p><code>stop-writes-on-bgsave-error</code>：默认值为yes。当启用了RDB且最后一次后台保存数据失败，Redis是否停止接收数据。<strong>用户可以感知是否持久化失败</strong></p>
-</li>
-<li><p><code>rdbcompression</code> ：默认值是yes。对于存储到磁盘中的快照，可以设置是否进行压缩存储。<strong>压缩会消耗大量cpu资源</strong></p>
-</li>
-<li><p><code>rdbchecksum</code> ：默认值是yes。在存储快照后，我们还可以让redis使用CRC64算法来进行数据校验，但是这样做会增加大约10%的性能消耗，如果希望获取到最大的性能提升，可以关闭此功能。<strong>消耗一定的性能保证持久化正确性</strong></p>
-</li>
-<li><p><code>dbfilename</code> ：设置<strong>快照的文件名</strong>，默认是 dump.rdb</p>
-</li>
-<li><p><code>dir</code>：设置快照文件的<strong>存放路径</strong>，这个配置项一定是个目录，而不能是文件名。默认是和当前配置文件保存在同一目录。</p>
-</li>
-</ul>
-<h3 id="3-1-3数据恢复"><a href="#3-1-3数据恢复" class="headerlink" title="3.1.3数据恢复"></a>3.1.3数据恢复</h3><p>将备份文件 (dump.rdb) 移动到 redis 安装目录并启动服务即可，redis就会自动加载文件数据至内存了。Redis 服务器在载入 RDB 文件期间，会一直处于阻塞状态，直到载入工作完成为止。</p>
-<h2 id="3-2AOF增量备份"><a href="#3-2AOF增量备份" class="headerlink" title="3.2AOF增量备份"></a>3.2AOF增量备份</h2><ul>
-<li>以日志的形式来记录每个<strong>写操作</strong>（增量保存），将Redis执行过的所有写指令记录下来(<strong>读操作不记录</strong>)</li>
-<li> <strong>只许追加文件但不可以改写文件</strong>，redis启动之初会读取该文件重新构建数据，换言之，<strong>redis 重启的话就根据日志文件的内容将写指令从前到后执行一次以完成数据的恢复工作。</strong></li>
-</ul>
-<h3 id="3-2-1持久化过程"><a href="#3-2-1持久化过程" class="headerlink" title="3.2.1持久化过程"></a>3.2.1持久化过程</h3><ul>
-<li>可选每次都追加、每秒追加、从不追加</li>
-<li>如果是每秒追加，这一秒如果产生了巨量的并发redis写入，会导致这个AOF内存缓冲区也特别庞大（<strong>这是额外的AOF消耗，不算上redis数据本身</strong>）</li>
-<li>每次追加是同步的，redis每次修改命令，会将持久化命令写到缓冲区里面；等达到落盘条件之后；从缓冲区进行落盘操作</li>
-</ul>
-<h3 id="3-2-2数据恢复"><a href="#3-2-2数据恢复" class="headerlink" title="3.2.2数据恢复"></a>3.2.2数据恢复</h3><ul>
-<li>文件大、备份满、但是安全    </li>
-<li>不能单独使用AOF，（但Redis默认单独使用RDB）</li>
-<li>AOF用的少</li>
-</ul>
-<h1 id="4-分布式锁概述"><a href="#4-分布式锁概述" class="headerlink" title="4.分布式锁概述"></a>4.分布式锁概述</h1><h2 id="4-1概念"><a href="#4-1概念" class="headerlink" title="4.1概念"></a>4.1概念</h2><ul>
-<li>分布式锁：满足<strong>分布式系统or集群</strong>下的<strong>多进程可见</strong> 且 <strong>互斥</strong> 的锁</li>
-<li>分布式锁可以用MySQL、Redis、ZooKeeper实现，前者最简单且低效，后者最安全且低效，Redis是一个业内常用的折中方案<img src="https://img-blog.csdnimg.cn/8fcad57170444e4a84c0991a163e477f.png"></li>
-<li>互斥、原子性、安全性 是Redis分布式锁的实现难点，Redisson是一个开源的高性能Redis分布式锁框架</li>
-<li>在功能上的特点包括：阻塞or非阻塞、是否可重入、是否是公平锁等</li>
-</ul>
-<h2 id="4-2简单实现"><a href="#4-2简单实现" class="headerlink" title="4.2简单实现"></a>4.2简单实现</h2><p>简单实现能满足大部分场景，最简单的是在unlock的时候调用RedisTemplate.execute()来执行一段lua脚本</p>
-<h3 id="4-2-1实现思路与解决的问题"><a href="#4-2-1实现思路与解决的问题" class="headerlink" title="4.2.1实现思路与解决的问题"></a>4.2.1实现思路与解决的问题</h3><p>因为Redis分布式的本质原理是setnx+过期时间+del，所以需要注意以下几点：</p>
-<ul>
-<li>key值需要携带线程的id，以便于在del的时候先判断是不是自己上的锁再删除（防止因timeout导致的删掉其他线程上的锁）</li>
-</ul>
-<h3 id="4-2-2key值无身份标识"><a href="#4-2-2key值无身份标识" class="headerlink" title="4.2.2key值无身份标识"></a>4.2.2key值无身份标识</h3><p>形如：<img src="https://img-blog.csdnimg.cn/b91c28b06c324fad9656a2710619530b.png"></p>
-<p><img src="https://img-blog.csdnimg.cn/97919f700efa47ca966440a38129a74c.png"></p>
-<h3 id="4-2-3解决误删问题"><a href="#4-2-3解决误删问题" class="headerlink" title="4.2.3解决误删问题"></a>4.2.3解决误删问题</h3><p>为了解决误删（不同线程）的问题，应在unlock的时候，先判断value中的threadid是否是当前threadid，如果是，则是删除自己上的锁</p>
-<h3 id="4-2-3业务阻塞：防止误删的判断"><a href="#4-2-3业务阻塞：防止误删的判断" class="headerlink" title="4.2.3业务阻塞：防止误删的判断"></a>4.2.3业务阻塞：防止误删的判断</h3><ul>
-<li>利用UUID区分分布式环境下不同的JVM，利用threadId区分不同的线程</li>
-<li>key值的UUID用于区分JVM</li>
-<li>value值是直接存一个threadid，用于判断是否可以删除锁</li>
-</ul>
-<p><img src="https://img-blog.csdnimg.cn/67fd223ab3da406eab42b211a6971258.png"></p>
-<h3 id="4-2-4解决误删问题"><a href="#4-2-4解决误删问题" class="headerlink" title="4.2.4解决误删问题"></a>4.2.4解决误删问题</h3><p>上面demo的最后一段，其实<code>判断能不能删 </code>和 <code>删除</code> 是两个步骤，这两个步骤之间虽然没有业务可以阻塞，但是可能存在因为JVM垃圾回收时STW时间过长，redis锁超时，造成2.1同样的问题</p>
-<pre><code>if(threadId.equals(id))&#123;
-    stringRedisTemplate.delete(KEY_PREFIX+name);
-&#125;
-</code></pre>
-<p><img src="https://img-blog.csdnimg.cn/d25634584bf14f23997731affddaf441.png"><br>因此，判断是否能删除（value中的threadid是否相同）、删除该锁 这两步操作必须是<code>原子性</code>（一次性）的</p>
-<h3 id="4-2-5lua脚本保证原子性"><a href="#4-2-5lua脚本保证原子性" class="headerlink" title="4.2.5lua脚本保证原子性"></a>4.2.5lua脚本保证原子性</h3><p>为了避免中间可能出现的STW，<strong>引入lua语言的脚本（lua可以用脚本一次性执行多条redis语句）</strong></p>
-<h3 id="4-2-6为什么不能用redis事务"><a href="#4-2-6为什么不能用redis事务" class="headerlink" title="4.2.6为什么不能用redis事务"></a>4.2.6为什么不能用redis事务</h3><ul>
-<li><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/94c4b1fa55f7?utm_campaign=haruki">reids和mysql事务的区别</a></li>
-<li>redis的事务不支持中途回滚，他仅仅是一堆命令的集合（<strong>redis事务其实是<code>批处理</code>，比如我们想先查了再判断，其实我们是拿不到这个结果的</strong>）（<strong>redis不允许回滚、阻塞造成的性能降低</strong>）；而mysql是支持回滚的</li>
-<li>虽然我们可以通过redis乐观锁在释放锁的时候进行判断，但是很麻烦</li>
-</ul>
-<h3 id="4-2-7原生的执行lua脚本"><a href="#4-2-7原生的执行lua脚本" class="headerlink" title="4.2.7原生的执行lua脚本"></a>4.2.7原生的执行lua脚本</h3><p>脚本本质就是一个字符串，Redis提供了一个执行脚本(Sctipt)的语法<code>EVAL &quot;  &quot;</code></p>
-<p><img src="https://img-blog.csdnimg.cn/6d23de6cef6e44ea8c1c7c882aa118d3.png"></p>
-<h3 id="4-2-8RedisTemplate的execute-方法"><a href="#4-2-8RedisTemplate的execute-方法" class="headerlink" title="4.2.8RedisTemplate的execute()方法"></a>4.2.8RedisTemplate的execute()方法</h3><p>这个API可以传入一个形参<code>RedisScript</code>，其底层实现是lua脚本</p>
-<p><img src="https://img-blog.csdnimg.cn/058c9f2c230540fe87dca565f22c6f84.png"><img src="https://img-blog.csdnimg.cn/bcffb44d703d439889b33e8d8629152b.png"></p>
-<p><img src="https://img-blog.csdnimg.cn/852e9b8c7a8e49a790376cb2026b11e3.png"></p>
-<h2 id="4-3最终的简单实现-仍存在很多问题"><a href="#4-3最终的简单实现-仍存在很多问题" class="headerlink" title="4.3最终的简单实现(仍存在很多问题)"></a>4.3最终的简单实现(仍存在很多问题)</h2><ul>
-<li>先创建一个脚本对象，用于释放锁的时候传参</li>
-</ul>
-<p><img src="https://img-blog.csdnimg.cn/d018e7f5ef8d47288c60dad07a70559a.png"></p>
-<ul>
-<li>然后调用，执行<img src="https://img-blog.csdnimg.cn/cad93407ac8543d593d6f620d63591b4.png"></li>
-<li>其中配置文件unlock.lua的代码如下<img src="https://img-blog.csdnimg.cn/d25e79bbd98d4cb18fc1ecf86cabef81.png"></li>
-</ul>
-<p>基于Redis的分布式锁实现思路：</p>
-<ul>
-<li><strong>利用set nx ex获取锁</strong>，<strong>并设置过期时间</strong>，<strong>保存线程标示</strong></li>
-<li>释放锁时先判断线程标示是否与自己一致，一致则删除锁</li>
-</ul>
-<p>特性：</p>
-<ul>
-<li>利用set nxi满足互斥性</li>
-<li>利用lua脚本保证释放锁时的一致性</li>
-<li>利用set ex保证故障时锁依然能释放，避免死锁，提高安全性</li>
-<li>利用Redis集群保证高可用和高并发特性</li>
-</ul>
-<h1 id="5-Redisson"><a href="#5-Redisson" class="headerlink" title="5.Redisson"></a>5.Redisson</h1><p>上面“最终简单实现”存在如下几个问题：</p>
-<ul>
-<li>不可重入：同一个线程，不同方法，不能获取同一个锁（<strong>因为使用的逻辑是setnx</strong>）</li>
-<li>不可重试：在实际业务场景中，不能因为获取不到锁就直接false，应该有重试机制</li>
-<li>超时释放问题：虽然上面用lua脚本解决了锁释放的一致性问题，但并没有解决“<strong>因为业务耗时太长导致的锁自动失效问题</strong>”</li>
-<li>主从一致性问题：setnx是写操作，应发生在主节点，若此时主节点挂了，没有将刚刚setnx锁同步给从节点，那成为新主节点的这个从节点是没有这个锁的（当然这种情况发生的概率很低，主从复制延迟很低）</li>
-</ul>
-<p>Redisson是一个在Redis的基础上实现的)ava驻内存数据网格(ln-Memory Data Grid)。它不仅提供了一系列的分布式的ava常用对象，还提供了许多分布式服务，其中就包含了各种分布式锁的实现。</p>
-<p><img src="https://img-blog.csdnimg.cn/e9a43f38831c477b88ccd20a7377eae5.png"><br>Redisson<a target="_blank" rel="noopener" href="https://github.com/redisson/redisson/wiki/%E7%9B%AE%E5%BD%95">中文wiki文档</a></p>
-<h2 id="5-1Redisson配置"><a href="#5-1Redisson配置" class="headerlink" title="5.1Redisson配置"></a>5.1Redisson配置</h2><pre><code>    &lt;dependency&gt;
-        &lt;groupId&gt;org.redisson&lt;/groupId&gt;
-        &lt;artifactId&gt;redisson&lt;/artifactId&gt;
-        &lt;version&gt;3.13.6&lt;/version&gt;
-    &lt;/dependency&gt;
-
-
-
-@Configuration
-public class RedissonConfig &#123;
-    @Bean
-    public RedissonClient redissonclient() &#123;
-//配置类
-        Config config = new Config();
-//添redis地址，这里添加了单点的地址，也可以使用config.useClusterServers()添加集群地址
-        config.useSingleServer().setAddress(&quot;redis://1***6:6379&quot;).setPassword(&quot;****6&quot;);
-//创建客户端
-        return Redisson.create(config);
-    &#125;
-&#125;
-</code></pre>
-<h2 id="5-2简单使用"><a href="#5-2简单使用" class="headerlink" title="5.2简单使用"></a>5.2简单使用</h2><p><img src="https://img-blog.csdnimg.cn/d5cb6e90f72245778498969455521bae.png"></p>
-<h2 id="5-3Redisson可重入锁原理"><a href="#5-3Redisson可重入锁原理" class="headerlink" title="5.3Redisson可重入锁原理"></a>5.3Redisson可重入锁原理</h2><p><img src="https://img-blog.csdnimg.cn/817d132c41414fcf871ad4ace0714637.png"></p>
-<p><img src="https://img-blog.csdnimg.cn/369e1a9a0fc94ec784850b105c881b13.png"><img src="https://img-blog.csdnimg.cn/20fedc1b4c7f45e2956f6356bd8c2ac1.png"></p>
-<h2 id="5-4锁重试和WatchDog机制"><a href="#5-4锁重试和WatchDog机制" class="headerlink" title="5.4锁重试和WatchDog机制"></a>5.4锁重试和WatchDog机制</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/m0_45364328/article/details/125175796">看门狗机制参考</a></p>
-<h1 id="6-Redis发布订阅"><a href="#6-Redis发布订阅" class="headerlink" title="6.Redis发布订阅"></a>6.Redis发布订阅</h1><p>这个发布订阅操作比消息队列简单，但扩展性也更低，一般不用</p>
-<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/184948451">redis发布订阅参考</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://blogzjh.github.io/2022/08/28/redis%E5%9F%BA%E7%A1%80/" data-id="cl8wvrz9f001mkkta4u15dyk6" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-
-
-  <nav id="page-nav">
-    
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/2/">下一页 &amp;raquo;</a>
-  </nav>
-
-</section>
-        
-          <aside id="sidebar">
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">分类</h3>
-    <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Java/">Java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%B8%AD%E9%97%B4%E4%BB%B6/">中间件</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%B7%A5%E4%BD%9C%E7%AC%94%E8%AE%B0/">工作笔记</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%AE%97%E6%B3%95/">数据结构算法</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%BA%90%E7%A0%81/">源码</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">标签</h3>
-    <div class="widget">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/HashMap/" rel="tag">HashMap</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">标签云</h3>
-    <div class="widget tagcloud">
-      <a href="/tags/HashMap/" style="font-size: 10px;">HashMap</a>
-    </div>
-  </div>
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">归档</h3>
-    <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/09/">九月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/08/">八月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/07/">七月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/06/">六月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">四月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">三月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/02/">二月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/01/">一月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/12/">十二月 2021</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">最新文章</h3>
-    <div class="widget">
-      <ul>
-        
-          <li>
-            <a href="/2022/09/26/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%81%9A%E9%BB%91%E5%90%8D%E5%8D%95%E7%9A%84%E6%96%B9%E6%A1%88/">布隆过滤做黑名单的方案</a>
-          </li>
-        
-          <li>
-            <a href="/2022/09/15/%E6%9F%90%E8%9A%81%E9%87%91%E6%9C%8D%E7%A7%8B%E6%8B%9B9-15/">某蚁金服秋招9-15</a>
-          </li>
-        
-          <li>
-            <a href="/2022/09/15/%E4%B8%89%E7%A7%8D%E6%83%85%E5%86%B5%E7%9A%84%E5%B1%82%E5%BA%8F%E9%81%8D%E5%8E%86/">三种情况的层序遍历</a>
-          </li>
-        
-          <li>
-            <a href="/2022/09/15/%E5%87%A0%E9%81%93%E5%B2%9B%E5%B1%BF%E9%97%AE%E9%A2%98-dfs-%E5%89%AA%E6%9E%9D-%E5%9B%9E%E6%BA%AF/">几道岛屿问题:dfs+剪枝+回溯</a>
-          </li>
-        
-          <li>
-            <a href="/2022/09/15/%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%9A%E6%9B%BF%E6%8D%A2%E3%80%81%E5%B7%A6%E6%97%8B%E3%80%81%E7%BC%BA%E5%A4%B1/">字符串：替换、左旋、缺失</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-
-  
 </aside>
+<div id="post" class="index">
+    <div class="pjax">
+        <article class="index">
+            <div class="toc-ref">
+    
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BC%95%E5%AF%BC"><span class="toc-text">引导</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%A5%E5%8D%9A%E5%AE%A2%E4%B8%8B%E7%9A%84%E5%BF%AB%E6%8D%B7%E9%94%AE"><span class="toc-text">该博客下的快捷键</span></a></li></ol></li></ol>
+    
+<style>
+    .left-col .switch-btn,
+    .left-col .switch-area {
+        display: none;
+    }
+    .toc-level-3 i,
+    .toc-level-3 ol {
+        display: none !important;
+    }
+</style>
+</div>
+            <h1 id="引导"><a href="#引导" class="headerlink" title="引导"></a>引导</h1><p>点击这里切换目录与文章列表</p>
+<p><img src="https://img-blog.csdnimg.cn/2bb36e3cf82b44d5b4f895033d7f4371.png"></p>
+<h2 id="该博客下的快捷键"><a href="#该博客下的快捷键" class="headerlink" title="该博客下的快捷键"></a>该博客下的快捷键</h2><table>
+<thead>
+<tr>
+<th align="center">快捷键</th>
+<th align="center">功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">s/S</td>
+<td align="center">全屏/取消全屏</td>
+</tr>
+<tr>
+<td align="center">w/W</td>
+<td align="center">打开/关闭文章目录</td>
+</tr>
+<tr>
+<td align="center">i/I</td>
+<td align="center">获取搜索框焦点</td>
+</tr>
+<tr>
+<td align="center">j/J</td>
+<td align="center">向下滑动</td>
+</tr>
+<tr>
+<td align="center">k/K</td>
+<td align="center">向上滑动</td>
+</tr>
+<tr>
+<td align="center">gg/GG</td>
+<td align="center">到最顶端</td>
+</tr>
+<tr>
+<td align="center">shift+G/g</td>
+<td align="center">到最下端</td>
+</tr>
+<tr>
+<td align="center">ESC</td>
+<td align="center">1.如果输入框有内容，清除内容<br>2.如果输入框无内容，失去焦点</td>
+</tr>
+<tr>
+<td align="center">下</td>
+<td align="center">向下选择文章</td>
+</tr>
+<tr>
+<td align="center">上</td>
+<td align="center">向上选择文章</td>
+</tr>
+<tr>
+<td align="center">回车</td>
+<td align="center">打开当前选中的文章，若没有，则默认打开第一个</td>
+</tr>
+</tbody></table>
+<p>到目前为止已经写了<code class="article_number"></code>篇文章， 共<code class="site_word_count"></code>字。</p>
+<p>本站访问人数：<code class="site_uv"></code>人次 ， 访问量：<code class="site_pv"></code>次</p>
+
+        </article>
         
-      </div>
-      <footer id="footer">
-  
-  <div class="outer">
-    <div id="footer-info" class="inner">
-      &copy; 2022 张家豪<br>
-      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        
     </div>
-  </div>
-</footer>
+    <div class="copyright">
+        <p class="footer-entry">
+    ©2021 ZJH
+</p>
+<p class="footer-entry">"生命以负熵为食"
+
     </div>
-    <nav id="mobile-nav">
-  
-    <a href="/" class="mobile-nav-link">Home</a>
-  
-    <a href="/archives" class="mobile-nav-link">Archives</a>
-  
-</nav>
+</div>
+<div class="full-toc">
+    <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
+<a class="" id="rocket" ></a>
+
+</div>
+
+</body>
+<script src="/js/jquery.pjax.js?v=1.1.0" ></script>
+
+<script src="/js/script.js?v=1.1.0" ></script>
+<script>
+    var img_resize = 'default';
+    function initArticle() {
+        /*渲染对应的表格样式*/
+        
+            $("#post .pjax table").addClass("green_title");
+        
+
+        /*渲染打赏样式*/
+        
+
+        /*高亮代码块行号*/
+        
+        $('pre code').each(function(){
+            var lines = $(this).text().trim().split('\n').length, widther='';
+            if (lines>99) {
+                widther = 'widther'
+            }
+            var $numbering = $('<ul/>').addClass('pre-numbering ' + widther).attr("unselectable","on");
+            $(this).addClass('has-numbering ' + widther)
+                    .parent()
+                    .append($numbering);
+            for(var i=1;i<=lines;i++){
+                $numbering.append($('<li/>').text(i));
+            }
+        });
+        
+
+        /*访问数量*/
+        
+        $.getScript("//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js");
+        
+
+        /*代码高亮，行号对齐*/
+        $('.pre-numbering').css('line-height',$('.has-numbering').css('line-height'));
+
+        
+        
+    }
+
+    /*打赏页面隐藏与展示*/
     
 
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+</script>
+
+<!--加入行号的高亮代码块样式-->
+
+<style>
+    pre{
+        position: relative;
+        margin-bottom: 24px;
+        border-radius: 10px;
+        border: 1px solid #e2dede;
+        background: #FFF;
+        overflow: hidden;
+    }
+    code.has-numbering{
+        margin-left: 30px;
+    }
+    code.has-numbering.widther{
+        margin-left: 35px;
+    }
+    .pre-numbering{
+        margin: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 20px;
+        padding: 0.5em 3px 0.7em 5px;
+        border-right: 1px solid #C3CCD0;
+        text-align: right;
+        color: #AAA;
+        background-color: ;
+    }
+    .pre-numbering.widther {
+        width: 35px;
+    }
+</style>
+
+<!--自定义样式设置-->
+<style>
+    
+    
+    .nav {
+        width: 542px;
+    }
+    .nav.fullscreen {
+        margin-left: -542px;
+    }
+    .nav-left {
+        width: 120px;
+    }
+    
+    
+    @media screen and (max-width: 1468px) {
+        .nav {
+            width: 492px;
+        }
+        .nav.fullscreen {
+            margin-left: -492px;
+        }
+        .nav-left {
+            width: 100px;
+        }
+    }
+    
+    
+    @media screen and (max-width: 1024px) {
+        .nav {
+            width: 492px;
+            margin-left: -492px
+        }
+        .nav.fullscreen {
+            margin-left: 0;
+        }
+    }
+    
+    @media screen and (max-width: 426px) {
+        .nav {
+            width: 100%;
+        }
+        .nav-left {
+            width: 100%;
+        }
+    }
+    
+    
+    .nav-right .title-list nav a .post-title, .nav-right .title-list #local-search-result a .post-title {
+        color: #383636;
+    }
+    
+    
+    .nav-right .title-list nav a .post-date, .nav-right .title-list #local-search-result a .post-date {
+        color: #5e5e5f;
+    }
+    
+    
+    .nav-right nav a.hover, #local-search-result a.hover{
+        background-color: #e2e0e0;
+    }
+    
+    
+
+    /*列表样式*/
+    
+
+    /* 背景图样式 */
+    
+    
 
 
-  
-<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+    /*引用块样式*/
+    
 
-  
-<script src="/fancybox/jquery.fancybox.pack.js"></script>
+    /*文章列表背景图*/
+    
 
-
-
-
-<script src="/js/script.js"></script>
+    
+</style>
 
 
 
 
-  </div>
-</body>
+
+
+
 </html>

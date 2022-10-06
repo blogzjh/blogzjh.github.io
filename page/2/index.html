@@ -2,3048 +2,966 @@
 <html>
 <head>
   <meta charset="utf-8">
-  
-
-  
   <title>张家豪的博客</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="张家豪的博客">
-<meta property="og:url" content="https://blogzjh.github.io/page/2/index.html">
+  <meta name="keywords" content="">
+  <meta name="description" content="张家豪的博客">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="description" content="1.已知布隆过滤有误判概率 因为hash运算后存在“假阳性”，因此做黑名单时可能把正常用户给拦截了 做白名单时一定是准确无误的 理论上做成黑名单有误判缺陷，但做白名单毫无问题，因此黑白名单结合才能实现黑名单的功能  2.黑白名单组合解决：ip黑名单问题直接列下我的设计思路：  现在有一个布隆过滤器保存了一组ip黑名单 一个正常用户ip遇到hash碰撞，被拦截了 接口直接跳转“验证真人的接口” 验证">
+<meta property="og:type" content="article">
+<meta property="og:title" content="布隆过滤做黑名单的方案">
+<meta property="og:url" content="https://blogzjh.github.io/2022/09/26/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%81%9A%E9%BB%91%E5%90%8D%E5%8D%95%E7%9A%84%E6%96%B9%E6%A1%88/index.html">
 <meta property="og:site_name" content="张家豪的博客">
+<meta property="og:description" content="1.已知布隆过滤有误判概率 因为hash运算后存在“假阳性”，因此做黑名单时可能把正常用户给拦截了 做白名单时一定是准确无误的 理论上做成黑名单有误判缺陷，但做白名单毫无问题，因此黑白名单结合才能实现黑名单的功能  2.黑白名单组合解决：ip黑名单问题直接列下我的设计思路：  现在有一个布隆过滤器保存了一组ip黑名单 一个正常用户ip遇到hash碰撞，被拦截了 接口直接跳转“验证真人的接口” 验证">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-09-25T18:22:57.000Z">
+<meta property="article:modified_time" content="2022-09-25T18:22:44.126Z">
 <meta property="article:author" content="张家豪">
 <meta name="twitter:card" content="summary">
-  
-    <link rel="alternate" href="/atom.xml" title="张家豪的博客" type="application/atom+xml">
-  
-  
-    <link rel="icon" href="/favicon.png">
-  
-  
-    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
-  
-  
-<link rel="stylesheet" href="/css/style.css">
+
+
+<link rel="icon" href="/img/QQ图片20211224224200.jpg">
+
+<link href="/css/style.css?v=1.1.0" rel="stylesheet">
+
+<link href="/css/hl_theme/rainbow.css?v=1.1.0" rel="stylesheet">
+
+<link href="//cdn.jsdelivr.net/npm/animate.css@4.1.0/animate.min.css" rel="stylesheet">
+
+<script src="//cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+<script src="/js/titleTip.js?v=1.1.0" ></script>
+
+<script src="//cdn.jsdelivr.net/npm/highlightjs@9.16.2/highlight.pack.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+<script src="//cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js"></script>
+
+
+
+<script src="//cdn.jsdelivr.net/npm/jquery.cookie@1.4.1/jquery.cookie.min.js" ></script>
+
+<script src="/js/iconfont.js?v=1.1.0" ></script>
 
 <meta name="generator" content="Hexo 5.4.0"></head>
+<div style="display: none">
+  <input class="theme_disqus_on" value="false">
+  <input class="theme_preload_comment" value="">
+  <input class="theme_blog_path" value="">
+  <input id="theme_shortcut" value="true" />
+  <input id="theme_highlight_on" value="true" />
+  <input id="theme_code_copy" value="true" />
+</div>
+
+
 
 <body>
-  <div id="container">
-    <div id="wrap">
-      <header id="header">
-  <div id="banner"></div>
-  <div id="header-outer" class="outer">
-    <div id="header-title" class="inner">
-      <h1 id="logo-wrap">
-        <a href="/" id="logo">张家豪的博客</a>
-      </h1>
-      
-    </div>
-    <div id="header-inner" class="inner">
-      <nav id="main-nav">
-        <a id="main-nav-toggle" class="nav-icon"></a>
-        
-          <a class="main-nav-link" href="/">Home</a>
-        
-          <a class="main-nav-link" href="/archives">Archives</a>
-        
-      </nav>
-      <nav id="sub-nav">
-        
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
-        
-        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
-      </nav>
-      <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://blogzjh.github.io"></form>
-      </div>
-    </div>
-  </div>
-</header>
-      <div class="outer">
-        <section id="main">
-  
-    <article id="post-RabbitMQ基础" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2022/08/27/RabbitMQ%E5%9F%BA%E7%A1%80/" class="article-date">
-  <time datetime="2022-08-27T08:26:14.000Z" itemprop="datePublished">2022-08-27</time>
+<aside class="nav mobile">
+    <div class="nav-left">
+        <a href="/"
+   class="avatar_target">
+    <img class="avatar"
+         src="/img/QQ图片20211224224200.jpg"/>
 </a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/%E4%B8%AD%E9%97%B4%E4%BB%B6/">中间件</a>
-  </div>
+<div class="author">
+    <span>张家豪</span>
+</div>
 
-  </div>
-  <div class="article-inner">
+<div class="icon">
     
-    
-      <header class="article-header">
         
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2022/08/27/RabbitMQ%E5%9F%BA%E7%A1%80/">RabbitMQ基础</a>
-    </h1>
-  
-
-      </header>
+            <a title="github"
+               href="https://github.com/blogzjh"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-github"></use>
+                    </svg>
+                
+            </a>
+        
     
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="1-MQ特点"><a href="#1-MQ特点" class="headerlink" title="1.MQ特点"></a>1.MQ特点</h1><h2 id="1-1-流量削峰"><a href="#1-1-流量削峰" class="headerlink" title="1.1 流量削峰"></a>1.1 流量削峰</h2><p>例如一个秒杀功能，请求的订单超过了服务器能处理的限度，那么就可以<strong>使用消息队列来做缓冲，而不是简单的限制用户下单</strong></p>
+        
+            <a title="csdn"
+               href="https://blog.csdn.net/m0_56079407"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-csdn"></use>
+                    </svg>
+                
+            </a>
+        
+    
+        
+            <a title="email"
+               href="mailto:2225674545@qq.com"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-email"></use>
+                    </svg>
+                
+            </a>
+        
+    
+        
+            <a title="qq"
+               href="http://wpa.qq.com/msgrd?v=3&uin=2225674545&site=qq&menu=yes"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-qq"></use>
+                    </svg>
+                
+            </a>
+        
+    
+</div>
+
+
+
+
 <ul>
-<li>把一秒内请求的订单分散到一段时间来处理</li>
-<li>用户可能从下单到下单成功会有十几秒的延迟，<strong>但体验总比限制下单更好</strong><h2 id="1-2-应用解耦"><a href="#1-2-应用解耦" class="headerlink" title="1.2 应用解耦"></a>1.2 应用解耦</h2></li>
+    <li>
+        <div class="all active" data-rel="全部文章">全部文章
+            
+                <small>(50)</small>
+            
+        </div>
+    </li>
+    
+        
+            
+                <li>
+                    <div data-rel="数据结构算法">
+                        
+                        数据结构算法
+                        <small>(7)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="工作笔记">
+                        
+                        工作笔记
+                        <small>(12)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="机器学习">
+                        
+                        机器学习
+                        <small>(7)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="源码">
+                        
+                        源码
+                        <small>(8)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="中间件">
+                        
+                        中间件
+                        <small>(8)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="Java">
+                        
+                        Java
+                        <small>(7)</small>
+                        
+                    </div>
+                    
+                </li>
+            
+        
+    
 </ul>
-<p>例如：用消息队列来实现下单时 订单、库存、支付、物流系统</p>
-<ul>
-<li>假如某一系统出现故障，需要几分钟修复</li>
-<li>用户仍然可以下单成功，未处理的消息被缓存在消息队列中，<strong>消息队列会监督它完成</strong></li>
-</ul>
-<h2 id="1-3-异步处理"><a href="#1-3-异步处理" class="headerlink" title="1.3 异步处理"></a>1.3 异步处理</h2><p>A调B时，B会花很长时间</p>
-<ul>
-<li>当A调B后，<strong>无需等待</strong>，而是去完成其他事情</li>
-<li><strong>等B结束之后，发消息给MQ</strong>，MQ通知A并传回返回值</li>
-</ul>
-<h2 id="1-4MQ工作原理"><a href="#1-4MQ工作原理" class="headerlink" title="1.4MQ工作原理"></a>1.4MQ工作原理</h2><p><img src="https://img-blog.csdnimg.cn/f84a9825a7154b88837a70dcc73713ad.png"></p>
-<ul>
-<li>如果每次访问RabbitMQ都创建一个Connection，<strong>那么TCP代价很高</strong></li>
-<li>多线程场景下，<strong>每个thread可以创建单独的Channel</strong>进行通讯</li>
-<li><strong>AMQP的method中包含了channel id</strong> ，可以帮助客户端Broker识别channel，因此<strong>不同channel之间是完全隔离的</strong></li>
-<li>message到达broker的第一站就是Exchange，根据分发规则，匹配routing key把消息分发到queue中；</li>
-</ul>
-<h2 id="1-5RabbitMQ后台管理页面"><a href="#1-5RabbitMQ后台管理页面" class="headerlink" title="1.5RabbitMQ后台管理页面"></a>1.5RabbitMQ后台管理页面</h2><h3 id="用户user"><a href="#用户user" class="headerlink" title="用户user"></a>用户user</h3><p><img src="https://img-blog.csdnimg.cn/9849394cfe314f9faa60b2d0d2a6c675.png"></p>
-<h3 id="Virtual-Host"><a href="#Virtual-Host" class="headerlink" title="Virtual Host"></a>Virtual Host</h3><p><img src="https://img-blog.csdnimg.cn/7345398a32d142a4a538b3f1e82b2743.png"></p>
-<h1 id="2-四大核心概念"><a href="#2-四大核心概念" class="headerlink" title="2.四大核心概念"></a>2.四大核心概念</h1><p><img src="https://img-blog.csdnimg.cn/899680fce3124951a0b0e63b5a49dc16.png"></p>
-<ul>
-<li>队列会监督消息直至完成</li>
-<li>多个消费者可以同时消费一个队列的消息</li>
-<li>生产者可以把消息发到多个队列中去</li>
-</ul>
-<h2 id="2-1-生产者"><a href="#2-1-生产者" class="headerlink" title="2.1 生产者"></a>2.1 生产者</h2><p>产生数据发送消息的程序</p>
-<pre><code>    ConnectionFactory connectionFactory = new ConnectionFactory();//1.创建工厂
-    connectionFactory.setHost(&quot;   &quot;);//2. ip
-    connectionFactory.setUsername(&quot;  &quot;);//3. 账号
-    connectionFactory.setPassword(&quot;  &quot;);//4. 密码
-    Connection connection = connectionFactory.newConnection();//5.创建连接
-    Channel    channel    = connection.createChannel();//6.创建信道
-    channel.queueDeclare(&quot;hello&quot;,false,false,false,null);//7.生成队列，并配置队列参数
-    channel.basicPublish(&quot;&quot;,&quot;hello&quot;,null,&quot;消息&quot;.getBytes(StandardCharsets.UTF_8));//8.发布     
-</code></pre>
-<p><img src="https://img-blog.csdnimg.cn/a9438b5127954ec4a0f8350f74ff67bc.png" alt="信道声明队列"><br>关于4“是否自动删除队列”，<strong>如果此时MQ中没有该队列，消费者会报错</strong>。<br><img src="https://img-blog.csdnimg.cn/8ccd336f5ec04f189a6a8d7dba5a340a.png" alt="信道发送消息"><strong>这里””为空，是因为没有指定Exchange；并且由于没有指定Exchange，routing key就是队列名本身</strong></p>
-<h2 id="2-2-交换机"><a href="#2-2-交换机" class="headerlink" title="2.2 交换机"></a>2.2 交换机</h2><ul>
-<li>交换机是 RabbitMQ 非常重要的一个部件，一方面它接收来自生产者的消息，另一方面它将消息推送到队列中。</li>
-<li>交换机必须确切知道如何处理它接收到的消息，是将这些消息推送到特定队列还是推<br>送到多个队列，亦或者是把消息丢弃，这个得由交换机类型决定</li>
-</ul>
-<h2 id="2-3-队列"><a href="#2-3-队列" class="headerlink" title="2.3 队列"></a>2.3 队列</h2><ul>
-<li>队列仅受主机的内存和磁盘限制的约束，本质上是一个大的消息缓冲区。</li>
-<li>许多生产者可以将消息发送到一个队列，许多消费者可以尝试从一个队列接收数据。这就是我们使用队列的方式<h2 id="2-4-消费者"><a href="#2-4-消费者" class="headerlink" title="2.4 消费者"></a>2.4 消费者</h2></li>
-</ul>
-<ul>
-<li><p>消费与接收具有相似的含义。消费者大多时候是一个等待接收消息的程序。</p>
-</li>
-<li><p>请注意生产者，消费者和消息中间件很多时候并不在同一机器上。同一个应用程序既可以是生产者又是可以是消费者</p>
-<pre><code>  ConnectionFactory connectionFactory = new ConnectionFactory();//1.创建工厂
-  connectionFactory.setHost(&quot;   &quot;);//2. ip
-  connectionFactory.setUsername(&quot;  &quot;);//3. 账号
-  connectionFactory.setPassword(&quot;  &quot;);//4. 密码
-  Connection connection = connectionFactory.newConnection();//5.创建连接
-  Channel    channel    = connection.createChannel();//6.创建信道
-      
-  //1.声明：接收消息时的回调 e1为consumerTag，e2为message
-  DeliverCallback deliverCallback = (e1,e2) -&gt; &#123;
-    String s = e2.getBody().toString();//一般message只取Body部分
-    System.out.println(s);
-    &#125;;
-
-  //2.声明：取消消息时的回调 这里就没有message了
-  CancelCallback cancelCallback = e-&gt;
-      System.out.println(&quot;消息中断&quot;);
-  //3.消费
-  channel.basicConsume(&quot;hello&quot;,true,deliverCallback,cancelCallback);
-</code></pre>
-</li>
-</ul>
-<p><img src="https://img-blog.csdnimg.cn/dadd5af8a38c4f158934d3fa54af4931.png" alt="信道：消费"></p>
-<h1 id="3-六大核心模式"><a href="#3-六大核心模式" class="headerlink" title="3.六大核心模式"></a>3.六大核心模式</h1><h2 id="交换机、队列、生产者消费者的关系"><a href="#交换机、队列、生产者消费者的关系" class="headerlink" title="交换机、队列、生产者消费者的关系"></a>交换机、队列、生产者消费者的关系</h2><ul>
-<li>消费者消费的核心API是channle.consumer(..)，如果此时MQ中没有响应的队列就会报错</li>
-<li><code>channle.queueDeclare()  channle.exchangeDeclare()  channle.queueBind()</code>其实随便可以写在生产者or消费者，只需要保证在channle.consumer(..)之前即可</li>
-<li>删除exchange并不会导致绑定的queue删除，如果此时queue上有消息，删除exchange也不会导致消息丢失</li>
-<li>消费者只需要关心queue即可，不同的功能是由exchange的模式不同实现的<h2 id="3-1fanout扇出模式（发布订阅）"><a href="#3-1fanout扇出模式（发布订阅）" class="headerlink" title="3.1fanout扇出模式（发布订阅）"></a>3.1fanout扇出模式（发布订阅）</h2>特点：</li>
-<li>声明exchange的时候指定为fanout，此时只需要绑定exchange和queue，<code>至于routingKey是什么，设或者不设都不影响</code></li>
-<li>绑定后的queue<strong>都会</strong>收到该exchange发来的消息</li>
-<li>适合于：<strong>广播、订阅</strong>的场景</li>
-</ul>
-<h3 id="3-1-1生产者代码："><a href="#3-1-1生产者代码：" class="headerlink" title="3.1.1生产者代码："></a>3.1.1生产者代码：</h3><pre><code>//fanout扇出 发布订阅
-  public static void main(String[] args) throws Exception &#123;
-    Channel channel = getChannel();
-    //1.在消费者启动之前，需要先声明  ——————交换机
-    channel.exchangeDeclare(&quot;我的fanout交换机&quot;, BuiltinExchangeType.FANOUT);
-    //2.在消费者启动之前，需要先声明  ——————队列
-        //如果要绑定交换机，则第三个exclusive参数为false
-    channel.queueDeclare(&quot;q1&quot;,true,false,false,null);
-    channel.queueDeclare(&quot;q2&quot;,true,false,false,null);
-    channel.queueDeclare(&quot;q3&quot;,true,false,false,null);
-    //3.fanout交换机中任何对于routingKey的指定都没有效果
-    channel.queueBind(&quot;q1&quot;,&quot;我的fanout交换机&quot;,&quot;随便写&quot;);
-    channel.queueBind(&quot;q2&quot;,&quot;我的fanout交换机&quot;,&quot;11111&quot;);
-    channel.queueBind(&quot;q3&quot;,&quot;我的fanout交换机&quot;,&quot;22222&quot;);
-    /*
-    * 其实exchange和queue的声明随便放在生产者or消费者
-    * 但是一定要在消费者consumer之前声明，不然就会报错
-    **/
-    //4.开始发消息，producer发给指定的exchange，因为指定了fanout模式，
-        //所以绑定该exchange的所有queue都会收到消息，且无关routingKey
-    for(int i = 1 ; i &lt; =10 ; i++)&#123;
-      channel.basicPublish(&quot;我的fanout交换机&quot;
-                          ,&quot;你看我随便指定routingKey&quot;
-                          , MessageProperties.PERSISTENT_TEXT_PLAIN
-                          , (&quot;第&quot;+i+&quot;条消息&quot;).getBytes(StandardCharsets.UTF_8));
-      System.out.println(&quot;Producer发布消息：&quot;+i);
-    &#125;
-</code></pre>
-<p><img src="https://img-blog.csdnimg.cn/d769b08272ff4796a1b03e87127864d9.png"></p>
-<p>producer发布了10次给exchange，对应的3个队列，一共30条消息<img src="https://img-blog.csdnimg.cn/ba1464bfdf8d461599bfda1c41c1783c.png"><img src="https://img-blog.csdnimg.cn/2ffcca06663145f3a3a8bd4e4a643246.png"></p>
-<h3 id="3-1-2消费者代码"><a href="#3-1-2消费者代码" class="headerlink" title="3.1.2消费者代码"></a>3.1.2消费者代码</h3><p>一共用3个消费者分别消费这三条队列的消息</p>
-<p>代码示例：</p>
-<pre><code>  public static void main(String[] args) throws Exception &#123;
-    Channel channel = getChannel();
-
-    DeliverCallback deliverCallback = (consumerTag,message)-&gt;&#123;
-      System.out.println(&quot;Consumer1收到消息：&quot;+new String(message.getBody(),&quot;UTF-8&quot;));
-    &#125;;
-    channel.basicConsume(&quot;q1&quot;,true,
-        deliverCallback,
-        cancleCallBack -&gt; &#123;&#125;//取消时什么都不做
-        );
-
-  &#125;
-</code></pre>
-<p><img src="https://img-blog.csdnimg.cn/ea15ec1dca294ec0ada49674bfb696de.png"><br><img src="https://img-blog.csdnimg.cn/6a625b1759354a309558dc56f09fa31c.png"></p>
-<h2 id="3-2direct路由模式"><a href="#3-2direct路由模式" class="headerlink" title="3.2direct路由模式"></a>3.2direct路由模式</h2><h3 id="3-2-1默认交换机-AMQP-default"><a href="#3-2-1默认交换机-AMQP-default" class="headerlink" title="3.2.1默认交换机(AMQP default)"></a>3.2.1默认交换机(AMQP default)</h3><p>当生产者没有指定channle.exchangeDeclare(..)的模式时，<strong>默认使用的是直连交换机，routingKey就是queue名字</strong><img src="https://img-blog.csdnimg.cn/5ddd53b7339e4088b3156ca088509b85.png"><br>代码示例：<img src="https://img-blog.csdnimg.cn/8d97aac3d6c64b8f85e317aabbe59dde.png"></p>
-<h3 id="3-2-2路由模式"><a href="#3-2-2路由模式" class="headerlink" title="3.2.2路由模式"></a>3.2.2路由模式</h3><p>与默认的direct模式不同，<strong>路由模式需要<code>显式</code>的声明exchange，并绑定routingKey</strong><br><img src="https://img-blog.csdnimg.cn/93fa05fd6426430983ceb7ccf989a496.png"></p>
-<h3 id="生产者"><a href="#生产者" class="headerlink" title="生产者"></a>生产者</h3><pre><code>  public static void main(String[] args) throws Exception &#123;
-
-    Channel channel = getChannel();
-    //1.声明为direct直连交换机
-    channel.exchangeDeclare(&quot;logger&quot;, BuiltinExchangeType.DIRECT);
-
-    channel.queueDeclare(&quot;ERROR&quot;,false,false,true,null);
-       //INFO和WARNING级别的日志写入磁盘7天，ERROR级别的写入磁盘30天
-    channel.queueDeclare(&quot;INFO_AND_WARNING&quot;,false,false,true,null);
-    //2.绑定队列 交换机
-    channel.queueBind(&quot;ERROR&quot;,&quot;logger&quot;,&quot;error_key&quot;);
-    channel.queueBind(&quot;INFO_AND_WARNING&quot;,&quot;logger&quot;,&quot;info_warning_key&quot;);
-
-    //3.模拟日志信息
-    HashMap&lt;String,String&gt; map = new HashMap&lt;&gt;();
-    map.put(&quot;INFO&quot;,&quot;INFO日志xxxxxxx&quot;);
-    map.put(&quot;WARNING&quot;,&quot;WARNING警告yyyyyy&quot;);
-    map.put(&quot;ERROR&quot;,&quot;ERROR错误zzzzzzz&quot;);
-
-    map.forEach((key,value)-&gt;&#123;
-
-      try &#123;
-        if(&quot;ERROR&quot;.equals(key))&#123;
-          channel.basicPublish(&quot;logger&quot;,&quot;error_key&quot;,null,value.getBytes(StandardCharsets.UTF_8));
-        &#125;
-        if(&quot;WARNING&quot;.equals(key) || &quot;INFO&quot;.equals(key))&#123;
-          channel.basicPublish(&quot;logger&quot;,&quot;info_warning_key&quot;,null,value.getBytes(StandardCharsets.UTF_8));
-        &#125;
-      &#125; catch (IOException e) &#123;
-        e.printStackTrace();
-      &#125;
-
-    &#125;);
-
-  &#125;
-</code></pre>
-<p><img src="https://img-blog.csdnimg.cn/781ec9fe86cb4ab09d485097e82101a7.png"></p>
-<h3 id="消费者"><a href="#消费者" class="headerlink" title="消费者"></a>消费者</h3><p>一个处理ERROR日志的消费者：</p>
-<pre><code>  public static void main(String[] args) throws Exception&#123;
-    Channel channel = getChannel();
-
-    channel.basicConsume(&quot;ERROR&quot;,true,(e1,e2)-&gt;&#123;
-      //把message写入磁盘30天
-      System.out.println(&quot;ERROR日志写入磁盘:&quot;+ new String(e2.getBody()));
-    &#125;, (e1,e2)-&gt;&#123;&#125;);
-
-  &#125;
-</code></pre>
-<p><img src="https://img-blog.csdnimg.cn/29a8a597626a487dafb66246023da879.png"></p>
-<p><img src="https://img-blog.csdnimg.cn/cca5929bfb4c40f3afc20423fc374931.png"></p>
-<p>一个处理INFO和WARNING日志的消费者：</p>
-<pre><code>  public static void main(String[] args) throws Exception&#123;
-
-    Channel channel = getChannel();
-
-    channel.basicConsume(&quot;INFO_AND_WARNING&quot;,true,
-        (e1,e2)-&gt;&#123;
-          System.out.println(new String(e2.getBody()));
-        &#125;,
-        (e1,e2)-&gt;&#123;&#125;);
-
-  &#125;
-  
-</code></pre>
-<p><img src="https://img-blog.csdnimg.cn/d1f4b7f7dda944b7ac0d2229d1f6854b.png"><br><img src="https://img-blog.csdnimg.cn/140489e37dc142bfa20a7480a9d16315.png"></p>
-<h2 id="3-3topic主题模式（通配符）"><a href="#3-3topic主题模式（通配符）" class="headerlink" title="3.3topic主题模式（通配符）"></a>3.3topic主题模式（通配符）</h2><ul>
-<li>topic模式和direct模式相似，不过topic模式支持<strong>模糊匹配</strong></li>
-<li>声明队列的时候不能用通配符，通配符是在queueBind的时候使用的</li>
-<li>其他的效果和direct一样，只不过是通配符的使用减少了direct的Bind次数<br><img src="https://img-blog.csdnimg.cn/255c92664da4453fa146e9a5b6a59afd.png"></li>
-</ul>
-<h3 id="3-3-1示例"><a href="#3-3-1示例" class="headerlink" title="3.3.1示例"></a>3.3.1示例</h3><p><img src="https://img-blog.csdnimg.cn/d108f4b058834553ab1fe7377f6da883.png"></p>
-<p>核心代码：</p>
-<pre><code>    //队列绑定交换机
-    channel.queueBind(TOPIC_QUEUE_1,TOPIC_EXCHAGE,&quot;item.#&quot;);
-    channel.queueBind(TOPIC_QUEUE_2,TOPIC_EXCHAGE,&quot;*.delete&quot;);
-</code></pre>
-<h2 id="其他三种"><a href="#其他三种" class="headerlink" title="其他三种"></a>其他三种</h2><p>一般只有画框的这三个用的多</p>
-<p><img src="https://img-blog.csdnimg.cn/8f9b17fb435e4117a36de36ec466dbb7.png"></p>
-<h2 id="3-4-简单模式"><a href="#3-4-简单模式" class="headerlink" title="3.4.简单模式"></a>3.4.简单模式</h2><ul>
-<li>不指定exchange</li>
-<li>一个producer</li>
-<li>一个consumer</li>
-</ul>
-<h2 id="3-5工作模式"><a href="#3-5工作模式" class="headerlink" title="3.5工作模式"></a>3.5工作模式</h2><ul>
-<li>不指定exchange</li>
-<li>一个producer</li>
-<li>多个consumer</li>
-</ul>
-<h2 id="3-6RPC模式"><a href="#3-6RPC模式" class="headerlink" title="3.6RPC模式"></a>3.6RPC模式</h2><p>略</p>
-<h2 id="期间遇到的Bug"><a href="#期间遇到的Bug" class="headerlink" title="期间遇到的Bug"></a>期间遇到的Bug</h2><p>在声明了交换机、队列之后，需要将队列与交换机绑定，但是我用的是<code>channle.exchangeBind(destination,sourse,routingKey)</code>这玩意其实是交换机之间互相绑定的，前两个参数都是exchange的名字<br>所以报错 channel error; protocol method: #method&lt;channel.close&gt;(reply-code=404, reply-text=NOT_FOUND - <code>no exchange &#39;q1&#39; in vhost &#39;/&#39;,</code> class-id=40, method-id=30)</p>
-<p>改用chanle.queueBind即可</p>
-<h1 id="4-工作队列"><a href="#4-工作队列" class="headerlink" title="4.工作队列"></a>4.工作队列</h1><h2 id="4-1轮训"><a href="#4-1轮训" class="headerlink" title="4.1轮训"></a>4.1轮训</h2><p>当有多个消费者消费同一个队列的消息时，采用轮训的方式竞争</p>
-<h2 id="4-2消息应答"><a href="#4-2消息应答" class="headerlink" title="4.2消息应答"></a>4.2消息应答</h2><h3 id="4-2-1概念"><a href="#4-2-1概念" class="headerlink" title="4.2.1概念"></a>4.2.1概念</h3><p>缺点：</p>
-<ul>
-<li>如果消息被<strong>消费到一半</strong>，消费者挂了，消息没有被正常消费。</li>
-<li>或者是消息从MQ发出后，消费者<strong>还没接收到</strong>就挂了。</li>
-<li>或者没有应答，MQ会不停发消息给消费者，<strong>导致消息积压</strong>，消费者内存耗尽挂了</li>
-</ul>
-<p>引入消息应答：</p>
-<ul>
-<li><p>引入消息应答，当且仅当消费者<strong>消费完成后通知MQ，MQ将该条消息从队列中剔除</strong></p>
-<h3 id="4-2-2自动应答"><a href="#4-2-2自动应答" class="headerlink" title="4.2.2自动应答"></a>4.2.2自动应答</h3></li>
-<li><p>在高吞吐场景下很鸡肋</p>
-</li>
-<li><p>消息消费完之后可能还有代码，但是这时候已经需要应答了</p>
-</li>
-</ul>
-<h3 id="4-2-3批量处理"><a href="#4-2-3批量处理" class="headerlink" title="4.2.3批量处理"></a>4.2.3批量处理</h3><p>批量处理实际上就是手动应答的一种实现，但是并不推荐</p>
-<ul>
-<li>批量应答可能导致<strong>应答前面的消息丢失但不可知</strong></li>
-<li>12345的消息，批量应答5个，如果23出现了问题，MQ是不可知的</li>
-<li>是否批量的Boolean multiple参数存在于手动应答的参数中</li>
-</ul>
-<h3 id="4-2-4手动应答-消费者决定"><a href="#4-2-4手动应答-消费者决定" class="headerlink" title="4.2.4手动应答:消费者决定"></a>4.2.4手动应答:消费者决定</h3><ol>
-<li>手动应答有3种方式：</li>
-</ol>
-<ul>
-<li><code>channel.basicAck(..)</code>用于肯定，告诉MQ可以丢弃消息了</li>
-<li><code>channel.basicNack(..)</code>用于否定，MQ不丢弃消息</li>
-<li><code>channel.basicReject(..)</code>用于不处理消息，直接拒绝，让MQ丢弃<br>他们都是写在DeliverCallback中的，DeliverCallback对象作为参数传给消费者的channel.consumer()</li>
-</ul>
-<ol start="2">
-<li>重新入队的概念：<br>MQ将消息发出后，<strong>该消息出队，但仍存在于MQ的内存中</strong>，当且仅当消息丢失时重新入队，寻找下一个消费者</li>
-</ol>
-<h3 id="4-2-5生产者不用配"><a href="#4-2-5生产者不用配" class="headerlink" title="4.2.5生产者不用配"></a>4.2.5生产者不用配</h3><p>生产者其实就是正常的给某个队列发消息就好<br>注意：是否关闭自动应答是消费者channel.basicConsumer(..)决定的</p>
-<h3 id="4-2-6手动应答——消费者"><a href="#4-2-6手动应答——消费者" class="headerlink" title="4.2.6手动应答——消费者"></a>4.2.6手动应答——消费者</h3><ul>
-<li>在DeliverCallback抽象类中的末尾手动应答channel,basicAck(..)</li>
-<li>在接收消息channel.basicConsumer(..)时，把第二个参数autoAck设为false</li>
-</ul>
-<p>代码示例：</p>
-<pre><code>    Channel    channel    = connection.createChannel();
-
-    //    channel.queueDeclare(&quot;hello2&quot;,false,false,false,null);//不影响消费者
-
-    DeliverCallback deliverCallback = (e1,e2) -&gt; &#123;
-      String s = new String(e2.getBody());
-      System.out.println(s);
-      //手动应答
-      channel.basicAck(e2.getEnvelope().getDeliveryTag(),false);//不批量应答
-      &#125;;
-
-    CancelCallback cancelCallback = e-&gt;
-        System.out.println(&quot;消息中断&quot;);
-    //消费
-    channel.basicConsume(&quot;hello&quot;,false,deliverCallback,cancelCallback);//同时又监听功能，第二个参数就是autoAck，设置为false
-   
-  &#125;
-</code></pre>
-<h3 id="4-2-7-未手动应答重启消费者产生的问题"><a href="#4-2-7-未手动应答重启消费者产生的问题" class="headerlink" title="4.2.7*未手动应答重启消费者产生的问题"></a>4.2.7*未手动应答重启消费者产生的问题</h3><p> 当在消费者的DeliverCallback 匿名对象中不手动应答，并且关闭生产者的自动应答时。过程如下：<br> 1，启动生产者，将一条消息压入队列<br> 2，启动消费者，消费消息<br> 3，<strong>此时因为生产者关闭了autoAck，消息虽然出队，但仍在内存中</strong><br> 4，<strong>重启消费者，此时相当于关闭了消费者和MQ之间的TCP连接</strong>，生产者将该消息从内存中重新放入队列，重启完成后，消费者又消费了这条消息，但并没有应答。一直重启则一直重复消费这条消息</p>
-<h1 id="5-持久化——生产者决定"><a href="#5-持久化——生产者决定" class="headerlink" title="5.持久化——生产者决定"></a>5.持久化——生产者决定</h1><p>持久化分为队列持久化 和 消息持久化<br>都是由生产者来做的<br>分别在声明 和 发布</p>
-<h2 id="5-1队列声明：队列持久化"><a href="#5-1队列声明：队列持久化" class="headerlink" title="5.1队列声明：队列持久化"></a>5.1队列声明：队列持久化</h2><ul>
-<li>队列持久化的目的是：生产者在发布消息的时候，MQ同时将队列持久化到硬盘，当MQ挂掉后重启，队列仍然存在。</li>
-<li>channel.queueDeclare(..）中第二个参数<code>durable设置为true</code></li>
-<li>可能会报错：<strong>需要删除之前的这个同名队列</strong></li>
-</ul>
-<p><img src="https://img-blog.csdnimg.cn/e9b5a9b4128f4a31bfeb766cfe4d0a2b.png" alt="删除"><br><img src="https://img-blog.csdnimg.cn/57072b31f7bb42b4a1ddcd144ab04698.png" alt="重启后出现Durable标志"></p>
-<h2 id="5-2发布消息：消息持久化"><a href="#5-2发布消息：消息持久化" class="headerlink" title="5.2发布消息：消息持久化"></a>5.2发布消息：消息持久化</h2><p>channel.basicPublish的第三个参数，将策略设置为<code>MessageProperties.PERSISTENT_TEXT_PLAIN</code><br><img src="https://img-blog.csdnimg.cn/19eafcab419d4ee6a1da34f24a8cba52.png" alt="第三个参数"></p>
-<ul>
-<li>作用：每次发布消息都告诉MQ，将消息持久化</li>
-<li>缺点：MQ可能在消息持久化过程中挂了</li>
-<li>对于简单任务队列绰绰有余，更可靠的持久化方案是后续的：发布确认</li>
-</ul>
-<h1 id="6-不公平分发——消费者决定"><a href="#6-不公平分发——消费者决定" class="headerlink" title="6.不公平分发——消费者决定"></a>6.不公平分发——消费者决定</h1><ul>
-<li><strong>RabbitMQ默认的消息分发机制是“轮训”，即公平</strong>；他相当于默认指定了<code>channel.basicQos(0);</code></li>
-<li>不公平分发秉承能者多劳原则，避免了因某一消费者耗时过长导致队列阻塞的问题。设置<code>channel.basicQos(&gt;0，建议100~300);</code></li>
-<li>写在接收消息basicConsumer之间</li>
-<li>需要同时将多个消费者都设置为<code>basicQos(&gt;0) </code>才能达到不公平分发的效果</li>
-</ul>
-<p><img src="https://img-blog.csdnimg.cn/9b901eba041044e09d00121fb3261e50.png"></p>
-<h2 id="6-1为什么要设置Qos-gt-0"><a href="#6-1为什么要设置Qos-gt-0" class="headerlink" title="6.1为什么要设置Qos(&gt;0)?"></a>6.1为什么要设置Qos(&gt;0)?</h2><p>本质是设置预取值</p>
-<h1 id="6-2预取值prefetch"><a href="#6-2预取值prefetch" class="headerlink" title="6.2预取值prefetch"></a>6.2预取值prefetch</h1><p>预取值就是<strong>消费者信道</strong>最多可以停留多少条消息。注意是消费者的信道。</p>
-<ul>
-<li>预取值默认是0 ,如果都是0，即公平分发，轮训</li>
-<li>预取值不为0时是不公平分发</li>
-<li>预取值不同并不是权重不同，他<strong>指的是信道中最多多少条消息</strong><br><img src="https://img-blog.csdnimg.cn/f8551355ad3a4a119172e75eefb19703.png"></li>
-</ul>
-<p>例如像这样一个场景，</p>
-<ul>
-<li>生产者连续channel.publish发送7次消息——c2一个 c1一个 c2一个 c1一个….————</li>
-<li>C2正在消费11   信道中有33 55 77<br>C1消费完了22 44 66 。这时候生产者再发88 99 1010  1111 1212————</li>
-<li>C2正在消费11   信道中有33 55 77 99 1111（正在消费1个，信道中5个）<br>C1消费完了22 44 66 88 1010  1212</li>
-</ul>
-<h1 id="7-发布确认"><a href="#7-发布确认" class="headerlink" title="7.发布确认"></a>7.发布确认</h1><p> <strong>解决发布消息丢失问题的</strong>大前提条件：</p>
-<ul>
-<li>队列持久化</li>
-<li>消息持久化</li>
-</ul>
-<h2 id="7-1发布确认的原理"><a href="#7-1发布确认的原理" class="headerlink" title="7.1发布确认的原理"></a>7.1发布确认的原理</h2><ul>
-<li><p>生产者设置队列持久化+消息持久化</p>
-</li>
-<li><p>只要有了信道channel对象，就可以开启发布确认，但一定要在publish之前：<code>channel.confirmSelect()</code>开启发布确认</p>
-</li>
-<li><p>当需要确认的时候调用<code>channel.waitForConfirms()</code>进行确认，这里的单词是复数，即这个方法可以实现单个确认，也可以实现批量确认</p>
-<h2 id="7-2单个同步确认发布"><a href="#7-2单个同步确认发布" class="headerlink" title="7.2单个同步确认发布"></a>7.2单个同步确认发布</h2></li>
-<li><p>同步的</p>
-</li>
-<li><p>生产者发一次消息就等待确认一次，是同步的，<strong>发布的速度慢</strong></p>
-</li>
-</ul>
-<h2 id="7-3批量同步确认发布"><a href="#7-3批量同步确认发布" class="headerlink" title="7.3批量同步确认发布"></a>7.3批量同步确认发布</h2><ul>
-<li>同步的</li>
-<li>这样可以<strong>提高吞吐量</strong>但可能导致如果出现了问题时，<strong>不能确定是哪条消息出了问题</strong></li>
-</ul>
-<h2 id="7-4异步确认发布"><a href="#7-4异步确认发布" class="headerlink" title="7.4异步确认发布"></a>7.4异步确认发布</h2><h3 id="7-4-1原理概述"><a href="#7-4-1原理概述" class="headerlink" title="7.4.1原理概述"></a>7.4.1原理概述</h3><ul>
-<li>在编写逻辑上是最复杂的，但是性价比最高，<strong>同时兼顾可靠性和高效性</strong>，因为少了等待确认的时间，所以<strong>时间最省</strong>；可靠性也强</li>
-<li>利用<strong>回调函数</strong>来保证<strong>可靠性</strong>，回调可以知道是否投递消息成功</li>
-<li>发布结束之后，<strong>监听器</strong>仍然在监听直至最后一条消息确认</li>
-<li>对于生产者，监听器和publish发布是两个线程</li>
-</ul>
-<h3 id="7-4-2监听器线程"><a href="#7-4-2监听器线程" class="headerlink" title="7.4.2监听器线程"></a>7.4.2监听器线程</h3><p>这个监听器线程其本质也是在publish之前：<code>channel.confirmSelect()</code>开启发布确认,当需要确认的时候调用<code>channel.waitForConfirms()</code>进行确认</p>
-<ul>
-<li>他监听的是<strong>发布者</strong>对MQ的发布情况，并且是<strong>每publish一次，就waitForConfirms一次</strong></li>
-<li>如果因为网络问题导致broker没有收到producer发来的消息，下次收到了其他消息，发送一次ack，那么通过<strong>缺失的ack可以找出缺失的消息</strong>。</li>
-</ul>
-<h3 id="7-4-3如何异步处理未确认的消息"><a href="#7-4-3如何异步处理未确认的消息" class="headerlink" title="7.4.3如何异步处理未确认的消息"></a>7.4.3如何异步处理未确认的消息</h3><ul>
-<li>引入<strong>并发键值对队列</strong><code>ConcurrentSkipListMap</code>，这是一个用于存储k-y的List，用于存储消息号 与 消息内容</li>
-<li><strong>Producer</strong>: 每当producer发布一次消息<code>之前</code>，维护listmap.put(<code>channel.getNextPublishSeqNo()</code>,”消息内容”)</li>
-<li><strong>Producer</strong>: producer只管使劲发，因为<code>ConfirmListener</code>的存在，这个确认的过程是异步的。例如此时发送消息序号为：1 2 3 4 5，并保存到listmap中</li>
-<li><strong>Producer</strong>: <code>ConfirmListener</code>有两个参数，ConfirmCallback <strong>ack</strong>, ConfirmCallback <strong>nack</strong></li>
-<li><strong>Broker</strong>: 当broker接收到消息并确认时，发送ack给producer；假如此时因为没有收到1号消息，所以ack=2</li>
-<li><strong>Producer</strong>: 监听器监听到ack，而在ack的处理中，将listmap中2号消息直接去除，剩下的listmap就是尚未确认的消息</li>
-<li>因为<code>生产者发布确认</code>不同于<code>消费者应答</code>，给broker发消息的producer一对一的共同维护一组消息，而consumer可能消费broker中某一组消息是多对一的，<strong>理论上讲producer按顺序发消息，也会按顺序收到akc或者nack</strong></li>
-<li>AMQP协议是基于TCP的，在TCP连接中的消息传递有<strong>超时重传</strong>机制，不存在broker收到了消息但不ack的情况</li>
-<li>那么只要是没有ack或者nack，就是在消息发送到broker之前就出错了，需要在生产者方处理</li>
-</ul>
-<h3 id="7-4-4代码演示——生产者"><a href="#7-4-4代码演示——生产者" class="headerlink" title="7.4.4代码演示——生产者"></a>7.4.4代码演示——生产者</h3><pre><code>Channel    channel    = connection.createChannel();
-
-channel.queueDeclare(&quot;异步队列&quot;,true, false,false,null);
-
-
-//1.线程安全有序的一个队列，适用于高并发
-ConcurrentSkipListMap&lt;Long, String&gt; mqMap = new ConcurrentSkipListMap&lt;&gt;();
-
-
-//2.回调
-
-  //2.1确认回调
-ConfirmCallback ack = (deliveryTag,multiple)-&gt;&#123;
-      //日志记录等操作，略
-      //去掉回调收到的第deliveryTag号消息
-  if(multiple) &#123;//如果是批量，则批量删除
-    ConcurrentNavigableMap&lt;Long, String&gt; newMqMap = mqMap.headMap(deliveryTag);
-    newMqMap.clear();
-  &#125;else&#123;//单个直接删
-    mqMap.remove(deliveryTag);
-  &#125;
-  //此时的mqMap中只剩下了尚未确认的消息
-
-&#125;;
-
-  //2.2否认回调
-ConfirmCallback nack = (deliveryTag,multiple)-&gt;&#123;
-    //日志记录等操作，略
-  System.out.println(mqMap.get(deliveryTag));
-    /*收到了nack，消息不会重新入队，需要自行处理
-      一般都是需要重发的，所以nack时不去除mqMap中的元素
-    */
-&#125;;
-
-
-
-    /*** 生产者开启confirm确认模式****/
-channel.confirmSelect();
-//3.新的线程：发布确认的消息监听 监听ack和nack
-    //注意顺序， 前面是ack，后面是nack
-channel.addConfirmListener(ack,nack);//还有另外一种构造形式，效果相同
-
-
-
-//4.模拟发布消息
-for(int i = 0 ; i &lt; 1000 ; i++)&#123;
-  channel.basicPublish(&quot;&quot;,//交换机
-      &quot;队列：&quot;+i,//routingKey
-      MessageProperties.PERSISTENT_TEXT_PLAIN,//消息策略：消息持久化
-      (&quot;消息&quot;+i).getBytes(StandardCharsets.UTF_8));//消息内容
-
-  //每次发布，mqMap都更新一个值
-  mqMap.put(channel.getNextPublishSeqNo(),&quot;消息&quot;+i);
-&#125;
-</code></pre>
-<h1 id="8-小结"><a href="#8-小结" class="headerlink" title="8.小结"></a>8.小结</h1><h2 id="8-1可靠策略"><a href="#8-1可靠策略" class="headerlink" title="8.1可靠策略"></a>8.1可靠策略</h2><h3 id="8-1-1生产者：持久化-发布确认"><a href="#8-1-1生产者：持久化-发布确认" class="headerlink" title="8.1.1生产者：持久化+发布确认"></a>8.1.1生产者：持久化+发布确认</h3><ul>
-<li>其实持久化（队列持久化+消息持久化）指的是MQ服务器上的broker，只不过是在生产者这里设置罢了</li>
-<li>队列持久化在声明队列的时候设置，消息持久化策略是发布的时候设置</li>
-<li>发布确认一般用异步单个确认，他可以保证broker是确实收到了消息，如果没收到就可以以其他方式重发</li>
-<li>持久化是为了消息在broker上不因宕机而丢失；发布确认是保证broker能收到消息</li>
-</ul>
-<h3 id="8-1-2消费者：手动应答"><a href="#8-1-2消费者：手动应答" class="headerlink" title="8.1.2消费者：手动应答"></a>8.1.2消费者：手动应答</h3><ul>
-<li>消息从broker转发给consumer的时候也需要保证consumer确实是收到了消息</li>
-<li>一般在DeliverCallback 抽象类对象中的最后进行ack确认，同样的，基于TCP的AMQP协议不会出现“consumer收到了消息，但ack没有传给broker的情况”</li>
-</ul>
-
-      
+<div class="left-bottom">
+    <div class="menus">
+        
+            
+            
+            
     </div>
-    <footer class="article-footer">
-      <a data-url="https://blogzjh.github.io/2022/08/27/RabbitMQ%E5%9F%BA%E7%A1%80/" data-id="cl8wvrz930016kkta7iao414e" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-RabbitMQ可靠性-Spring" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2022/08/27/RabbitMQ%E5%8F%AF%E9%9D%A0%E6%80%A7-Spring/" class="article-date">
-  <time datetime="2022-08-27T08:02:25.000Z" itemprop="datePublished">2022-08-27</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/%E4%B8%AD%E9%97%B4%E4%BB%B6/">中间件</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
+    <div>
         
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2022/08/27/RabbitMQ%E5%8F%AF%E9%9D%A0%E6%80%A7-Spring/">RabbitMQ可靠性-Spring</a>
-    </h1>
-  
+        
+    </div>
+</div>
+<input type="hidden" id="yelog_site_posts_number" value="50">
+<input type="hidden" id="yelog_site_word_count" value="100.4k">
+<div style="display: none">
+    <span id="busuanzi_value_site_uv"></span>
+    <span id="busuanzi_value_site_pv"></span>
+</div>
 
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
+    </div>
+    <div class="nav-right">
+        <div class="friends-area">
+    <div class="friends-title">
+        友情链接
+        <i class="iconfont icon-left"></i>
+    </div>
+    <div class="friends-content">
         <ul>
-<li>消息队列可靠发布包括：(从流程分析)<ol>
-<li>发布层面：<strong>发布确认</strong>(两个回调)、<strong>备份交换机</strong>(与发布确认方案二选一)</li>
-<li>rabbit服务器层面：<strong>队列与消息持久化</strong>、<strong>惰性队列</strong>、<strong>集群与镜像队列</strong></li>
-<li>消费层面：<strong>自动应答</strong>(默认)、<strong>手动应答</strong>(可以自由拒绝或否定)</li>
-<li>业务层面：<strong>幂等性设计</strong>、<strong>优先级队列</strong></li>
-</ol>
-</li>
-<li>以下用SpringBoot演示，本demo中关于发布确认<strong>失败的消息</strong>仅用日志记录，如有需要可以用<code>ConcucrrentSkipListMap</code>来存储<strong>id - 消息内容</strong> 的映射，在回调函数中用<code>correlationData.getId()</code>来获取对应的消息；<strong>也可以通过备份交换机进行处理</strong></li>
-</ul>
-<h1 id="1-为什么需要发布确认"><a href="#1-为什么需要发布确认" class="headerlink" title="1.为什么需要发布确认"></a>1.为什么需要发布确认</h1><ul>
-<li>消息丢失时，消费者感受不到，因此<strong>发布确认机制存在于发送阶段</strong></li>
-<li><strong>生产者找不到对应的exchange或者routingkey或者rabbitmq正在重启</strong>，消息会丢失</li>
-<li>发布确认模式：确保消息的可靠投递</li>
-</ul>
-<h1 id="2-发布确认的时机"><a href="#2-发布确认的时机" class="headerlink" title="2.发布确认的时机"></a>2.发布确认的时机</h1><ul>
-<li>首先：无论是原生API还是SpringBoot的API，<strong>默认都是关闭发布确认的</strong>。需要手动开启</li>
-<li><code>ConfirmCallback </code><strong>回调函数</strong>(重心在判断是否找到<code>exchange</code>) ,生产者的<strong>消息只要进入了broker就会触发</strong>，如果没找到对应的exchange，则ack=false；如果找到了对应的exchange，则ack=true</li>
-<li> <code>ReturnCallback</code><strong>退回模式</strong>(重心在判断是否找到对应的<code>queue</code>)，使用这个之前需要先设置<code>mandatory</code>=true；触发条件是：找到了exchange，但没找到routingkey对应的queue，才会执行（<strong>找到了queue则不执行</strong>）</li>
-</ul>
-<h1 id="3-ConfirmCallback回调"><a href="#3-ConfirmCallback回调" class="headerlink" title="3.ConfirmCallback回调"></a>3.ConfirmCallback回调</h1><h2 id="3-1配置文件"><a href="#3-1配置文件" class="headerlink" title="3.1配置文件"></a>3.1配置文件</h2><p>也可以用连接工厂 而不是写死在配置文件中<br><img src="https://img-blog.csdnimg.cn/8c7ec8c41f4245af98c4192a34f9c880.png"></p>
-<h2 id="3-2实现回调接口"><a href="#3-2实现回调接口" class="headerlink" title="3.2实现回调接口"></a>3.2实现回调接口</h2><pre><code>/**
- * 消息只要被 rabbitmq broker 接收到就会触发 confirmCallback 回调 。
- * @param correlationData 回调的相关数据。
- * @param ack             ack为真，nack为假
- * @param cause           一个可选的原因，用于nack，如果可用，否则为空。
- */
-@Slf4j
-@Component
-public class ConfirmCallbackService implements RabbitTemplate.ConfirmCallback &#123;
-
-  @Override
-  public void confirm(CorrelationData correlationData, boolean ack, String cause) &#123;
-    if (!ack) &#123;
-      log.error(&quot;消息发送异常!correlationData=&#123;&#125; ,ack=&#123;&#125;&quot;, correlationData.getId(), ack);
-    &#125; else &#123;
-      log.info(&quot;消息已成功推送到mq队列，correlationData=&#123;&#125; ,ack=&#123;&#125;, cause=&#123;&#125;&quot;, correlationData.getId(), ack, cause);
-    &#125;
-  &#125;
-&#125;
-</code></pre>
-<h2 id="3-3设置RabbitTemplate回调属性"><a href="#3-3设置RabbitTemplate回调属性" class="headerlink" title="3.3设置RabbitTemplate回调属性"></a>3.3设置RabbitTemplate回调属性</h2><ul>
-<li><p>此时如果直接@Autowired一个RabbitTemplate对象，是没有装配这个回调的，需要手动调用：</p>
-</li>
-<li><p><em><code>rabbitTemplate.setConfirmCallback</code>(RabbitTemplate.ConfirmCallback confirmCallback)</em>*</p>
-</li>
-<li><p>由于<code>ConfirmCallback</code>本身是一个接口，根据多态性，这里传入其实现类即可</p>
-</li>
-</ul>
-<p>在3.2中有一个实现类，直接传进入就好，为了可以区分不同的配置，我们可以采用如下方式：</p>
-<h3 id="3-3-1创建一个新的Bean"><a href="#3-3-1创建一个新的Bean" class="headerlink" title="3.3.1创建一个新的Bean"></a>3.3.1创建一个新的Bean</h3><p>在配置类中，创建名为myRabbitTemplate的Bean对象，逻辑是<strong>根据连接工厂</strong>（后面写）新new一个RabbitTemplate对象进行设置属性</p>
-<p><strong>不直接操作原生的rabbitTemplate对象是为了解耦</strong></p>
-<pre><code>  @Bean(name = &quot;myRabbitTemplate&quot;)
-  public RabbitTemplate wwRabbitTemplate(@Qualifier(&quot;myConnectionFactory&quot;) ConnectionFactory connectionFactory) &#123;
-    RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
-    rabbitTemplate.setConfirmCallback(new ConfirmCallbackService());
-    return rabbitTemplate;
-  &#125;
-</code></pre>
-<p>使用时直接用@Resource</p>
-<pre><code>  @Resource(name = &quot;myRabbitTemplate&quot;)
-  private RabbitTemplate rabbitTemplate;
-</code></pre>
-<h1 id="4-ReturnCallback退回"><a href="#4-ReturnCallback退回" class="headerlink" title="4.ReturnCallback退回"></a>4.ReturnCallback退回</h1><h2 id="4-1实现退回接口"><a href="#4-1实现退回接口" class="headerlink" title="4.1实现退回接口"></a>4.1实现退回接口</h2><pre><code>/**
- * 如果消息未能投递到目标 queue 里将触发回调 returnCallback ，一旦向 queue 投递消息未成功，这里一般会记录下当前消息的详细投递数据，方便后续做重发或者补偿等操作。
- */
-@Slf4j
-@Component
-public class ReturnCallbackService implements RabbitTemplate.ReturnCallback &#123;
-
-  @Override
-  public void returnedMessage(Message message, int replyCode, String replyText, String exchange, String routingKey) &#123;
-    log.info(&quot;returnedMessage：replyCode=&#123;&#125; ,replyText=&#123;&#125; ,exchange=&#123;&#125; ,routingKey=&#123;&#125;&quot;, replyCode, replyText, exchange, routingKey);
-  &#125;
-&#125;
-</code></pre>
-<h2 id="4-2结合3号标题整合"><a href="#4-2结合3号标题整合" class="headerlink" title="4.2结合3号标题整合"></a>4.2结合3号标题整合</h2><p>当然配置信息其实不应该这样写死，因为能会使用非集群的多个mq，因此在5号标题中引出连接工厂</p>
-<pre><code>spring.rabbitmq.host=12...
-#spring.rabbitmq.port=5672 默认
-spring.rabbitmq.username=ad..
-spring.rabbitmq.password=.
-spring.rabbitmq.publisher-confirm-type=correlated
-spring.rabbitmq.publisher-returns=true
-
-
-  @Bean(name = &quot;myRabbitTemplate&quot;)
-  public RabbitTemplate wwRabbitTemplate(@Qualifier(&quot;myConnectionFactory&quot;) ConnectionFactory connectionFactory) &#123;
-    RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
-    /**
-     * 确保消息发送失败后可以重新返回到队列中
-     * 注意：yml需要配置 publisher-returns: true
-     */
-    // 将两种不同确认模式的回调接口实例传入
-    rabbitTemplate.setConfirmCallback(new ConfirmCallbackService());
-    //找不到routingkey时的处理
-    rabbitTemplate.setMandatory(Boolean.TRUE);//退回函数生效
-    rabbitTemplate.setReturnCallback(new ReturnCallbackService());
-    return rabbitTemplate;
-  &#125;
-</code></pre>
-<h1 id="5-补：配置类-连接工厂"><a href="#5-补：配置类-连接工厂" class="headerlink" title="5.补：配置类+连接工厂"></a>5.补：配置类+连接工厂</h1><h2 id="5-1连接工厂"><a href="#5-1连接工厂" class="headerlink" title="5.1连接工厂"></a>5.1连接工厂</h2><p><img src="https://img-blog.csdnimg.cn/d1c20e478ef74681b7d46044fd4f0b31.png"></p>
-<p>我现在有很多个mq，其中有一个的配置如下（写在配置类中）</p>
-<pre><code>  @Bean(name = &quot;myConnectionFactory&quot;)
-  public ConnectionFactory myConnectionFactory() &#123;
-    CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
-    connectionFactory.setHost(host);
-    connectionFactory.setPort(port);
-    connectionFactory.setVirtualHost(virtualHost);
-    connectionFactory.setUsername(userName);
-    connectionFactory.setPassword(password);
-    connectionFactory.setPublisherConfirms(true); //发布确认回调
-    connectionFactory.setPublisherReturns(true); //退回
-    return connectionFactory;
-  &#125;
-</code></pre>
-<h2 id="5-2为独特的配置创建Bean对象"><a href="#5-2为独特的配置创建Bean对象" class="headerlink" title="5.2为独特的配置创建Bean对象"></a>5.2为独特的配置创建Bean对象</h2><p>使用时用@Resource注入即可</p>
-<pre><code>  @Bean(name = &quot;myRabbitTemplate&quot;)
-  public RabbitTemplate wwRabbitTemplate(@Qualifier(&quot;myConnectionFactory&quot;) ConnectionFactory connectionFactory) &#123;
-    RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
-    /**
-     * 确保消息发送失败后可以重新返回到队列中
-     * 注意：yml需要配置 publisher-returns: true
-     */
-    // 将两种不同确认模式的回调接口实例传入
-    rabbitTemplate.setConfirmCallback(new ConfirmCallbackService());
-    //找不到routingkey时的处理
-    rabbitTemplate.setMandatory(Boolean.TRUE);//退回函数生效
-    rabbitTemplate.setReturnCallback(new ReturnCallbackService());
-    return rabbitTemplate;
-  &#125;
-</code></pre>
-<h1 id="6-发布确认的原理"><a href="#6-发布确认的原理" class="headerlink" title="6.发布确认的原理"></a>6.发布确认的原理</h1><p>首先，Spring整合RabbitMQ中的回调实现是<strong>异步、独立</strong>的<img src="https://img-blog.csdnimg.cn/3a2e6a20973e422c9ab4ea2b96817253.png"><br>并且这个ConfirmCallback不是原生的那个，是Spring中的，是一个内部接口，不要混淆了<br><img src="https://img-blog.csdnimg.cn/601e23df03ba46c6bb6e1e1d5117ba18.png"></p>
-<h2 id="6-1异步的好处"><a href="#6-1异步的好处" class="headerlink" title="6.1异步的好处"></a>6.1异步的好处</h2><p>这就要涉及到另外两个原生的方案：</p>
-<ul>
-<li>同步、独立确认：慢，并发场景效率很低</li>
-<li>同步、批量确认：稍快，不过一旦出问题，不能定位是哪条消息出了问题</li>
-</ul>
-<p>异步、独立确认：不影响消息发布线程，且能准确定位具体是哪条消息出的问题</p>
-<h2 id="6-2原生与Spring整合的异步回调区别"><a href="#6-2原生与Spring整合的异步回调区别" class="headerlink" title="6.2原生与Spring整合的异步回调区别"></a>6.2原生与Spring整合的异步回调区别</h2><ul>
-<li>原生的API中回调接口可以支持批量回调</li>
-<li>但是Spring这个回调明显可以看到只能调用<code>correlationData.getId()</code>获取一个唯一的id，更加可靠</li>
-</ul>
-<h3 id="6-2-1原生API实现批量确认-了解"><a href="#6-2-1原生API实现批量确认-了解" class="headerlink" title="6.2.1原生API实现批量确认(了解)"></a>6.2.1原生API实现批量确认(了解)</h3><pre><code>Channel    channel    = connection.createChannel();
-
-channel.queueDeclare(&quot;异步队列&quot;,true, false,false,null);
-
-
-//1.线程安全有序的一个队列，并发
-ConcurrentSkipListMap&lt;Long, String&gt; mqMap = new ConcurrentSkipListMap&lt;&gt;();
-
-
-//2.回调
-
-  //2.1确认回调
-ConfirmCallback ack = (deliveryTag,multiple)-&gt;&#123;
-      //日志记录等操作，略
-      //去掉回调收到的第deliveryTag号消息
-  if(multiple) &#123;//如果是批量，则批量删除
-    ConcurrentNavigableMap&lt;Long, String&gt; newMqMap = mqMap.headMap(deliveryTag);
-    newMqMap.clear();
-  &#125;else&#123;//单个直接删
-    mqMap.remove(deliveryTag);
-  &#125;
-  //此时的mqMap中只剩下了尚未确认的消息
-
-&#125;;
-
-  //2.2否认回调
-ConfirmCallback nack = (deliveryTag,multiple)-&gt;&#123;
-    //日志记录等操作，略
-  System.out.println(mqMap.get(deliveryTag));
-    /*收到了nack，消息不会重新入队，需要自行处理
-      一般都是需要重发的，所以nack时不去除mqMap中的元素
-    */
-&#125;;
-
-
-
-    /*** 生产者开启confirm确认模式****/
-channel.confirmSelect();
-//3.新的线程：发布确认的消息监听 监听ack和nack
-    //注意顺序， 前面是ack，后面是nack
-channel.addConfirmListener(ack,nack);//还有另外一种构造形式，效果相同
-
-
-
-//4.模拟发布消息
-for(int i = 0 ; i &lt; 1000 ; i++)&#123;
-  channel.basicPublish(&quot;&quot;,//交换机
-      &quot;队列：&quot;+i,//routingKey
-      MessageProperties.PERSISTENT_TEXT_PLAIN,//消息策略：消息持久化
-      (&quot;消息&quot;+i).getBytes(StandardCharsets.UTF_8));//消息内容
-
-  //每次发布，mqMap都更新一个值
-  mqMap.put(channel.getNextPublishSeqNo(),&quot;消息&quot;+i);
-&#125;
-</code></pre>
-<h1 id="7-如何处理发布失败的消息？"><a href="#7-如何处理发布失败的消息？" class="headerlink" title="7.如何处理发布失败的消息？"></a>7.如何处理发布失败的消息？</h1><p>由上述可知：我们可以从回调接口中获取<code>CorrelationData</code>参数，这个类中包含了一个很重要的信息————消息id，我们可以创建一个<code>ConcucrrentSkipListMap</code>来存储<strong>id - 消息内容</strong> 的映射，每次回调时：</p>
-<ul>
-<li>ack = true则去除这个键值对</li>
-<li>ack = false则<strong>取value重发或做一些其他的事</strong></li>
-</ul>
-<h1 id="8-备份交换机"><a href="#8-备份交换机" class="headerlink" title="8.备份交换机"></a>8.备份交换机</h1><h2 id="8-1发布确认已解决的问题"><a href="#8-1发布确认已解决的问题" class="headerlink" title="8.1发布确认已解决的问题"></a>8.1发布确认已解决的问题</h2><ul>
-<li>有了<code>ConfirmCallback</code>：只要进入broker就回调，可以感知到exchange是否出错</li>
-<li>有了<code>mandatory</code>和<code>ReturnCallback</code>：可以感知到queue是否出错</li>
-<li>实现上述两个接口并赋值给RabbitTemplate后，可以确保生产者投递消息时消息不丢失；但是如果要实现消息自由处理需要额外维护一个Map保存（消息id — 消息内容），<strong>不过这样对于生产者来说代码比较重</strong></li>
-<li><strong>注意：同时存在发布确认 和 备份交换机时，失败的消息优先进入备份交换机</strong>，所以方案二选一即可</li>
-</ul>
-<h2 id="8-2备份交换机的好处"><a href="#8-2备份交换机的好处" class="headerlink" title="8.2备份交换机的好处"></a>8.2备份交换机的好处</h2><ul>
-<li>备份交换机是一个fanout-exchange，<strong>当消息投递失败后不用上述两种回调，而是直接投递给备份交换机</strong>，备份交换机可以连接多个消费者如：日志记录，消息重发</li>
-<li>不过这属于锦上添花，减少了回调写法的复杂度</li>
-</ul>
-<p><img src="https://img-blog.csdnimg.cn/78e79b0ecdfd4094a72d6d2a4c9b8736.png"></p>
-<h2 id="8-3SpringBoot写法"><a href="#8-3SpringBoot写法" class="headerlink" title="8.3SpringBoot写法"></a>8.3SpringBoot写法</h2><p>他本质也是个普通的扇出交换机，所以区别只是在“<strong>消息失败后投递给他</strong>”</p>
-<p>普通交换机 指向(<code>alternate-exchange</code>) 备份交换机</p>
-<p><img src="https://img-blog.csdnimg.cn/212fac777b844dfa9877806fde53138d.png"></p>
-<h1 id="9-消费者应答"><a href="#9-消费者应答" class="headerlink" title="9.消费者应答"></a>9.消费者应答</h1><p>SpringBoot默认是自动应答(监听队列也是)，同时提供的API也会应答<img src="https://img-blog.csdnimg.cn/0928df02f9c94e55a34d502dfff6af2b.png"></p>
-<h2 id="9-1配置手动应答"><a href="#9-1配置手动应答" class="headerlink" title="9.1配置手动应答"></a>9.1配置手动应答</h2><p>首先需要关闭自动应答</p>
-<p><img src="https://img-blog.csdnimg.cn/649b28ef3b014255a6714f410082bac2.png"></p>
-<pre><code>spring.rabbitmq.listener.direct.acknowledge-mode=manual
-spring.rabbitmq.listener.simple.acknowledge-mode=manual
-</code></pre>
-<p>当然，仍然可以通过配置类来进行低耦合配置</p>
-<pre><code>  @Bean
-  public RabbitListenerContainerFactory&lt;?&gt; rabbitListenerContainerFactory(@Qualifier(&quot;myConnectionFactory&quot;) ConnectionFactory connectionFactory) &#123;
-    SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
-    factory.setConnectionFactory(connectionFactory);
-    factory.setAcknowledgeMode(AcknowledgeMode.MANUAL);
-    return factory;
-  &#125;
-</code></pre>
-<h2 id="9-2三种应答"><a href="#9-2三种应答" class="headerlink" title="9.2三种应答"></a>9.2三种应答</h2><p>注：如果@RabbitListener写在类上，就需要搭配@RabbitHandler使用<br><img src="https://img-blog.csdnimg.cn/1d1ffb650901464b912246d7f6b6ee19.png"><br><img src="https://img-blog.csdnimg.cn/e7564f04205f4554bc8507a40bb0ce06.png"></p>
-<p>形参中有channel</p>
-<pre><code>      // 确认 ： 消息tag，不批量
-      channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
-        //拒绝（不重新入队）： 消息tag，不批量
-      channel.basicReject(message.getMessageProperties().getDeliveryTag(), false);
-      // 否定（可选重新入队）：消息tag，不批量，重新入队
-      channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, true);
-</code></pre>
-<h1 id="10-持久化"><a href="#10-持久化" class="headerlink" title="10.持久化"></a>10.持久化</h1><h2 id="10-1队列持久化"><a href="#10-1队列持久化" class="headerlink" title="10.1队列持久化"></a>10.1队列持久化</h2><p>在使用方面，声明队列的时候，其实底层也是调用的channel.queueDeclare(..）中第二个参数<code>durable设置为true</code><br><img src="https://img-blog.csdnimg.cn/bf21817c5db242d1b7e44281cf7c64b4.png"></p>
-<h2 id="10-2消息持久化"><a href="#10-2消息持久化" class="headerlink" title="10.2消息持久化"></a>10.2消息持久化</h2><p>SpringBoot提供的API中是默认消息持久化的</p>
-<p>参考<a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_38322527/article/details/122921878">rabbitTemplate消息持久化</a></p>
-<p>channel.basicPublish的第三个参数，将策略设置为<code>MessageProperties.PERSISTENT_TEXT_PLAIN</code><br><img src="https://img-blog.csdnimg.cn/19eafcab419d4ee6a1da34f24a8cba52.png" alt="第三个参数"></p>
-<ul>
-<li>作用：每次发布消息都告诉MQ，将消息持久化</li>
-<li>缺点：MQ可能在消息持久化过程中挂了</li>
-<li>对于简单任务队列绰绰有余，更可靠的持久化方案是：发布确认</li>
-</ul>
-<h1 id="11-惰性队列"><a href="#11-惰性队列" class="headerlink" title="11.惰性队列"></a>11.惰性队列</h1><ul>
-<li>通俗话讲就是：队列存在磁盘中，内存中只保存索引，消费者消费消息的时候根据索引读取到内存中。</li>
-<li>这样做很安全，内存占用低，但是效率低下</li>
-</ul>
-<p> 参考：</p>
-<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/xiangjunyes/article/details/121887970">原生写法</a></p>
-<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44390164/article/details/120461515">springboot写法</a><br><img src="https://img-blog.csdnimg.cn/9e0865299550478a9503c37d65177e40.png"></p>
-<h1 id="12-集群与镜像队列"><a href="#12-集群与镜像队列" class="headerlink" title="12.集群与镜像队列"></a>12.集群与镜像队列</h1><p><img src="https://img-blog.csdnimg.cn/9f4e8807481c4a0184cf3ba3b19dad26.png"><br>其他的关于RabbitMQ负载均衡部分省略</p>
-<h1 id="13-幂等设计"><a href="#13-幂等设计" class="headerlink" title="13.幂等设计"></a>13.幂等设计</h1><p>一般也都是用Redis，快<br>全局唯一ID + Redis</p>
-<p><img src="https://img-blog.csdnimg.cn/e9429bfcf681465586b0d8527337b4fd.png"></p>
-<h1 id="14-队列优先级"><a href="#14-队列优先级" class="headerlink" title="14.队列优先级"></a>14.队列优先级</h1><p>操作的是max-priority属性<br><img src="https://img-blog.csdnimg.cn/d3a29b1d2fc0429d8e31d6e2a3f93d25.png"></p>
-<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_39794062/article/details/118226296">参考：原生写法</a></p>
-
-      
+            
+            <li><a target="_blank" href="http://yelog.org/">叶落阁</a></li>
+            
+        </ul>
     </div>
-    <footer class="article-footer">
-      <a data-url="https://blogzjh.github.io/2022/08/27/RabbitMQ%E5%8F%AF%E9%9D%A0%E6%80%A7-Spring/" data-id="cl8wvrz90000zkkta2opp0o3l" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-RabbitMQ死信队列、延迟队列-Spring" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2022/08/27/RabbitMQ%E6%AD%BB%E4%BF%A1%E9%98%9F%E5%88%97%E3%80%81%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97-Spring/" class="article-date">
-  <time datetime="2022-08-26T17:05:35.000Z" itemprop="datePublished">2022-08-27</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/%E4%B8%AD%E9%97%B4%E4%BB%B6/">中间件</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2022/08/27/RabbitMQ%E6%AD%BB%E4%BF%A1%E9%98%9F%E5%88%97%E3%80%81%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97-Spring/">RabbitMQ死信队列、延迟队列-Spring</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="1-死信队列"><a href="#1-死信队列" class="headerlink" title="1.死信队列"></a>1.死信队列</h1><ul>
-<li>当queue中的消息无法被消费时，消息成为死信，产生条件如下三个：<ol>
-<li><strong>消息TTL过期</strong>（TTL一般生产者每次发消息都单独指定）</li>
-<li><strong>queue满了</strong>而无法添加</li>
-<li><strong>消息被拒or否定 且不重新入队</strong>（<code>basic.reject</code>拒绝 或<code> basic.nack</code>否定）并且<code>requeue = false</code>不重新入队</li>
-</ol>
-</li>
-</ul>
-<ul>
-<li>失败消息如何转发到（绑定到）死信队列<ol>
-<li>需要单独声明：死信交换机 和 死信队列</li>
-<li>需要<strong>设置参数</strong>来实现消息转发到死信交换机<img src="https://img-blog.csdnimg.cn/43d6570bc26b4df1a8600254b8edbd6d.png" alt="绑定参数，转发到死信队列"><br><img src="https://img-blog.csdnimg.cn/ba8862e58bb3453197a082d7d3ad97fe.png" alt="消息拒绝"></li>
-</ol>
-</li>
-<li>应用场景举例：<ol>
-<li>需要保证消息不丢失（如下单功能）</li>
-<li>延迟队列的一种实现方式（还有一种是基于插件）</li>
-</ol>
-</li>
-</ul>
-<h1 id="2-延迟队列"><a href="#2-延迟队列" class="headerlink" title="2.延迟队列"></a>2.延迟队列</h1><h2 id="2-1适用场景"><a href="#2-1适用场景" class="headerlink" title="2.1适用场景"></a>2.1适用场景</h2><p><img src="https://img-blog.csdnimg.cn/793a92a64ea544d58908c9b1b208779f.png"></p>
-<h3 id="2-1-1轮训和定时任务的缺点"><a href="#2-1-1轮训和定时任务的缺点" class="headerlink" title="2.1.1轮训和定时任务的缺点"></a>2.1.1轮训和定时任务的缺点</h3><ul>
-<li>数据量小：可以采用每秒轮训实现上述功能（数据量大时会导致轮训瞬间处理太多）</li>
-<li>对时间要求不严格：那么可以每天凌晨跑定时任务来实现（例如生成一些日报）</li>
-</ul>
-<p>但是对于大数据量、时效性强的场景，需要用到延迟队列</p>
-<h3 id="2-1-2延迟队列的优点"><a href="#2-1-2延迟队列的优点" class="headerlink" title="2.1.2延迟队列的优点"></a>2.1.2延迟队列的优点</h3><p>延迟功能有保障（时间要求严格）<br>不会像轮训一样一瞬间处理太多</p>
-<h2 id="2-2延迟队列的两种实现"><a href="#2-2延迟队列的两种实现" class="headerlink" title="2.2延迟队列的两种实现"></a>2.2延迟队列的两种实现</h2><p>RabbitMQ本身是不支持延迟队列的，如果不使用插件，就只能<strong>改造死信队列</strong>————C1消费着直接不存在，<strong>消息到期TTL之后</strong>一定会进入死信队列进行处理</p>
-<p>延迟队列的实现分为“<strong>死信队列实现</strong>”和“<strong>插件直接实现</strong>”，结构图分别为：<img src="https://img-blog.csdnimg.cn/928a035b6dca4d76976c0505627aed56.png" alt="基于死信队列"><br><img src="https://img-blog.csdnimg.cn/e75e296161794b6eb58eeeba5d4f3d34.png" alt="基于插件"></p>
-<h1 id="3-死信实现延时队列"><a href="#3-死信实现延时队列" class="headerlink" title="3.死信实现延时队列"></a>3.死信实现延时队列</h1><p>注意：由于队列的先进先出特性，只有当过期的消息到了队列的顶端（队首），才会被真正的丢弃或者进入死信队列。<br><strong>如果遇到不同的任务类型需要不同的延时的话，需要为每一种不同延迟时间的消息建立单独的消息队列。</strong> </p>
-<h2 id="3-1配置信息"><a href="#3-1配置信息" class="headerlink" title="3.1配置信息"></a>3.1配置信息</h2><h3 id="3-1-1pom"><a href="#3-1-1pom" class="headerlink" title="3.1.1pom"></a>3.1.1pom</h3><p>下面两个 </p>
-<pre><code>    &lt;dependency&gt;
-      &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-      &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
-    &lt;/dependency&gt;
-
-     &lt;dependency&gt;
-      &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-      &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
-      &lt;scope&gt;test&lt;/scope&gt;
-    &lt;/dependency&gt;
-
-    &lt;dependency&gt;
-      &lt;groupId&gt;com.rabbitmq&lt;/groupId&gt;
-      &lt;artifactId&gt;amqp-client&lt;/artifactId&gt;
-      &lt;version&gt;5.8.0&lt;/version&gt;
-    &lt;/dependency&gt;
-
-    &lt;dependency&gt;
-      &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-      &lt;artifactId&gt;spring-boot-starter-amqp&lt;/artifactId&gt;
-    &lt;/dependency&gt;
-</code></pre>
-<h3 id="3-1-2配置文件"><a href="#3-1-2配置文件" class="headerlink" title="3.1.2配置文件"></a>3.1.2配置文件</h3><pre><code>spring.rabbitmq.host=124...
-#spring.rabbitmq.port=5672 默认
-spring.rabbitmq.username=admin
-spring.rabbitmq.password=123
-
-server.port=8080
-</code></pre>
-<h2 id="3-2架构图"><a href="#3-2架构图" class="headerlink" title="3.2架构图"></a>3.2架构图</h2><p>左边的YD要与右边的YD相同（<strong>routingkey保证相同</strong>才能正确转发消息）<br><img src="https://img-blog.csdnimg.cn/6fecb8e2907246698431dc4a93465ab6.png"></p>
-<h2 id="3-3配置类声明与绑定"><a href="#3-3配置类声明与绑定" class="headerlink" title="3.3配置类声明与绑定"></a>3.3配置类声明与绑定</h2><pre><code>@Configuration
-public class DeadConfig &#123;
-
-  //  1.交换机
-  public static final String X_EXCHANGE = &quot;X&quot;;
-  public static final String Y_DEAD_LETTER_EXCHANGE = &quot;Y&quot;;
-
-  //  2. 队列
-  public static final String QUEUE_A = &quot;QA&quot;;
-  public static final String QUEUE_B = &quot;QB&quot;;
-  public static final String DEAD_LETTER_QUEUE = &quot;QD&quot;;
-  &#125;
-</code></pre>
-<h3 id="3-3-1交换机"><a href="#3-3-1交换机" class="headerlink" title="3.3.1交换机"></a>3.3.1交换机</h3><pre><code>  @Bean(&quot;xExchange&quot;)
-  public DirectExchange xExchange()&#123;
-    return new DirectExchange(X_EXCHANGE);
-  &#125;
-  @Bean(&quot;yExchange&quot;)
-  public DirectExchange yExchange()&#123;
-    return new DirectExchange(Y_DEAD_LETTER_EXCHANGE);
-  &#125;
-</code></pre>
-<h3 id="3-3-2队列"><a href="#3-3-2队列" class="headerlink" title="3.3.2队列"></a>3.3.2队列</h3><p>关于ttl，实际环境尽量不要写在队列声明期间，而应写在生产者send的时候</p>
-<pre><code> @Bean(&quot;queueA&quot;)//10s过期时间
-  public Queue queueA()&#123;//AMQP包下的Queue
-    //绑定参数————转发到死信交换机
-/*  原始写法
-    HashMap&lt;String, Object&gt; arg = new HashMap&lt;&gt;();
-    arg.put(&quot;x-dead-letter-exchange&quot;,Y_DEAD_LETTER_EXCHANGE);
-    arg.put(&quot;x-dead-letter-routing-key&quot;,&quot;YD&quot;);
-    arg.put(&quot;x-message-ttl&quot;,10000);
-    return QueueBuilder.
-        durable(QUEUE_A).
-        withArguments(arg).
-        build();
- *///SpringBoot写法
-    return QueueBuilder.
-        durable(QUEUE_A).
-        deadLetterExchange(Y_DEAD_LETTER_EXCHANGE).
-        deadLetterRoutingKey(&quot;YD&quot;).
-        ttl(10000).
-        build();
-  &#125;
-
-  @Bean(&quot;queueB&quot;)//40s过期时间
-  public Queue queueB()&#123;
-    return QueueBuilder.
-        durable(QUEUE_B).
-        deadLetterExchange(Y_DEAD_LETTER_EXCHANGE).
-        deadLetterRoutingKey(&quot;YD&quot;).
-        ttl(40000).
-        build();
-  &#125;
-
-  @Bean(&quot;queueD&quot;)//死信队列
-  public Queue queueD()&#123;
-    return QueueBuilder.durable(DEAD_LETTER_QUEUE).build();
-  &#125;
-</code></pre>
-<h3 id="3-2-3绑定"><a href="#3-2-3绑定" class="headerlink" title="3.2.3绑定"></a>3.2.3绑定</h3><pre><code>  @Bean //参数：QA  xExchange
-  public Binding QAbindX(@Qualifier(&quot;queueA&quot;) Queue QA, @Qualifier(&quot;xExchange&quot;) DirectExchange X)&#123;
-    return BindingBuilder.bind(QA).to(X).with(&quot;XA&quot;);
-  &#125;
-
-  @Bean
-  public Binding QBbindX(@Qualifier(&quot;queueB&quot;) Queue QB, @Qualifier(&quot;xExchange&quot;) DirectExchange X)&#123;
-    return BindingBuilder.bind(QB).to(X).with(&quot;XB&quot;);
-  &#125;
-
-  @Bean
-  public Binding QDbindY(@Qualifier(&quot;queueD&quot;) Queue QD, @Qualifier(&quot;yExchange&quot;) DirectExchange Y)&#123;
-    return BindingBuilder.bind(QD).to(Y).with(&quot;YB&quot;);
-  &#125;
-</code></pre>
-<p><img src="https://img-blog.csdnimg.cn/39ba8aa28076405b82d1ad4c2fc88202.png" alt="在这里插入图片描述"></p>
-<h2 id="3-4生产者"><a href="#3-4生产者" class="headerlink" title="3.4生产者"></a>3.4生产者</h2><pre><code>@RestController
-@RequestMapping(&quot;ttl&quot;)
-public class ProducerController &#123;
-  @Autowired
-  RabbitTemplate rabbitTemplate;
-
-  @GetMapping(&quot;send&quot;)
-  public void sendA(String msg)&#123;
-    System.out.println(&quot;生产者发送消息：&quot; + new Date().toString());
-    rabbitTemplate.convertAndSend(&quot;X&quot;,&quot;XA&quot;,&quot;10s延迟&quot;);
-    rabbitTemplate.convertAndSend(&quot;X&quot;,&quot;XB&quot;,&quot;40s延迟&quot;);
-
-  &#125;
-
-&#125;
-</code></pre>
-<h2 id="3-5消费者监听"><a href="#3-5消费者监听" class="headerlink" title="3.5消费者监听"></a>3.5消费者监听</h2><p>消费者其实只需要用<code>@RabbitListener</code>进行监听即可，而不是做成一个接口</p>
-<pre><code>@Service
-//@Component也行
-public class ConsumerService &#123;
-
-  @RabbitListener(queues = &quot;QD&quot;)//监听QD队列消息（QD是死信队列）
-  public void receiveD(Message message , Channel channel) &#123;//导入AMQP包
-    System.out.println(&quot;收到死信队列消息：&quot; + new String(message.getBody()) + new Date().toString());
-  &#125;
-
-&#125;
-</code></pre>
-<p><img src="https://img-blog.csdnimg.cn/3bc7dc2c753e41108447ed562337e908.png"></p>
-<h1 id="4-插件实现延迟队列"><a href="#4-插件实现延迟队列" class="headerlink" title="4.插件实现延迟队列"></a>4.插件实现延迟队列</h1><p>具体百度RabbitMQ延迟队列插件，官网下载，当安装好后可以在web界面看到多了一种交换机————由此可知，<strong>插件是通过交换机实现延迟的</strong><img src="https://img-blog.csdnimg.cn/e4ae02ae2ffd42ceb76840e2c690171a.png"></p>
-<h2 id="4-1配置交换机"><a href="#4-1配置交换机" class="headerlink" title="4.1配置交换机"></a>4.1配置交换机</h2><ul>
-<li>因为基于插件的延迟队列只有交换机不同，所以只需要配置交换机</li>
-<li>而新的交换机在Spring中没有对应的API，所以需要用自定义交换机<code>CustomExchange</code></li>
-</ul>
-<pre><code>  @Bean
-  public Queue delayQueue()&#123;
-    return new Queue(&quot;delayQueue&quot;);
-  &#125;
-
-  @Bean
-  public CustomExchange delayExchange()&#123;
-  //只能用原生写法，没有Spring提供的API
-    HashMap&lt;String, Object&gt; arg = new HashMap&lt;&gt;();
-    arg.put(&quot;x-delayed-type&quot;,&quot;direct&quot;);
-    return new CustomExchange(&quot;dExchange&quot;,&quot;x-delayed-message&quot;,true,false,arg);
-  &#125;
-
-  @Bean
-  public Binding delayBinding(@Qualifier(&quot;delayQueue&quot;) Queue QC,
-      @Qualifier(&quot;delayExchange&quot;) CustomExchange cExchange)&#123;
-    return BindingBuilder.
-        bind(QC).
-        to(cExchange).
-        with(&quot;delayRoutingKey&quot;).
-        noargs();
-  &#125;
-</code></pre>
-<h2 id="4-2生产者和消费者"><a href="#4-2生产者和消费者" class="headerlink" title="4.2生产者和消费者"></a>4.2生产者和消费者</h2><pre><code>  @GetMapping(&quot;delay&quot;)
-  public void delaySent(String msg)&#123;
-    System.out.println(&quot;生产者发送消息：&quot; + new Date().toString());
-    rabbitTemplate.convertAndSend(&quot;dExchange&quot;,&quot;delayRoutingKey&quot;,msg,m -&gt; &#123;
-      m.getMessageProperties().setDelay(5000);//5秒延迟
-      return m;
-    &#125;);
-  &#125;
-
-  @RabbitListener(queues = &quot;delayQueue&quot;)
-  public void delayListenner(Message message , Channel channel)&#123;
-    System.out.println(&quot;收到死信队列消息：&quot; + new String(message.getBody()) + new Date().toString());
-  &#125;
-</code></pre>
-<h1 id="5-补充"><a href="#5-补充" class="headerlink" title="5.补充"></a>5.补充</h1><p>延迟队列的选择还有：Java中的DelayQueue、Quartz；Redis中的zset；Kafka的时间轮。但RabbitMQ的方案最全面</p>
-
-      
+</div>
+        <div class="title-list">
+    <div class="right-top">
+        <div id="default-panel">
+            <i class="iconfont icon-search" data-title="搜索 快捷键 i"></i>
+            <div class="right-title">全部文章</div>
+            <i class="iconfont icon-file-tree" data-title="切换到大纲视图 快捷键 w"></i>
+        </div>
+        <div id="search-panel">
+            <i class="iconfont icon-left" data-title="返回"></i>
+            <input id="local-search-input" autocomplete="off"/>
+            <label class="border-line" for="input"></label>
+            <i class="iconfont icon-case-sensitive" data-title="大小写敏感"></i>
+            <i class="iconfont icon-tag" data-title="标签"></i>
+        </div>
+        <div id="outline-panel" style="display: none">
+            <div class="right-title">大纲</div>
+            <i class="iconfont icon-list" data-title="切换到文章列表"></i>
+        </div>
     </div>
-    <footer class="article-footer">
-      <a data-url="https://blogzjh.github.io/2022/08/27/RabbitMQ%E6%AD%BB%E4%BF%A1%E9%98%9F%E5%88%97%E3%80%81%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97-Spring/" data-id="cl8wvrz910012kkta4zg6etdh" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
 
-
-  
-    <article id="post-MySQL事务与锁" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2022/08/23/MySQL%E4%BA%8B%E5%8A%A1%E4%B8%8E%E9%94%81/" class="article-date">
-  <time datetime="2022-08-23T04:49:38.000Z" itemprop="datePublished">2022-08-23</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/%E4%B8%AD%E9%97%B4%E4%BB%B6/">中间件</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
+    <div class="tags-list">
+    <input id="tag-search" />
+    <div class="tag-wrapper">
         
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2022/08/23/MySQL%E4%BA%8B%E5%8A%A1%E4%B8%8E%E9%94%81/">MySQL事务与锁</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <ul>
-<li>事务的4大特性分别由：事务日志、锁机制实现，0~4标题是事务日志，5之后是锁机制</li>
-<li>每个阶段的小结放在最前面</li>
-</ul>
-<h1 id="0-事务日志：总结"><a href="#0-事务日志：总结" class="headerlink" title="0.事务日志：总结"></a>0.事务日志：总结</h1><ul>
-<li>redo log保证持久性，在<code>innodb_flush_log_at_trx_commit=1</code>（默认）的情况下，保证了事务的安全可靠</li>
-<li>undo log保证原子性、一致性，且undo log自身的持久化也依赖于redo log。undo log通过<strong>回滚指针形成链路</strong>，保证了回滚与MVCC。如果undo log被MVCC占用，则一直不会被删除。</li>
-<li>刷盘持久化对于：页中数据(脏页)持久化、redo log持久化都有着相似的策略：（另外的线程）</li>
-<li>delete和对<strong>主键</strong>update，实际上进行的软删除（修改deletemark隐藏字段），由purge线程来进行真实的删除。<h1 id="1-事务的4种特性"><a href="#1-事务的4种特性" class="headerlink" title="1.事务的4种特性"></a>1.事务的4种特性</h1></li>
-<li>事务有4种特性：原子性、一致性、持久性、隔离性</li>
-<li><code>隔离性</code>：由锁机制 or  MVCC实现</li>
-<li><code>原子性、一致性、持久性</code>：由事务的redo日志和undo日志保证<br><img src="https://img-blog.csdnimg.cn/15768b7c08c14eec9fae8e77459f1d04.png"></li>
-</ul>
-<h1 id="2-事务日志概述"><a href="#2-事务日志概述" class="headerlink" title="2.事务日志概述"></a>2.事务日志概述</h1><ul>
-<li>redo log ：<code>重做日志</code>，记录<strong>物理级别</strong>上的修改(在页上的修改)的日志，提供再写入操作，恢复提交事务修改页的操作，保证事务<code>持久性</code>；主要保证数据可靠性</li>
-<li>undo log：<code>回滚日志</code>，记录<strong>逻辑操作</strong>的日志(每个改动操作的逆过程)，回滚到某一个特定版本，保证事务的<code>原子性、一致性</code>；主要用于回滚和MVCC</li>
-<li><strong>二者都是一种恢复操作</strong>，只是场景不同</li>
-<li>都是存储引擎生成的日志（而bin log则是数据层产生的）</li>
-</ul>
-<h1 id="3-redo-log与持久性-D"><a href="#3-redo-log与持久性-D" class="headerlink" title="3.redo log与持久性(D)"></a>3.redo log与持久性(D)</h1><h2 id="3-1Buffer-Pool"><a href="#3-1Buffer-Pool" class="headerlink" title="3.1Buffer Pool"></a>3.1Buffer Pool</h2><ul>
-<li>在InnoDB中数据是存储在16k的页中的，在访问页中数据之前，会先将数据从磁盘读到内存中的Buffer Pool中</li>
-<li>每次变更都需要先修改Buffer Pool，然后master线程以一定频率刷入磁盘。从而优化整体性能</li>
-</ul>
-<h2 id="3-2刷盘频率"><a href="#3-2刷盘频率" class="headerlink" title="3.2刷盘频率"></a>3.2刷盘频率</h2><ul>
-<li>如果每次事务提交都进行刷盘，那么效率就很低下（因为每次刷盘都是对一整个页进行刷盘，每次IO都是16kb）</li>
-<li> 当一个事务影响了多个页，刷盘时可能进行很多的随机IO（页可能不连续，而随机IO比顺序IO更慢，尤其对于传统机械硬盘）</li>
-</ul>
-<h2 id="3-3redo日志解决刷盘频率问题"><a href="#3-3redo日志解决刷盘频率问题" class="headerlink" title="3.3redo日志解决刷盘频率问题"></a>3.3redo日志解决刷盘频率问题</h2><ul>
-<li>redo log也是写在磁盘中的，但占用的空间很小，也减少了刷盘的频率（<strong>16kb带来的性能开销远高于写一条日志</strong>）</li>
-<li>redo log是<strong>顺序写入磁盘</strong>的，比随机IO速度更快</li>
-<li><strong>此刷盘（redo log）非彼刷盘（页中数据）</strong></li>
-</ul>
-<h2 id="3-4redo-log-buffer和redo-log-file"><a href="#3-4redo-log-buffer和redo-log-file" class="headerlink" title="3.4redo log buffer和redo log file"></a>3.4redo log buffer和redo log file</h2><p>buffer：在内存中，默认16M，内部的block块是512kb<br>file：在磁盘中</p>
-<p><strong>只要保证redo log从buffer持久化到file不出错，那么MySQL宕机也能恢复数据</strong><br><img src="https://img-blog.csdnimg.cn/63a03ebe859341208c8d8c6ed631c457.png"></p>
-<h3 id="3-4-1刷盘策略innodb-flush-log-at-trx-commit"><a href="#3-4-1刷盘策略innodb-flush-log-at-trx-commit" class="headerlink" title="3.4.1刷盘策略innodb_flush_log_at_trx_commit="></a>3.4.1刷盘策略innodb_flush_log_at_trx_commit=</h3><ul>
-<li>innodb_flush_log_at_trx_commit=1：每次commit就刷盘，redo log 一定在磁盘中，安全，不存在数据丢失问题，效率最差</li>
-<li>innodb_flush_log_at_trx_commit=2：每次commit只写入文件系统缓存(page cache)，由后台线程进行刷盘，效率高，但不安全</li>
-<li>innodb_flush_log_at_trx_commit=0：1、2的折中做法，后台线程刷盘频率为1s</li>
-</ul>
-<h3 id="3-4-2建议使用默认"><a href="#3-4-2建议使用默认" class="headerlink" title="3.4.2建议使用默认"></a>3.4.2建议使用默认</h3><p>默认值为1，虽然效率差，但安全。使用事务本来考虑的就是安全性优先</p>
-<h1 id="4-undo-log与原子性-A"><a href="#4-undo-log与原子性-A" class="headerlink" title="4.undo log与原子性(A)"></a>4.undo log与原子性(A)</h1><ul>
-<li>第3点的redo log保证的是持久性，事务过程中每次操作<code>之后</code>都会产生一条redo log</li>
-<li>而undo log保证的是原子性，要保留之前的数据则需要在每次操作<code>之前</code></li>
-</ul>
-<h2 id="4-1undo-log应用场景"><a href="#4-1undo-log应用场景" class="headerlink" title="4.1undo log应用场景"></a>4.1undo log应用场景</h2><ul>
-<li>服务器出错、断电需要回滚</li>
-<li>事务手动roll back回滚</li>
-<li>MVCC</li>
-<li>注：<strong>SELECT不产生undo log，但在MVCC机制中会用到undo log</strong></li>
-<li><strong>undo log产生的同时也会产生保护自身的redo log</strong>，而redo log默认刷盘策略innodb_flush_log_at_trx_commit=1又能保证回滚日志的安全(持久化)</li>
-</ul>
-<h2 id="4-2undo-log回滚的理解"><a href="#4-2undo-log回滚的理解" class="headerlink" title="4.2undo log回滚的理解"></a>4.2undo log回滚的理解</h2><ul>
-<li>undo log是逻辑日志，回滚只是表面上恢复之前的物理状态，但实际上是反向操作</li>
-<li>InnoDB支持的<strong>并发事务数量</strong>是由<code>回滚段roll back segment</code>决定的，默认是128*1024</li>
-</ul>
-<h2 id="4-3每一行数据的结构"><a href="#4-3每一行数据的结构" class="headerlink" title="4.3每一行数据的结构"></a>4.3每一行数据的结构</h2><p>对于InnoDB来说，每一行都有3个隐藏列</p>
-<ul>
-<li>DB_ROW_ID: 没有指定主键时的隐藏主键</li>
-<li>DB_TRX_ID：事务ID</li>
-<li>DB_ROLL_PTR：回滚指针，指向undo log，<strong>相当于记录了修改该行之前的值</strong>，而undo log本身的数据结构也有一个undo log指针，指向上一个undo log（通过序号链式指向，在回滚和MVCC中用处很大）<img src="https://img-blog.csdnimg.cn/632b7b30e4fc498392ec41e1db4c2c4a.png"><h3 id="4-3-1undo-log序号"><a href="#4-3-1undo-log序号" class="headerlink" title="4.3.1undo log序号"></a>4.3.1undo log序号</h3>这个序号是按顺序写入日志的，因此在回滚的时候直接倒叙回滚就好</li>
-</ul>
-<h2 id="4-4更新主键：deletemark"><a href="#4-4更新主键：deletemark" class="headerlink" title="4.4更新主键：deletemark"></a>4.4更新主键：deletemark</h2><p>4.3这种更新非主键是通过直接修改undo log指针指向来实现的。而如果修改主键id则需要利用<code>deletemark</code>（一个软删除标志，=1则软删，真实的删除由<code>purge线程</code>删除线程实现）<br><img src="https://img-blog.csdnimg.cn/ecfaae3fedf94c03a401683f5ba73d38.png"></p>
-<h2 id="4-5undo-log何时删除"><a href="#4-5undo-log何时删除" class="headerlink" title="4.5undo log何时删除"></a>4.5undo log何时删除</h2><h3 id="4-5-1对于insert操作"><a href="#4-5-1对于insert操作" class="headerlink" title="4.5.1对于insert操作"></a>4.5.1对于insert操作</h3><p>在RR(可重复读)的隔离级别下，insert操作只对本事务可见（RR级别的MVCC解决了幻读），因此insert操作的 undo log可以在commit之后直接删除</p>
-<h3 id="4-5-2对于update操作"><a href="#4-5-2对于update操作" class="headerlink" title="4.5.2对于update操作"></a>4.5.2对于update操作</h3><p>由于MVCC机制中的日志数组可能仍持有这条undo log记录，因此update操作commit后不能直接删除，而是存入undo log的一个链表中</p>
-<h1 id="5-事务的隔离级别与解决的问题"><a href="#5-事务的隔离级别与解决的问题" class="headerlink" title="5.事务的隔离级别与解决的问题"></a>5.事务的隔离级别与解决的问题</h1><p>问题一般是：脏读、不可重复读、幻读</p>
-<ul>
-<li>脏读：B读取了A<strong>回滚前</strong>的数据</li>
-<li>不可重复读：<strong>B两次读取</strong>，分别读了A修改前和修改后的数据</li>
-<li>幻读：一般是B事务<strong>SELECT一个WHERE范围</strong>，在这个范围中读到了<strong>A没提交的insert数据</strong></li>
-<li><code> SELECT @@transaction_isolation;</code>查看隔离级别<h2 id="5-1RU级别"><a href="#5-1RU级别" class="headerlink" title="5.1RU级别"></a>5.1RU级别</h2>RU：Read Uncommitted <strong>读未提交</strong>，最低的隔离级别，<strong>任何情况都不加锁</strong>，在这个隔离级别下可能出现所有的问题</li>
-</ul>
-<h2 id="5-2RC级别"><a href="#5-2RC级别" class="headerlink" title="5.2RC级别"></a>5.2RC级别</h2><p>RC：Read Committed <strong>读已提交</strong>，MVCC支持的最低隔离级别</p>
-<ul>
-<li>如果有InnoDB的MVCC机制，则解决了：脏读、不可重复读</li>
-<li>如果没有MVCC机制，则只解决了：脏读</li>
-</ul>
-<h2 id="5-3RR级别"><a href="#5-3RR级别" class="headerlink" title="5.3RR级别"></a>5.3RR级别</h2><p>RR：Read Repeatable <strong>可重复读</strong>，<strong>在MVCC机制下可避免幻读</strong></p>
-<h2 id="5-4Serializable"><a href="#5-4Serializable" class="headerlink" title="5.4Serializable"></a>5.4Serializable</h2><p>Serializable：<strong>串行化</strong>，最高的隔离级别，由加锁实现，最安全，性能最差<br>如果每条crud都加x锁，那么即便是不设置隔离级别为串行化，也是串行的</p>
-<h1 id="6-锁：总结"><a href="#6-锁：总结" class="headerlink" title="6.锁：总结"></a>6.锁：总结</h1><ul>
-<li>事务的<code>隔离性</code>是由锁实现的 （也可由MVCC）</li>
-<li><strong>锁的互斥性需要相同类型的锁</strong>，比如间隙锁与插入意向锁同为gap锁，同类型的冲突保证了间隙不出现幻读；而真正表级的意向锁互相都是兼容的，不会相互阻塞，他仅作为一个提示</li>
-<li></li>
-</ul>
-<h1 id="7-锁的概述"><a href="#7-锁的概述" class="headerlink" title="7.锁的概述"></a>7.锁的概述</h1><p>锁机制用于多个线程or进程并发访问某一个资源，保证数据的一致性和完整性。<br>锁机制保证了各个事务的隔离级别<br>锁机制一般不针对读-读，只针对读-写 、写-读 、写-写</p>
-<h1 id="8-补：InnoDB的内存结构"><a href="#8-补：InnoDB的内存结构" class="headerlink" title="8.补：InnoDB的内存结构"></a>8.补：InnoDB的内存结构</h1><p><img src="https://img-blog.csdnimg.cn/a3142b47e0964d91b5c8c3e008e17589.png"></p>
-<p><img src="https://img-blog.csdnimg.cn/5db385f9d8d645d68273214e751b6ffa.png"><img src="https://img-blog.csdnimg.cn/77bb4e2b7ea34215943f2f71e1535af6.png"></p>
-<p><img src="https://img-blog.csdnimg.cn/377617355b2c4c268ad3faa83b5edbad.png"><img src="https://img-blog.csdnimg.cn/399dbcd17e0a4a5a971abc9d497c21b2.png"></p>
-<h1 id="9-按操作类型-兼容性-划分"><a href="#9-按操作类型-兼容性-划分" class="headerlink" title="9.按操作类型(兼容性)划分"></a>9.按操作类型(兼容性)划分</h1><p>共享锁（读锁）（S锁）：<code>SELECT ... LOCK IN SHARE MODE</code>或<code>SELECT .. FOR SHARE</code><br>排他锁（写锁）（X锁）：<code>SELECT .. FOR UPDATE</code></p>
-<ul>
-<li>锁可以手动加，也可以自动加</li>
-<li>这两种锁主要体现在兼容性（是否会相互阻塞）上，无论是行锁表锁、意向锁等等都存在兼容性问题<br><img src="https://img-blog.csdnimg.cn/fb551713969e4aeca3fa14b689e04ecd.png"></li>
-<li>兼容性不是一成不变的，<strong>表锁的兼容性与行锁的就不同</strong>。</li>
-<li><em>同一个事务中</em>*<br>行锁：不会互相影响，即同一事务可以同时SELECT 又 UPDATE<br>表锁：独占的，本事务加S表锁，则不能在本事务中UPDATE</li>
-</ul>
-<h2 id="9-1读"><a href="#9-1读" class="headerlink" title="9.1读"></a>9.1读</h2><p>读没什么好说的</p>
-<h2 id="9-2写"><a href="#9-2写" class="headerlink" title="9.2写"></a>9.2写</h2><h3 id="9-2-1-insert"><a href="#9-2-1-insert" class="headerlink" title="9.2.1 insert"></a>9.2.1 insert</h3><p>由<code>隐式锁</code>保护，<strong>保证新数据在commit之前不会被其他事务访问</strong></p>
-<h3 id="9-2-2-delete"><a href="#9-2-2-delete" class="headerlink" title="9.2.2 delete"></a>9.2.2 delete</h3><p>从B+树找到该条记录的位置，获取这条记录的X锁，执行delete mark软删。真正的删除是purge线程删除</p>
-<h3 id="9-2-3-update"><a href="#9-2-3-update" class="headerlink" title="9.2.3 update"></a>9.2.3 update</h3><p>分为3种情况</p>
-<ul>
-<li>情况1：未修改主键，且更新后存储空间<strong>不变</strong>：定位——获取X锁——在原记录的位置上修改</li>
-<li>情况2：未修改主键，但更新后存储空间<strong>改变</strong>：定位——获取X锁——删除原数据，<strong>再insert（隐式锁）</strong></li>
-<li>情况3：修改了主键：类似情况2，先delete再insert</li>
-</ul>
-<h1 id="10-按粒度划分"><a href="#10-按粒度划分" class="headerlink" title="10.按粒度划分"></a>10.按粒度划分</h1><ul>
-<li>锁粒度越小（锁定的少），并发性越好，但资源消耗更大</li>
-</ul>
-<h2 id="10-1表锁"><a href="#10-1表锁" class="headerlink" title="10.1表锁"></a>10.1表锁</h2><h3 id="10-1-1表级S锁与X锁"><a href="#10-1-1表级S锁与X锁" class="headerlink" title="10.1.1表级S锁与X锁"></a>10.1.1表级S锁与X锁</h3><ul>
-<li><p>没有死锁问题</p>
-</li>
-<li><p>表锁也有S锁和X锁，但是兼容性与行锁不同：具体体现在如下两点<br><img src="https://img-blog.csdnimg.cn/94af8e0a0407413db3ce008bfe79b54f.png"></p>
-</li>
-<li><p>语法演示：</p>
-<pre><code>  begin;
-  lock tables xxx read; #也可以加write锁
-  show open tables where in_use &gt; 0; #查看加锁的表
-  SELECT * FROM xxx ; # 正常可以查
-  UPDATE xxx SET s1 = 111  WHERE ... ;#阻塞，因为加了S表锁，所以同一事务也不能写当前表
-  unlock tables;#也可以直接commit; 都是释放表锁
-</code></pre>
-</li>
-</ul>
-<h3 id="10-1-2意向锁intention-lock-多粒度锁支持-加行锁时自动添加表级意向锁"><a href="#10-1-2意向锁intention-lock-多粒度锁支持-加行锁时自动添加表级意向锁" class="headerlink" title="10.1.2意向锁intention lock(多粒度锁支持)(加行锁时自动添加表级意向锁)"></a>10.1.2意向锁intention lock(多粒度锁支持)(加行锁时自动添加表级意向锁)</h3><ul>
-<li>InnoDB支持多粒度锁（允许行锁表锁共存）。而<strong>意向锁就是一种表锁</strong></li>
-<li>意向锁由存储引擎自己维护，用户无法操作。当添加<strong>行锁</strong>的时候，自动生成这个<strong>表级别的意向锁</strong></li>
-<li><strong>意向锁不会锁住这个表</strong>，他只是告诉其他表“<strong>有其他事务锁住了表中的某些记录</strong>”</li>
-</ul>
-<p>如果事务想要获得数据表中<strong>某些记录</strong>的<strong>共享S锁</strong>，就需要在数据<strong>表</strong>上添加<strong>意向共享S锁</strong>。<br>如果事务想要获得数据表中<strong>某些记录</strong>的<strong>排他X锁</strong>，就需要在数据<strong>表</strong>上添加<strong>意向排他X锁</strong>。</p>
-<ul>
-<li>意向锁互相兼容（也可以看作意向锁与行锁相互兼容）<br><img src="https://img-blog.csdnimg.cn/37629e64af5d4b0a85047941f4737e3e.png"></li>
-<li>意向锁与<strong>表锁</strong>存在不兼容情况<br><img src="https://img-blog.csdnimg.cn/f38c426a765e45818115c2040e01e1f9.png"><img src="https://img-blog.csdnimg.cn/61d05a11722a4cd39639cbcd9d275798.png"></li>
-</ul>
-<h3 id="10-1-3自增锁AUTO-INC"><a href="#10-1-3自增锁AUTO-INC" class="headerlink" title="10.1.3自增锁AUTO-INC"></a>10.1.3自增锁AUTO-INC</h3><p>如果主键设置的是auto_increment，那么就有这个自增锁，<strong>当一个事务持有自增锁的时候，其他事务的insert语句都会被阻塞。</strong>如果innoDB知道要插入多少条数据则不会上自增锁</p>
-<ul>
-<li>能明确知道插入的行数：例如insert into xx ..value(),(),()</li>
-<li>不能明确知道插入的行数：例如从其他表查<code>insert...select</code> 或 <code>replace...select</code>  或<code>load data</code>或混合模式</li>
-</ul>
-<h3 id="10-1-4元数据锁meta-data-lock"><a href="#10-1-4元数据锁meta-data-lock" class="headerlink" title="10.1.4元数据锁meta data lock"></a>10.1.4元数据锁meta data lock</h3><ul>
-<li>这个锁是表级别的，是为了防止crud DML的途中<strong>其他事务修改表结构</strong></li>
-<li> crud DML的时候加MDL读锁，修改表结构DDL的时候加MDL写锁。读-读不互斥</li>
-<li>对用户透明，自动添加</li>
-</ul>
-<h2 id="10-2行锁"><a href="#10-2行锁" class="headerlink" title="10.2行锁"></a>10.2行锁</h2><p>行锁在存储引擎层实现，粒度小，开销大，更容易出现死锁，并发度高<br>对于行锁的监控方法如下</p>
-<p><img src="https://img-blog.csdnimg.cn/8fd568b351e3472f8ade4bf64fc9c8b5.png"><br><img src="https://img-blog.csdnimg.cn/19b3af1633fc4eb8b06fa5e9ca660a05.png"><img src="https://img-blog.csdnimg.cn/910c2321bfbc4c3eae19989bd882f3d1.png"></p>
-<h3 id="10-2-1记录锁record-locks"><a href="#10-2-1记录锁record-locks" class="headerlink" title="10.2.1记录锁record locks"></a>10.2.1记录锁record locks</h3><p>这个就是可以自行添加，或在非RU级别下自动添加的锁，是狭义上的行锁</p>
-<h3 id="10-2-2间隙锁gap-lock"><a href="#10-2-2间隙锁gap-lock" class="headerlink" title="10.2.2间隙锁gap lock"></a>10.2.2间隙锁gap lock</h3><ul>
-<li>gap lock的提出仅仅是为了防止<strong>幻读</strong>，防止在间隙写入数据</li>
-<li>gap lock可能是由next_key locks退化而来</li>
-<li>我个人更倾向于：间隙锁是临键锁的组成成分，而保证间隙锁的必要条件是<code>索引</code>，因为只有索引才能保证确定这个间隙锁的范围</li>
-<li>如何触发间隙锁？：<strong>有索引</strong>，<code>范围查询or查不存在的值</code></li>
-</ul>
-<h3 id="10-2-3临键锁next-key-locks"><a href="#10-2-3临键锁next-key-locks" class="headerlink" title="10.2.3临键锁next_key locks"></a>10.2.3临键锁next_key locks</h3><ul>
-<li>默认情况下，InnoDB在REPEATABLE READ事务隔离级别运行，InnoDB使用next-key锁进行<strong>搜索和索引扫描，以防止幻读。</strong></li>
-<li><code>临键锁 =  gap锁 + 记录锁  </code></li>
-<li>例如 SELCT * FROM xxx WHERE age &lt;= 10 and age &gt; 5 （for update）这样加S锁（或X锁），因为有索引存在，（5,10]上的数据是不允许被其他事务插入的，从而防止了幻读</li>
-</ul>
-<h3 id="10-2-4插入意向锁insert-intention-locks"><a href="#10-2-4插入意向锁insert-intention-locks" class="headerlink" title="10.2.4插入意向锁insert intention locks"></a>10.2.4插入意向锁insert intention locks</h3><ul>
-<li>这个锁是一个gap锁，而不是意向锁。</li>
-<li>因为其他事务需要保证间隙锁生效，<strong>因此需要一个同类型的锁来进行判断，所以引出了插入意向锁用于判断是否冲突</strong></li>
-</ul>
-<h2 id="10-3页锁"><a href="#10-3页锁" class="headerlink" title="10.3页锁"></a>10.3页锁</h2><ul>
-<li>行锁与表锁的折中粒度锁，并发度一般，也会出现死锁</li>
-<li>InnoDB一般用不到页锁</li>
-<li><strong>锁空间占满了，自动进行了锁升级</strong>，比如delete太多数据会导致锁表</li>
-</ul>
-<h1 id="11-按态度划分"><a href="#11-按态度划分" class="headerlink" title="11.按态度划分"></a>11.按态度划分</h1><h2 id="11-1乐观锁"><a href="#11-1乐观锁" class="headerlink" title="11.1乐观锁"></a>11.1乐观锁</h2><ul>
-<li>通过程序代码实现，而不采用数据库的锁机制</li>
-<li>例如CAS机制、版本号机制（如where xxx = #{xxx}比如对update_time的时间戳进行校验）</li>
-</ul>
-<h2 id="11-2悲观锁"><a href="#11-2悲观锁" class="headerlink" title="11.2悲观锁"></a>11.2悲观锁</h2><ul>
-<li>像Java中的<code>synchronized和ReentantLock</code>等等<code>独占锁</code>都是悲观锁实现</li>
-<li>在MySQL中使用悲观锁<strong>一定需要索引</strong>，否则会导致锁表（全表扫描）</li>
-<li>如果事务太长（锁开销过高），推荐使用乐观锁</li>
-</ul>
-<h1 id="12-加锁方式"><a href="#12-加锁方式" class="headerlink" title="12.加锁方式"></a>12.加锁方式</h1><h2 id="12-1隐式锁"><a href="#12-1隐式锁" class="headerlink" title="12.1隐式锁"></a>12.1隐式锁</h2><p>隐式锁是没有指令可以查看的，当且仅当产生锁等待的时候转为显示锁</p>
-<p><img src="https://img-blog.csdnimg.cn/81d18400a69c40c2b8c231afab322b9c.png"></p>
-<h2 id="12-2显示锁"><a href="#12-2显示锁" class="headerlink" title="12.2显示锁"></a>12.2显示锁</h2><p>上面能查看的锁都是显示锁</p>
-<h1 id="13-其他"><a href="#13-其他" class="headerlink" title="13.其他"></a>13.其他</h1><h2 id="13-1全局锁"><a href="#13-1全局锁" class="headerlink" title="13.1全局锁"></a>13.1全局锁</h2><ul>
-<li>对整个数据加锁：例如在全库逻辑备份的时候，整个数据库都是只读状态</li>
-<li>粒度最大的锁</li>
-</ul>
-<h2 id="13-2死锁"><a href="#13-2死锁" class="headerlink" title="13.2死锁"></a>13.2死锁</h2><h3 id="13-2-1产生条件"><a href="#13-2-1产生条件" class="headerlink" title="13.2.1产生条件"></a>13.2.1产生条件</h3><ul>
-<li>两个or以上的事务</li>
-<li>每个事务都已经持有锁，并且正在申请新的锁</li>
-<li>锁在不同的事务间不兼容</li>
-<li>关键在于：<strong>加锁的顺序不一致</strong></li>
-</ul>
-<h3 id="13-2-2如何处理死锁"><a href="#13-2-2如何处理死锁" class="headerlink" title="13.2.2如何处理死锁"></a>13.2.2如何处理死锁</h3><p>存储引擎层面：</p>
-<ul>
-<li>等待，直到超时：默认的innodb_lock_wait_timeout=50s，这个时间可以自己设置，如果太短也会误伤正常锁等待</li>
-<li>死锁检测：存储引擎自动检查事务是否产生回路（死锁），回滚undo量最小的事务。<strong>但是这个方法每次遇到阻塞都去检测，并发量高的情况下检测回路的开销特别大</strong>，也可以自行关闭</li>
-</ul>
-<p>业务设计层面：</p>
-<ul>
-<li>控制并发量：例如使用MQ</li>
-<li>调整SQL业务顺序，避免update和delete在事务的开头占据太长时间</li>
-<li>将大事务拆分为小事务</li>
-</ul>
-<p>数据库设计层面：</p>
-<ul>
-<li>合理设计索引，减少锁竞争</li>
-<li>降低隔离级别，且尽量不要显示加锁。（例如有MVCC的存在，可以将RR调整为RC，避免gap lock造成的死锁）</li>
-</ul>
-<h1 id="14-MVCC"><a href="#14-MVCC" class="headerlink" title="14.MVCC"></a>14.MVCC</h1><ul>
-<li>MVCC:多版本并发控制，与锁机制共同保证了事务的隔离性</li>
-<li>依赖于数据库每行记录中的<code>三个隐藏字段</code>、<code>undo log</code>、<code>readView</code></li>
-<li>在MySQL的InnoDB中，依赖于MVCC，<code>RR(REPEATABLE READ)</code>隔离级别下解决了幻读问题（如果没有MVCC机制则需要串行化or全加X锁才能解决幻读）</li>
-<li>MVCC在RR级别和RC级别都是有效的，区别在于<code>ReadView</code>对于undo log的判断规则。只是后者不能解决幻读问题。<strong>MVCC保证的是读，锁保证的是写，因为写永远是针对最新的版本。</strong></li>
-</ul>
-<p><img src="https://img-blog.csdnimg.cn/848e9bb938f74a488cd5e76484c4a6fd.png"></p>
-<h2 id="14-1当前读、快照读"><a href="#14-1当前读、快照读" class="headerlink" title="14.1当前读、快照读"></a>14.1当前读、快照读</h2><p>快照读的前提是<strong>不能是串行化</strong>，串行化下快照读退化为当前读<br><img src="https://img-blog.csdnimg.cn/aba4d84e165a4c17b741561cb154a39c.png"></p>
-<h2 id="14-2MVCC实现原理"><a href="#14-2MVCC实现原理" class="headerlink" title="14.2MVCC实现原理"></a>14.2MVCC实现原理</h2><h3 id="14-2-1undo-log版本链"><a href="#14-2-1undo-log版本链" class="headerlink" title="14.2.1undo log版本链"></a>14.2.1undo log版本链</h3><p>每次事务修改这条记录，都会产生一个版本，版本中的隐藏列DB_ROLL_PTR指针又形成了undo log版本链<br><img src="https://img-blog.csdnimg.cn/c90f31a47bda43408606a4be6c4ca21d.png"></p>
-<h3 id="14-2-2readView"><a href="#14-2-2readView" class="headerlink" title="14.2.2readView"></a>14.2.2readView</h3><p>这里面包含的四个字段，都是事务id相关的，他们共同决定了在读取undo log版本链的时候究竟是读哪个版本的数据。并且跟隔离级别也有关系</p>
-<p><img src="https://img-blog.csdnimg.cn/ebf094ebf632406892dbbc4a085e3b39.png"><br><img src="https://img-blog.csdnimg.cn/5804adb358f34b83bf6f767daeb3b479.png"><br><img src="https://img-blog.csdnimg.cn/c62ecd17a1f5460aa0e115c238963a31.png"></p>
-
-      
+            <li class="article-tag-list-item">
+                <i class="iconfont icon-tag"></i><a>HashMap</a>
+            </li>
+        
     </div>
-    <footer class="article-footer">
-      <a data-url="https://blogzjh.github.io/2022/08/23/MySQL%E4%BA%8B%E5%8A%A1%E4%B8%8E%E9%94%81/" data-id="cl8wvrz8y000skktaau3r4zia" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
 
+</div>
 
-  
-    <article id="post-AOP实现分布式锁" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2022/08/23/AOP%E5%AE%9E%E7%8E%B0%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/" class="article-date">
-  <time datetime="2022-08-23T04:48:25.000Z" itemprop="datePublished">2022-08-23</time>
-</a>
     
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/%E5%B7%A5%E4%BD%9C%E7%AC%94%E8%AE%B0/">工作笔记</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
+    <nav id="title-list-nav">
         
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2022/08/23/AOP%E5%AE%9E%E7%8E%B0%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">AOP实现分布式锁</a>
-    </h1>
-  
+        <a  class="全部文章 工作笔记 "
+           href="/2022/09/26/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%81%9A%E9%BB%91%E5%90%8D%E5%8D%95%E7%9A%84%E6%96%B9%E6%A1%88/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="布隆过滤做黑名单的方案">布隆过滤做黑名单的方案</span>
+            <span class="post-date" title="2022-09-26 02:22:57">2022/09/26</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/2022/09/15/%E6%9F%90%E8%9A%81%E9%87%91%E6%9C%8D%E7%A7%8B%E6%8B%9B9-15/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="某蚁金服秋招9-15">某蚁金服秋招9-15</span>
+            <span class="post-date" title="2022-09-15 21:22:38">2022/09/15</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/2022/09/15/%E4%B8%89%E7%A7%8D%E6%83%85%E5%86%B5%E7%9A%84%E5%B1%82%E5%BA%8F%E9%81%8D%E5%8E%86/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="三种情况的层序遍历">三种情况的层序遍历</span>
+            <span class="post-date" title="2022-09-15 21:21:24">2022/09/15</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/2022/09/15/%E5%87%A0%E9%81%93%E5%B2%9B%E5%B1%BF%E9%97%AE%E9%A2%98-dfs-%E5%89%AA%E6%9E%9D-%E5%9B%9E%E6%BA%AF/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="几道岛屿问题:dfs+剪枝+回溯">几道岛屿问题:dfs+剪枝+回溯</span>
+            <span class="post-date" title="2022-09-15 21:20:58">2022/09/15</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/2022/09/15/%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%9A%E6%9B%BF%E6%8D%A2%E3%80%81%E5%B7%A6%E6%97%8B%E3%80%81%E7%BC%BA%E5%A4%B1/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="字符串：替换、左旋、缺失">字符串：替换、左旋、缺失</span>
+            <span class="post-date" title="2022-09-15 21:20:41">2022/09/15</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/2022/09/15/%E5%87%A0%E9%81%93%E4%BA%8C%E5%8F%89%E6%A0%91-dfs-%E5%9B%9E%E6%BA%AF/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="几道二叉树:dfs+回溯">几道二叉树:dfs+回溯</span>
+            <span class="post-date" title="2022-09-15 21:19:53">2022/09/15</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/2022/09/15/%E5%87%A0%E9%81%93%E5%8A%A8%E5%BD%92%E6%80%BB%E7%BB%93/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="几道动归总结">几道动归总结</span>
+            <span class="post-date" title="2022-09-15 21:18:43">2022/09/15</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/2022/09/15/BeanFactory%E5%92%8CApplicationContext/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="BeanFactory和ApplicationContext">BeanFactory和ApplicationContext</span>
+            <span class="post-date" title="2022-09-15 21:17:39">2022/09/15</span>
+        </a>
+        
+        <a  class="全部文章 中间件 "
+           href="/2022/08/28/%E4%B8%89%E7%A7%8D%E4%B8%AD%E9%97%B4%E4%BB%B6%E7%9A%84%E5%88%B7%E7%9B%98-%E6%8C%81%E4%B9%85%E5%8C%96-%E7%AD%96%E7%95%A5/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="三种中间件的刷盘(持久化)策略">三种中间件的刷盘(持久化)策略</span>
+            <span class="post-date" title="2022-08-28 13:34:20">2022/08/28</span>
+        </a>
+        
+        <a  class="全部文章 中间件 "
+           href="/2022/08/28/redis%E5%9F%BA%E7%A1%80/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="redis基础">redis基础</span>
+            <span class="post-date" title="2022-08-28 12:21:22">2022/08/28</span>
+        </a>
+        
+        <a  class="全部文章 中间件 "
+           href="/2022/08/27/RabbitMQ%E5%9F%BA%E7%A1%80/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="RabbitMQ基础">RabbitMQ基础</span>
+            <span class="post-date" title="2022-08-27 16:26:14">2022/08/27</span>
+        </a>
+        
+        <a  class="全部文章 中间件 "
+           href="/2022/08/27/RabbitMQ%E5%8F%AF%E9%9D%A0%E6%80%A7-Spring/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="RabbitMQ可靠性-Spring">RabbitMQ可靠性-Spring</span>
+            <span class="post-date" title="2022-08-27 16:02:25">2022/08/27</span>
+        </a>
+        
+        <a  class="全部文章 中间件 "
+           href="/2022/08/27/RabbitMQ%E6%AD%BB%E4%BF%A1%E9%98%9F%E5%88%97%E3%80%81%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97-Spring/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="RabbitMQ死信队列、延迟队列-Spring">RabbitMQ死信队列、延迟队列-Spring</span>
+            <span class="post-date" title="2022-08-27 01:05:35">2022/08/27</span>
+        </a>
+        
+        <a  class="全部文章 中间件 "
+           href="/2022/08/23/MySQL%E4%BA%8B%E5%8A%A1%E4%B8%8E%E9%94%81/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="MySQL事务与锁">MySQL事务与锁</span>
+            <span class="post-date" title="2022-08-23 12:49:38">2022/08/23</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/2022/08/23/AOP%E5%AE%9E%E7%8E%B0%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="AOP实现分布式锁">AOP实现分布式锁</span>
+            <span class="post-date" title="2022-08-23 12:48:25">2022/08/23</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/2022/08/23/ReentrantLock%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="ReentrantLock源码剖析">ReentrantLock源码剖析</span>
+            <span class="post-date" title="2022-08-23 12:34:15">2022/08/23</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/2022/08/23/%E5%8F%8D%E5%B0%84%E8%8E%B7%E5%8F%96AQS%E4%B8%AD%E5%90%8C%E6%AD%A5%E9%98%9F%E5%88%97%E4%B8%8E%E7%AD%89%E5%BE%85%E9%98%9F%E5%88%97%E7%9A%84%E9%95%BF%E5%BA%A6/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="反射获取AQS中同步队列与等待队列的长度">反射获取AQS中同步队列与等待队列的长度</span>
+            <span class="post-date" title="2022-08-23 12:32:58">2022/08/23</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/2022/08/14/Spring%E3%80%81Servlet%E7%9B%91%E5%90%AC%E5%99%A8/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Spring、Servlet监听器">Spring、Servlet监听器</span>
+            <span class="post-date" title="2022-08-14 21:01:46">2022/08/14</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/2022/08/13/AOP-%E5%8F%8D%E5%B0%84%EF%BC%9A%E6%8E%A5%E5%8F%A3%E5%8F%82%E6%95%B0%E6%A0%A1%E9%AA%8C/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="AOP+反射：接口参数校验">AOP+反射：接口参数校验</span>
+            <span class="post-date" title="2022-08-13 17:12:17">2022/08/13</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/2022/08/12/%E5%AF%B9dto%E6%8C%87%E5%AE%9A%E5%B1%9E%E6%80%A7%E4%B8%80%E9%94%AE%E5%8A%A0%E8%A7%A3%E5%AF%86/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="对dto指定属性一键加解密">对dto指定属性一键加解密</span>
+            <span class="post-date" title="2022-08-12 22:51:17">2022/08/12</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/2022/08/03/%E5%8F%8D%E5%B0%84%E4%BF%AE%E6%94%B9jsessionid%E5%AE%9E%E7%8E%B0session%E5%85%B1%E4%BA%AB/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="反射修改jsessionid实现session共享">反射修改jsessionid实现session共享</span>
+            <span class="post-date" title="2022-08-03 21:53:21">2022/08/03</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/2022/08/03/RestTemlate%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%8F%8A%E5%B7%A5%E5%85%B7%E7%B1%BB%E8%AE%BE%E8%AE%A1/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="RestTemlate源码分析及工具类设计">RestTemlate源码分析及工具类设计</span>
+            <span class="post-date" title="2022-08-03 21:51:57">2022/08/03</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/2022/08/03/%E7%9F%AD%E4%BF%A1%E6%9C%8D%E5%8A%A1%E8%A2%AB%E6%94%BB%E5%87%BB%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="短信服务被攻击解决方案">短信服务被攻击解决方案</span>
+            <span class="post-date" title="2022-08-03 21:51:16">2022/08/03</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/2022/08/03/%E5%9B%9B%E7%A7%8D%E6%96%B9%E6%B3%95Servlet%E5%AE%B9%E5%99%A8%E4%BD%BF%E7%94%A8Spring%E7%9A%84Bean%E5%AF%B9%E8%B1%A1/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="四种方法Servlet容器使用Spring的Bean对象">四种方法Servlet容器使用Spring的Bean对象</span>
+            <span class="post-date" title="2022-08-03 21:47:54">2022/08/03</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/2022/07/19/%E5%86%85%E5%AD%98%E5%8C%BA%E5%9F%9F%E3%80%81%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="内存区域、类的加载">内存区域、类的加载</span>
+            <span class="post-date" title="2022-07-19 22:29:21">2022/07/19</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/2022/07/19/Restful%E9%A3%8E%E6%A0%BC%E7%9C%9F%E7%9A%84%E6%9C%89%E5%BF%85%E8%A6%81%E5%90%97/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Restful风格真的有必要吗？">Restful风格真的有必要吗？</span>
+            <span class="post-date" title="2022-07-19 20:19:57">2022/07/19</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/2022/07/17/%E6%B0%94%E8%B1%A1cv-%E5%9C%B0%E5%9F%BA%E4%BA%91%E5%9B%BE%E4%BA%91%E7%B3%BB%E5%88%86%E5%89%B2/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="气象cv-地基云图云系分割">气象cv-地基云图云系分割</span>
+            <span class="post-date" title="2022-07-17 12:04:12">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/2022/07/17/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA%E6%9E%A3%E7%B1%BB%E9%81%97%E4%BC%A0%E7%9A%84%E5%9B%9E%E5%BD%92%E9%A2%84%E6%B5%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="支持向量机枣类遗传的回归预测">支持向量机枣类遗传的回归预测</span>
+            <span class="post-date" title="2022-07-17 11:47:04">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/2022/07/17/%E6%B0%94%E8%B1%A1%E5%A4%A7%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="气象大数据分析">气象大数据分析</span>
+            <span class="post-date" title="2022-07-17 11:44:44">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/2022/07/17/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%8D%95%E5%9B%BE%E8%B6%85%E5%88%86%E8%BE%A8%E7%8E%87%E7%9A%84%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="卷积神经网络单图超分辨率的深度学习方法">卷积神经网络单图超分辨率的深度学习方法</span>
+            <span class="post-date" title="2022-07-17 11:33:07">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/2022/07/17/%E7%96%AB%E6%83%85%E6%B8%AF%E5%8F%A3%E6%8C%82%E9%9D%A0%E6%95%B0ARIMA%E6%97%B6%E5%BA%8F%E5%88%86%E6%9E%90/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="疫情港口挂靠数ARIMA时序分析">疫情港口挂靠数ARIMA时序分析</span>
+            <span class="post-date" title="2022-07-17 11:21:13">2022/07/17</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/2022/07/15/OGNL%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%94%B9%E9%80%A0%E4%BB%A5%E4%BD%BF%E7%94%A8%E7%B4%A2%E5%BC%95/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="OGNL表达式改造以使用索引">OGNL表达式改造以使用索引</span>
+            <span class="post-date" title="2022-07-15 22:27:54">2022/07/15</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/2022/07/15/mvcc+%E6%8C%89%E5%A4%A9%E7%BC%93%E5%AD%98%E7%BB%9F%E8%AE%A1%E4%B8%A4%E4%B8%AA%E6%94%B6%E7%9B%8A/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="mvcc+按天缓存统计两个收益">mvcc+按天缓存统计两个收益</span>
+            <span class="post-date" title="2022-07-15 21:35:25">2022/07/15</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/2022/07/15/%E5%8E%8B%E7%BC%A9%E6%89%93%E5%8C%85%E4%BD%86%E4%B8%8D%E5%BD%92%E6%A1%A3%EF%BC%8C%E5%88%A9%E7%94%A8response/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="压缩打包但不归档，利用response">压缩打包但不归档，利用response</span>
+            <span class="post-date" title="2022-07-15 21:26:51">2022/07/15</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/2022/07/15/%E4%B8%9A%E5%8A%A1%E4%B8%ADdelete_flag%E5%AD%97%E6%AE%B5%E5%AE%B9%E6%98%93%E8%B8%A9%E7%9A%84%E5%9D%91/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="业务中delete_flag字段容易踩的坑">业务中delete_flag字段容易踩的坑</span>
+            <span class="post-date" title="2022-07-15 21:19:19">2022/07/15</span>
+        </a>
+        
+        <a  class="全部文章 工作笔记 "
+           href="/2022/07/15/%E9%9D%9E%E6%97%B6%E5%BA%8F%E6%8E%92%E5%BA%8F%E4%B8%8B%E7%9A%84%E7%80%91%E5%B8%83%E6%B5%81%E5%88%86%E9%A1%B5/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="非时序排序下的瀑布流分页">非时序排序下的瀑布流分页</span>
+            <span class="post-date" title="2022-07-15 21:15:15">2022/07/15</span>
+        </a>
+        
+        <a  class="全部文章 数据结构算法 "
+           href="/2022/06/25/%E8%A1%8C%E7%A8%8B%E7%BC%96%E7%A0%81%E5%8E%8B%E7%BC%A9%E5%9B%BE%E7%89%87/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="行程编码压缩图片">行程编码压缩图片</span>
+            <span class="post-date" title="2022-06-25 01:35:20">2022/06/25</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/2022/04/21/Filter%E7%9A%84%E5%B8%B8%E8%A7%81%E7%94%A8%E6%B3%95/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Filter的常见用法">Filter的常见用法</span>
+            <span class="post-date" title="2022-04-21 09:51:40">2022/04/21</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/2022/04/21/Lambda%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%92%8C%E6%96%B9%E6%B3%95%E5%BC%95%E7%94%A8/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Lambda表达式和方法引用">Lambda表达式和方法引用</span>
+            <span class="post-date" title="2022-04-21 09:50:42">2022/04/21</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/2022/04/21/Mybatis%E4%B8%ADxml%E4%B8%AD%E8%B0%83java%E6%96%B9%E6%B3%95OGNL%E8%A1%A8%E8%BE%BE%E5%BC%8F/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Mybatis中xml中调java方法OGNL表达式">Mybatis中xml中调java方法OGNL表达式</span>
+            <span class="post-date" title="2022-04-21 09:47:36">2022/04/21</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/2022/04/21/Java%E6%B3%A8%E8%A7%A3%E5%92%8C%E5%8F%8D%E5%B0%84/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Java注解和反射">Java注解和反射</span>
+            <span class="post-date" title="2022-04-21 09:45:15">2022/04/21</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/2022/03/21/HashMap%E4%B8%ADentrySet-%E8%AF%A6%E8%A7%A3/"
+           data-tag="HashMap"
+           data-author="" >
+            <span class="post-title" title="HashMap中entrySet()详解">HashMap中entrySet()详解</span>
+            <span class="post-date" title="2022-03-21 00:15:10">2022/03/21</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/2022/03/21/HashMap/"
+           data-tag="HashMap"
+           data-author="" >
+            <span class="post-title" title="HashMap">HashMap</span>
+            <span class="post-date" title="2022-03-21 00:13:23">2022/03/21</span>
+        </a>
+        
+        <a  class="全部文章 中间件 "
+           href="/2022/03/07/Mysql%E4%BA%8B%E5%8A%A1%E5%92%8C%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Mysql事务和存储引擎">Mysql事务和存储引擎</span>
+            <span class="post-date" title="2022-03-07 22:11:06">2022/03/07</span>
+        </a>
+        
+        <a  class="全部文章 中间件 "
+           href="/2022/03/07/Mysql-InnoDB-%E7%B4%A2%E5%BC%95%E5%8E%9F%E7%90%86%E5%8F%8A%E7%9A%84%E4%BD%BF%E7%94%A8/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Mysql(InnoDB)索引原理及的使用">Mysql(InnoDB)索引原理及的使用</span>
+            <span class="post-date" title="2022-03-07 22:10:05">2022/03/07</span>
+        </a>
+        
+        <a  class="全部文章 源码 "
+           href="/2022/02/21/LinkedList%E6%BA%90%E7%A0%81%E4%B8%AD%E4%B8%BA%E4%BD%95%E5%A4%A7%E9%87%8F%E5%87%BA%E7%8E%B0final/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="LinkedList源码中为何大量出现final">LinkedList源码中为何大量出现final</span>
+            <span class="post-date" title="2022-02-21 09:57:35">2022/02/21</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/2022/01/11/%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E6%B3%B0%E5%9D%A6%E5%B0%BC%E5%85%8B%E5%8F%B7%E8%8E%B7%E6%95%91%E9%A2%84%E6%B5%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="随机森林——泰坦尼克号获救预测">随机森林——泰坦尼克号获救预测</span>
+            <span class="post-date" title="2022-01-11 03:06:10">2022/01/11</span>
+        </a>
+        
+        <a  class="全部文章 机器学习 "
+           href="/2022/01/01/%E5%86%B3%E7%AD%96%E6%A0%91-%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E2%80%94%E2%80%94%E7%94%A8%E6%88%B7%E6%B5%81%E5%A4%B1%E9%A2%84%E6%B5%8B%E7%9A%84%E6%A1%88%E4%BE%8B/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="决策树/随机森林——用户流失预测的案例">决策树/随机森林——用户流失预测的案例</span>
+            <span class="post-date" title="2022-01-01 00:41:40">2022/01/01</span>
+        </a>
+        
+        <a  class="全部文章 "
+           href="/2021/12/25/IDEA%E5%B8%B8%E7%94%A8%E5%BF%AB%E6%8D%B7%E9%94%AE/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="IDEA常用快捷键">IDEA常用快捷键</span>
+            <span class="post-date" title="2021-12-25 21:55:46">2021/12/25</span>
+        </a>
+        
+        <a  class="全部文章 Java "
+           href="/2021/12/25/Java%E5%9B%9B%E7%A7%8Dnext%E7%94%A8%E6%B3%95/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Java四种next用法">Java四种next用法</span>
+            <span class="post-date" title="2021-12-25 01:59:30">2021/12/25</span>
+        </a>
+        
+        <div id="no-item-tips">
 
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="1-使用示例"><a href="#1-使用示例" class="headerlink" title="1.使用示例"></a>1.使用示例</h1><ul>
-<li>可以对整个接口加锁，也可以对某一个业务方法加锁</li>
-<li>必须指定锁的key值，为避免冲突最好使用枚举</li>
-<li>可选锁等待时间waitTime、超时时间leaseTime、单位timeUnit</li>
-<li>关于AOP代码中“获取注解信息”也可以再封装为一个方法，这里就不写了</li>
-</ul>
-<pre><code>  @GetMapping(&quot;lock&quot;)
-  @RedissonLock(lockKey = &quot;lock1&quot;)
-  public Integer getAop(String s1 , String s2)&#123;
-    System.out.println(&quot;阻塞？&quot;+s1+s2);
-    if(&quot;ex&quot;.equals(s1))&#123;//模拟异常
-            throw new RuntimeException();
-    &#125;
-    return 1;
-  &#125;
-</code></pre>
-<h1 id="2-AOP实现"><a href="#2-AOP实现" class="headerlink" title="2.AOP实现"></a>2.AOP实现</h1><h2 id="2-1注解"><a href="#2-1注解" class="headerlink" title="2.1注解"></a>2.1注解</h2><pre><code>@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface RedissonLock &#123;
-
-  /**
-   * 锁标识
-   */
-  String lockKey();
-
-  /**
-   * 时间单位，默认秒
-   */
-  TimeUnit timeUnit() default TimeUnit.SECONDS;
-
-  /**
-   * 锁等待时间
-   */
-  int waitTime() default 10;
-
-  /**
-   * 锁超时时间
-   */
-  int leaseTime() default 60;
-
-&#125;
-</code></pre>
-<h2 id="2-2AOP"><a href="#2-2AOP" class="headerlink" title="2.2AOP"></a>2.2AOP</h2><pre><code>@Aspect
-@Component
-public class RedissonLockAspect &#123;
-
-  @Autowired
-  private RedissonClient redissonClient;
-
-
-
-  @Before(value = &quot;@annotation(RedissonLock)&quot;)
-  public void beforeAspect(JoinPoint jp) throws RuntimeException, NoSuchMethodException &#123;
-    MethodSignature signature = (MethodSignature) jp.getSignature();
-    Class[]         parameterTypes = signature.getParameterTypes();
-    String          name = signature.getName();
-    Object target = jp.getTarget();
-    //用target.getClass()获得的是一个类对象的实例，不同于Class.forName();因此可以获取指定的注解信息
-    Method   method = target.getClass().getMethod(name, parameterTypes);
-    RedissonLock annotation = method.getAnnotation(RedissonLock.class);
-    boolean flag = tryLock(annotation.lockKey(), annotation.timeUnit(), annotation.waitTime(), annotation.leaseTime());
-    if(!flag)&#123;
-      //可添加日志记录
-      throw new RuntimeException(&quot;业务繁忙，分布式锁获取失败&quot;);
-    &#125;
-  &#125;
-
-  @AfterReturning(value = &quot;@annotation(RedissonLock)&quot;)
-  public void afterAspect(JoinPoint jp) throws NoSuchMethodException &#123;
-    MethodSignature signature = (MethodSignature) jp.getSignature();
-    Class[]         parameterTypes = signature.getParameterTypes();
-    String          name = signature.getName();
-    Object target = jp.getTarget();
-    //用target.getClass()获得的是一个类对象的实例，不同于Class.forName();因此可以获取指定的注解信息
-    Method   method = target.getClass().getMethod(name, parameterTypes);
-    RedissonLock annotation = method.getAnnotation(RedissonLock.class);
-    unLock(annotation.lockKey());
-  &#125;
-
-  @AfterThrowing(value = &quot;@annotation(RedissonLock)&quot;, throwing = &quot;ex&quot;)
-  public void afterThrowing(JoinPoint jp, Throwable ex) throws NoSuchMethodException &#123;
-    //先释放锁
-    MethodSignature signature = (MethodSignature) jp.getSignature();
-    Class[]         parameterTypes = signature.getParameterTypes();
-    String          name = signature.getName();
-    Object target = jp.getTarget();
-    Method   method = target.getClass().getMethod(name, parameterTypes);
-    RedissonLock annotation = method.getAnnotation(RedissonLock.class);
-    unLock(annotation.lockKey());
-    //然后追加一些日志记录
-    System.out.println(&quot;日志记录&quot;);
-  &#125;
-
-
-  public boolean tryLock(String lockKey, TimeUnit unit, int waitTime, int leaseTime) &#123;
-    try &#123;
-      RLock lock = redissonClient.getLock(lockKey);
-      if (Objects.nonNull(lock)) &#123;
-        return lock.tryLock(waitTime, leaseTime, unit);
-      &#125; else &#123;
-        return false;
-      &#125;
-    &#125; catch (InterruptedException e) &#123;
-     //可添加日志记录
-      return false;
-    &#125;
-  &#125;
-
-  public void unLock(String lockKey)&#123;
-    try &#123;
-      RLock lock = redissonClient.getLock(lockKey);
-      //可能存在锁过期等问题
-      if (Objects.nonNull(lock) &amp;&amp; lock.isLocked() &amp;&amp; lock.isHeldByCurrentThread()) &#123;
-        lock.unlock();
-      &#125;
-    &#125; catch (Exception e) &#123;
-      //解锁出错一般不会导致严重业务问题，例如阻塞，这里可以添加日志记录
-    &#125;
-  &#125;
-&#125;
-</code></pre>
-
-      
+        </div>
+    </nav>
+    <div id="outline-list">
     </div>
-    <footer class="article-footer">
-      <a data-url="https://blogzjh.github.io/2022/08/23/AOP%E5%AE%9E%E7%8E%B0%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/" data-id="cl8wvrz860000kkta91bu9pvp" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
+</div>
 
-
-  
-    <article id="post-ReentrantLock源码剖析" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2022/08/23/ReentrantLock%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/" class="article-date">
-  <time datetime="2022-08-23T04:34:15.000Z" itemprop="datePublished">2022-08-23</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/%E6%BA%90%E7%A0%81/">源码</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2022/08/23/ReentrantLock%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/">ReentrantLock源码剖析</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="1-源码分析总结"><a href="#1-源码分析总结" class="headerlink" title="1.源码分析总结"></a>1.源码分析总结</h1><p>这里把结论提前放这里：</p>
-<ul>
-<li>AQS是一个抽象类，包含了Node（用于维护<strong>同步队列</strong>）、ConditionObject（也用Node维护了<strong>等待队列</strong>，给ReentrantLock提供更高的自由度，可由<code>reentrantLock.newCondition()</code>创建）</li>
-<li>CAS（乐观锁的一种实现，本身与自旋锁无关）是通过比较属性的<code>offset</code>偏移量来实现原子性操作，一般<strong>配合while()或者for(;;)实现自旋锁</strong>，如果只是想尝试一次获取锁，那么就不需要循环，只需要保证原子性即可</li>
-<li>自旋锁只是不停尝试，真正执行语句的原子性需要CAS保证，<strong>自旋锁也一般配合阻塞实现</strong></li>
-<li>公平锁和非公平锁<strong>都用Node维护了2个双端队列</strong>，不过只有公平锁在争锁的时候会先<strong>判断是不是队列的头节点</strong>，一旦进入队列仍然是有序的</li>
-<li><code> reentrantLock.lock()</code>和<code>condition.await()</code>底层都同时做了两件事：将节点放入队列、在<code>for(;;)</code>自旋锁中调用<code>LockSupport.park()</code>来阻塞线程，<strong>暂停自旋,防止消耗cpu资源</strong>，有且仅有同步队列的第二个节点在自旋</li>
-<li> <code> reentrantLock.unlock()</code>和<code>condition.signal()</code>底层都同时做了两件事：从自己维护的队列中取出头节点（即便是非公平锁也是取头节点）、底层调用<code>LockSupport.park()</code>来唤醒对应的线程</li>
-<li>由此可见，<strong>ReentrantLock的非公平锁并不是真正意义上的非公平，他只是在第一次获取锁的时候非公平，一旦进入同步队列，还是得乖乖排队</strong></li>
-<li>源码中大量使用了if( &amp;&amp; ) 的短路功能，来简化代码</li>
-<li>关于<code>LockSupport.park()</code>，底层就是阻塞线程，lock失败、awiat都用到了他。同理unpark在unlock和signal中被使用，用于唤醒指定线程（唤醒等待队列的头节点）</li>
-<li>关于<strong>同步队列与等待队列</strong>，其实<code>lock和unlock操作的是同步队列</code>（即使源码注释只提到了等待队列），而awati和signal分别是“<code>将同步队列节点移到等待队列</code>”，“<code>将等待列队节点移到同步队列</code>”————在第6点中细讲</li>
-</ul>
-<h1 id="2-ReentrantLock大体思路"><a href="#2-ReentrantLock大体思路" class="headerlink" title="2.ReentrantLock大体思路"></a>2.ReentrantLock大体思路</h1><ul>
-<li>已知 lock()在没有抢到锁的时候会导致线程阻塞，那么可以猜测相关的线程挂起逻辑是<code>while(true) for(;;) </code>自旋 +<code> park()</code>阻塞，等待别人<code>unpark()</code>唤醒后继续自旋</li>
-<li>Java中调用CAS(<strong>乐观锁，底层是原子操作</strong>)是在Usafe类下的native方法，而这个<code>state</code>的值在CAS锁机制下使用的参数是<code>stateOffset</code>偏移量，效果相同，例如<code>unsafe.objectFieldOffset</code>获取偏移量，然后<code>usafe.compareAndSwapInt</code>执行原子指令</li>
-<li>利用形如<code>while( !unsafe.compareAndSwapInt(this, stateOffset, 0 ,1 ))</code>来实现自旋锁，直到加到锁，其中原子性是由CAS（一种乐观锁实现）来保证的</li>
-</ul>
-<h2 id="2-1CAS实现一个简单的自旋锁"><a href="#2-1CAS实现一个简单的自旋锁" class="headerlink" title="2.1CAS实现一个简单的自旋锁"></a>2.1CAS实现一个简单的自旋锁</h2><ul>
-<li>用while + cas 可以实现一个<strong>自旋锁</strong>（自旋的思想就是不停重试）</li>
-<li>但是一直while很消耗cpu资源</li>
-<li>因此，<strong>我们不能让所有等待线程都while，在源码中使用park进行阻塞自旋</strong><h3 id="2-1-1-Unsafe类的使用demo"><a href="#2-1-1-Unsafe类的使用demo" class="headerlink" title="2.1.1 Unsafe类的使用demo"></a>2.1.1 Unsafe类的使用demo</h3></li>
-</ul>
-<pre><code>public class AQSTest &#123;
-
-  public static void main(String[] args) &#123;
-
-    AQSTest aqsTest = new AQSTest();
-    aqsTest.test();
-
-  &#125;
-
-
-  public void test()&#123;
-    System.out.println(state);//0
-    Unsafe unsafe = getUnsafe();
-    boolean b     = unsafe.compareAndSwapInt(this, stateOffset, 0, 1);
-    System.out.println(state);//1
-  &#125;
-
-  
-  private volatile int state = 0;//状态0则没加锁，volatile防止指令重排
-  private static final Unsafe unsafe = getUnsafe();//import sun.misc.Unsafe;
-  //偏移量，即在计算机中定位到state的位置，以便于原子操作
-  private static Long stateOffset;
-
-  //用静态代码块捕获异常，如果直接定义private static Long stateOffset =
-  // unsafe.objectFieldOffset(AQSTest.class.getDeclaredField(&quot;state&quot;));
-  //那么则会在空参构造上抛出异常
-  static &#123;
-    try &#123;
-      stateOffset = unsafe.objectFieldOffset(AQSTest.class.getDeclaredField(&quot;state&quot;));
-    &#125; catch (NoSuchFieldException e) &#123;
-      e.printStackTrace();
-    &#125;
-  &#125;
-
-  //获取unsafe对象
-  private static Unsafe getUnsafe()&#123;
-    try &#123;
-      Field field = Unsafe.class.getDeclaredField(&quot;theUnsafe&quot;);
-      field.setAccessible(true);
-      return (Unsafe) field.get(null);
-    &#125; catch (NoSuchFieldException e) &#123;
-      e.printStackTrace();
-    &#125; catch (IllegalAccessException e) &#123;
-      e.printStackTrace();
-    &#125;
-    return null;
-  &#125;
-
-&#125;
-</code></pre>
-<h3 id="2-1-2lock和unlock"><a href="#2-1-2lock和unlock" class="headerlink" title="2.1.2lock和unlock"></a>2.1.2lock和unlock</h3><p>加锁解锁方法:</p>
-<pre><code>  public void lock()&#123;
-    Unsafe unsafe = getUnsafe();
-    while ( !unsafe.compareAndSwapInt(this,stateOffset,0,1) )&#123;
-      System.out.println(Thread.currentThread().getName() + &quot;尝试获取锁&quot;);
-      try &#123;
-        TimeUnit.SECONDS.sleep(1);
-      &#125; catch (InterruptedException e) &#123;
-        e.printStackTrace();
-      &#125;
-    &#125;
-    System.out.println(Thread.currentThread().getName() + &quot;获取锁成功&quot;);
-  &#125;
-
-  public void unlock()&#123;
-    Unsafe unsafe = getUnsafe();
-    boolean flag     = unsafe.compareAndSwapInt(this, stateOffset, 1, 0);
-    if(flag)&#123;
-      System.out.println(&quot;解锁成功&quot;);
-    &#125;
-  &#125;
-</code></pre>
-<h3 id="2-1-3两个线程测试"><a href="#2-1-3两个线程测试" class="headerlink" title="2.1.3两个线程测试"></a>2.1.3两个线程测试</h3><p>main中开启两个线程：</p>
-<pre><code>AQSTest t = new AQSTest();
-
-
-new Thread(()-&gt;&#123;
-  System.out.println(&quot;线程1开始,上锁&quot;);
-  t.lock();
-  try &#123;
-    TimeUnit.SECONDS.sleep(3);
-  &#125; catch (InterruptedException e) &#123;
-    e.printStackTrace();
-  &#125;
-  //3秒后释放锁
-  t.unlock();
-&#125;,&quot;线程1&quot;).start();
-
-
-new Thread(()-&gt;&#123;
-  System.out.println(&quot;线程2开始&quot;);
-  t.lock();
-  t.unlock();
-&#125;,&quot;线程2&quot;).start();
-</code></pre>
-<p>输出：</p>
-<p><img src="https://img-blog.csdnimg.cn/0cd0d31e4b724f7e904b697d3b60b078.png"></p>
-<h1 id="3-AQS下的两个类"><a href="#3-AQS下的两个类" class="headerlink" title="3.AQS下的两个类"></a>3.AQS下的两个类</h1><p><img src="https://img-blog.csdnimg.cn/e9763c7896d04f1ea70a3942dd8fd362.png"></p>
-<h2 id="3-1Node节点（双端队列）"><a href="#3-1Node节点（双端队列）" class="headerlink" title="3.1Node节点（双端队列）"></a>3.1Node节点（双端队列）</h2><ul>
-<li>这几个状态值在lock、await  unlock、signal中都是不同的，起到一个状态对应的作用，也用于判断是否可以唤醒线程</li>
-<li>每个ReentrantLock中维护着一个Node对象（相应的维护了一个双端队列）</li>
-<li>每个Condition中也维护着一个Node对象（同上，一个condition可以对应await在很多地方），因此可以实现指定唤醒</li>
-<li>Node中的属性Thread非常重要，由于底层的unpark方法唤醒的是指定线程，<strong>在源码中的逻辑是：unpark()唤醒同步队列中的头节点head.thread线程</strong><br><img src="https://img-blog.csdnimg.cn/ea516a10a19841f38dfbb596b016b811.png"></li>
-</ul>
-<h2 id="3-2ConditionObject"><a href="#3-2ConditionObject" class="headerlink" title="3.2ConditionObject"></a>3.2ConditionObject</h2><p>主要是使用这两个方法，其内部也用到了上述双端队列，并且在大题执行逻辑上</p>
-<ul>
-<li>signal()与lock()相似，底层都是调用<code> LockSupport.unpark(node.thread);</code></li>
-<li>await()与unlock()<strong>被阻塞</strong>相似，底层都是<code>LockSupport.park(this);</code></li>
-<li>正是由于使用<code>Condition</code>类，在阻塞、唤醒的操作上比传统多线程提高了很多灵活性</li>
-<li>在传统的多线程中，使用<code>notify()</code>、<code>notifyAll()</code>、<code>wait()</code>来<strong>唤醒其他线程</strong> 和 <strong>阻塞自己并进入等待队列，等待唤醒后进入同步队列</strong>，在JUC编程中使用<code>await()</code>替换了Object类中的wait,<code>signal()</code>替换Object中的notify</li>
-</ul>
-<p><img src="https://img-blog.csdnimg.cn/3fe9366cb11b4edd9cf9959f9b920b76.png"></p>
-<h2 id="3-2-1signal-指定唤醒等待队列头节点"><a href="#3-2-1signal-指定唤醒等待队列头节点" class="headerlink" title="3.2.1signal()指定唤醒等待队列头节点"></a>3.2.1signal()指定唤醒等待队列头节点</h2><p><img src="https://img-blog.csdnimg.cn/c2e3dcc3d8e54a3cbae3b4a095bf2ef2.png">其中doSIgnal()底层调用的就是<code>LockSupport.unpark(node.thread);</code></p>
-<h2 id="3-2-2await-阻塞进入等待队列"><a href="#3-2-2await-阻塞进入等待队列" class="headerlink" title="3.2.2await()阻塞进入等待队列"></a>3.2.2await()阻塞进入等待队列</h2><p><strong>着重需要注意的是：调用condition.await()很容易写成condition.wait()从而报错</strong><br>这个方法与unlock调用的都是<code>tryRelease()</code>，底层也都是unpark()<br>因为Condition类的存在，await()变得异常灵活，我们可以在不同的线程用同一个condition调用await()，其等待队列维护在这个condition对象中，可以被signal()给唤醒</p>
-<p><img src="https://img-blog.csdnimg.cn/3c939cf2b4f64e17acefbd3e32265ada.png"></p>
-<p>关于同步队列、等待队列的内容在第6号标题</p>
-<p><img src="https://img-blog.csdnimg.cn/14818daac6ab453db15015500855457e.png"><br><img src="https://img-blog.csdnimg.cn/bb371c8836d3439ca8a50ef0a8cb49d1.png"></p>
-<h1 id="4-lock源码分析"><a href="#4-lock源码分析" class="headerlink" title="4.lock源码分析"></a>4.lock源码分析</h1><ul>
-<li>lock有两个实现  公平和非公平</li>
-<li>两者的区别在于第一步tryAcquire，而第二步acquireQueued二者都是相同的（<strong>这也同时证明了非公平锁并不是真正意义上的公平</strong>）</li>
-<li><em>二者都维护了等待队列，但在获取锁时只有公平锁使用的队列顺序</em>*</li>
-<li>非公平锁<strong>第一次加锁不考虑队列</strong>，会尝试两次锁（失败后进入等待队列）</li>
-</ul>
-<p><img src="https://img-blog.csdnimg.cn/e689244922b74bc78c1ea1f3b7078c86.png" alt="加锁失败后会打断自己"></p>
-<h2 id="4-1-amp-amp-的左边条件tryAcquire"><a href="#4-1-amp-amp-的左边条件tryAcquire" class="headerlink" title="4.1&amp;&amp;的左边条件tryAcquire"></a>4.1&amp;&amp;的左边条件tryAcquire</h2><ul>
-<li><p>在这个&amp;&amp;的前半块，在<code>tryAcquire </code>中，<strong>公平锁要先判断是不是队列队头，而非公平锁是直接cas抢锁</strong>（当然因为没有循环，只会获取一次，如果没抢到就算了）<br><img src="https://img-blog.csdnimg.cn/ec889af94870461fa875bdf58e623e68.png"></p>
-</li>
-<li><p>关于排队<code>hasQueuedPredecessors</code>，详细内容如下（考虑了并发问题）<img src="https://img-blog.csdnimg.cn/d69c0f216eec422dbd082c8e1129e98f.png"></p>
-<h2 id="4-2-amp-amp-的右边条件acquireQueued"><a href="#4-2-amp-amp-的右边条件acquireQueued" class="headerlink" title="4.2&amp;&amp;的右边条件acquireQueued"></a>4.2&amp;&amp;的右边条件acquireQueued</h2></li>
-</ul>
-<p>在这里面公平锁与非公平锁都一样，都是使用了：<br><strong>自旋锁 + park阻塞 + unpark唤醒 + 同步队列FIFO</strong> 的策略</p>
-<h3 id="4-2-1-addWaiter维护同步队列"><a href="#4-2-1-addWaiter维护同步队列" class="headerlink" title="4.2.1 addWaiter维护同步队列"></a>4.2.1 addWaiter维护同步队列</h3><p>（这里源码中的等待队列其实<strong>本质是同步队列</strong>，相关内容在第6号标题中）</p>
-<p>那么非公平锁是否有维护这个队列呢？在&amp;&amp;的后半块：我们在<code>addWaiter()</code>的方法打个断点，分别测试公平锁和非公平锁，发现都会进来，就证明<strong>其实二者都维护了同步队列</strong>（只有公平锁加锁时用<code>hasQueuedPredecessors</code>判断是否是队列头）<br><img src="https://img-blog.csdnimg.cn/d51949a4212f41cd849f9167892a7cb7.png">debug后发现，对于<code>addWaiter同步队列</code>，二者的流程一致。不得不说这个addWaiter设计十分精妙，<strong>enq(Node node)方法的自旋锁完全考虑了队列为空、创建队列时被插入、新增节点时可能遇到的所有并发问题</strong><br><img src="https://img-blog.csdnimg.cn/c60fee28abec4502a7bc429f25714225.png"><img src="https://img-blog.csdnimg.cn/f5180873882741ad807cebbd357dfc9e.png" alt="自旋保证节点成功添加到队列中"></p>
-<h3 id="4-2-2acquireQueued获取同步队列"><a href="#4-2-2acquireQueued获取同步队列" class="headerlink" title="4.2.2acquireQueued获取同步队列"></a>4.2.2acquireQueued获取同步队列</h3><p>刚刚分析到了加锁失败后，这里形参是刚刚生成的节点，这里最重要的是这个打框的地方，<code>shouldParkAfterFailedAcquire(pre,node)</code>是一个should开头的疑问句，作用是<strong>判断当前节点是不是下一个执行节点</strong>，如果是的话则执行<code>parkAndCheckInterrupt()</code>阻塞<br><strong>而在for(;;)中是自旋的，这里阻塞了可以减少循环消耗cpu资源，也能被上一个节点成功唤醒</strong><br><img src="https://img-blog.csdnimg.cn/0825b54af554421fa85c78d915261cdc.png">因为被<code>parkAndCheckInterrupt()</code>阻塞了，停止了循环，当上一个节点唤醒当前节点后解除阻塞，继续循环，尝试加锁（非公平锁仍有可能抢不过————<strong>存在虽然被唤醒但竞争失败的情况</strong>）</p>
-<h3 id="4-2-3-parkAndCheckInterrupt方法"><a href="#4-2-3-parkAndCheckInterrupt方法" class="headerlink" title="4.2.3 parkAndCheckInterrupt方法"></a>4.2.3 parkAndCheckInterrupt方法</h3><p>关于LockSupport.park方法，这里参考<a target="_blank" rel="noopener" href="https://blog.csdn.net/a7980718/article/details/83661613">参考链接</a>，park是一个native方法，<strong>可以实现精准唤醒（配合队列可以指定唤醒某一个节点）</strong>，其中公平锁非公平锁都用了相同逻辑的同步队列</p>
-<p><img src="https://img-blog.csdnimg.cn/4fdc7bd52bdd41299be58193331ad315.png"></p>
-<h1 id="5-unlock源码分析"><a href="#5-unlock源码分析" class="headerlink" title="5.unlock源码分析"></a>5.unlock源码分析</h1><h2 id="5-1源码浅析"><a href="#5-1源码浅析" class="headerlink" title="5.1源码浅析"></a>5.1源码浅析</h2><p>unlock调的都是同一个<code>release()</code>方法<br><img src="https://img-blog.csdnimg.cn/769e9e42e82c4304b436c8b67f04c3a5.png">这里调用unpark去唤醒下一个节点，下一个节点那边接触阻塞</p>
-<p><img src="https://img-blog.csdnimg.cn/324ebc43c92341f6a847b93fac89c18e.png"></p>
-<h2 id="5-2使用示例"><a href="#5-2使用示例" class="headerlink" title="5.2使用示例"></a>5.2使用示例</h2><p>这个案例主要是探究await()阻塞、</p>
-<p><img src="https://img-blog.csdnimg.cn/38aab27ea2c04426a9a069387f177f80.png"></p>
-<h1 id="6-同步队列、等待队列"><a href="#6-同步队列、等待队列" class="headerlink" title="6.同步队列、等待队列"></a>6.同步队列、等待队列</h1><ul>
-<li>首先：同步队列的优先级高于等待队列，<strong>同步队列决定接下来执行哪个线程</strong>。</li>
-<li>例如：<strong>有多个condition等待队列存在的情况下</strong>，需要先通过signal扔进同步队列才能确定线程的最终执行顺序</li>
-</ul>
-<h2 id="6-1同步队列"><a href="#6-1同步队列" class="headerlink" title="6.1同步队列"></a>6.1同步队列</h2><ul>
-<li>使用reentrantLock.lock()时，当前线程进入的是<code>同步队列</code>，如果阻塞也是阻塞在同步队列</li>
-<li>使用reentrantLock.unlock()会将当前节点（线程）从<code>同步队列</code>剔除，释放锁，并通知下一个节点（<code>LockSupport.unpark()</code>）</li>
-</ul>
-<p><img src="https://img-blog.csdnimg.cn/f79e1caf91134c56b13c2ec01bcc3a7d.png"></p>
-<h2 id="6-2等待队列"><a href="#6-2等待队列" class="headerlink" title="6.2等待队列"></a>6.2等待队列</h2><ul>
-<li>使用condtion.await()时，将当前<strong>同步队列的头节点</strong>（当前获取锁的线程）扔到对应的<strong>condition中的队列尾</strong>，同时释放锁（与unlock逻辑相同）</li>
-<li>使用condition.signal()时，将<strong>condition等待队列的头节点</strong>扔到<strong>同步队列的队尾</strong></li>
-</ul>
-<p><img src="https://img-blog.csdnimg.cn/35af5a50c9ab4980b9488627d109a45e.png"></p>
-<h2 id="6-3执行流程"><a href="#6-3执行流程" class="headerlink" title="6.3执行流程"></a>6.3执行流程</h2><p>线程的执行顺序由同步队列决定，等待队列仅仅起到一个保存节点的作用</p>
-<p><img src="https://img-blog.csdnimg.cn/14818daac6ab453db15015500855457e.png" alt="案例"></p>
-<h2 id="6-4demo"><a href="#6-4demo" class="headerlink" title="6.4demo"></a>6.4demo</h2><pre><code>public class AwaitTest &#123;
-
-  public static void main(String[] args) &#123;
-
-    final ReentrantLock lock = new ReentrantLock();
-    final  Condition     condition = lock.newCondition();
-
-    new Thread(()-&gt;&#123;
-      lock.lock();
-      System.out.println(&quot;线程000000开始&quot;);
-      System.out.println(&quot;线程000000await()阻塞，进入等待队列&quot;);
-      try &#123;
-       condition.await();//线程0进入等待队列
-      &#125; catch (InterruptedException e) &#123;
-      &#125;
-      System.out.println(&quot;线程0被唤醒&quot;);
-      lock.unlock();//线程0释放锁，锁交给同步队列的下一个节点
-    &#125;).start();
-
-
-    new Thread(()-&gt;&#123;
-      lock.lock();
-      System.out.println(&quot;线程111111开始&quot;);
-      System.out.println(&quot;线程111111await()阻塞，进入等待队列，此时等待队列有线程0和1&quot;);
-      try &#123;
-        //线程1从同步队列移除，进入condition等待队列，此时的condition等待队列有两个元素
-        condition.await();
-      &#125; catch (InterruptedException e) &#123;
-      &#125;
-      System.out.println(&quot;线程1被唤醒&quot;);
-      lock.unlock();//线程1释放锁，锁交给同步队列的下一个节点
-    &#125;).start();
-
-    new Thread(()-&gt;&#123;
-      try &#123;
-      lock.lock();
-      System.out.println(&quot;此时同步队列队首为线程2（线程2获取锁），线程222222开始&quot;);
-        System.out.println(&quot;唤醒0线程————线程0从等待队列进入同步队列，当线程2 unlock后执行&quot;);
-        condition.signal();//唤醒0线程
-
-        System.out.println(&quot;唤醒1线程————线程1从等待队列进入同步队列，当线程0 unlock后执行&quot;);
-        condition.signal();//唤醒1线程
-
-        System.out.println(&quot;此时同步队列队首的线程2调用unlock释放锁，执行其他同步队列节点&quot;);
-        lock.unlock();
-      &#125; catch (Exception e) &#123;
-        e.printStackTrace();
-      &#125;
-    &#125;).start();
-    
-  &#125;
-
-&#125;
-</code></pre>
-<p><img src="https://img-blog.csdnimg.cn/8336b084e785433daaa749fcffa107b1.png"></p>
-<h2 id="6-4两个队列的本质"><a href="#6-4两个队列的本质" class="headerlink" title="6.4两个队列的本质"></a>6.4两个队列的本质</h2><ul>
-<li><p>本质其实就是这个Node节点的结构问题。Node节点是在AQS抽象类中的，且被AQS内部类创建，<strong>因此一个ReentrantLock可以有多个Node节点（1个同步队列，多个newCondition创建的等待队列）</strong></p>
-</li>
-<li><p>除此之外，我们用lock  unlock操作的节点隶属于最外层AQS<img src="https://img-blog.csdnimg.cn/d131da198363458e9d4513e4344cd522.png"></p>
-</li>
-<li><p>而await  signal操作的节点是AQS的内部类ConditionObject中的<img src="https://img-blog.csdnimg.cn/087978696280470f977253c723f770a7.png"></p>
-</li>
-<li><p>因此形成了这种情况：</p>
-</li>
-<li><p><em>lock  unlock操作的是同步队列<br>await  signal操作的是等待队列</em>*</p>
-</li>
-</ul>
-
-      
     </div>
-    <footer class="article-footer">
-      <a data-url="https://blogzjh.github.io/2022/08/23/ReentrantLock%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/" data-id="cl8wvrz920014kktagu2j5mbe" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-反射获取AQS中同步队列与等待队列的长度" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2022/08/23/%E5%8F%8D%E5%B0%84%E8%8E%B7%E5%8F%96AQS%E4%B8%AD%E5%90%8C%E6%AD%A5%E9%98%9F%E5%88%97%E4%B8%8E%E7%AD%89%E5%BE%85%E9%98%9F%E5%88%97%E7%9A%84%E9%95%BF%E5%BA%A6/" class="article-date">
-  <time datetime="2022-08-23T04:32:58.000Z" itemprop="datePublished">2022-08-23</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/%E6%BA%90%E7%A0%81/">源码</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2022/08/23/%E5%8F%8D%E5%B0%84%E8%8E%B7%E5%8F%96AQS%E4%B8%AD%E5%90%8C%E6%AD%A5%E9%98%9F%E5%88%97%E4%B8%8E%E7%AD%89%E5%BE%85%E9%98%9F%E5%88%97%E7%9A%84%E9%95%BF%E5%BA%A6/">反射获取AQS中同步队列与等待队列的长度</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <ul>
-<li><p>在使用JUC中的锁时（如<code>ReentrantLock</code>、<code>ReentrantReadWriteLock</code>），底层维护了两个队列（<strong>同步队列和等待队列</strong>），但是并没有提供相关的API来获取其队列的长度。我这里通过反射写了一个工具类，可以传入一个Lock实例获取两个队列的长度</p>
-</li>
-<li><p>在写这个工具类前，需要先完全弄清楚AQS与Lock的结构（<strong>包括其中的内部类、内部类子类</strong>）。尤其是不能忽略实际上<code>Lock</code>在运行中中创建的<code>Sync</code>对象是其子类<code>NonfairSync</code>和<code>fairSync</code>。如果需要反射获取到AQS中的Node节点，就需要<strong>连续两次</strong><code>syncClazz.getSuperclass().getSuperclass()</code>获取父类</p>
-</li>
-<li><p>下面标题1给出最终工具类，标题2开始分析源码和改造思路，按照这个思路还可以自由地更改AQS锁队列的顺序，指定线程强制提前，指定剔除等</p>
-</li>
-</ul>
-<h1 id="1-工具类"><a href="#1-工具类" class="headerlink" title="1.工具类"></a>1.工具类</h1><h2 id="1-1代码"><a href="#1-1代码" class="headerlink" title="1.1代码"></a>1.1代码</h2><p><strong>获取同步队列长度：传入Lock实例<br>获取等待队列长度：传入Condition实例</strong></p>
-<pre><code>public class AQSUtils &#123;
-  /**
-   * 获取同步队列长度（线程lock被阻塞 + 正持有锁的 节同步队列点总数） 支持JUC下locks包中所有锁
-   *
-   * @Author: zjh
-   * @Date: 2022/8/23 10:14
-   */
-  public static int getSyncQueueLength(Lock lock) throws NoSuchFieldException, IllegalAccessException &#123;
-    Class&lt;? extends Lock&gt; lockClazz = lock.getClass();
-    //先获取内部类Sync实例，因为Sync继承于AbstractQueuedSynchronizer，从而可以获得Node head节点
-    //这里Lock接口下的几个实现类（如ReentrantLock、ReentantReadWriteLock）中Sync都是内部类
-    Field syncField = lockClazz.getDeclaredField(&quot;sync&quot;);
-    syncField.setAccessible(true);
-    AbstractQueuedSynchronizer                  sync      = (AbstractQueuedSynchronizer) syncField.get(lock);
-    Class&lt;? extends AbstractQueuedSynchronizer&gt; syncClazz = sync.getClass();
-    //***十分需要注意，这里用了两次getSuperclass()
-    Class&lt;AbstractQueuedSynchronizer&gt; AQSClazz = (Class&lt;AbstractQueuedSynchronizer&gt;) syncClazz.getSuperclass().getSuperclass();
-    //获取同步队列的头节点  末尾节点
-    Field headNode = AQSClazz.getDeclaredField(&quot;head&quot;);
-    headNode.setAccessible(true);
-    //这里实际上是同步队列的Node节点，碍于访问修饰符问题，只能通过反射获取next节点的值
-    Object head = headNode.get(sync);
-    //计算长度
-    int    length = 0;
-    Object temp   = head;
-    while (temp != null) &#123;
-      length++;
-      Class&lt;?&gt; nodecLazz = temp.getClass();
-      Field    nextNode      = nodecLazz.getDeclaredField(&quot;next&quot;);
-      nextNode.setAccessible(true);
-      temp = nextNode.get(temp);
-    &#125;
-    return length;
-  &#125;
-
-  /**
-   * 每个Condition对象中都持有一个等待队列，获取其等待队列长度
-   *
-   * @Author: zjh
-   * @Date: 2022/8/23 10:18
-   */
-  public static int getWaiteQueueLengthInCondition(Condition condition)
-      throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException, InstantiationException &#123;
-    Class&lt;? extends Condition&gt; conClazz = condition.getClass();
-    Field                      firstWaiterNode = conClazz.getDeclaredField(&quot;firstWaiter&quot;);
-    firstWaiterNode.setAccessible(true);
-    Object firstWaiter = firstWaiterNode.get(condition);
-    int length = 0;
-    Object temp = firstWaiter;
-    while(temp!=null)&#123;
-      length++;
-      Class&lt;?&gt; nodeClazz = temp.getClass();
-      Field    next      = nodeClazz.getDeclaredField(&quot;nextWaiter&quot;);
-      next.setAccessible(true);
-      temp = next.get(temp);
-    &#125;
-    return length;
-  &#125;
-
-&#125;
-</code></pre>
-<h2 id="1-2演示案例"><a href="#1-2演示案例" class="headerlink" title="1.2演示案例"></a>1.2演示案例</h2><ol>
-<li><p>在main中创建Lock和Condition实例:</p>
-<pre><code> ReentrantLock lock = new ReentrantLock();
- Condition     condition = lock.newCondition();
-</code></pre>
-</li>
-</ol>
-<ol start="2">
-<li><p>创建3个这样的线程：</p>
-<pre><code>   //lock加锁后await阻塞————》同步队列不变   等待队列+1
-     new Thread(()-&gt;&#123;
-       lock.lock();
-       try &#123;
-         condition.await();
-       &#125; catch (InterruptedException e) &#123;
-         e.printStackTrace();
-       &#125;
-       lock.unlock();
-     &#125;).start();
-</code></pre>
-</li>
-<li><p>创建5个这样的线程：</p>
-<pre><code> //lock加锁 同步队列+1  等待队列不变
- new Thread(()-&gt;&#123;
-   lock.lock();
- &#125;).start();
-</code></pre>
-</li>
-<li><p>调用AQSUtils</p>
-</li>
-</ol>
-<pre><code>    TimeUnit.SECONDS.sleep(1);//保证线程全部开启
-    int syncQueueLength = AQSUtils.getSyncQueueLength(lock);
-    System.out.println(syncQueueLength);
-
-    int waiteQueueLengthInCondition = AQSUtils.getWaiteQueueLengthInCondition(condition);
-    System.out.println(waiteQueueLengthInCondition);
-</code></pre>
-<ol start="5">
-<li>结果：同步队列5个  等待队列3个<br><img src="https://img-blog.csdnimg.cn/08a3ffaeec91417f8fa219abfcbc6de3.png"></li>
-<li>同理，调用<code>signal()</code>也会让等待队列-1  同步队列+1，<code>signalAll()</code>会将对应condition中所有等待队列节点全部移入同步队列</li>
-</ol>
-<h1 id="2-源码解析"><a href="#2-源码解析" class="headerlink" title="2.源码解析"></a>2.源码解析</h1><p>这个其实主要是看AQS源码的结构，已知：</p>
-<ul>
-<li>Lock下的实例的锁相关操作都是调的AQS类中的方法，</li>
-<li>AQS中有一个内部类Node用于维护队列，AQS另一个内部类ConditionObject也调用了Node，</li>
-<li>因此有两个不同维度的Node，一个是同步队列，一个是等待队列</li>
-</ul>
-<h2 id="2-1生成同步队列-用于debug"><a href="#2-1生成同步队列-用于debug" class="headerlink" title="2.1生成同步队列(用于debug)"></a>2.1生成同步队列(用于debug)</h2><p>在main线程中运行如下代码，debug可知产生了同步队列的节点</p>
-<pre><code>ReentrantLock lock   = new ReentrantLock(false);
-//用于通知生产者进行生产
-Condition pro = lock.newCondition();
-new Thread(()-&gt;&#123;
-  //产生同步队列
-  lock.lock();
-&#125;).start();
-
-new Thread(()-&gt;&#123;
-  //产生同步队列
-  lock.lock();
-&#125;).start();
-
-new Thread(()-&gt;&#123;
-  //产生同步队列
-  lock.lock();
-&#125;).start();
-</code></pre>
-<p>Sync实例的直接Node属性是同步队列，Sync.<br><img src="https://img-blog.csdnimg.cn/7e80845395d9401e93accd5c12b8d728.png"></p>
-<h2 id="2-2AQS结构"><a href="#2-2AQS结构" class="headerlink" title="2.2AQS结构"></a>2.2AQS结构</h2><p><img src="https://img-blog.csdnimg.cn/8cce10ff5e2546029e5cfa563a15940e.png"></p>
-<p><img src="https://img-blog.csdnimg.cn/d693bd89dce94727a294c1ce1f8adaad.png"></p>
-<h2 id="2-3改造思路"><a href="#2-3改造思路" class="headerlink" title="2.3改造思路"></a>2.3改造思路</h2><h3 id="2-3-1同步队列"><a href="#2-3-1同步队列" class="headerlink" title="2.3.1同步队列"></a>2.3.1同步队列</h3><p>Lock——》Sync——》获取父类的父类AQS——》获取head节点——》循环遍历next节点</p>
-<h3 id="2-3-2等待队列"><a href="#2-3-2等待队列" class="headerlink" title="2.3.2等待队列"></a>2.3.2等待队列</h3><p>Lock——》生成的Condition——》获取firstWaiter节点——》循环遍历nextWaiter节点</p>
-
-      
+    <div class="hide-list">
+        <div class="semicircle" data-title="切换全屏 快捷键 s">
+            <div class="brackets first"><</div>
+            <div class="brackets">&gt;</div>
+        </div>
     </div>
-    <footer class="article-footer">
-      <a data-url="https://blogzjh.github.io/2022/08/23/%E5%8F%8D%E5%B0%84%E8%8E%B7%E5%8F%96AQS%E4%B8%AD%E5%90%8C%E6%AD%A5%E9%98%9F%E5%88%97%E4%B8%8E%E7%AD%89%E5%BE%85%E9%98%9F%E5%88%97%E7%9A%84%E9%95%BF%E5%BA%A6/" data-id="cl8wvrz9m0027kkta590kf889" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Spring、Servlet监听器" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2022/08/14/Spring%E3%80%81Servlet%E7%9B%91%E5%90%AC%E5%99%A8/" class="article-date">
-  <time datetime="2022-08-14T13:01:46.000Z" itemprop="datePublished">2022-08-14</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/Java/">Java</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2022/08/14/Spring%E3%80%81Servlet%E7%9B%91%E5%90%AC%E5%99%A8/">Spring、Servlet监听器</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="1-Servlet监听器"><a href="#1-Servlet监听器" class="headerlink" title="1.Servlet监听器"></a>1.Servlet监听器</h1><ul>
-<li><code>ServletContext、HttpSession、ServletRequest</code>的监听都是通过<code>javax.servlet </code>包下定义的，他们都是servlet的特性，换句话说，他们不依赖于Spring，而依赖于web容器（tomcat容器），他们的加载优先于Spring容器</li>
-<li>Servlet监听器有用处，但是没有Spring监听器用的多，用的方便；并且通常可以用<code>HttpServletRequest和HttpServletResponse实现相同的需求</code></li>
-<li>Servlet监听器提供了很多接口，在这些接口的实现类中<strong>需要重写接口方法</strong>，<strong>并且要制定对应的监听事件，监听事件也会直接影响监听目标</strong><br><a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/1018726">参考链接1</a><br><a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/1551830">参考链接2</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/dirft_din/article/details/107041979">参考链接3统计在线人数</a></li>
-<li><em>其实统计人数用<code>httpServletRequest().getServletContext().setAttribute();</code>来直接获取Servlet上下文实现</em>*</li>
-</ul>
-<h2 id="1-1Servlet上下文监听"><a href="#1-1Servlet上下文监听" class="headerlink" title="1.1Servlet上下文监听"></a>1.1Servlet上下文监听</h2><ul>
-<li>补充：<strong>在Spring项目中，启动Spring会先启动Servlet(tomcat）</strong>，Spring的init()紧跟其后<br>而关闭Spring项目会之后会立马destroyed()Servlet容器，因此这个<code>ServletContext监听器可以完全被ApplicationListener监听器代替</code>,<code>ApplicationListener是Spring3.0沿用至今最流行的全局监听器</code></li>
-</ul>
-<p>可以监听ServletContext对象的创建和删除以及属性的添加、删除和修改等操作。该监听器需要使用到如下两个接口类：</p>
-<p>● <code>ServletContextAttributeListener</code>：监听对ServletContext属性的操作，如增加、删除、修改操作。</p>
-<p>● <code>ServletContextListener</code>：监听ServletContext。</p>
-<p>当创建ServletContext时，激发<code>contextInitialized(ServletContextEvent sce)</code>方法；</p>
-<p>当销毁ServletContext时，激发<code>contextDestroyed(ServletContext- Event sce)</code>方法。</p>
-<h2 id="1-2Http会话监听"><a href="#1-2Http会话监听" class="headerlink" title="1.2Http会话监听"></a>1.2Http会话监听</h2><ul>
-<li>在Spring项目中对Session域进行监控仍然用的是<code>HttpSessionListener</code>，其来自于Servlet2.3</li>
-<li>用来监听 Web 应用种的 Session 对象，通常用于统计在线情况。</li>
-</ul>
-<p>可以监听Http会话活动情况、Http会话中属性设置情况，也可以监听Http会话的active、pasivate情况等。</p>
-<p>该监听器需要使用到如下多个接口类：</p>
-<p>● <code>HttpSessionListener</code>：监听HttpSession的操作。</p>
-<p>当创建一个Session时，激发<code>sessionCreated (SessionEvent se)</code>方法；</p>
-<p>当销毁一个Session时，激发<code>sessionDestroyed (HttpSessionEvent se)</code>    方法。</p>
-<p>● <code>HttpSessionActivationListener</code>：用于监听Http会话active、passivate情况。</p>
-<p>● <code>HttpSessionAttributeListener</code>：监听HttpSession中属性的操作。</p>
-<p>当在Session<strong>增加</strong>一个属性时，激发attributeAdded(HttpSessionBindingEvent se) 方法；</p>
-<p>当在Session<strong>删除</strong>一个属性时，激发attributeRemoved(HttpSessionBindingEvent se)方法；</p>
-<p>在Session属性被<strong>修改</strong>时，激发attributeReplaced(HttpSessionBindingEvent se) 方法。</p>
-<h2 id="1-3客户端Request请求监听"><a href="#1-3客户端Request请求监听" class="headerlink" title="1.3客户端Request请求监听"></a>1.3客户端Request请求监听</h2><ul>
-<li>用来监听 Request 对象的属性操作。</li>
-<li>ServletRequestListener监听器来自于Servlet2.4</li>
-</ul>
-<p>● <code>ServletRequestListener</code>接口类。</p>
-<p>● <code>ServletRequestAttrubuteListener</code>接口类。</p>
-<p>其实现类实现了ServletContextAttributeListener和ServletContextListener两个接口类中的<strong>5个方法</strong>：</p>
-<p>● contextInitialized(ServletContextEvent s)方法用来<strong>初始化</strong>ServletContext对象。</p>
-<p>● contextDestroyed(ServletContextEvent s)方法在上下文中<strong>删除</strong>某个属性时调用。</p>
-<p>● attributeAdded(ServletContextAttributeEvent sa)方法在上下文中<strong>添加</strong>一个新的属性时调用。</p>
-<p>● attributeReplaced(ServletContextAttributeEvent sa)方法在<strong>更新</strong>属性时调用。</p>
-<p>● attributeRemoved(ServletContextAttributeEvent sa)方法在上下文中<strong>删除</strong>某个属性时会被调用。</p>
-<h1 id="2-Servlet监听事件"><a href="#2-Servlet监听事件" class="headerlink" title="2.Servlet监听事件"></a>2.Servlet监听事件</h1><p>在实现了Servlet监听器接口的方法中，需要重写其接口抽象方法，而其抽象方法的形参，<strong>则对应了一个监听器对象</strong></p>
-<h2 id="2-1不带Attribute监听事件的创建和销毁"><a href="#2-1不带Attribute监听事件的创建和销毁" class="headerlink" title="2.1不带Attribute监听事件的创建和销毁"></a>2.1不带Attribute监听事件的创建和销毁</h2><pre><code>@WebListener
-public class MyServletListener implements ServletContextListener &#123;
-
-  @Override
-  public void contextInitialized(ServletContextEvent sce) &#123;
-    ServletContextListener.super.contextInitialized(sce);
-  &#125;
-
-  @Override
-  public void contextDestroyed(ServletContextEvent sce) &#123;
-    ServletContextListener.super.contextDestroyed(sce);
-  &#125;&#125;
-
-————————————————————————————————————————————————————————————————————————
-@WebListener
-public class MyServletListener implements HttpSessionListener &#123;
-
-  @Override
-  public void sessionCreated(HttpSessionEvent se) &#123;
-    HttpSessionListener.super.sessionCreated(se);
-  &#125;
-
-  @Override
-  public void sessionDestroyed(HttpSessionEvent se) &#123;
-    HttpSessionListener.super.sessionDestroyed(se);
-  &#125;&#125;
-
-—————————————————————————————————————————————————————————————————————————
-    @WebListener
-public class MyServletListener implements ServletRequestListener &#123;
-
-  @Override
-  public void requestDestroyed(ServletRequestEvent sre) &#123;
-    ServletRequestListener.super.requestDestroyed(sre);
-  &#125;
-
-  @Override
-  public void requestInitialized(ServletRequestEvent sre) &#123;
-    ServletRequestListener.super.requestInitialized(sre);
-  &#125;&#125;
-</code></pre>
-<h2 id="2-2带Attribute监听事件的增、删、改"><a href="#2-2带Attribute监听事件的增、删、改" class="headerlink" title="2.2带Attribute监听事件的增、删、改"></a>2.2带Attribute监听事件的增、删、改</h2><pre><code>@WebListener
-public class MyServletListener implements ServletContextAttributeListener &#123;
-
-  @Override
-  public void attributeAdded(ServletContextAttributeEvent scae) &#123;
-    ServletContextAttributeListener.super.attributeAdded(scae);
-  &#125;
-
-  @Override
-  public void attributeRemoved(ServletContextAttributeEvent scae) &#123;
-    ServletContextAttributeListener.super.attributeRemoved(scae);
-  &#125;
-
-  @Override
-  public void attributeReplaced(ServletContextAttributeEvent scae) &#123;
-    ServletContextAttributeListener.super.attributeReplaced(scae);
-  &#125;&#125;
-</code></pre>
-<p>其他两个关于Attribute监听的都是有三个抽象方法：added  removed repalced</p>
-<h1 id="3-为什么大量出现ed过去式？"><a href="#3-为什么大量出现ed过去式？" class="headerlink" title="3.为什么大量出现ed过去式？"></a>3.为什么大量出现ed过去式？</h1><p>众所周知英语中ed结尾的动词都是<code>过去完成式</code><br>我们发现 <code>sessionCreated  contextDestroyed Replaced等等</code>这些抽象方法都是ed结尾的过去式，那么可以 从中推断出：监听中的方法是在事件发生之后进行的。<br>因此我们可以解决一个疑惑：“我想在监听器方法中使用容器中的其他对象方法，会不会报错？”<br>答案是不会：“因为对context监听的ed方法一定触发在整个容器加载结束之后”</p>
-<h1 id="4-Spring监听器"><a href="#4-Spring监听器" class="headerlink" title="4. Spring监听器"></a>4. Spring监听器</h1><p><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000039097608">两种方式：参考资料</a></p>
-<h2 id="4-1ApplicationListener接口实现监听"><a href="#4-1ApplicationListener接口实现监听" class="headerlink" title="4.1ApplicationListener接口实现监听"></a>4.1ApplicationListener接口实现监听</h2><p>一般来说，在Spring项目中监听器只选择ApplicationListener，而对于监听事件spring提供了多种选择</p>
-<pre><code>ApplicationStartedEvent：spring boot启动监听类
-ApplicationEnvironmentPreparedEvent：环境事先准备
-ApplicationPreparedEvent：上下文context准备时触发
-ApplicationReadyEvent：上下文已经准备完毕的时候触发
-ApplicationFailedEvent：该事件为spring boot启动失败时的操作
-</code></pre>
-<ul>
-<li>他们<code>都是ApplicationEvent的抽象子类</code>，触发的时机不同</li>
-<li>例如用<code>ApplicationListener监听</code>，那么<code>以上5种子类事件都可以被监听到</code></li>
-<li>你可以<code>自定义一个事件</code>，继承于上面的<code>子事件</code>，来实现一些<code>数据的绑定</code>，不过一般不会用到</li>
-</ul>
-<h2 id="4-2-EventListener注解实现监听"><a href="#4-2-EventListener注解实现监听" class="headerlink" title="4.2@EventListener注解实现监听"></a>4.2@EventListener注解实现监听</h2><pre><code>@Component//需要注入IOC，无需实现任何接口
-public class MySprigListenerAnno &#123;
-@EventListener//配置一个监听器，省去了写ApplicationListener，但必须明确指出形参中的监听事件
-  public void myEvent(ApplicationEvent event)&#123;
-  System.out.println(&quot;用注解的方式实现Spring监听器，当前：&quot;+event.getClass().getName());
-&#125;
-
-&#125;
-</code></pre>
-<h2 id="4-3重要的泛型"><a href="#4-3重要的泛型" class="headerlink" title="4.3重要的泛型"></a>4.3重要的泛型</h2><p>查看源码可知<code>泛型决定了监听事件是谁</code>，如果不指定，那么就是<code>默认监听根父类ApplicationEvent</code></p>
-<p><img src="https://img-blog.csdnimg.cn/12e25b4e04b048b8be588db230769b26.png" alt="源码"></p>
-<h1 id="5-Servlet和Spring的初始化顺序"><a href="#5-Servlet和Spring的初始化顺序" class="headerlink" title="5.Servlet和Spring的初始化顺序"></a>5.Servlet和Spring的初始化顺序</h1><p>我们用一个案例直接看</p>
-<h2 id="5-1Serlvet：监听context"><a href="#5-1Serlvet：监听context" class="headerlink" title="5.1Serlvet：监听context"></a>5.1Serlvet：监听context</h2><pre><code>@WebListener
-public class MyServletListener implements ServletContextListener &#123;
-
-  @Override
-  public void contextInitialized(ServletContextEvent sce) &#123;
-    /**
-     * ServletContextEvent的父类EventListener是没有contextInitialized(sce)方法的。
-     * 所以对于此处来说，调不调super.contextInitialized都无所谓
-     */
-    ServletContextListener.super.contextInitialized(sce);
-    System.out.println(&quot;当前是Servlet初始化&quot;);
-  &#125;
-
-  @Override
-  public void contextDestroyed(ServletContextEvent sce) &#123;
-    ServletContextListener.super.contextDestroyed(sce);
-    System.out.println(&quot;当前是Servlet销毁&quot;);
-  &#125;&#125;
-</code></pre>
-<h2 id="5-2Spring：监听context"><a href="#5-2Spring：监听context" class="headerlink" title="5.2Spring：监听context"></a>5.2Spring：监听context</h2><p>这里监听ApplicationEvent，相当于监听其所有子类事件的，他的子类很多，但是Spring启动的时候只有几个事件会被监听<br><img src="https://img-blog.csdnimg.cn/b1c3fa9dfe8f42e1b7ea48967e353f25.png"></p>
-<pre><code>@Component
-@Order(1)
-public class MySpringListener implements ApplicationListener&lt;ApplicationEvent&gt; &#123;
-
-  @Override
-  public void onApplicationEvent(ApplicationEvent event) &#123;
-    System.out.println(&quot;当前是Spring的:&quot;+event.getClass().getName()+&quot;监听事件&quot;);
-  &#125;&#125;
-</code></pre>
-<h2 id="5-3启动Spring"><a href="#5-3启动Spring" class="headerlink" title="5.3启动Spring"></a>5.3启动Spring</h2><p>执行顺序大概是:  tomcat初始化——Servlet启动——Servlet引擎——Servlet初始化完成——tomcat启动完成——Spring初始化</p>
-<p><img src="https://img-blog.csdnimg.cn/1ba92b971a804d79823eeef5f62e9733.png"></p>
-<h1 id="6-监听器的应用：Spring启动时就调用业务方法"><a href="#6-监听器的应用：Spring启动时就调用业务方法" class="headerlink" title="6.监听器的应用：Spring启动时就调用业务方法"></a>6.监听器的应用：Spring启动时就调用业务方法</h1><ul>
-<li>通过监听<code>ApplicationReadyEvent</code>或<code>ApplicationStartedEvent</code>事件，就可以调用；</li>
-<li><strong>注意started是过去式，即此时Spring的IOC容器已经启动完成，可以在此时调用IOC容器中的bean</strong></li>
-<li>而Ready更是在Started之后，更可以直接@Autowired使用IOC容器中的bean</li>
-</ul>
-<pre><code>    @Service
-    public class TheFuckList &#123;
-    
-      @Autowired
-      RedisTemplate redisTemplate;
-    
-      public List&lt;String&gt; getFuckList()&#123;
-    //    List fuckList = redisTemplate.boundListOps(&quot;list1&quot;).range(0, 10);
-        List fuckList = redisTemplate.opsForList().range(&quot;list1&quot;,0,10);
-        Iterator iterator = fuckList.iterator();
-        while(iterator.hasNext())&#123;
-          System.out.println(iterator.next());
-        &#125;
-        return fuckList;
-      &#125;
-    &#125;
-</code></pre>
-<hr>
-<pre><code>@Component
-@Order(0)
-public class MySpringListener2 implements ApplicationListener&lt;ApplicationStartedEvent&gt; &#123;
-
-  @Autowired
-  TheFuckList theFuckList;
-
-  @Autowired
-  FuckListBean fuckListBean;
-
-  @Override
-  public void onApplicationEvent(ApplicationStartedEvent event) &#123;
-    fuckListBean.fuckList = theFuckList.getFuckList();
-    System.out.println(fuckListBean.fuckList.size());
-  &#125;
-&#125;
-</code></pre>
-<h1 id="7-多个Spring监听器执行顺序"><a href="#7-多个Spring监听器执行顺序" class="headerlink" title="7.多个Spring监听器执行顺序"></a>7.多个Spring监听器执行顺序</h1><p>以<code>监听事件</code>为基准，监听器之间的顺序以@Order决定</p>
-<pre><code>@Component
-@Order(-1)
-public class MySpringListener implements ApplicationListener&lt;ApplicationEvent&gt; &#123;//ApplicationStartedEvent
-  
-  @Override
-  public void onApplicationEvent(ApplicationEvent event) &#123;
-    System.out.println(&quot;当前是Srp:&quot;+event.getClass().getName()+&quot;监听事件&quot;);
-  &#125;
-
-
-@Component
-@Order(0)
-public class MySpringListener2 implements ApplicationListener&lt;ApplicationEvent&gt; &#123;
-  @Override
-  public void onApplicationEvent(ApplicationEvent event) &#123;
-    System.out.println(&quot;第二个监听器&quot;);
-  &#125;
-&#125;
-</code></pre>
-<p><img src="https://img-blog.csdnimg.cn/19d04361b5834e95bbe60f7f96c00c4d.png"></p>
-<h1 id="8-过滤器、拦截器、监听器执行顺序"><a href="#8-过滤器、拦截器、监听器执行顺序" class="headerlink" title="8.过滤器、拦截器、监听器执行顺序"></a>8.过滤器、拦截器、监听器执行顺序</h1><ul>
-<li>注意，<strong>过滤器、拦截器</strong>是针对某个包下的<strong>controller接口被调用时而进行处理的</strong>；</li>
-<li><strong>监听器</strong>则可以深入到Servlet、Spring容器的创建之时执行。</li>
-<li>Filter过滤器的本质是：<code>回调</code></li>
-<li>Interceptor拦截器的本质是：<code>反射</code></li>
-</ul>
-<p><a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/1981326">参考资料</a></p>
-<p>那么如果是过滤器，拦截器，监听器同时生效呢？</p>
-<p><img src="https://img-blog.csdnimg.cn/97a00ec1378f4e7f835f8d0448de819d.png"><br><img src="https://img-blog.csdnimg.cn/b7c8f3983c3d4b4789c11a10eca876cc.png"></p>
-<h2 id="8-1Filter的过滤流程"><a href="#8-1Filter的过滤流程" class="headerlink" title="8.1Filter的过滤流程"></a>8.1Filter的过滤流程</h2><ul>
-<li>在我们自定义的过滤器中都会实现一个 doFilter()方法，这个方法有一个FilterChain 参数，而实际上它是一个回调接口。ApplicationFilterChain是它的实现类， 这个实现类内部也有一个 doFilter() 方法就是回调方法。</li>
-<li>回调的顺序由@Order来进行配置</li>
-<li>过滤器Filter是在<strong>请求进入web容器后，但在进入servlet之前进行预处理</strong>，请求结束是在servlet处理完以后。</li>
-</ul>
-<h2 id="8-2Interceptor拦截器流程"><a href="#8-2Interceptor拦截器流程" class="headerlink" title="8.2Interceptor拦截器流程"></a>8.2Interceptor拦截器流程</h2><ul>
-<li>对于Spring拦截器，一般直接实现<code>HandlerInterceptor接口</code>，并重写三个抽象方法。</li>
-<li>拦截器 Interceptor 是在请求进入servlet后，在进入Controller之前进行预处理的，Controller 中渲染了对应的视图之后请求结束。</li>
-</ul>
-<p><a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/1413447">参考资料1</a></p>
-<p><img src="https://img-blog.csdnimg.cn/077b51c0573f4111a6102f7a618838b0.png"></p>
-<h2 id="8-3Controller请求调用顺序"><a href="#8-3Controller请求调用顺序" class="headerlink" title="8.3Controller请求调用顺序"></a>8.3Controller请求调用顺序</h2><p>controller 中所有的请求都要经过<strong>核心组件<code>DispatcherServlet</code>路由</strong>，都会执行它的 <code>doDispatch() </code>方法，<strong>而拦截器postHandle()、preHandle()方法便是在其中调用的。</strong></p>
-<h1 id="9-DispatcherServlet类：路由，中央调度器"><a href="#9-DispatcherServlet类：路由，中央调度器" class="headerlink" title="9.DispatcherServlet类：路由，中央调度器"></a>9.DispatcherServlet类：路由，中央调度器</h1><p><img src="https://img-blog.csdnimg.cn/e1e200007df2422d9279852fde1274ac.png" alt="源码"></p>
-<ul>
-<li><strong><code>HTTP请求处理程序/控制器的中央调度器</code></strong></li>
-</ul>
-<pre><code>![源码](https://img-blog.csdnimg.cn/e7bb33374b2444b09cef9327d79c312b.png)
-</code></pre>
-<h2 id="9-1doDispatch中央调度方法"><a href="#9-1doDispatch中央调度方法" class="headerlink" title="9.1doDispatch中央调度方法"></a>9.1doDispatch中央调度方法</h2><pre><code>    protected void doDispatch(HttpServletRequest request, HttpServletResponse response) throws Exception &#123;
-    
-        try &#123;
-     ...........
-        try &#123;
-       
-            // 获取可以执行当前Handler的适配器
-            HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler());
-
-            // Process last-modified header, if supported by the handler.
-            String method = request.getMethod();
-            boolean isGet = &quot;GET&quot;.equals(method);
-            if (isGet || &quot;HEAD&quot;.equals(method)) &#123;
-                long lastModified = ha.getLastModified(request, mappedHandler.getHandler());
-                if (logger.isDebugEnabled()) &#123;
-                    logger.debug(&quot;Last-Modified value for [&quot; + getRequestUri(request) + &quot;] is: &quot; + lastModified);
-                &#125;
-                if (new ServletWebRequest(request, response).checkNotModified(lastModified) &amp;&amp; isGet) &#123;
-                    return;
-                &#125;
-            &#125;
-            // 注意： 执行Interceptor中PreHandle()方法
-            if (!mappedHandler.applyPreHandle(processedRequest, response)) &#123;
-                return;
-            &#125;
-
-            // 注意：执行Handle【包括我们的业务逻辑，当抛出异常时会被Try、catch到】
-            mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
-
-            if (asyncManager.isConcurrentHandlingStarted()) &#123;
-                return;
-            &#125;
-            applyDefaultViewName(processedRequest, mv);
-
-            // 注意：执行Interceptor中PostHandle 方法【抛出异常时无法执行】
-            mappedHandler.applyPostHandle(processedRequest, response, mv);
-        &#125;
-    &#125;
-    ...........
-&#125;
-</code></pre>
-<h2 id="9-2为何拦截器的pre和post执行顺序是栈顺序"><a href="#9-2为何拦截器的pre和post执行顺序是栈顺序" class="headerlink" title="9.2为何拦截器的pre和post执行顺序是栈顺序"></a>9.2为何拦截器的pre和post执行顺序是栈顺序</h2><p>看看两个方法<code>applyPreHandle(）</code>、<code>applyPostHandle(）</code>具体是如何被调用的，就明白为什么postHandle()、preHandle() 执行顺序是相反的了。</p>
-<p><img src="https://img-blog.csdnimg.cn/15a94ae683a14c4b83a6104f1fba77a6.png"></p>
-<p>正是因为<code>DispathcherServlet类中的doDispach()方法</code>进行调度的时候，<strong>实际上</strong>是调用了<code>applyPreHandler()和applyPostHandler()</code>，而这两个方法中的for循环遍历<code>interceptorList</code>数组时一个是<code>i++</code>一个是<code>i--</code>，所以表面上就成了入栈出栈的执行顺序</p>
-<h1 id="10-过滤器监听器几个注解及配置"><a href="#10-过滤器监听器几个注解及配置" class="headerlink" title="10.过滤器监听器几个注解及配置"></a>10.过滤器监听器几个注解及配置</h1><h2 id="WebFilter"><a href="#WebFilter" class="headerlink" title="@WebFilter"></a>@WebFilter</h2><p>标注在 xxxxx<code>implements Filter</code>的类上，即把<code>Servlet过滤器</code>注入Servlet容器中，这是Servlet3.0的注解规范，被Spring5.0引入</p>
-<h2 id="WebListener"><a href="#WebListener" class="headerlink" title="@WebListener"></a>@WebListener</h2><p>标注在 xxxxx<code> implements ServletContextListener</code>的类上，即把<code>Servlet监听器</code>注入Servlet容器中，这是Servlet3.0的注解规范，被Spring5.0引入</p>
-<h2 id="EventListener"><a href="#EventListener" class="headerlink" title="@EventListener"></a>@EventListener</h2><pre><code>@Component//需要注入IOC，无需实现任何接口
-public class MySprigListenerAnno &#123;
-@EventListener//配置一个监听器，省去了写ApplicationListener，但必须明确指出形参中的监听事件
-  public void myEvent(ApplicationEvent event)&#123;
-  System.out.println(&quot;用注解的方式实现Spring监听器，当前：&quot;+event.getClass().getName());
-&#125;
-</code></pre>
-<p>————————————如果不用注解就需要实现接口</p>
-<pre><code>@Component
-@Order(0)
-public class MySpringListener2 implements ApplicationListener&lt;ApplicationEvent&gt; &#123;
-  @Override
-  public void onApplicationEvent(ApplicationEvent event) &#123;
-    System.out.println(&quot;第二个监听器&quot;);
-  &#125;
-&#125;
-</code></pre>
-<h2 id="WebMvcConfigurer配置"><a href="#WebMvcConfigurer配置" class="headerlink" title="WebMvcConfigurer配置"></a>WebMvcConfigurer配置</h2><p>为Spring容器注册HandlerInterceptor的实现类</p>
-<pre><code>@Configuration
-public class MyWebMvcConfigurer implements WebMvcConfigurer &#123;
-
-  @Override
-  public void addInterceptors(InterceptorRegistry registry) &#123;
-    registry.addInterceptor(new MyHandlerInterceptor()).addPathPatterns(&quot;/login/web&quot;)
-        .excludePathPatterns(&quot;/login/no&quot;);
-  &#125;
-&#125;
-</code></pre>
-<p>————————<strong>拦截器本身内容跟注册配置缺一不可</strong></p>
-<pre><code>public class MyHandlerInterceptor  implements HandlerInterceptor &#123;
-
-  @Override
-  public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception &#123;
-    long start = System.currentTimeMillis();
-    request.setAttribute(&quot;startTime&quot;, start);
-    return true;//直接放行
-//    return HandlerInterceptor.super.preHandle(request, response, handler);
-  &#125;
-  @Override
-  public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception &#123;
-    long start = (long) request.getAttribute(&quot;startTime&quot;);
-    long end     = System.currentTimeMillis();
-    request.setAttribute(&quot;handleTime&quot;,end-start);
-//    HandlerInterceptor.super.postHandle(request, response, handler, modelAndView);
-  &#125;
-
-  @Override
-  public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception &#123;
-  log.info(
-      String.format(&quot;本次请求%s的%s接口耗时%s毫秒&quot;,
-          request.getRequestURL(),
-          request.getMethod(),
-          (long)request.getAttribute(&quot;handleTime&quot;)));
-//    HandlerInterceptor.super.afterCompletion(request, response, handler, ex);
-  &#125;
-&#125;
-</code></pre>
-<h2 id="小结："><a href="#小结：" class="headerlink" title="小结："></a>小结：</h2><p>除了@EventListener可以不写实现类，其他都必须写</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://blogzjh.github.io/2022/08/14/Spring%E3%80%81Servlet%E7%9B%91%E5%90%AC%E5%99%A8/" data-id="cl8wvrz9d001hkktaa2rnbrlc" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-AOP-反射：接口参数校验" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2022/08/13/AOP-%E5%8F%8D%E5%B0%84%EF%BC%9A%E6%8E%A5%E5%8F%A3%E5%8F%82%E6%95%B0%E6%A0%A1%E9%AA%8C/" class="article-date">
-  <time datetime="2022-08-13T09:12:17.000Z" itemprop="datePublished">2022-08-13</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/%E5%B7%A5%E4%BD%9C%E7%AC%94%E8%AE%B0/">工作笔记</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2022/08/13/AOP-%E5%8F%8D%E5%B0%84%EF%BC%9A%E6%8E%A5%E5%8F%A3%E5%8F%82%E6%95%B0%E6%A0%A1%E9%AA%8C/">AOP+反射：接口参数校验</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <ul>
-<li>本案例包括4个核心类：<br>AopUtils：抽取出来的公共方法<br>@ValidateGroup<br>@ValidateField<br>ValidateAspectJHandler</li>
-<li>功能包括：长度、值范围、正则匹配、非空校验</li>
-<li>以下是设计思路、最终代码、测试结果</li>
-<li>后续扩展只需要修改@ValidateField 和 ValidateAspectJHandler；例如如果是按照我第一份实习时候的代码架构，可以在AspectJ中添加<a target="_blank" rel="noopener" href="https://zjhblog.gitee.io/zjh/2022/08/12/%E5%AF%B9dto%E6%8C%87%E5%AE%9A%E5%B1%9E%E6%80%A7%E4%B8%80%E9%94%AE%E5%8A%A0%E8%A7%A3%E5%AF%86/">对dto指定属性一键加解密</a>的逻辑。</li>
-</ul>
-<h1 id="1-演示-最终使用方法"><a href="#1-演示-最终使用方法" class="headerlink" title="1.演示: 最终使用方法"></a>1.演示: 最终使用方法</h1><p>以注册功能为例</p>
-<pre><code>@RestController
-@RequestMapping(&quot;validater&quot;)
-public class ValidateController &#123;
-
-  @ValidateGroup(fields = &#123;
-    //index默认=0，即对第一个参数param1校验，其他参数是校验规则、报错日志记录的内容
-      @ValidateField(index = 0,notNull = true,maxLen = 10,code = &quot;param1-error&quot;,message = &quot;param1校验错误&quot;),
-      @ValidateField(index = 1,notNull = true,fieldName = &quot;passWord&quot;,minLen = 6,code = &quot;passWord-erro&quot;,message = &quot;密码校验错误&quot;),
-      @ValidateField(index = 1,notNull = true,fieldName = &quot;age&quot;,minVal = 0,code = &quot;age-error&quot;,message = &quot;年龄不能小于0&quot;),
-      @ValidateField(index = 1,notNull = true,fieldName = &quot;tall&quot;,minVal = 0,maxVal = 250.9,code =&quot;tall-error&quot;,message = &quot;身高范围出错&quot;),
-      @ValidateField(index = 1,notNull = true,fieldName = &quot;phone&quot;,regStr = &quot;^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\\d&#123;8&#125;$&quot;,code = &quot;phone-error&quot;,message = &quot;手机号错误&quot;)
-  &#125;)
-  @PostMapping(&quot;post&quot;)
-  public String postValidater(@RequestParam String param1,  RegisterDto dto)&#123;
-
-    System.out.println(&quot;成功通过校验&quot;);
-    System.out.println(&quot;第一个参数是：&quot; + param1);
-
-    System.out.println(&quot;第二个参数是&quot;+dto.toString());
-
-    return &quot;succeed&quot;;
-  &#125;    
-&#125;
-</code></pre>
-<p>其中：请求Dto包含name、passWord、phone等字段；<br>利用AspectJ对接口方法直接进行代理校验</p>
-<h1 id="2-流程分析"><a href="#2-流程分析" class="headerlink" title="2.流程分析"></a>2.流程分析</h1><ul>
-<li>AspectJ代理注解<code>@ValidateGroup</code>标注的方法，而这个Group注解中的属性就是<code>@ValidateField []</code></li>
-<li>获取到<code>@ValidateField</code>数组后，遍历。通过比对注解的参数 与 dto或者param中对应名字的参数来进行校验</li>
-<li>如果校验成功就放行，校验失败就抛异常终止</li>
-</ul>
-<h1 id="3-公共方法抽取AopUtils"><a href="#3-公共方法抽取AopUtils" class="headerlink" title="3.公共方法抽取AopUtils"></a>3.公共方法抽取AopUtils</h1><p>经过流程分析可知：至少需要以下几个方法（并可以抽取为公共组件）</p>
-<ul>
-<li> <code>public Method getMethod(ProceedingJoinPoint pjp)</code>：获取被AOP拦截的方法Method对象</li>
-<li> <code> public Annotation getAnnotationByMethod(Method method, Class annoClass)</code>：获取目标方法对象的指定注解对象</li>
-<li><code>public Object getFieldFromDtoByFieldName(Object dto , String fieldName) </code>从dto中，获取指定属性名的属性值</li>
-</ul>
-<p>如下工具类也可以做成全静态方法</p>
-<pre><code>public class AopUtils &#123;
-
-private volatile static AopUtils aopUtils;
-
-
-private AopUtils() &#123;
-&#125;
-
-public static AopUtils getInstance() &#123;
-    if (aopUtils == null) &#123;
-        synchronized (AopUtils.class) &#123;
-            if (aopUtils == null) &#123;
-                aopUtils = new AopUtils();
-            &#125;
-        &#125;
-    &#125;
-    return aopUtils;
-&#125;
-
-/**
- * 获取目标类的指定方法
- */
-public Method getMethodByClassAndName(Class c, String methodName) &#123;
-    Method[] methods = c.getDeclaredMethods();
-    for (Method method : methods) &#123;
-        if (method.getName().equals(methodName)) &#123;
-            return method;
-        &#125;
-    &#125;
-    return null;
-&#125;
-
-/**
- * 获取目标方法的指定注解
- * 相当于 method.getAnnotation(xxxx.class);
- */
-public Annotation getAnnotationByMethod(Method method, Class annoClass) &#123;
-    Annotation all[] = method.getAnnotations();
-    for (Annotation annotation : all) &#123;
-        if (annotation.annotationType() == annoClass) &#123;
-            return annotation;
-        &#125;
-    &#125;
-    return null;
-&#125;
-
-/**
- * 获取被拦截方法的对象
- * 配合使用，最终用于在Aspectj中获取被拦截方法上的注解
- * 例如：AopUtils.getMethod(pjp).getDeclaredAnnotation(被aop拦截的注解.class)
- */
-public Method getMethod(ProceedingJoinPoint pjp) &#123;
-    //获取参数的签名
-    MethodSignature msig = (MethodSignature) pjp.getSignature();
-    // MethodSignature.getMethod() 获取的是顶层接口或者父类的方法对象 如果在实现类的方法上，应该使用反射获取当前对象的方法对象
-    Object target = pjp.getTarget();//获取连接点所在的目标对象（被代理的对象）而不是父类or接口
-    //方法名 + 方法形参 ————》获取指定的方法对象(重载)
-    String methodName = msig.getName();
-    Class[] parameterTypes = msig.getParameterTypes();
-    Method method = null;
-    try &#123;
-        method = target.getClass().getMethod(methodName, parameterTypes);
-    &#125; catch (NoSuchMethodException e) &#123;
-        //log.error(...);
-    &#125;
-    return method;
-&#125;
-
-/**
- * 从dto中，获取指定属性名的属性值；
- */
-public Object getFieldFromDtoByFieldName(Object dto , String fieldName) throws NoSuchFieldException, IllegalAccessException &#123;
-    Class&lt;?&gt; dtoClazz = dto.getClass();
-    Field field = dtoClazz.getDeclaredField(fieldName);
-    field.setAccessible(true);
-    return field.get(dto);
-&#125;
-
-//  这个其实还有另一种写法
-//  private Method getMethod(ProceedingJoinPoint joinPoint) &#123;
-//    try &#123;
-//      Class[] parameterTypes = ((MethodSignature) joinPoint.getSignature()).getMethod().getParameterTypes();
-//      return joinPoint.getTarget().getClass().getMethod(joinPoint.getSignature().getName(), parameterTypes);
-//    &#125; catch (NoSuchMethodException e) &#123;
-//      e.printStackTrace();
-//    &#125;
-//    return null;
-//  &#125;
-&#125;
-</code></pre>
-<h1 id="4-注解及设计原理"><a href="#4-注解及设计原理" class="headerlink" title="4.注解及设计原理"></a>4.注解及设计原理</h1><h2 id="4-1ValidateGroup"><a href="#4-1ValidateGroup" class="headerlink" title="4.1ValidateGroup"></a>4.1ValidateGroup</h2><p>这个注解用于被AspectJ拦截，其属性是一个数组，用于参数校验</p>
-<pre><code>@Retention(RetentionPolicy.RUNTIME)
-@Target(&#123;ElementType.METHOD, ElementType.FIELD&#125;)
-public @interface ValidateGroup &#123;
-
-  ValidateFiled[] fields();
-
-&#125;
-</code></pre>
-<h2 id="4-2ValidateField"><a href="#4-2ValidateField" class="headerlink" title="4.2ValidateField"></a>4.2ValidateField</h2><ul>
-<li>当且仅当只有一个参数的时候可以不用指定index</li>
-<li>index默认为0，例如<code>public void register(@RequestParam String param1 , @RequestBody Dto dto)&#123;&#125;</code>中应该设置index = 1 ，这是由于<code>joinPoint.getArgs()</code>获取的形参是一个数组，需要用index指定位置</li>
-<li>所有参数都有默认值（不进行校验）</li>
-</ul>
-<p>如下：</p>
-<pre><code>@Retention(RetentionPolicy.RUNTIME)
-@Target(&#123;ElementType.METHOD, ElementType.FIELD&#125;)
-public @interface ValidateField &#123;
-
-  /**
-   * 参数索引位置：接口中有多个参数时用index指定需要校验的参数
-   * 默认：0号索引，当且仅当接口方法只有一个参数
-   */
-  int index() default 0;
-
-  /**
-   * 默认：如果参数是基本数据类型或String，就不用指定该参数
-   * 如果参数是对象，要验证对象里面某个属性，就用该参数指定属性名
-   */
-  String fieldName() default &quot;&quot;;
-
-  /**
-   * 错误码，用于日志记录
-   */
-  String code() default &quot;&quot;;
-
-  /**
-   * 错误提示语，用于日志记录
-   */
-  String message() default &quot;&quot;;
-
-  /**
-   * 正则验证
-   */
-  String regStr() default &quot;&quot;;
-
-  /**
-   * 非空校验，为true表示不能为空，false表示能够为空
-   */
-  boolean notNull() default false;
-
-  /**
-   * 字符串最大长度
-   */
-  int maxLen() default 0x7fffffff;
-
-  /**
-   * 字符串最小长度
-   */
-  int minLen() default 0;
-
-  /**
-   * 最大值，用于验证数值类型数据
-   */
-  double maxVal() default 0x1.fffffffffffffP+1023;
-
-  /**
-   * 最小值，用于验证数值类型数据
-   */
-  double minVal() default 0x0.0000000000001P-1022;
-
-&#125;
-</code></pre>
-<h1 id="5-ValidateAspectJHandler"><a href="#5-ValidateAspectJHandler" class="headerlink" title="5.ValidateAspectJHandler"></a>5.ValidateAspectJHandler</h1><h2 id="5-1大体结构"><a href="#5-1大体结构" class="headerlink" title="5.1大体结构"></a>5.1大体结构</h2><pre><code>@Component
-@Aspect
-public class ValidateAspectHandler &#123;
-
-  private AopUtils aopUtils = AopUtils.getInstance();
-  /**
-   * 使用AOP对使用了ValidateGroup的方法进行代理校验
-   */
-  @Around(&quot;@annotation(ValidateGroup)&quot;)
-  public Object validateAround(ProceedingJoinPoint joinPoint) throws Throwable &#123;
-//1.获取当前方法对象method
-//2.根据method对象获取对应的ValidateGroup对象
-//3.调用封装方法，将validateGroup.fields() 与 joinPoint.getArgs()形参数组传入，进行校验
-//4.如果为true，则执行下一步
-    return joinPoint.proceed();
-  &#125;
-
-
-  /**
-   * 封装方法：验证参数是否合法
-   */
-  private boolean validateField(ValidateFiled[] validateFields, Object[] args) &#123;
-    for (ValidateFiled validateFiled : validateFields) &#123;
-        //1.每次循环都是一个校验逻辑
-        //2.index仍然是指定对第几号元素进行校验
-        //3.fieldName如果不指定，那就是对基本数据类型即@RequestParam进行校验；如果指定，则对Dto即@RequestBody进行校验
-
-&#125;
-</code></pre>
-<h2 id="5-2具体实现"><a href="#5-2具体实现" class="headerlink" title="5.2具体实现"></a>5.2具体实现</h2><pre><code>@Component
-@Aspect
-public class ValidateAspctJHandler &#123;
-
-//    private static org.slf4j.Logger logger = LoggerFactory.getLogger(&quot;ValidateAspctJHandler&quot;);
-    private AopUtils aopUtils = AopUtils.getInstance();
-
-  /**
-   * 使用AOP对使用了ValidateGroup的方法进行代理校验
-   */
-  //相当于用@Around + return joinPoint.proceed(); 
-  //使用@Before的时候不能用ProceedingJoinPoint 只能用JoinPoint
-    @Before(&quot;@annotation(ValidateGroup)&quot;)
-    public void validateAround(JoinPoint joinPoint) throws Throwable &#123;
-        //获取被代理的方法对象
-        Method method = aopUtils.getMethod(joinPoint);
-        //获取被代理的方法对象对应的@ValidateGroup对象
-        ValidateGroup validateGroup = (ValidateGroup)aopUtils.getAnnotationByMethod(method, ValidateGroup.class);
-        //获取被代理方法的参数数组(这是参数值，而不是 method.getParameterTypes()返回的是Class[]  )
-        Object[] args = joinPoint.getArgs();
-        /*
-         * args和validateGroup中包含了全部需要校验的信息，因此可以封装为一个方法
-         * 在这个方法中，如果校验失败则用throws抛异常的方式终止
-         */
-        validateAllFields(validateGroup.fields(), args);
-    &#125;
-
-    /**
-     * 验证参数是否合法
-     * ValidateField[]中每一条都是一个校验规则，每一条都对应一个属性
-     * Object[] args中是所有的请求参数值，需要从args[validateFiled.index()中确定是对谁进行校验
-     */
-  private void validateAllFields(ValidateField[] validateFields, Object[] args) throws NoSuchFieldException, IllegalAccessException &#123;
-      //遍历：对每个@ValidateField进行校验
-    for (ValidateField validateFiled : validateFields) &#123;
-      Object arg;
-      //1.当fieldName为默认值&quot;&quot;的时候，此时是对@RequestParam即基本数据类型orString进行校验
-      if (&quot;&quot;.equals(validateFiled.fieldName())) &#123;
-          //arg是基本数据类型orString
-        arg = args[validateFiled.index()];
-        //2.如果fieldName设置了，那就是对dto中的某个属性进行校验
-      &#125; else &#123;
-          //获取第index号参数dto指定的属性值
-        arg = aopUtils.getFieldFromDtoByFieldName(args[validateFiled.index()], validateFiled.fieldName());
-      &#125;
-
-      //3.以下是校验流程，需要同时考虑是对dto属性or基本数据类型orString
-      //3.1判断参数是否为空
-      if (validateFiled.notNull()) &#123;
-        if (arg == null || arg.equals(&quot;&quot;)) &#123;
-//            logger.error(validateFiled.code() + &quot;:&quot; + validateFiled.message());
-          throw new RuntimeException(validateFiled.code()  + &quot;:&quot; + validateFiled.message());
-        //如果该参数能够为空，并且当参数为空时，就不用判断后面的了 ，直接返回
-        &#125; &#125;else &#123;
-        if (arg == null || arg.equals(&quot;&quot;)) &#123;
-          return;
-        &#125;
-      &#125;
-
-      //3.2判断字符串最大长度  如果设置为一个负数则不校验  默认为最大int值
-      if (validateFiled.maxLen() &gt;= 0) &#123;
-        if (arg.toString().length() &gt; validateFiled.maxLen()) &#123;
-//          logger.error(validateFiled.code() + &quot;:&quot; + validateFiled.message());
-          throw new RuntimeException(validateFiled.code()  + &quot;:&quot; + validateFiled.message());
-        &#125;
-      &#125;
-      //3.3判断字符串最小长度  如果设置为一个负数则不校验  默认为0
-      if (validateFiled.minLen() &gt;= 0) &#123;
-        if (arg.toString().length() &lt; validateFiled.minLen()) &#123;
-//          logger.error(validateFiled.code() + &quot;:&quot; + validateFiled.message());
-          throw new RuntimeException(validateFiled.code()  + &quot;:&quot; + validateFiled.message());
-        &#125;
-      &#125;
-      //3.4判断数值最大值  当不是默认值0x1.fffffffffffffP+1023的时候进行判断
-      if (validateFiled.maxVal() != 0x1.fffffffffffffP+1023) &#123;
-        if (Double.parseDouble(arg.toString()) &gt; validateFiled.maxVal()) &#123;
-//          logger.error(validateFiled.code() + &quot;:&quot; + validateFiled.message());
-          throw new RuntimeException(validateFiled.code()  + &quot;:&quot; + validateFiled.message());
-        &#125;
-      &#125;
-      //3.5判断数值最小值   当不是默认值0x0.0000000000001P-1022的时候进行判断
-      if (validateFiled.minVal() != 0x0.0000000000001P-1022) &#123;
-        if (Double.parseDouble(arg.toString()) &lt; validateFiled.minVal()) &#123;
-//          logger.error(validateFiled.code() + &quot;:&quot; + validateFiled.message());
-          throw new RuntimeException(validateFiled.code()  + &quot;:&quot; + validateFiled.message());
-        &#125;
-      &#125;
-
-      //3.6判断正则 若未设置正则校验则跳过
-      if (!&quot;&quot;.equals(validateFiled.regStr())) &#123;
-        if (arg instanceof String || arg instanceof Integer || arg instanceof BigDecimal || arg instanceof Double) &#123;
-          if (!(arg.toString()).matches(validateFiled.regStr())) &#123;
-//            logger.error(validateFiled.code() + &quot;:&quot; + validateFiled.message());
-            throw new RuntimeException(validateFiled.code()  + &quot;:&quot; + validateFiled.message());
-          &#125;
-        &#125;
-      &#125;
-    &#125;
-    return;
-  &#125;
-&#125;
-</code></pre>
-<h2 id="5-3接口测试"><a href="#5-3接口测试" class="headerlink" title="5.3接口测试"></a>5.3接口测试</h2><pre><code>@RestController
-@RequestMapping(&quot;validater&quot;)
-public class ValidateController &#123;
-
-  @ValidateGroup(fields = &#123;
-      //如果是index=0也可以省略不写
-      @ValidateField(index = 0,notNull = true,maxLen = 10,code = &quot;param1-error&quot;,message = &quot;param1校验错误&quot;),
-      @ValidateField(index = 1,notNull = true,fieldName = &quot;passWord&quot;,minLen = 6,code = &quot;passWord-erro&quot;,message = &quot;密码校验错误&quot;),
-      @ValidateField(index = 1,notNull = true,fieldName = &quot;age&quot;,minVal = 0,code = &quot;age-error&quot;,message = &quot;年龄不能小于0&quot;),
-      @ValidateField(index = 1,notNull = true,fieldName = &quot;tall&quot;,minVal = 0,maxVal = 250.9,code =&quot;tall-error&quot;,message = &quot;身高范围出错&quot;),
-      @ValidateField(index = 1,notNull = true,fieldName = &quot;phone&quot;,regStr = &quot;^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\\d&#123;8&#125;$&quot;,code = &quot;phone-error&quot;,message = &quot;手机号错误&quot;)
-  &#125;)
-  @PostMapping(&quot;post&quot;)
-  public String postValidater(@RequestParam String param1,  RegisterDto dto)&#123;
-
-    System.out.println(&quot;成功通过校验&quot;);
-    System.out.println(&quot;第一个参数是：&quot; + param1);
-
-    System.out.println(&quot;第二个参数是&quot;+dto.toString());
-
-    return &quot;succeed&quot;;
-  &#125;
-&#125;
-</code></pre>
-<p><img src="https://img-blog.csdnimg.cn/e5f4ac9d44474348ba35f74fc9263209.png"><br>如果参数错误，则会直接抛异常终止请求<br><img src="https://img-blog.csdnimg.cn/09ae76ac260b4970a236069c7e020fa6.png"></p>
-<p>如果参数都正确就可以通过校验，如下：<br><img src="https://img-blog.csdnimg.cn/1f5e188fef6142eca85c1074208832ee.png"></p>
-<h1 id="6-可扩展的点"><a href="#6-可扩展的点" class="headerlink" title="6.可扩展的点"></a>6.可扩展的点</h1><p>传入的参数是加密后的，那么可以再写一个拦截器对入参dto中的属性进行解密，这里可以参考<br><a target="_blank" rel="noopener" href="https://zjhblog.gitee.io/zjh/2022/08/12/%E5%AF%B9dto%E6%8C%87%E5%AE%9A%E5%B1%9E%E6%80%A7%E4%B8%80%E9%94%AE%E5%8A%A0%E8%A7%A3%E5%AF%86/">对dto指定属性一键加解密</a></p>
-<p>也可以调用这个工具类直接写在这个AspectJ里面</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://blogzjh.github.io/2022/08/13/AOP-%E5%8F%8D%E5%B0%84%EF%BC%9A%E6%8E%A5%E5%8F%A3%E5%8F%82%E6%95%B0%E6%A0%A1%E9%AA%8C/" data-id="cl8wvrz8b0001kktah2cvamnu" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-对dto指定属性一键加解密" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2022/08/12/%E5%AF%B9dto%E6%8C%87%E5%AE%9A%E5%B1%9E%E6%80%A7%E4%B8%80%E9%94%AE%E5%8A%A0%E8%A7%A3%E5%AF%86/" class="article-date">
-  <time datetime="2022-08-12T14:51:17.000Z" itemprop="datePublished">2022-08-12</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/%E5%B7%A5%E4%BD%9C%E7%AC%94%E8%AE%B0/">工作笔记</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2022/08/12/%E5%AF%B9dto%E6%8C%87%E5%AE%9A%E5%B1%9E%E6%80%A7%E4%B8%80%E9%94%AE%E5%8A%A0%E8%A7%A3%E5%AF%86/">对dto指定属性一键加解密</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>在第一份电商实习的时候，公司对于接口的规范是：</p>
-<ul>
-<li>入参必须封装为一个dto用@RequestBody接收；</li>
-<li>出参也必须封装为一个Dto然后转JSON</li>
-</ul>
-<p>但对于某些属性的加密解密，只是机械的直接对某个属性进行set。这个方法可以一键对dto指定属性加密解密<br>虽然已经过了几个月了，但是还是来复盘一下吧</p>
-<h1 id="1-实现思路"><a href="#1-实现思路" class="headerlink" title="1.实现思路"></a>1.实现思路</h1><ul>
-<li>用<code>CodecUtils.encodeDtoField(xxxDto)</code>对dto里面的指定属性进行加密</li>
-<li>用<code>@DtoEncoder</code>标注在属性上，决定是否被加密  </li>
-<li>用<code>@DtoEncoder(Boolean force)</code>注解的参数来决定是否强制加密  </li>
-</ul>
-<p>以上decoder和encoder同理（解密）</p>
-<h1 id="2-使用实例"><a href="#2-使用实例" class="headerlink" title="2.使用实例"></a>2.使用实例</h1><h2 id="2-1入参实体类Dto"><a href="#2-1入参实体类Dto" class="headerlink" title="2.1入参实体类Dto"></a>2.1入参实体类Dto</h2><p>这里只展示入参，需要加密的属性，如果是出参可以使用@DtoEncoder</p>
-<pre><code>public class LoginDto &#123;
-
-String name;
-
-//passWord将会被解密(因为传参过来的时候是加密的，所以需要先解密)
-@DtoDecoder
-String passWord;
-
-//这个test属性不会被解密
-@DtoDecoder(force = false)
-String test;
-&#125;
-</code></pre>
-<h2 id="2-2调用解密方法"><a href="#2-2调用解密方法" class="headerlink" title="2.2调用解密方法"></a>2.2调用解密方法</h2><pre><code>//这将会对passWord进行解密
-LoginDto destLoginDto = CodecUtils.decodeDtoField(loginDto);
-</code></pre>
-<h1 id="3-具体实现"><a href="#3-具体实现" class="headerlink" title="3.具体实现"></a>3.具体实现</h1><h2 id="3-1加密解密注解"><a href="#3-1加密解密注解" class="headerlink" title="3.1加密解密注解"></a>3.1加密解密注解</h2><h3 id="3-1-1加密注解"><a href="#3-1-1加密注解" class="headerlink" title="3.1.1加密注解"></a>3.1.1加密注解</h3><pre><code>@Documented
-@Target(&#123;ElementType.FIELD&#125;)
-@Retention(RUNTIME)
-public @interface DtoEncoder &#123;
-/**
-* true：必须转（无论是否已转码，都需要进行转换），false：非必须转（如果已转码，则不会再次进行转换）
-*/
-boolean force() default true;
-&#125;
-</code></pre>
-<h3 id="3-1-2解密注解"><a href="#3-1-2解密注解" class="headerlink" title="3.1.2解密注解"></a>3.1.2解密注解</h3><pre><code>@Documented
-@Target(&#123;ElementType.FIELD&#125;)
-@Retention(RUNTIME)
-public @interface DtoDecoder &#123;
-/**
-* true：必须转（无论是否已转码，都需要进行转换），false：非必须转（如果已转码，则不会再次进行转换）
-*/
-boolean force() default true;
-&#125;
-</code></pre>
-<h2 id="3-2加密解密工具类"><a href="#3-2加密解密工具类" class="headerlink" title="3.2加密解密工具类"></a>3.2加密解密工具类</h2><pre><code>public class CodecUtils &#123;
-
-
-public static String encode(String src)&#123;
-    return &quot;加密过程省略&quot;;
-&#125;
-
-public static String decode(String src)&#123;
-    return &quot;解密过程省略&quot;;
-&#125;
-
-/**
-* 对dto进行加密，需要判断force属性
-* @Author: zjh
-* @Date: 2022/8/12 22:22
-*/
-public static &lt;T&gt; T encodeDtoField(T dto) &#123;
-    if (dto != null) &#123;
-    try &#123;
-        Class&lt;?&gt; dtoClass = dto.getClass();
-        Field[]  fields   = dtoClass.getDeclaredFields();
-        for (Field field : fields) &#123;
-        //对使用@DtoEncoder注解的属性进行加密
-        if (field.isAnnotationPresent(DtoEncoder.class)) &#123;
-            field.setAccessible(true);
-            Object obj = field.get(dto);
-            String value = obj == null ? &quot;&quot; : String.valueOf(obj);
-            DtoEncoder dtoEncoder = field.getAnnotation(DtoEncoder.class);
-            //如果force设置为false，则不加密，@DtoEncoder(true)相当于没有写这个注解
-            if (dtoEncoder.force()) &#123;
-            field.set(dto, encode(value));
-            &#125;
-        &#125;
-        &#125;
-        return dto;
-    &#125;
-    catch (Exception e) &#123;
-        throw new RuntimeException(&quot;dto encode error&quot;, e);
-    &#125;
-    &#125;
-    return null;
-&#125;
-
-
-/**
-* 对dto进行解密，需要判断force属性
-* @Author: zjh
-* @Date: 2022/8/12 22:22
-*/
-public static &lt;T&gt; T decodeDtoField(T dto) &#123;
-    if (dto != null) &#123;
-    try &#123;
-        Class&lt;?&gt; dtoClass = dto.getClass();
-        Field[]  fields   = dtoClass.getDeclaredFields();
-        for (Field field : fields) &#123;
-        //对使用@DtoEncoder注解的属性进行加密
-        if (field.isAnnotationPresent(DtoDecoder.class)) &#123;
-            field.setAccessible(true);
-            Object obj = field.get(dto);
-            String value = obj == null ? &quot;&quot; : String.valueOf(obj);
-            DtoDecoder dtoDecoder = field.getAnnotation(DtoDecoder.class);
-            //如果force设置为false，则不加密，@DtoEncoder(true)相当于没有写这个注解
-            if (dtoDecoder.force()) &#123;
-            field.set(dto, decode(value));
-            &#125;
-        &#125;
-        &#125;
-        return dto;
-    &#125;
-    catch (Exception e) &#123;
-        throw new RuntimeException(&quot;dto encode error&quot;, e);
-    &#125;
-    &#125;
-    return null;
-&#125;
-
-&#125;
-</code></pre>
-<h1 id="4-小结"><a href="#4-小结" class="headerlink" title="4.小结"></a>4.小结</h1><ul>
-<li>因为有的数据很敏感，出参入参都需要解密加密，如果一个dto有多个需要解密加密的属性，那用这个方法再合适不过了</li>
-<li>至于为何不用拦截器+反射处理：如果用拦截器直接对入参dto进行解密，虽然可以减少一些代码量，但同时也更加笨重</li>
-</ul>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://blogzjh.github.io/2022/08/12/%E5%AF%B9dto%E6%8C%87%E5%AE%9A%E5%B1%9E%E6%80%A7%E4%B8%80%E9%94%AE%E5%8A%A0%E8%A7%A3%E5%AF%86/" data-id="cl8wvrz9p002hkkta24ghhmui" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-
-
-  <nav id="page-nav">
-    
-    <a class="extend prev" rel="prev" href="/">&amp;laquo; 上一页</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/3/">下一页 &amp;raquo;</a>
-  </nav>
-
-</section>
-        
-          <aside id="sidebar">
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">分类</h3>
-    <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Java/">Java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%B8%AD%E9%97%B4%E4%BB%B6/">中间件</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%B7%A5%E4%BD%9C%E7%AC%94%E8%AE%B0/">工作笔记</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%AE%97%E6%B3%95/">数据结构算法</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%BA%90%E7%A0%81/">源码</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">标签</h3>
-    <div class="widget">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/HashMap/" rel="tag">HashMap</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">标签云</h3>
-    <div class="widget tagcloud">
-      <a href="/tags/HashMap/" style="font-size: 10px;">HashMap</a>
-    </div>
-  </div>
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">归档</h3>
-    <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/09/">九月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/08/">八月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/07/">七月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/06/">六月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">四月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">三月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/02/">二月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/01/">一月 2022</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/12/">十二月 2021</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">最新文章</h3>
-    <div class="widget">
-      <ul>
-        
-          <li>
-            <a href="/2022/09/26/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%81%9A%E9%BB%91%E5%90%8D%E5%8D%95%E7%9A%84%E6%96%B9%E6%A1%88/">布隆过滤做黑名单的方案</a>
-          </li>
-        
-          <li>
-            <a href="/2022/09/15/%E6%9F%90%E8%9A%81%E9%87%91%E6%9C%8D%E7%A7%8B%E6%8B%9B9-15/">某蚁金服秋招9-15</a>
-          </li>
-        
-          <li>
-            <a href="/2022/09/15/%E4%B8%89%E7%A7%8D%E6%83%85%E5%86%B5%E7%9A%84%E5%B1%82%E5%BA%8F%E9%81%8D%E5%8E%86/">三种情况的层序遍历</a>
-          </li>
-        
-          <li>
-            <a href="/2022/09/15/%E5%87%A0%E9%81%93%E5%B2%9B%E5%B1%BF%E9%97%AE%E9%A2%98-dfs-%E5%89%AA%E6%9E%9D-%E5%9B%9E%E6%BA%AF/">几道岛屿问题:dfs+剪枝+回溯</a>
-          </li>
-        
-          <li>
-            <a href="/2022/09/15/%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%9A%E6%9B%BF%E6%8D%A2%E3%80%81%E5%B7%A6%E6%97%8B%E3%80%81%E7%BC%BA%E5%A4%B1/">字符串：替换、左旋、缺失</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-
-  
 </aside>
+<div id="post" class="index">
+    <div class="pjax">
+        <article class="index">
+            <div class="toc-ref">
+    
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BC%95%E5%AF%BC"><span class="toc-text">引导</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%A5%E5%8D%9A%E5%AE%A2%E4%B8%8B%E7%9A%84%E5%BF%AB%E6%8D%B7%E9%94%AE"><span class="toc-text">该博客下的快捷键</span></a></li></ol></li></ol>
+    
+<style>
+    .left-col .switch-btn,
+    .left-col .switch-area {
+        display: none;
+    }
+    .toc-level-3 i,
+    .toc-level-3 ol {
+        display: none !important;
+    }
+</style>
+</div>
+            <h1 id="引导"><a href="#引导" class="headerlink" title="引导"></a>引导</h1><p>点击这里切换目录与文章列表</p>
+<p><img src="https://img-blog.csdnimg.cn/2bb36e3cf82b44d5b4f895033d7f4371.png"></p>
+<h2 id="该博客下的快捷键"><a href="#该博客下的快捷键" class="headerlink" title="该博客下的快捷键"></a>该博客下的快捷键</h2><table>
+<thead>
+<tr>
+<th align="center">快捷键</th>
+<th align="center">功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">s/S</td>
+<td align="center">全屏/取消全屏</td>
+</tr>
+<tr>
+<td align="center">w/W</td>
+<td align="center">打开/关闭文章目录</td>
+</tr>
+<tr>
+<td align="center">i/I</td>
+<td align="center">获取搜索框焦点</td>
+</tr>
+<tr>
+<td align="center">j/J</td>
+<td align="center">向下滑动</td>
+</tr>
+<tr>
+<td align="center">k/K</td>
+<td align="center">向上滑动</td>
+</tr>
+<tr>
+<td align="center">gg/GG</td>
+<td align="center">到最顶端</td>
+</tr>
+<tr>
+<td align="center">shift+G/g</td>
+<td align="center">到最下端</td>
+</tr>
+<tr>
+<td align="center">ESC</td>
+<td align="center">1.如果输入框有内容，清除内容<br>2.如果输入框无内容，失去焦点</td>
+</tr>
+<tr>
+<td align="center">下</td>
+<td align="center">向下选择文章</td>
+</tr>
+<tr>
+<td align="center">上</td>
+<td align="center">向上选择文章</td>
+</tr>
+<tr>
+<td align="center">回车</td>
+<td align="center">打开当前选中的文章，若没有，则默认打开第一个</td>
+</tr>
+</tbody></table>
+<p>到目前为止已经写了<code class="article_number"></code>篇文章， 共<code class="site_word_count"></code>字。</p>
+<p>本站访问人数：<code class="site_uv"></code>人次 ， 访问量：<code class="site_pv"></code>次</p>
+
+        </article>
         
-      </div>
-      <footer id="footer">
-  
-  <div class="outer">
-    <div id="footer-info" class="inner">
-      &copy; 2022 张家豪<br>
-      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        
     </div>
-  </div>
-</footer>
+    <div class="copyright">
+        <p class="footer-entry">
+    ©2021 ZJH
+</p>
+<p class="footer-entry">"生命以负熵为食"
+
     </div>
-    <nav id="mobile-nav">
-  
-    <a href="/" class="mobile-nav-link">Home</a>
-  
-    <a href="/archives" class="mobile-nav-link">Archives</a>
-  
-</nav>
+</div>
+<div class="full-toc">
+    <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
+<a class="" id="rocket" ></a>
+
+</div>
+
+</body>
+<script src="/js/jquery.pjax.js?v=1.1.0" ></script>
+
+<script src="/js/script.js?v=1.1.0" ></script>
+<script>
+    var img_resize = 'default';
+    function initArticle() {
+        /*渲染对应的表格样式*/
+        
+            $("#post .pjax table").addClass("green_title");
+        
+
+        /*渲染打赏样式*/
+        
+
+        /*高亮代码块行号*/
+        
+        $('pre code').each(function(){
+            var lines = $(this).text().trim().split('\n').length, widther='';
+            if (lines>99) {
+                widther = 'widther'
+            }
+            var $numbering = $('<ul/>').addClass('pre-numbering ' + widther).attr("unselectable","on");
+            $(this).addClass('has-numbering ' + widther)
+                    .parent()
+                    .append($numbering);
+            for(var i=1;i<=lines;i++){
+                $numbering.append($('<li/>').text(i));
+            }
+        });
+        
+
+        /*访问数量*/
+        
+        $.getScript("//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js");
+        
+
+        /*代码高亮，行号对齐*/
+        $('.pre-numbering').css('line-height',$('.has-numbering').css('line-height'));
+
+        
+        
+    }
+
+    /*打赏页面隐藏与展示*/
     
 
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+</script>
+
+<!--加入行号的高亮代码块样式-->
+
+<style>
+    pre{
+        position: relative;
+        margin-bottom: 24px;
+        border-radius: 10px;
+        border: 1px solid #e2dede;
+        background: #FFF;
+        overflow: hidden;
+    }
+    code.has-numbering{
+        margin-left: 30px;
+    }
+    code.has-numbering.widther{
+        margin-left: 35px;
+    }
+    .pre-numbering{
+        margin: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 20px;
+        padding: 0.5em 3px 0.7em 5px;
+        border-right: 1px solid #C3CCD0;
+        text-align: right;
+        color: #AAA;
+        background-color: ;
+    }
+    .pre-numbering.widther {
+        width: 35px;
+    }
+</style>
+
+<!--自定义样式设置-->
+<style>
+    
+    
+    .nav {
+        width: 542px;
+    }
+    .nav.fullscreen {
+        margin-left: -542px;
+    }
+    .nav-left {
+        width: 120px;
+    }
+    
+    
+    @media screen and (max-width: 1468px) {
+        .nav {
+            width: 492px;
+        }
+        .nav.fullscreen {
+            margin-left: -492px;
+        }
+        .nav-left {
+            width: 100px;
+        }
+    }
+    
+    
+    @media screen and (max-width: 1024px) {
+        .nav {
+            width: 492px;
+            margin-left: -492px
+        }
+        .nav.fullscreen {
+            margin-left: 0;
+        }
+    }
+    
+    @media screen and (max-width: 426px) {
+        .nav {
+            width: 100%;
+        }
+        .nav-left {
+            width: 100%;
+        }
+    }
+    
+    
+    .nav-right .title-list nav a .post-title, .nav-right .title-list #local-search-result a .post-title {
+        color: #383636;
+    }
+    
+    
+    .nav-right .title-list nav a .post-date, .nav-right .title-list #local-search-result a .post-date {
+        color: #5e5e5f;
+    }
+    
+    
+    .nav-right nav a.hover, #local-search-result a.hover{
+        background-color: #e2e0e0;
+    }
+    
+    
+
+    /*列表样式*/
+    
+
+    /* 背景图样式 */
+    
+    
 
 
-  
-<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+    /*引用块样式*/
+    
 
-  
-<script src="/fancybox/jquery.fancybox.pack.js"></script>
+    /*文章列表背景图*/
+    
 
-
-
-
-<script src="/js/script.js"></script>
+    
+</style>
 
 
 
 
-  </div>
-</body>
+
+
+
 </html>
