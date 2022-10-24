@@ -739,12 +739,12 @@
     </div>
     <div class="article-meta">
         
-            发布时间 : <time class="date" title='最后更新: 2022-08-13 17:55:16'>2022-08-12 22:51</time>
+            发布时间 : <time class="date" title='最后更新: 2022-10-24 22:42:21'>2022-08-12 22:51</time>
         
     </div>
     <div class="article-meta">
         
-        <span>字数:865</span>
+        <span>字数:834</span>
         
         
         <span id="busuanzi_container_page_pv">
@@ -779,12 +779,12 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>在第一份电商实习的时候，公司对于接口的规范是：</p>
+        <p>公司对于接口的规范是：</p>
 <ul>
 <li>入参必须封装为一个dto用@RequestBody接收；</li>
 <li>出参也必须封装为一个Dto然后转JSON</li>
 </ul>
-<p>但对于某些属性的加密解密，只是机械的直接对某个属性进行set。这个方法可以一键对dto指定属性加密解密<br>虽然已经过了几个月了，但是还是来复盘一下吧</p>
+<p>但对于某些属性的加密解密，只是机械的直接对某个属性进行set。这个方法可以一键对dto指定属性加密解密</p>
 <h1 id="1-实现思路"><a href="#1-实现思路" class="headerlink" title="1.实现思路"></a>1.实现思路</h1><ul>
 <li>用<code>CodecUtils.encodeDtoField(xxxDto)</code>对dto里面的指定属性进行加密</li>
 <li>用<code>@DtoEncoder</code>标注在属性上，决定是否被加密  </li>
