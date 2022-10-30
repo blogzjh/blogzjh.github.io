@@ -4,6 +4,25 @@
   
     
     <entry>
+      <title>RabbitMQ思维导图1</title>
+      <link href="/2022/10/30/RabbitMQ%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE1/"/>
+      <url>/2022/10/30/RabbitMQ%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE1/</url>
+      
+        <content type="html"><![CDATA[<p><img src="https://img-blog.csdnimg.cn/2b232efb55c0452096122f34cc3773a8.png#pic_center"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 思维导图 </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>MySQL思维导图1</title>
       <link href="/2022/10/27/MySQL%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE1/"/>
       <url>/2022/10/27/MySQL%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE1/</url>
@@ -24,10 +43,29 @@
     
     <entry>
       <title>布隆过滤做黑名单的方案</title>
+      <link href="/2022/09/26/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%81%9A%E9%BB%91%E5%90%8D%E5%8D%95or%E5%8E%BB%E9%87%8D%E7%9A%84%E6%96%B9%E6%A1%88/"/>
+      <url>/2022/09/26/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%81%9A%E9%BB%91%E5%90%8D%E5%8D%95or%E5%8E%BB%E9%87%8D%E7%9A%84%E6%96%B9%E6%A1%88/</url>
+      
+        <content type="html"><![CDATA[<h1 id="1-已知布隆过滤有误判概率"><a href="#1-已知布隆过滤有误判概率" class="headerlink" title="1.已知布隆过滤有误判概率"></a>1.已知布隆过滤有误判概率</h1><ul><li>因为hash运算后存在“假阳性”，因此<strong>做黑名单时可能把正常用户给拦截了</strong></li><li><strong>做白名单时一定是准确无误的</strong></li><li>理论上做成黑名单有误判缺陷，但做白名单毫无问题，因此黑白名单结合才能实现黑名单的功能</li></ul><h1 id="2-黑白名单组合解决：ip黑名单问题"><a href="#2-黑白名单组合解决：ip黑名单问题" class="headerlink" title="2.黑白名单组合解决：ip黑名单问题"></a>2.黑白名单组合解决：ip黑名单问题</h1><p>直接列下我的设计思路：</p><ol><li>现在有一个布隆过滤器保存了一组ip黑名单</li><li>一个正常用户ip遇到hash碰撞，被拦截了</li><li>接口直接跳转“验证真人的接口”</li><li>验证成功后，该ip加入白名单</li></ol><p>因此我们在（伪）代码中体现如下</p><p>_if ( <code>黑名单BloomFilter.contain( ip )</code> ){//1.在黑名单中</p><p>___if( <code>白名单BloomFilter.contain( ip )</code> ){//2.但是又同时在白名单中</p><p>______//donothing啥都不做</p><p>___} else{</p><p>______    //<strong>在黑名单 但不在白名单中，跳转到验证真人的接口</strong></p><p>______    redirect—&gt;验证真人的接口，<strong>验证成功后加入白名单</strong></p><p>___}</p><p>_}</p><p>//到这里就是正常的业务逻辑了</p><h1 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h1><h2 id="1-离散数据去重"><a href="#1-离散数据去重" class="headerlink" title="1.离散数据去重"></a>1.离散数据去重</h2><p>以下几种场景的数据去重：<code>离散的、无范围限制的</code></p><ul><li>爬虫爬取url</li><li>大量邮件中筛选出垃圾邮件</li></ul><h2 id="2-连续数据不适合用布隆过滤"><a href="#2-连续数据不适合用布隆过滤" class="headerlink" title="2.连续数据不适合用布隆过滤"></a>2.连续数据不适合用布隆过滤</h2><ul><li>如果数据是离散且有限的（例如用户id），用布隆过滤做<code>白名单</code>没有任何问题（用户注册后同步更新布隆过滤器）</li><li>但如果待查数据是一个float或double类型，是连续的（具体业务场景我想不出来），我们<strong>无法为每一个浮点类型数据加入布隆过滤的白名单</strong>，因此这样的布隆过滤器是无意义的</li></ul><h2 id="3-布隆过滤器的维护"><a href="#3-布隆过滤器的维护" class="headerlink" title="3.布隆过滤器的维护"></a>3.布隆过滤器的维护</h2><ul><li>定时任务：参考copyOnWrite的思想，按一定频率直接重构这个布隆过滤器</li><li>同步更新：如果布隆过滤器中的集合一万年都不变，大可做成同步的，效率肯定比上面那个高</li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> 工作笔记 </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>布隆过滤做黑名单or去重的方案</title>
       <link href="/2022/09/26/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%81%9A%E9%BB%91%E5%90%8D%E5%8D%95%E7%9A%84%E6%96%B9%E6%A1%88/"/>
       <url>/2022/09/26/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%81%9A%E9%BB%91%E5%90%8D%E5%8D%95%E7%9A%84%E6%96%B9%E6%A1%88/</url>
       
-        <content type="html"><![CDATA[<h1 id="1-已知布隆过滤有误判概率"><a href="#1-已知布隆过滤有误判概率" class="headerlink" title="1.已知布隆过滤有误判概率"></a>1.已知布隆过滤有误判概率</h1><ul><li>因为hash运算后存在“假阳性”，因此<strong>做黑名单时可能把正常用户给拦截了</strong></li><li><strong>做白名单时一定是准确无误的</strong></li><li>理论上做成黑名单有误判缺陷，但做白名单毫无问题，因此黑白名单结合才能实现黑名单的功能</li></ul><h1 id="2-黑白名单组合解决：ip黑名单问题"><a href="#2-黑白名单组合解决：ip黑名单问题" class="headerlink" title="2.黑白名单组合解决：ip黑名单问题"></a>2.黑白名单组合解决：ip黑名单问题</h1><p>直接列下我的设计思路：</p><ol><li>现在有一个布隆过滤器保存了一组ip黑名单</li><li>一个正常用户ip遇到hash碰撞，被拦截了</li><li>接口直接跳转“验证真人的接口”</li><li>验证成功后，该ip加入白名单</li></ol><p>因此我们在（伪）代码中体现如下</p><p>_if ( <code>黑名单BloomFilter.contain( ip )</code> ){//1.在黑名单中</p><p>___if( <code>白名单BloomFilter.contain( ip )</code> ){//2.但是又同时在白名单中</p><p>______//donothing啥都不做</p><p>___} else{</p><p>______    //<strong>在黑名单 但不在白名单中，跳转到验证真人的接口</strong></p><p>______    redirect—&gt;验证真人的接口，<strong>验证成功后加入白名单</strong></p><p>___}</p><p>_}</p><p>//到这里就是正常的业务逻辑了</p><h1 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h1><h2 id="1-离散数据去重"><a href="#1-离散数据去重" class="headerlink" title="1.离散数据去重"></a>1.离散数据去重</h2><p>以下几种场景的数据去重：<code>离散的、无范围限制的</code></p><ul><li>爬虫爬取url</li><li>大量邮件中筛选出垃圾邮件</li></ul><h2 id="2-连续数据不适合用布隆过滤"><a href="#2-连续数据不适合用布隆过滤" class="headerlink" title="2.连续数据不适合用布隆过滤"></a>2.连续数据不适合用布隆过滤</h2><ul><li>如果数据是离散且有限的（例如用户id），用布隆过滤做<code>白名单</code>没有任何问题（用户注册后同步更新布隆过滤器）</li><li>但如果待查数据是一个float或double类型，是连续的（具体业务场景我想不出来），我们<strong>无法为每一个浮点类型数据加入布隆过滤的白名单</strong>，因此这样的布隆过滤器是无意义的</li></ul><h2 id="3-布隆过滤器的维护"><a href="#3-布隆过滤器的维护" class="headerlink" title="3.布隆过滤器的维护"></a>3.布隆过滤器的维护</h2><ul><li>定时任务：参考copyOnWrite的思想，按一定频率直接重构这个布隆过滤器</li><li>同步更新：如果布隆过滤器中的集合一万年都不变，大可做成同步的，效率肯定比上面那个高</li></ul>]]></content>
+        <content type="html"><![CDATA[<p>这个“黑名单”方案在实际生产环境中并不适用，因为作为一个基础组件不应该耦合到其他的业务。并且实际生产环境中内存其实也不值钱，没必要为了省那点内存把黑名单校验搞这么复杂。</p><p>但是为了理解方便，这里案例具体还是以“黑名单”为例，实际应用场景目前没想到，可能一些文件存储的去重功能可以用这个实现</p><h1 id="1-已知布隆过滤有误判概率"><a href="#1-已知布隆过滤有误判概率" class="headerlink" title="1.已知布隆过滤有误判概率"></a>1.已知布隆过滤有误判概率</h1><ul><li>因为hash运算后存在“假阳性”，因此<strong>做黑名单时可能把正常用户给拦截了</strong></li><li><strong>做白名单时一定是准确无误的</strong></li><li>理论上做成黑名单有误判缺陷，但做白名单毫无问题，因此黑白名单结合才能实现黑名单的功能</li></ul><h1 id="2-黑白名单组合解决：ip黑名单问题"><a href="#2-黑白名单组合解决：ip黑名单问题" class="headerlink" title="2.黑白名单组合解决：ip黑名单问题"></a>2.黑白名单组合解决：ip黑名单问题</h1><p>直接列下我的设计思路：</p><ol><li>现在有一个布隆过滤器保存了一组ip黑名单</li><li>一个正常用户ip遇到hash碰撞，被拦截了</li><li>接口直接跳转“验证真人的接口”</li><li>验证成功后，该ip加入白名单</li></ol><p>因此我们在（伪）代码中体现如下</p><p>_if ( <code>黑名单BloomFilter.contain( ip )</code> ){//1.在黑名单中</p><p>___if( <code>白名单BloomFilter.contain( ip )</code> ){//2.但是又同时在白名单中</p><p>______//donothing啥都不做</p><p>___} else{</p><p>______    //<strong>在黑名单 但不在白名单中，跳转到验证真人的接口</strong></p><p>______    redirect—&gt;验证真人的接口，<strong>验证成功后加入白名单</strong></p><p>___}</p><p>_}</p><p>//到这里就是正常的业务逻辑了</p><h1 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h1><h2 id="1-离散数据去重"><a href="#1-离散数据去重" class="headerlink" title="1.离散数据去重"></a>1.离散数据去重</h2><p>以下几种场景的数据去重：<code>离散的、无范围限制的</code></p><ul><li>爬虫爬取url</li><li>大量邮件中筛选出垃圾邮件</li></ul><h2 id="2-连续数据不适合用布隆过滤"><a href="#2-连续数据不适合用布隆过滤" class="headerlink" title="2.连续数据不适合用布隆过滤"></a>2.连续数据不适合用布隆过滤</h2><ul><li>如果数据是离散且有限的（例如用户id），用布隆过滤做<code>白名单</code>没有任何问题（用户注册后同步更新布隆过滤器）</li><li>但如果待查数据是一个float或double类型，是连续的（具体业务场景我想不出来），我们<strong>无法为每一个浮点类型数据加入布隆过滤的白名单</strong>，因此这样的布隆过滤器是无意义的</li></ul><h2 id="3-布隆过滤器的维护"><a href="#3-布隆过滤器的维护" class="headerlink" title="3.布隆过滤器的维护"></a>3.布隆过滤器的维护</h2><ul><li>定时任务：参考copyOnWrite的思想，按一定频率直接重构这个布隆过滤器</li><li>同步更新：如果布隆过滤器中的集合一万年都不变，大可做成同步的，效率肯定比上面那个高</li></ul>]]></content>
       
       
       <categories>
