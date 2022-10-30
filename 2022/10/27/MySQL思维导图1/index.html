@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>四种方法Servlet容器使用Spring的Bean对象 | 张家豪的博客</title>
+  <title>MySQL思维导图1 | 张家豪的博客</title>
   <meta name="keywords" content="">
-  <meta name="description" content="四种方法Servlet容器使用Spring的Bean对象 | 张家豪的博客">
+  <meta name="description" content="MySQL思维导图1 | 张家豪的博客">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MySQL思维导图1">
@@ -733,9 +733,9 @@
 </aside>
 <div id="post">
     <div class="pjax">
-        <article id="post-四种方法Servlet容器使用Spring的Bean对象" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-MySQL思维导图1" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">四种方法Servlet容器使用Spring的Bean对象</h1>
+        <h1 class="article-title">MySQL思维导图1</h1>
     
     <div class="article-meta">
         
@@ -745,7 +745,7 @@
             <i class="iconfont icon-category"></i>
             
             
-            <a  data-rel="工作笔记">工作笔记</a>
+            <a  data-rel="思维导图">思维导图</a>
             
         </span>
         
@@ -753,12 +753,12 @@
     </div>
     <div class="article-meta">
         
-            发布时间 : <time class="date" title='最后更新: 2022-10-30 22:12:35'>2022-08-03 21:47</time>
+            发布时间 : <time class="date" title='最后更新: 2022-10-28 16:14:08'>2022-10-27 22:42</time>
         
     </div>
     <div class="article-meta">
         
-        <span>字数:1.3k</span>
+        <span>字数:0</span>
         
         
         <span id="busuanzi_container_page_pv">
@@ -777,7 +777,7 @@
     
     <div class="toc-ref">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-Servlet%E9%83%A8%E5%88%86"><span class="toc-text">1.Servlet部分</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1Servlet%E6%8E%A5%E5%8F%A3"><span class="toc-text">1.1Servlet接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2ServletRegistrationBean%E6%B3%A8%E5%86%8C%E6%8E%A5%E5%8F%A3"><span class="toc-text">1.2ServletRegistrationBean注册接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-3%E6%B3%A8%E6%84%8F%E7%82%B9"><span class="toc-text">1.3注意点</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-SpringBeanAutowiringSupport%E5%B7%A5%E5%85%B7%E7%B1%BB"><span class="toc-text">2.SpringBeanAutowiringSupport工具类</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1processInjectionBasedOnServletContext"><span class="toc-text">2.1processInjectionBasedOnServletContext()</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E6%B3%A8%E5%86%8CServlet%E6%8E%A5%E5%8F%A3%E6%97%B6%E7%9B%B4%E6%8E%A5%E9%80%9A%E8%BF%87%E6%9E%84%E9%80%A0%E5%99%A8%E8%8E%B7%E5%8F%96%E6%8C%87%E9%92%88"><span class="toc-text">3.注册Servlet接口时直接通过构造器获取指针</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1Servlet%E7%BB%93%E6%9E%84%E4%BF%AE%E6%94%B9"><span class="toc-text">3.1Servlet结构修改</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2%E9%80%9A%E8%BF%87%E6%9E%84%E9%80%A0%E5%99%A8%E8%8E%B7%E5%8F%96%E6%8C%87%E9%92%88"><span class="toc-text">3.2通过构造器获取指针</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-%E6%89%80%E7%94%A8%E7%9A%84bean%E6%98%AF%E9%80%9A%E8%BF%87-Component%E9%85%8D%E7%9A%84%EF%BC%8C%E8%80%8C%E4%B8%8D%E6%98%AF-Configuration-Bean%E9%85%8D%E7%BD%AE%E7%9A%84"><span class="toc-text">4.所用的bean是通过@Component配的，而不是@Configuration+@Bean配置的</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1-Component%E6%B3%A8%E5%86%8C"><span class="toc-text">4.1@Component注册</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2%E9%85%8D%E7%BD%AE%E7%B1%BB"><span class="toc-text">4.2配置类</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-ApplicationContextAware%E6%8E%A5%E5%8F%A3"><span class="toc-text">5.ApplicationContextAware接口</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#5-1%E5%B7%A5%E5%85%B7%E7%B1%BB"><span class="toc-text">5.1工具类</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-2%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B"><span class="toc-text">5.2使用示例</span></a></li></ol></li></ol>
+        
     
 <style>
     .left-col .switch-btn,
@@ -793,171 +793,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>公司用的图片验证码模块用的是很多年前的Servlet，我的需求需要在Servlet中调用一个Spring的bean对象，但Servlet和Sping bean的生命周期不同、context也不同：</p>
-<ul>
-<li>无法直接在Servlet中使用@Autowired来获取bean对象（<strong>不在IOC中，BeanPostProcessor解析不了</strong>）</li>
-<li>Spring启动过程中不会主动发现Servlet接口（即便是配置了如@WebServlet），<strong>通过ServletRegistrationBean配置只能让Spring发现这个Servlet接口，但不会让Servlet添加到IOC作为bean</strong>（因此还是不能使用@Autowired）</li>
-<li>2、3、4、5都是“在Servlet使用bean”的解决方法，Filter也可以用相同的逻辑，<strong>我在这个需求中使用的是第4个方法（因为本身就已经有了注册Servlet接口的配置，只需通过已有的构造器添加指针即可）</strong></li>
-</ul>
-<h1 id="1-Servlet部分"><a href="#1-Servlet部分" class="headerlink" title="1.Servlet部分"></a>1.Servlet部分</h1><h2 id="1-1Servlet接口"><a href="#1-1Servlet接口" class="headerlink" title="1.1Servlet接口"></a>1.1Servlet接口</h2><p>Servlet通过@WebServlet表明这是一个接口，但Spring启动过程中不能直接发现@WebServlet，<strong>所以需要通过<code>ServletRegistrationBean</code>在Spring启动过程中注册接口</strong></p>
-<pre><code>@AllArgsConstructor
-@NoArgsConstructor
-@WebServlet(&quot;hello&quot;)
-public class MyServlet extends HttpServlet &#123;
-
-  @Autowired
-  MyBean myBean;
-
-  @Override
-  protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException &#123;
-    System.out.println(&quot;此时mybean是否为空&quot; + (myBean == null));
-  &#125;
-  &#125;
-</code></pre>
-<h2 id="1-2ServletRegistrationBean注册接口"><a href="#1-2ServletRegistrationBean注册接口" class="headerlink" title="1.2ServletRegistrationBean注册接口"></a>1.2ServletRegistrationBean注册接口</h2><p>因为在@WebServlet参数中指定了url，所以这里不用再指定</p>
-<pre><code>@Configuration
-public class MyConfig&#123;
-  @Bean
-  public ServletRegistrationBean registration()&#123;
-    ServletRegistrationBean servletRegistration = new ServletRegistrationBean
-    (new MyServlet());//因为在@WebServlet参数中指定了url，所以这里不用再指定
-    return servletRegistration;
-  &#125;
-&#125;
-</code></pre>
-<h2 id="1-3注意点"><a href="#1-3注意点" class="headerlink" title="1.3注意点"></a>1.3注意点</h2><p>此时的Servlet并没有作为bean加入到IOC，只是SpringMVC添加了这个Servlet写的接口。<br><strong>如果想在MyServlet中使用@Autowired，则有如下两种方法</strong></p>
-<h1 id="2-SpringBeanAutowiringSupport工具类"><a href="#2-SpringBeanAutowiringSupport工具类" class="headerlink" title="2.SpringBeanAutowiringSupport工具类"></a>2.SpringBeanAutowiringSupport工具类</h1><p>见名知意，这是用来解析@Autowired的工具类，源码我看了下，用于解析@Autowired和@Value，<strong>但并不局限于Bean初始化的BeanPostProcessor阶段，<code>可以对任意普通类进行增强，本质就是从IOC中拿到这个指针</code></strong></p>
-<h2 id="2-1processInjectionBasedOnServletContext"><a href="#2-1processInjectionBasedOnServletContext" class="headerlink" title="2.1processInjectionBasedOnServletContext()"></a>2.1processInjectionBasedOnServletContext()</h2><p>为了不影响Servlet正常使用，我选择将其放在<code>init()</code>方法中</p>
-<p>重写init()方法，调用作用于BeanPostProcessor的工具类<code>SpringBeanAutowiringSupport.processInjectionBasedOnServletContext()</code><br>当请求第一次过来时就能在Servlet（非Spring的Bean中）解析@Autowired了</p>
-<pre><code>@AllArgsConstructor
-@NoArgsConstructor
-@WebServlet(&quot;hello&quot;)
-public class MyServlet extends HttpServlet &#123;
-
-  @Autowired
-  MyBean myBean;
-
-  @Override
-  protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException &#123;
-    System.out.println(&quot;此时mybean是否为空&quot; + (myBean == null));
-  &#125;
-
-  //第一次请求这个Servlet接口时会触发一次
-  @Override
-  public void init(ServletConfig config) throws ServletException &#123;
-    System.out.println(&quot;解析mybena之前：&quot; + (myBean == null));
-    //允许Servlet上下文解析@Autowired
-    ServletContext servletContext = config.getServletContext();
-    SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, servletContext);
-  &#125;
-
-&#125;
-</code></pre>
-<h1 id="3-注册Servlet接口时直接通过构造器获取指针"><a href="#3-注册Servlet接口时直接通过构造器获取指针" class="headerlink" title="3.注册Servlet接口时直接通过构造器获取指针"></a>3.注册Servlet接口时直接通过构造器获取指针</h1><p>其实上面那个解析@Autowired也仅仅是从IOC中拿到bean的指针，与Spring的启动过程无关<br>同时我们知道<strong>Spring的三级缓存机制</strong>，那么就可以在Spring启动的第2个阶段（<code>BeanFactoryPostProcessor</code>）<strong>直接把待使用的bean指针给到Servlet</strong>，<strong>即便此时待使用的bean还未初始化完毕</strong></p>
-<h2 id="3-1Servlet结构修改"><a href="#3-1Servlet结构修改" class="headerlink" title="3.1Servlet结构修改"></a>3.1Servlet结构修改</h2><p>此时可以去掉<code>@Autowired</code>和<code>SpringBeanAutowiringSupport.processInjectionBasedOnServletContext()</code>了</p>
-<pre><code>@AllArgsConstructor
-@NoArgsConstructor
-@WebServlet(&quot;hello&quot;)
-public class MyServlet extends HttpServlet &#123;
-//不用加@Autowired
-  MyBean myBean;
-
-  @Override
-  protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException &#123;
-    System.out.println(&quot;此时mybean是否为空&quot; + (myBean == null));
-  &#125;
-
-&#125;
-</code></pre>
-<h2 id="3-2通过构造器获取指针"><a href="#3-2通过构造器获取指针" class="headerlink" title="3.2通过构造器获取指针"></a>3.2通过构造器获取指针</h2><p><img src="https://img-blog.csdnimg.cn/b8583a05a870403287a32ede17833f44.png"></p>
-<pre><code>@Configuration
-public class MyConfig implements ApplicationContextAware &#123;
-
-  @Bean
-  public MyBean myBean() &#123;
-    MyBean myBean = new MyBean(&quot;张三&quot;);
-    return myBean;
-  &#125;
-
-  @Bean(&quot;myServlet2&quot;)
-  public ServletRegistrationBean registration(MyBean myBean) &#123;
-    ServletRegistrationBean servletRegistration = new ServletRegistrationBean(new MyServlet(myBean));
-    return servletRegistration;
-  &#125;
-&#125;
-</code></pre>
-<h1 id="4-所用的bean是通过-Component配的，而不是-Configuration-Bean配置的"><a href="#4-所用的bean是通过-Component配的，而不是-Configuration-Bean配置的" class="headerlink" title="4.所用的bean是通过@Component配的，而不是@Configuration+@Bean配置的"></a>4.所用的bean是通过@Component配的，而不是@Configuration+@Bean配置的</h1><p>上面的第三点，<strong>Servlet注册</strong> 和 <strong>所调用的Bean</strong> 都在同一个Config文件，因此可以自由引用，那如果所调用的Bean是通过@Component注册的呢？</p>
-<h2 id="4-1-Component注册"><a href="#4-1-Component注册" class="headerlink" title="4.1@Component注册"></a>4.1@Component注册</h2><pre><code>@Component
-public class MyBean &#123;
-
-  private String username = &quot;111&quot;;
-  private String password = &quot;222&quot;;
-
-&#125;
-</code></pre>
-<h2 id="4-2配置类"><a href="#4-2配置类" class="headerlink" title="4.2配置类"></a>4.2配置类</h2><p>这里也是因为大家都是在Spring启动过程中完成的，有三级缓存的机制下，也是可以通过这种方式让Servlet拿到其他包下的bean对象</p>
-<pre><code>@Configuration
-public class MyConfig  &#123;
-
-  @Autowired
-  MyBean mybean;
-
-  @Bean(&quot;myServlet2&quot;)
-  public ServletRegistrationBean registration(MyBean myBean) &#123;
-    ServletRegistrationBean servletRegistration = new ServletRegistrationBean(new MyServlet(myBean));
-    return servletRegistration;
-  &#125;
-  &#125;
-</code></pre>
-<h1 id="5-ApplicationContextAware接口"><a href="#5-ApplicationContextAware接口" class="headerlink" title="5.ApplicationContextAware接口"></a>5.ApplicationContextAware接口</h1><p>这个接口是给Bean使用的，用于获取指定的bean对象，言下之意实现这个接口，想要生效（获取到applicationContext）自己本身也必须是一个bean</p>
-<h2 id="5-1工具类"><a href="#5-1工具类" class="headerlink" title="5.1工具类"></a>5.1工具类</h2><p>通过这个工具类可以在任何一个类中使用Bean对象了（获取Bean的指针）</p>
-<pre><code>@Component
-public class SpringContextUtils implements ApplicationContextAware &#123;
-  private static ApplicationContext applicationContext;
-
-  @Override
-  public void setApplicationContext(ApplicationContext context) throws BeansException &#123;
-    applicationContext = context;
-  &#125;
-
-  //静态加载applicationContext
-  public static ApplicationContext getApplicationContext() &#123;
-    return applicationContext;
-  &#125;
-  //通过反射获取Bean
-  public static &lt;T&gt; T getBean(Class&lt;T&gt; requiredType)&#123;
-    return getApplicationContext().getBean(requiredType);
-  &#125;
-  //通过id名获取bean
-  public static &lt;T&gt; T getBean(String name)&#123;
-    return (T) getApplicationContext().getBean(name);
-  &#125;
-&#125;
-</code></pre>
-<h2 id="5-2使用示例"><a href="#5-2使用示例" class="headerlink" title="5.2使用示例"></a>5.2使用示例</h2><pre><code>@AllArgsConstructor
-@NoArgsConstructor
-@WebServlet(&quot;hello&quot;)
-public class MyServlet extends HttpServlet &#123;
-
-  MyBean myBean;
-
-  @Override
-  protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException &#123;
-    System.out.println(&quot;此时mybean是否为空&quot; + (myBean == null));
-  &#125;
-  
-  @Override
-  public void init() throws ServletException &#123;
-    System.out.println(&quot;在通过ApplicationContextAware获取Bean之前：&quot; + (myBean == null));
-    MyBean myBean = SpringContextUtils.getBean(MyBean.class);
-    this.myBean = myBean;
-    System.out.println(&quot;在通过ApplicationContextAware获取Bean之后：&quot; + (this.myBean == null));
-
-  &#125;
-
-
-&#125;
-</code></pre>
+        <p><img src="https://img-blog.csdnimg.cn/943ffbaba6504d6c978e39e71c10153b.png#pic_center"></p>
 
       
        <hr><span style="font-style: italic;color: gray;"> 生命以负熵为食，归整以抵抗熵增； </span>
