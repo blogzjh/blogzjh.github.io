@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>字符串：替换、左旋、缺失 | 张家豪的博客</title>
+  <title>Hive DDL、存储方式、分区分桶 | 张家豪的博客</title>
   <meta name="keywords" content="">
-  <meta name="description" content="字符串：替换、左旋、缺失 | 张家豪的博客">
+  <meta name="description" content="Hive DDL、存储方式、分区分桶 | 张家豪的博客">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="description" content="1.DDL建表语句结构 只有这几个划红线的必须选，画圈的二选一，其他都可以默认设置，也可以修改Hive对这些属性的默认配置 建表语法一定要按这个顺序，不可颠倒  删除表就跟SQL标准一样，DROP TABLE  xxx，不过要注意是否是内部表导致数据文件也被删除 2.数据类型2.1原生数据类型用的比较多的是：int、double、String、timestamp、date 2.2复杂数据类型用的比">
 <meta property="og:type" content="article">
@@ -789,9 +789,9 @@
 </aside>
 <div id="post">
     <div class="pjax">
-        <article id="post-字符串：替换、左旋、缺失" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-Hive-DDL、存储方式、分区分桶" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">字符串：替换、左旋、缺失</h1>
+        <h1 class="article-title">Hive DDL、存储方式、分区分桶</h1>
     
     <div class="article-meta">
         
@@ -801,7 +801,7 @@
             <i class="iconfont icon-category"></i>
             
             
-            <a  data-rel="数据结构算法">数据结构算法</a>
+            <a  data-rel="中间件">中间件</a>
             
         </span>
         
@@ -809,12 +809,12 @@
     </div>
     <div class="article-meta">
         
-            发布时间 : <time class="date" title='最后更新: 2022-09-15 21:34:49'>2022-09-15 21:20</time>
+            发布时间 : <time class="date" title='最后更新: 2022-11-11 10:06:30'>2022-11-11 10:06</time>
         
     </div>
     <div class="article-meta">
         
-        <span>字数:522</span>
+        <span>字数:1.6k</span>
         
         
         <span id="busuanzi_container_page_pv">
@@ -833,7 +833,7 @@
     
     <div class="toc-ref">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E6%9B%BF%E6%8D%A2%E7%A9%BA%E6%A0%BC"><span class="toc-text">1.替换空格</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A2%98%E8%A7%A3"><span class="toc-text">题解</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-0-n-1%E7%BC%BA%E5%A4%B1%E6%95%B0%E5%AD%97"><span class="toc-text">2.    0~n-1缺失数字</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E5%88%86%E6%80%9D%E6%83%B3"><span class="toc-text">二分思想</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E5%B7%A6%E6%97%8B%E8%BD%AC%E5%AD%97%E7%AC%A6%E4%B8%B2"><span class="toc-text">3.左旋转字符串</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9A%B4%E5%8A%9Bsplit"><span class="toc-text">暴力split</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%EF%BC%88%E8%80%97%E6%97%B6%E7%9F%AD%EF%BC%89%E4%B8%A4%E6%AC%A1for%EF%BC%8C%E4%B8%8D%E7%94%A8split"><span class="toc-text">（耗时短）两次for，不用split</span></a></li></ol></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-DDL%E5%BB%BA%E8%A1%A8%E8%AF%AD%E5%8F%A5%E7%BB%93%E6%9E%84"><span class="toc-text">1.DDL建表语句结构</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="toc-text">2.数据类型</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1%E5%8E%9F%E7%94%9F%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="toc-text">2.1原生数据类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2%E5%A4%8D%E6%9D%82%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="toc-text">2.2复杂数据类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E7%89%B9%E5%BE%81"><span class="toc-text">2.3数据类型特征</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-1%E6%98%BE%E7%A4%BA%E8%BD%AC%E6%8D%A2"><span class="toc-text">2.3.1显示转换</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-2%E9%9A%90%E5%BC%8F%E8%BD%AC%E6%8D%A2"><span class="toc-text">2.3.2隐式转换</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E6%9F%A5%E7%9C%8B%E8%A1%A8%E7%9A%84%E5%B1%9E%E6%80%A7"><span class="toc-text">3.查看表的属性</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1desc-formatted%E6%8C%87%E4%BB%A4"><span class="toc-text">3.1desc formatted指令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2%E5%8C%85%E5%90%AB%E7%9A%84%E5%86%85%E5%AE%B9"><span class="toc-text">3.2包含的内容</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-3%E5%86%85%E9%83%A8%E8%A1%A8%E3%80%81%E5%A4%96%E9%83%A8%E8%A1%A8"><span class="toc-text">3.3内部表、外部表</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-4SerDe%EF%BC%88%E8%A7%81%E4%B8%8B%E6%96%B9%EF%BC%89"><span class="toc-text">3.4SerDe（见下方）</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-SerDe%E7%B1%BB"><span class="toc-text">4.SerDe类</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1%E5%B8%B8%E7%94%A8SerDe"><span class="toc-text">4.1常用SerDe</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-1LazySimpleSerDe%E5%A4%84%E7%90%86%E6%96%87%E6%9C%AC%E6%96%87%E6%A1%A3"><span class="toc-text">4.1.1LazySimpleSerDe处理文本文档</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-2ORC%E5%88%97%E5%BC%8F%E5%AD%98%E5%82%A8"><span class="toc-text">4.1.2ORC列式存储</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-%E5%88%86%E5%8C%BA%E8%A1%A8"><span class="toc-text">5.分区表</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#5-1%E9%9D%99%E6%80%81%E5%88%86%E5%8C%BA"><span class="toc-text">5.1静态分区</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-1-load%E6%96%B9%E5%BC%8F"><span class="toc-text">5.1.1 load方式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-2%E5%8A%A8%E6%80%81%E5%88%86%E5%8C%BA"><span class="toc-text">5.2动态分区</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-1%E5%85%81%E8%AE%B8%E5%8A%A8%E6%80%81%E5%88%86%E5%8C%BA%E5%8A%A0%E8%BD%BD"><span class="toc-text">5.2.1允许动态分区加载</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-2%E6%93%8D%E4%BD%9C%E7%A4%BA%E4%BE%8B"><span class="toc-text">5.2.2操作示例</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-3%E9%9D%99%E5%8A%A8%E7%BB%93%E5%90%88"><span class="toc-text">5.3静动结合</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-3-1-INSERT-INTO%E5%92%8COVERWRITE"><span class="toc-text">5.3.1 INSERT INTO和OVERWRITE</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-4%E5%88%86%E5%8C%BA%E7%9A%84%E4%BC%98%E7%82%B9"><span class="toc-text">5.4分区的优点</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#6-%E5%88%86%E6%A1%B6%E8%A1%A8"><span class="toc-text">6.分桶表</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#6-1%E4%B8%8E%E5%88%86%E5%8C%BA%E8%A1%A8%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-text">6.1与分区表的区别</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-2%E5%88%86%E6%A1%B6%E7%9A%84%E5%8E%9F%E7%90%86"><span class="toc-text">6.2分桶的原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-3%E5%88%86%E6%A1%B6%E7%9A%84%E4%BC%98%E7%82%B9"><span class="toc-text">6.3分桶的优点</span></a></li></ol></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -849,105 +849,117 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="1-替换空格"><a href="#1-替换空格" class="headerlink" title="1.替换空格"></a>1.替换空格</h1><pre><code>请实现一个函数，把字符串 s 中的每个空格替换成&quot;%20&quot;。
-
-
-
-示例 1：
-
-输入：s = &quot;We are happy.&quot;
-输出：&quot;We%20are%20happy.&quot;
-
-
-
-限制：
-
-0 &lt;= s 的长度 &lt;= 10000
+        <h1 id="1-DDL建表语句结构"><a href="#1-DDL建表语句结构" class="headerlink" title="1.DDL建表语句结构"></a>1.DDL建表语句结构</h1><ul>
+<li>只有这几个<strong>划红线的必须选，画圈的二选一</strong>，其他都可以默认设置，也可以修改Hive对这些属性的默认配置</li>
+<li>建表语法一定要按这个顺序，不可颠倒</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/5d1572365c7944499aa6398e6b48ffc7.png"><br>删除表就跟SQL标准一样，DROP TABLE  xxx，不过要注意是否是内部表导致数据文件也被删除</p>
+<h1 id="2-数据类型"><a href="#2-数据类型" class="headerlink" title="2.数据类型"></a>2.数据类型</h1><h2 id="2-1原生数据类型"><a href="#2-1原生数据类型" class="headerlink" title="2.1原生数据类型"></a>2.1原生数据类型</h2><p>用的比较多的是：int、double、String、timestamp、date</p>
+<h2 id="2-2复杂数据类型"><a href="#2-2复杂数据类型" class="headerlink" title="2.2复杂数据类型"></a>2.2复杂数据类型</h2><p>用的比较多的是：array、map</p>
+<h2 id="2-3数据类型特征"><a href="#2-3数据类型特征" class="headerlink" title="2.3数据类型特征"></a>2.3数据类型特征</h2><ul>
+<li>大小写不敏感</li>
+<li>复杂数据类型使用通常需要和<strong>分隔符指定语法</strong>配合使用</li>
+<li>数据类型转换：如果数据类型不一致，Hive会尝试隐式转换（不一定成功，<strong>隐式转换的方向是保证精度不丢失</strong>）</li>
+</ul>
+<h3 id="2-3-1显示转换"><a href="#2-3-1显示转换" class="headerlink" title="2.3.1显示转换"></a>2.3.1显示转换</h3><p>CAST函数：</p>
+<ul>
+<li>CAST（’100’ as INT）把这个字符串100，转为int。能成功，<strong>返回100</strong></li>
+<li>CAST（’AB’ as INT）这样就会转化失败，<strong>返回null</strong></li>
+</ul>
+<h3 id="2-3-2隐式转换"><a href="#2-3-2隐式转换" class="headerlink" title="2.3.2隐式转换"></a>2.3.2隐式转换</h3><p>可以从int转double，void转boolean，总之不能让精度丢失</p>
+<h1 id="3-查看表的属性"><a href="#3-查看表的属性" class="headerlink" title="3.查看表的属性"></a>3.查看表的属性</h1><h2 id="3-1desc-formatted指令"><a href="#3-1desc-formatted指令" class="headerlink" title="3.1desc formatted指令"></a>3.1desc formatted指令</h2><p><code>describe formatted 库.表</code><br>或<br><code>desc formatted 库.表</code></p>
+<h2 id="3-2包含的内容"><a href="#3-2包含的内容" class="headerlink" title="3.2包含的内容"></a>3.2包含的内容</h2><p>通过观察结构可以看出Hive的describe指令是通过如下图的方式进行区分的<img src="https://img-blog.csdnimg.cn/70beb750310b4c8483185f5979bb251f.png"></p>
+<p>其中包含了所有的表信息，包括但不限于：列、分区分桶、owner、创建及更新时间、location<br>其中比较重要的几个是：</p>
+<ul>
+<li><code>Table Type</code>:  内部表or外部表</li>
+<li><code>SerDe Library</code>:   SerDe方式</li>
+<li><code>InputFormat和OutputFormat</code>：通常与SerDe一致，不一致可能出现序列化、反序列化的错误</li>
+<li><code>location</code>：存储在HDFS上的路径</li>
+</ul>
+<h2 id="3-3内部表、外部表"><a href="#3-3内部表、外部表" class="headerlink" title="3.3内部表、外部表"></a>3.3内部表、外部表</h2><p>内部表：Internal Table、也叫<strong>托管表</strong>Managed Table，删除内部表会导致HDFS上对应文件也被删除</p>
+<p>外部表：建表时指定EXTERNAL，实际生产中可以配合 指定location达到更安全的效果</p>
+<h2 id="3-4SerDe（见下方）"><a href="#3-4SerDe（见下方）" class="headerlink" title="3.4SerDe（见下方）"></a>3.4SerDe（见下方）</h2><h1 id="4-SerDe类"><a href="#4-SerDe类" class="headerlink" title="4.SerDe类"></a>4.SerDe类</h1><p>SerDe分别对应</p>
+<ul>
+<li>Serializer序列化：对象  转  字节码</li>
+<li>Deserializer反序列化：字节码  转  对象</li>
+</ul>
+<p>对象 指：<strong>表中的行</strong></p>
+<ul>
+<li>序列化与反序列化必须一致，否则可能解析错误，因此DDL时直接在后面加<code>STORED AS xxxx</code>，此时的<code>InputFormat和OutputFormat</code>则都与SerDe一致</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="http://blog.chinaunix.net/uid-31012107-id-5782480.html">常用SerDe介绍</a></p>
+<h2 id="4-1常用SerDe"><a href="#4-1常用SerDe" class="headerlink" title="4.1常用SerDe"></a>4.1常用SerDe</h2><p>一般来说最常用的就是<code>ORC</code>和默认的<code>LazySimpleSerDe</code></p>
+<h3 id="4-1-1LazySimpleSerDe处理文本文档"><a href="#4-1-1LazySimpleSerDe处理文本文档" class="headerlink" title="4.1.1LazySimpleSerDe处理文本文档"></a>4.1.1LazySimpleSerDe处理文本文档</h3><p>这个SerDe类主要是用于<strong>处理text文本文件</strong>，我们可以通过如下ddl案例看出，我们可以在文本文档中通过符号来界定元素</p>
+<p><img src="https://img-blog.csdnimg.cn/b7ac9227b7bf4438b6359a2f1a5ccc15.png"></p>
+<h3 id="4-1-2ORC列式存储"><a href="#4-1-2ORC列式存储" class="headerlink" title="4.1.2ORC列式存储"></a>4.1.2ORC列式存储</h3><p><strong>列存储</strong>，列式存储比起传统的行式存储更适合<strong>批量OLAP查询</strong></p>
+<p>当我们建表时使用：</p>
+<pre><code>CREATE TABLE IF NOT EXISTS xxxx(
+ xxxx
+)
+STORED AS ORC;
 </code></pre>
-<h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><pre><code>class Solution &#123;
-    public String replaceSpace(String s) &#123;
-        StringBuffer dest = new StringBuffer();
-        for(int i = 0 ; i &lt; s.length() ; i++)&#123;
-            if(s.charAt(i) != &#39; &#39;)
-    
-            dest.append(s.charAt(i));
-            else
-                    dest.append(&quot;%20&quot;);
-    &#125;
-        return dest.toString();
-    &#125;
-&#125;
+<p>那么就可以通过<code>desc formatted xx表</code>看到<img src="https://img-blog.csdnimg.cn/9c25ce699c344c4d94fefff06316ccf2.png"></p>
+<h1 id="5-分区表"><a href="#5-分区表" class="headerlink" title="5.分区表"></a>5.分区表</h1><ul>
+<li>分区字段<strong>不能是表中已有字段</strong>（字段名必须区分开）</li>
+<li>SELECT时，分区字段也会显示在结果中（在最后的中列）<br><img src="https://img-blog.csdnimg.cn/b7137b09b8a4498cbb00851038bfd874.png"><br>当我们对已经分区的表（如上方）加载数据时（<strong>加载数据可以通过insert、load两种方式</strong>），<strong>必须指定“数据加载到哪个分区”</strong>，否则无法加载数据<h2 id="5-1静态分区"><a href="#5-1静态分区" class="headerlink" title="5.1静态分区"></a>5.1静态分区</h2><h3 id="5-1-1-load方式"><a href="#5-1-1-load方式" class="headerlink" title="5.1.1 load方式"></a>5.1.1 load方式</h3></li>
+</ul>
+<p><strong>load data [local] inpath ‘路径’ into 表名 partition( partition1 = ‘分区值’, partition2 = ‘分区值’)</strong></p>
+<ul>
+<li>用load方式加载数据，<strong>一定是要把分区partition写死的</strong>，<strong>因为load无法动态获取数据的字段值</strong></li>
+<li>[]中的local参数用于区分是本地 or HDFS上的文件</li>
+</ul>
+<h2 id="5-2动态分区"><a href="#5-2动态分区" class="headerlink" title="5.2动态分区"></a>5.2动态分区</h2><ul>
+<li>insert + select语句（也可以通过with建立内存表）<h3 id="5-2-1允许动态分区加载"><a href="#5-2-1允许动态分区加载" class="headerlink" title="5.2.1允许动态分区加载"></a>5.2.1允许动态分区加载</h3></li>
+</ul>
+<p>#是否开启动态分区功能<br><code>set hive.exec.dynamic.partition=true;</code><br>#指定动态分区模式,分为nonstick非严格模式和strict严格模式。<br>#<strong>strict严格模式要求至少有一个分区为静态分区。</strong><br><code>set hive.exec.dynamic.partition.mode=nonstrict;</code></p>
+<h3 id="5-2-2操作示例"><a href="#5-2-2操作示例" class="headerlink" title="5.2.2操作示例"></a>5.2.2操作示例</h3><ul>
+<li>查询出来的字段数 必须多于 目标表</li>
+<li><strong>多出来的字段无关名字</strong>，<strong>直接按建表时的分区顺序</strong>来决定分区<br><img src="https://img-blog.csdnimg.cn/148a59917b414168bf6aefbbf08ddd7e.png"></li>
+</ul>
+<h2 id="5-3静动结合"><a href="#5-3静动结合" class="headerlink" title="5.3静动结合"></a>5.3静动结合</h2><p>这是我在工作中遇到的一个场景：</p>
+<ol>
+<li><p>ios表、android表都是<strong>按day分区</strong>的，我们把其中的某两个字段加载到一个新表中</p>
+</li>
+<li><p>为了防止同一day的数据ios和android互相覆盖（基于业务特性原因，在5.3.1中详细说明），建表时额外对source进行分区</p>
+</li>
+<li><p><code>PARTITIONED BY ( source_partition STRING, day_partition STRING)</code></p>
+</li>
+<li><p>加载数据时，source_partition要么选ios要么选android，那么就可以直接写死，而day_partition仍然动态分区</p>
+<pre><code> set hive.mapred.mode=nonstrict;                 --允许全分区字段动态，这里写strict也没事
+ set hive.exec.dynamic.partition=true;           --动态插入分区表
+ 
+ WITH android as(   --内存表中有两个字段
+     SELECT   aaaaaa,day  FROM ....
+ )
+ 
+ --OVERWRITE覆盖原有文件，保证中途传的正常。
+ --按source和day分区
+ INSERT OVERWRITE TABLE xxx  PARTITION(source_partition = &#39;android&#39;, day_partition)
+     SELECT aaaaa, day , day  FROM android
+     --多查一遍day字段，会自动映射（因为只有一个动态分区了）
 </code></pre>
-<h1 id="2-0-n-1缺失数字"><a href="#2-0-n-1缺失数字" class="headerlink" title="2.    0~n-1缺失数字"></a>2.    0~n-1缺失数字</h1><pre><code>一个长度为n-1的递增排序数组中的所有数字都是唯一的，并且每个数字都在范围0～n-1之内。在范围0～n-1内的n个数字中有且只有一个数字不在该数组中，请找出这个数字。
-
-
-
-示例 1:
-
-输入: [0,1,3]
-输出: 2
-
-示例 2:
-
-输入: [0,1,2,3,4,5,6,7,9]
-输出: 8
-</code></pre>
-<h2 id="二分思想"><a href="#二分思想" class="headerlink" title="二分思想"></a>二分思想</h2><pre><code>class Solution &#123;
-    public int missingNumber(int[] nums) &#123;
-        int left = 0 ;
-        int right = nums.length - 1 ;
-        int middle;
-        while(left &lt;= right)&#123;
-            middle = (left + right)&gt;&gt;1;
-            if(nums[middle] == middle)&#123;//那就是后半段的问题
-                left  = middle+1;//范围缩小到右边
-            &#125;else&#123;//前半段出错
-                right  = middle-1;//范围缩小到左边
-            &#125;
-        &#125;
-        return left;
-
-    &#125;
-&#125;
-</code></pre>
-<h1 id="3-左旋转字符串"><a href="#3-左旋转字符串" class="headerlink" title="3.左旋转字符串"></a>3.左旋转字符串</h1><pre><code>字符串的左旋转操作是把字符串前面的若干个字符转移到字符串的尾部。请定义一个函数实现字符串左旋转操作的功能。比如，输入字符串&quot;abcdefg&quot;和数字2，该函数将返回左旋转两位得到的结果&quot;cdefgab&quot;。
-
-
-
-示例 1：
-
-输入: s = &quot;abcdefg&quot;, k = 2
-输出: &quot;cdefgab&quot;
-
-示例 2：
-
-输入: s = &quot;lrloseumgh&quot;, k = 6
-输出: &quot;umghlrlose&quot;
-</code></pre>
-<h2 id="暴力split"><a href="#暴力split" class="headerlink" title="暴力split"></a>暴力split</h2><pre><code>class Solution &#123;
-    public String reverseLeftWords(String s, int n) &#123;
-        StringBuffer rep = new StringBuffer();
-        for(int i = 0 ; i &lt; n ; i++)&#123;
-            rep.append(s.charAt(i));
-        &#125;
-        return rep.insert(0,s.split(rep.toString(),2)[1]).toString();
-    &#125;
-&#125;
-</code></pre>
-<h2 id="（耗时短）两次for，不用split"><a href="#（耗时短）两次for，不用split" class="headerlink" title="（耗时短）两次for，不用split"></a>（耗时短）两次for，不用split</h2><pre><code>class Solution &#123;
-    public String reverseLeftWords(String s, int n) &#123;
-        StringBuffer rep = new StringBuffer();
-        for(int i = n ; i &lt; s.length() ; i++)&#123;
-            rep.append(s.charAt(i));
-        &#125;
-        for(int i = 0 ; i &lt; n ; i++)&#123;
-            rep.append(s.charAt(i));
-        &#125;
-        return rep.toString();
-        
-    &#125;
-&#125;
-</code></pre>
+</li>
+</ol>
+<h3 id="5-3-1-INSERT-INTO和OVERWRITE"><a href="#5-3-1-INSERT-INTO和OVERWRITE" class="headerlink" title="5.3.1 INSERT INTO和OVERWRITE"></a>5.3.1 INSERT INTO和OVERWRITE</h3><ul>
+<li><code>insert into</code>：在原文件上追加写</li>
+<li><code>insert overwrite</code>：先删除原文件，再新建文件</li>
+</ul>
+<ol>
+<li>为了防止新表的数据出现重复（<strong>上一次传到一半宕机了，如果用insert into则会导致重复</strong>），因此不能用insert into</li>
+<li>但是用insert overwrite <strong>会导致同一day的ios和android数据互相覆盖</strong>，因此需要对source进行额外分区，防止覆盖数据</li>
+</ol>
+<h2 id="5-4分区的优点"><a href="#5-4分区的优点" class="headerlink" title="5.4分区的优点"></a>5.4分区的优点</h2><p>当SELECT ….  WHERE  <code>分区字段 = xxxx</code>时，可以避免全表扫描<br><strong>同时像5.3.1对于分区的用法也可以实现业务上的一些幂等操作</strong><br><img src="https://img-blog.csdnimg.cn/c417c18de2624e719e8837611c92fe8f.png"></p>
+<h1 id="6-分桶表"><a href="#6-分桶表" class="headerlink" title="6.分桶表"></a>6.分桶表</h1><p>这个用的没有分区表多，因为分区表已经能满足绝大部分场景了。<br>当且仅当<strong>每个分区的数据量都还是很大（十亿级别）</strong>、同时<strong>也能按逻辑再细划分（如：按省分区，按市分桶）</strong></p>
+<h2 id="6-1与分区表的区别"><a href="#6-1与分区表的区别" class="headerlink" title="6.1与分区表的区别"></a>6.1与分区表的区别</h2><ul>
+<li>分区不会把文件拆分，而分桶会</li>
+<li>分区字段不能是列字段，而分桶字段必须是列字段</li>
+</ul>
+<h2 id="6-2分桶的原理"><a href="#6-2分桶的原理" class="headerlink" title="6.2分桶的原理"></a>6.2分桶的原理</h2><p>经典的hash取模算法<img src="https://img-blog.csdnimg.cn/0b2e44e628f040d3b3b8b46f1883db53.png"></p>
+<h2 id="6-3分桶的优点"><a href="#6-3分桶的优点" class="headerlink" title="6.3分桶的优点"></a>6.3分桶的优点</h2><ul>
+<li>提升查询速度，避免全表扫描</li>
+<li>分桶表数据进行<strong>高效抽样</strong>（天生就是随机抽样）</li>
+<li><strong>JOIN时提高MR效率，减少笛卡尔积数量（必须是针对JOIN ON的条件字段进行分桶）</strong><img src="https://img-blog.csdnimg.cn/45d748b7832d41678f130198e2e0951f.png"></li>
+</ul>
 
       
        <hr><span style="font-style: italic;color: gray;"> 生命以负熵为食，归整以抵抗熵增； </span>
