@@ -6,20 +6,27 @@
   <meta name="keywords" content="">
   <meta name="description" content="AOP实现分布式锁 | 张家豪的博客">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="1.场景Hive日志表中要取出几十个统计指标，并最后做OLAP 2.注意点都是来自于同一个表的很多指标，不能用常规的select ..from。这样会导致很多次扫表，要用from insert多重插入 或者 union all，这边我试了下，同表union all的优化比from insert更好，500W数据查20字段的时间占比是：  select from : 1000s from inser">
+<meta name="description" content="除了es-head，其他的插件都需要与es版本一致 1 es7.6.2每个es都是自成一个集群，不同于solar还需要zk来搭建集群 1.1 下载安装https:&#x2F;&#x2F;www.elastic.co&#x2F;cn&#x2F;downloads&#x2F;past-releases&#x2F;elasticsearch-7-6-2因为占用内存实在是太大了，我在服务器上装了运行不起来，所以下载了win版本 1.2 配置文件在\elastics">
 <meta property="og:type" content="article">
-<meta property="og:title" content="词典直播从日志提取几十个指标的方案">
-<meta property="og:url" content="https://blogzjh.github.io/2022/11/18/%E8%AF%8D%E5%85%B8%E7%9B%B4%E6%92%AD%E4%BB%8E%E6%97%A5%E5%BF%97%E6%8F%90%E5%8F%96%E5%87%A0%E5%8D%81%E4%B8%AA%E6%8C%87%E6%A0%87%E7%9A%84%E6%96%B9%E6%A1%88/index.html">
+<meta property="og:title" content="es、head、ik的搭建">
+<meta property="og:url" content="https://blogzjh.github.io/2022/11/18/es%E3%80%81head%E3%80%81ik%E7%9A%84%E6%90%AD%E5%BB%BA/index.html">
 <meta property="og:site_name" content="张家豪的博客">
-<meta property="og:description" content="1.场景Hive日志表中要取出几十个统计指标，并最后做OLAP 2.注意点都是来自于同一个表的很多指标，不能用常规的select ..from。这样会导致很多次扫表，要用from insert多重插入 或者 union all，这边我试了下，同表union all的优化比from insert更好，500W数据查20字段的时间占比是：  select from : 1000s from inser">
+<meta property="og:description" content="除了es-head，其他的插件都需要与es版本一致 1 es7.6.2每个es都是自成一个集群，不同于solar还需要zk来搭建集群 1.1 下载安装https:&#x2F;&#x2F;www.elastic.co&#x2F;cn&#x2F;downloads&#x2F;past-releases&#x2F;elasticsearch-7-6-2因为占用内存实在是太大了，我在服务器上装了运行不起来，所以下载了win版本 1.2 配置文件在\elastics">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/8dfc5b51e26b45408c6475fd48334f7e.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/ee788024645143239b554ea97f3a0328.png">
-<meta property="article:published_time" content="2022-11-18T07:47:03.000Z">
-<meta property="article:modified_time" content="2022-11-18T07:47:18.798Z">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e44644c2311043c0b94644bc446b8b90.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/669c4c406b0542c38d16959b379449c4.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/db89586d8e864d168344a8679da326f8.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e96010dda3ca4a038d1909b7caaa789a.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8231760958804319a4f315edd20b84b3.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/52471ac477764fcf8a926470ce4ee9eb.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4f6f867b9e044e4591351447a1bb3d77.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5cbcbd485c2449fba2706e9fa273a662.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a55c9a26d73449c38a4170da637103bb.png">
+<meta property="article:published_time" content="2022-11-18T07:52:15.000Z">
+<meta property="article:modified_time" content="2022-11-18T07:52:26.209Z">
 <meta property="article:author" content="张家豪">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://img-blog.csdnimg.cn/8dfc5b51e26b45408c6475fd48334f7e.png">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/e44644c2311043c0b94644bc446b8b90.png">
 
 
 <link rel="icon" href="/img/QQ图片20211224224200.jpg">
@@ -129,7 +136,7 @@
     <li>
         <div class="all active" data-rel="全部文章">全部文章
             
-                <small>(58)</small>
+                <small>(61)</small>
             
         </div>
     </li>
@@ -210,7 +217,7 @@
                     <div data-rel="中间件">
                         
                         中间件
-                        <small>(9)</small>
+                        <small>(12)</small>
                         
                     </div>
                     
@@ -245,8 +252,8 @@
         
     </div>
 </div>
-<input type="hidden" id="yelog_site_posts_number" value="58">
-<input type="hidden" id="yelog_site_word_count" value="108.9k">
+<input type="hidden" id="yelog_site_posts_number" value="61">
+<input type="hidden" id="yelog_site_word_count" value="112.2k">
 <div style="display: none">
     <span id="busuanzi_value_site_uv"></span>
     <span id="busuanzi_value_site_pv"></span>
@@ -301,6 +308,30 @@
 
     
     <nav id="title-list-nav">
+        
+        <a  class="全部文章 中间件 "
+           href="/2022/11/18/es%E3%80%81head%E3%80%81ik%E7%9A%84%E6%90%AD%E5%BB%BA/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="es、head、ik的搭建">es、head、ik的搭建</span>
+            <span class="post-date" title="2022-11-18 15:52:15">2022/11/18</span>
+        </a>
+        
+        <a  class="全部文章 中间件 "
+           href="/2022/11/18/Hive%E7%9A%84DML%E4%BB%A5%E5%8F%8A%E5%90%84%E7%A7%8D%E4%BC%98%E5%8C%96/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Hive的DML以及各种优化">Hive的DML以及各种优化</span>
+            <span class="post-date" title="2022-11-18 15:51:14">2022/11/18</span>
+        </a>
+        
+        <a  class="全部文章 中间件 "
+           href="/2022/11/18/Hive%E7%9A%84DQL%E4%BB%A5%E5%8F%8A%E5%90%84%E7%A7%8D%E4%BC%98%E5%8C%96/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="Hive的DQL以及各种优化">Hive的DQL以及各种优化</span>
+            <span class="post-date" title="2022-11-18 15:50:12">2022/11/18</span>
+        </a>
         
         <a  class="全部文章 工作笔记 "
            href="/2022/11/18/%E8%AF%8D%E5%85%B8%E7%9B%B4%E6%92%AD%E4%BB%8E%E6%97%A5%E5%BF%97%E6%8F%90%E5%8F%96%E5%87%A0%E5%8D%81%E4%B8%AA%E6%8C%87%E6%A0%87%E7%9A%84%E6%96%B9%E6%A1%88/"

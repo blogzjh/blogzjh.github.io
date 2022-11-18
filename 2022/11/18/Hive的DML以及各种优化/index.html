@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>卷积神经网络单图超分辨率的深度学习方法 | 张家豪的博客</title>
+  <title>Hive的DML以及各种优化 | 张家豪的博客</title>
   <meta name="keywords" content="">
-  <meta name="description" content="卷积神经网络单图超分辨率的深度学习方法 | 张家豪的博客">
+  <meta name="description" content="Hive的DML以及各种优化 | 张家豪的博客">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="description" content="除了es-head，其他的插件都需要与es版本一致 1 es7.6.2每个es都是自成一个集群，不同于solar还需要zk来搭建集群 1.1 下载安装https:&#x2F;&#x2F;www.elastic.co&#x2F;cn&#x2F;downloads&#x2F;past-releases&#x2F;elasticsearch-7-6-2因为占用内存实在是太大了，我在服务器上装了运行不起来，所以下载了win版本 1.2 配置文件在\elastics">
 <meta property="og:type" content="article">
@@ -815,9 +815,9 @@
 </aside>
 <div id="post">
     <div class="pjax">
-        <article id="post-卷积神经网络单图超分辨率的深度学习方法" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-Hive的DML以及各种优化" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">卷积神经网络单图超分辨率的深度学习方法</h1>
+        <h1 class="article-title">Hive的DML以及各种优化</h1>
     
     <div class="article-meta">
         
@@ -827,7 +827,7 @@
             <i class="iconfont icon-category"></i>
             
             
-            <a  data-rel="机器学习">机器学习</a>
+            <a  data-rel="中间件">中间件</a>
             
         </span>
         
@@ -835,12 +835,12 @@
     </div>
     <div class="article-meta">
         
-            发布时间 : <time class="date" title='最后更新: 2022-07-17 11:33:26'>2022-07-17 11:33</time>
+            发布时间 : <time class="date" title='最后更新: 2022-11-18 15:51:25'>2022-11-18 15:51</time>
         
     </div>
     <div class="article-meta">
         
-        <span>字数:4.2k</span>
+        <span>字数:1.4k</span>
         
         
         <span id="busuanzi_container_page_pv">
@@ -859,7 +859,7 @@
     
     <div class="toc-ref">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%91%98%E8%A6%81"><span class="toc-text">摘要</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Abstract"><span class="toc-text">Abstract</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E5%89%8D%E8%A8%80%E5%8F%8A%E7%A0%94%E7%A9%B6%E8%83%8C%E6%99%AF"><span class="toc-text">1.前言及研究背景</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1%E5%9B%BE%E5%83%8F%E7%9A%84%E8%B6%85%E5%88%86%E8%BE%A8%E7%8E%87%E9%97%AE%E9%A2%98"><span class="toc-text">1.1图像的超分辨率问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2%E4%BC%A0%E7%BB%9F%E6%96%B9%E6%B3%95"><span class="toc-text">1.2传统方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-3-%E6%9C%AC%E6%8A%A5%E5%91%8A%E6%8F%90%E5%87%BA%E7%9A%84%E6%96%B9%E6%B3%95"><span class="toc-text">1.3 本报告提出的方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-4-%E4%BC%98%E8%B6%8A%E6%80%A7"><span class="toc-text">1.4 优越性</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E5%AE%9E%E9%AA%8C%E8%BF%87%E7%A8%8B"><span class="toc-text">2.实验过程</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1%E5%AE%9E%E9%AA%8C%E6%96%B9%E6%B3%95"><span class="toc-text">2.1实验方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-SRCNN%E7%9A%84%E7%BB%93%E6%9E%84%E7%89%B9%E6%80%A7%EF%BC%9A"><span class="toc-text">2.2 SRCNN的结构特性：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3%E8%AE%BA%E8%AF%81%E7%A8%80%E7%96%8F%E7%BC%96%E7%A0%81%E8%A1%A8%E7%A4%BA%E5%9C%A8RSCNN%E4%B8%AD%E7%9A%84%E5%8F%AF%E8%A1%8C%E6%80%A7"><span class="toc-text">2.3论证稀疏编码表示在RSCNN中的可行性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-4%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0"><span class="toc-text">2.4损失函数</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C"><span class="toc-text">3.实验结果</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1%E8%B0%83%E6%95%B4%E5%8F%82%E6%95%B0"><span class="toc-text">3.1调整参数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87%EF%BC%9A"><span class="toc-text">3.2评价指标：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-3%E5%AF%B9%E9%A2%9C%E8%89%B2%E9%80%9A%E9%81%93%E7%9A%84%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C%EF%BC%9A"><span class="toc-text">3.3对颜色通道的实验结果：</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%AF%B4%E6%98%8E%EF%BC%9A"><span class="toc-text">说明：</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-%E5%AE%9E%E9%AA%8C%E7%BB%93%E8%AE%BA"><span class="toc-text">4.实验结论</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE%EF%BC%9A"><span class="toc-text">参考文献：</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-Load%E5%8A%A0%E8%BD%BD%E6%95%B0%E6%8D%AE"><span class="toc-text">1.Load加载数据</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1Load%E8%AF%AD%E6%B3%95"><span class="toc-text">1.1Load语法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-1-filepath"><span class="toc-text">1.1.1 filepath</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-2-local"><span class="toc-text">1.1.2 local</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-3overwrite"><span class="toc-text">1.1.3overwrite</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-4into"><span class="toc-text">1.1.4into</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2-Hive3-0%E6%96%B0%E7%89%B9%E6%80%A7"><span class="toc-text">1.2 Hive3.0新特性</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-insert%E5%8A%A0%E8%BD%BD%E6%95%B0%E6%8D%AE"><span class="toc-text">2.insert加载数据</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-%E5%AE%98%E6%96%B9%E6%8E%A8%E8%8D%90%E7%9A%84%E6%95%B0%E6%8D%AE%E5%8A%A0%E8%BD%BD%E6%96%B9%E5%BC%8Fload%E5%8F%8A%E5%85%B6%E4%BC%98%E7%BC%BA%E7%82%B9"><span class="toc-text">2.1 官方推荐的数据加载方式load及其优缺点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-%E5%A4%9A%E9%87%8D%E6%8F%92%E5%85%A5multiple-insert"><span class="toc-text">2.2 多重插入multiple insert</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3%E5%8A%A8%E6%80%81%E5%88%86%E5%8C%BA%E6%8F%92%E5%85%A5"><span class="toc-text">2.3动态分区插入</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-1-set%E5%8F%82%E6%95%B0"><span class="toc-text">2.3.1 set参数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-4%E5%AF%BC%E5%87%BA%E6%95%B0%E6%8D%AEinsert-directory"><span class="toc-text">2.4导出数据insert directory</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E4%BA%8B%E5%8A%A1%E8%A1%A8%EF%BC%88%E7%94%A8%E4%BA%8E%E6%94%AF%E6%8C%81update%E5%92%8Cdelete%EF%BC%8C%E4%B8%8D%E6%98%AFinsert%EF%BC%89"><span class="toc-text">3.事务表（用于支持update和delete，不是insert）</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1%E4%BA%8B%E5%8A%A1%E8%A1%A8%E7%9A%84%E5%88%9B%E5%BB%BA"><span class="toc-text">3.1事务表的创建</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2%E5%B1%80%E9%99%90%E6%80%A7"><span class="toc-text">3.2局限性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-3%E4%B8%BA%E4%BD%95%E9%9C%80%E8%A6%81%E4%BA%8B%E5%8A%A1%E8%A1%A8"><span class="toc-text">3.3为何需要事务表</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-4%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86"><span class="toc-text">3.4实现原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-1-delta%E6%96%87%E4%BB%B6%E4%B8%8Edelete-delta%E6%96%87%E4%BB%B6"><span class="toc-text">3.4.1 delta文件与delete_delta文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-2-Compator%E5%90%88%E5%B9%B6%E5%99%A8"><span class="toc-text">3.4.2 Compator合并器</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-update%E5%92%8Cdelete"><span class="toc-text">4.update和delete</span></a></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -875,34 +875,85 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h1><p>我们提出了一种用于单图像超分辨率（SR）的深度学习方法。 我们的方法直接学习低或高分辨率图像之间的端到端映射。 映射被表示为深度卷积神经网络（CNN），其将低分辨率图像作为输入和输出高分辨率。我们进一步表明，还可以将传统的稀疏编码的SR方法视为深卷积网络。 但与传统方法不同，这些方法单独处理每个组件，我们的方法都会共同优化所有层。 我们的深层卷积神经网络具有轻量级结构，但展示了最先进的恢复质量，并实现了实际在线使用的快速速度。 我们探索不同的网络结构和参数设置，以实现性能和速度之间的权衡。 此外，我们将网络扩展到同时应对三种颜色通道，并显示出更好的整体重建质量。</p>
-<h1 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h1><p>We propose a deep learning method for single image hyperresolution (SR). Our method directly learns end-to-end mapping between low- or high resolution images. The mapping is represented as a deep convolutional neural network (CNN), which uses low resolution images as input and output high resolution. We further show that<br>traditional sparsely encoded SR methods can also be regarded as deep convolutional networks. However, unlike traditional methods, these methods deal with each component separately, and our methods will jointly optimise all layers. Our deep convolutional neural network has a lightweight structure, but it shows the most advanced recovery quality and realises the fast speed of actual online use. We explore different network structures and parameter settings to realise the trade off between performance and speed. In addition, we have expanded the network to deal with three colour channels at the same time, and show a better overall reconstruction quality.</p>
-<p>目录<br>摘要    2<br>1.前言及研究背景    4<br>1.1图像的超分辨率问题    4<br>1.2传统方法    4<br>1.3 本报告提出的方法    5<br>1.4 优越性    5<br>2.实验过程    5<br>2.1实验方法    5<br>使用深卷积网络进行图像的超级分辨率（SRCNN）：    5<br>2.2 SRCNN的结构特性：    6<br>2.3论证稀疏编码表示在RSCNN中的可行性    7<br>2.4损失函数    8<br>3.实验结果    8<br>3.1调整参数    8<br>3.2评价指标：    9<br>3.3对颜色通道的实验结果：    9<br>4.实验结论    11</p>
-<h1 id="1-前言及研究背景"><a href="#1-前言及研究背景" class="headerlink" title="1.前言及研究背景"></a>1.前言及研究背景</h1><h2 id="1-1图像的超分辨率问题"><a href="#1-1图像的超分辨率问题" class="headerlink" title="1.1图像的超分辨率问题"></a>1.1图像的超分辨率问题</h2><p>图像分辨率指图像中存储的信息量，是每英寸图像内有多少个像素点，分辨率的单位为PPI(Pixels Per Inch)，通常叫做像素每英寸。一般情况下，图像分辨率越高，图像中包含的细节就越多，信息量也越大。图像分辨率分为空间分辨率和时间分辨率。通常，分辨率被表示成每一个方向上的像素数量，例如64*64的二维图像。但分辨率的高低其实并不等同于像素数量的多少，例如一个通过插值放大了5倍的图像并不表示它包含的细节增加了多少。图像超分辨率重建关注的是恢复图像中丢失的细节，即高频信息。 在大量的电子图像应用领域，人们经常期望得到高分辨率（简称HR）图像。但由于设备、传感器等原因，我们得到的图像往往是低分辨率图像（LR）。因此,将LR映射到HR的函数空间非常大,学习一个好的解是非常困难的。而且低分辨率图像往往缺失图像超分辨率最需要的高频信息和纹理特征,却包含大量的低频信息来阻碍超分辨率重建,导致图像超分辨率是一个极具挑战性的任务。近年来,深度学习方法在计算机视觉领域大放异彩,同时也给图像超分辨率提供了新的解决方案。【1】增加空间分辨率最直接的解决方法就是通过传感器制造技术减少像素尺寸（例如增加每单元面积的像素数量）；另外一个增加空间分辨率的方法是增加芯片的尺寸，从而增加图像的容量。因为很难提高大容量的偶合转换率，所以这种方法一般不认为是有效的，因此，引出了图像超分辨率技术。<br>针对深度卷积神经网络对特征信息利用不足的问题和基于像素损失的网络无法克服重建图像伪影和平滑的问题进行研究,对深度卷积神经网络的特定结构、网络模块、损失函数等进行分析,通过构建信息蒸馏和密集特征融合模块加强了网络内部信息的流动效率;引入改进的生成对抗网络来改善重建图像的伪影和过于平滑的问题。【2】<br>超分辨率问题本质是不适定的或者说欠定逆问题，也就是图像超分辨率的解是不唯一的。对于任何给定的低分辨率像素都存在多重解，所以对于这个问题通常用强先验信息约束解空间来缓解，为了学习强先验信息，主要有两种思路：<br>（1）利用同一图像的内部相似性；<br>（2）从外部低分辨率和高分辨率样例图片对中学习映射函数</p>
-<h2 id="1-2传统方法"><a href="#1-2传统方法" class="headerlink" title="1.2传统方法"></a>1.2传统方法</h2><p>传统基于稀疏编码的超分辨率方法是基于外部实例方法的一种方法，该方法流程如下：<br>（1）从输入图片中密集地进行采样形成大量的重叠的patches，并且对这些patch进行预处理（例如减去均值、标准化）；<br>（2）用一个低分辨率的字典对patches进行编码；<br>（3）稀疏系数被传递到一个高分辨率字典中，用来重构高分辨率的patches；<br>（4）将重叠的patches进行聚合（平均权重）产生最终的输出；</p>
-<h2 id="1-3-本报告提出的方法"><a href="#1-3-本报告提出的方法" class="headerlink" title="1.3 本报告提出的方法"></a>1.3 本报告提出的方法</h2><p>这篇课程设计报告的实验是基于2015年由何恺明博士、汤晓鸥教授等发表于TPAMI的关于图像超分辨率的一篇论文《Image Super-resolution Using Deep Convolutional Networks (SRCNN)》，同时也是世界上较早的将深度学习应用在图像超分辨率的工作【3】，文中提出了一种用于单图像超分辨率的三层卷积网络，即SRCNN来实现图像的超分辨率的深度学习方法，相较于传统的基于稀疏表示的字典学习方法，一定程度上提升了图像重建的质量。</p>
-<h2 id="1-4-优越性"><a href="#1-4-优越性" class="headerlink" title="1.4 优越性"></a>1.4 优越性</h2><p>针对低分辨率图像在预处理时使用双三次插值导致图像丢失一些重要的高频纹理细节以及网络模型优化问题,文章提出了连分式插值结合卷积神经网络的超分辨率重建方法。在原有的轻量级基于卷积神经网络的超分辨率重建算法（super-resolution convolutional neural net work, SRCNN）网络模型基础上,首先采用Newton-Thiele型连分式插值函数将低分辨率图像插值到目标尺寸;然后利用3个卷积层进行图像特征提取、非线性映射、重建与优化;该文在网络收敛时利用Radam优化算法自适应地调整梯度,并且采用余弦衰减法逐渐降低学习率。实验结果表明,该网络模型能够在轻量级的卷积神经网络下获得更丰富的纹理细节和更清晰的图像边缘。 【4】<br>与稀疏编码表示的方法相比，SRCNN有诸多优点：<br>①SRCNN没有显式地学习用于modeling the patch space的dictionaries或manifolds，而是通过隐藏层隐式实现的。<br>②patch的提取和聚合也被表示为卷积层，因此也被包含在了优化过程中。<br>③完全是通过学习获得的，几乎没有预处理或后处理。<br>④结构简单而且准确率还比一些基于实例的先进方法的高；<br>⑤有合适的卷积核数和层数，即便使用CPU，也能有很快的速度；<br>⑥SRCNN是完全前馈的网络，在使用中不需要解决任何优化问题，因此要快于其他基于实例的方法；<br>⑦当数据集更大、更多样化或者模型更大、更深时，网络的恢复质量可以进一步提高；<br>⑧SRCNN可以同时处理彩色图像的三通道，提高了超分辨率性能</p>
-<h1 id="2-实验过程"><a href="#2-实验过程" class="headerlink" title="2.实验过程"></a>2.实验过程</h1><h2 id="2-1实验方法"><a href="#2-1实验方法" class="headerlink" title="2.1实验方法"></a>2.1实验方法</h2><p>使用深卷积网络进行图像的超级分辨率（SRCNN）：<br>简单来讲，SRCNN的原理可以概括为：直接学习低/高分辨率图像之间的端到端映射。 这一映射被表示为深度卷积神经网络（CNN），其将低分辨率图像作为输入，经映射后输出高分辨率图形，达到了很好的效果，同时证明了传统基于稀疏编码的SR方法也可以看作是一个深度卷积网络。其区别在于，传统方法是分别处理每个组件，而SRCNN则是联合优化所有层。SRCNN网络问世后,它在图像超分辨重建的应用使得深度学习在图像处理领域得到扩展。2014年,深度学习模型SRCNN一经提出,为深度学习解决图像压缩领域的像素问题开创了新纪元。【5】</p>
-<p><img src="https://img-blog.csdnimg.cn/d6f664b731e942f68e464da586d23829.png" alt="图1 论文中展示的三种方法效果比较"><br><img src="https://img-blog.csdnimg.cn/6d16c36c60a84707b52124b535d30fd4.png" alt="图2 用demo code复现进行图片测试SRCNN的超分辨率效果"></p>
-<h2 id="2-2-SRCNN的结构特性："><a href="#2-2-SRCNN的结构特性：" class="headerlink" title="2.2 SRCNN的结构特性："></a>2.2 SRCNN的结构特性：</h2><p>SRCNN具有三层网络结构，在具有轻量结构的同时，还具有最先进的恢复质量，并实现了快速的在线使用，作者在论文中探索了不同的网络结构和参数设置，以实现性能和速度之间的权衡。从处理过程来看，SRCNN可以同时处理RGB三个颜色通道，从而表现出更好的整体重建质量。<br><img src="https://img-blog.csdnimg.cn/92c13c1bf2274db7a5759b18ccea5bf5.png" alt="图3 SRCNN的三层网络结构图解"></p>
-<ul>
-<li><p>第一卷积层：提取一组特征映射<img src="https://img-blog.csdnimg.cn/363154deb0e54a16b083f89aee64e2a7.png"><br>W1表示为滤波器，B1表示为偏差；</p>
-</li>
-<li><p>第二卷积层：映射这些特征非线性地映射到高分辨率表示<img src="https://img-blog.csdnimg.cn/8daf3bbc7de1444ab954b4b0148444dd.png"></p>
-</li>
-<li><p>第三卷积层：结合了空间邻域内的预测重建，以产生最终的高分辨率图像<img src="https://img-blog.csdnimg.cn/40545e99569d4c94aeaac35694a7ae64.png"><br>W3是一组线性滤波器</p>
-</li>
+        <h1 id="1-Load加载数据"><a href="#1-Load加载数据" class="headerlink" title="1.Load加载数据"></a>1.Load加载数据</h1><ul>
+<li>不管路径在哪里，只有<strong>把数据文件移动到对应的表文件夹下面，Hive才能映射解析成功;</strong></li>
+<li>最原始暴力的方式就是使用<code>hadoop fs -put/-mv</code>等方式直接将数据移动到表文件夹下;但<strong>Hive推荐使用Load指令</strong></li>
+<li>将数据文件移动到Hive对应的位置</li>
+<li><strong>纯粹的移动、纯粹的复制</strong></li>
 </ul>
-<h2 id="2-3论证稀疏编码表示在RSCNN中的可行性"><a href="#2-3论证稀疏编码表示在RSCNN中的可行性" class="headerlink" title="2.3论证稀疏编码表示在RSCNN中的可行性"></a>2.3论证稀疏编码表示在RSCNN中的可行性</h2><p><img src="https://img-blog.csdnimg.cn/9ae717db7900475b8e91774846c4bbea.png" alt="图4 基于稀疏编码的方法的例证在卷积神经网络的视图中"><br>①左半部分：可以看作是把f1×f1低分辨率的patch看成是从输入图片提取出来的，稀疏编码将patch投影到一个字典上，如果这个字典的大小为n1，那么相当于在输入图片上使用n1个大小f1×f1的卷积核进行卷积运算。<br>②中间部分：稀疏编码会迭代的处理n1维度的向量，从而得到一个n2维度的向量，一般来说n1、n2是相等的，这个时候稀疏编码求解程序起的作用就是一个大小为1×1的非线性映射运算符。<br>③右半部分：最后再对n2维度的向量投影到另一个字典空间目的是产生高分辨率的patch，重叠部分的patch会进行平均操作。</p>
-<h2 id="2-4损失函数"><a href="#2-4损失函数" class="headerlink" title="2.4损失函数"></a>2.4损失函数</h2><p>SRCNN模型的参数有：W1, W2, W3, B1, B2, B3。给定一组高分辨率图片Xi以及对应低分辨率图片Yi，我们使用均方误差MSE（mean squared error）作为损失函数。设为：<img src="https://img-blog.csdnimg.cn/b0901c59b07c40368942b9b1faed0a91.png"><br>其中n是训练样本的数量。<br>损失函数使用随机梯度下降进行优化<br><img src="https://img-blog.csdnimg.cn/8a6539ed46284c5abeaa26324d103740.png"><br>其中的l∈{1，2，3}，i是层和迭代的索引，每层的卷积核权重都由均值为0标准差为0.001的高斯分布进行初始化，每层偏置都初始化为0，η是学习率，前两层的学习率为10^-4 ，最后一层的学习率为10^-5，尤其最后一层使用小的学习率对SRCNN的收敛性能影响较大。</p>
-<p>可见，四层网络收敛的比三层的慢，但若有足够的训练时间，四层网络最终也能赶上三层的网络。论文中实验表明网络并不是越深越好，当使用越深的网络（例如四层或五层的网络），我们发现很难去设置一个合适的学习率来确保网络收敛，即使模型收敛了，也可能陷入一个不好的局部最小值，并且经过足够的训练时间，已学习的卷积核的多样性会变少。而且在图像分类领域，不适当的增加模型深度也会使得准确率的下降或退化。</p>
-<h1 id="3-实验结果"><a href="#3-实验结果" class="headerlink" title="3.实验结果"></a>3.实验结果</h1><h2 id="3-1调整参数"><a href="#3-1调整参数" class="headerlink" title="3.1调整参数"></a>3.1调整参数</h2><p>为了平衡性能和速度，我们的方法选用了f1=9, f2=5, f3=5, n1=64, n2=32,并且在ImageNet上进行训练。并且对每个放大系数∈{2, 3, 4}，都分别训练了一个相应的网络。</p>
-<p><img src="https://img-blog.csdnimg.cn/3ac54a07f1964bb1b5abc70a0ce54c30.png" alt="图5 SET5数据集上的PSNR，SSIM，IFC，NQM，WPSNR和MSSIM的平均结果"></p>
-<h2 id="3-2评价指标："><a href="#3-2评价指标：" class="headerlink" title="3.2评价指标："></a>3.2评价指标：</h2><p>①PSNR（Peak Signal to Noise Ratio）峰值信噪比：PSNR是最普遍，最广泛使用的评鉴画质的客观量测法。但这个指标只是速度快，评价效果一般；<br>②SSIM（Structural SIMilarity）结构相似性：是一种衡量两幅图像相似度的指标，用均值作为亮度的估计，标准差作为对比度的估计，协方差作为结构相似程度的度量。<br>③IFC（information fidelity criterion）信息保真度准则：通过计算待评图像与参考图像之间的互信息来衡量待评图像的质量优劣。<br>④NQM（noise quality measure）噪声质量测量<br>⑤WPSNR(Weighted Peak Signal to Noise Ratio)加权峰值信噪比<br>⑥MSSSIM（Multi Scale Structural SIMilarity ）多尺度结构相似性</p>
-<h2 id="3-3对颜色通道的实验结果："><a href="#3-3对颜色通道的实验结果：" class="headerlink" title="3.3对颜色通道的实验结果："></a>3.3对颜色通道的实验结果：</h2><p><img src="https://img-blog.csdnimg.cn/ee4d3708c9b3454ea5e9d8dda8dca498.png" alt="图6 SET5数据集上的不同通道的平均PSNR（DB）和培训策略"></p>
-<h1 id="说明："><a href="#说明：" class="headerlink" title="说明："></a>说明：</h1><p>①Y only：基线方法，是一个单通道网络（c=1），只在亮度上进行了训练。对Cb、Cr通道采用双三次插值进行了扩展。<br>②YCbCr：在YCbCr空间的三个通道上进行训练<br>③Y pre-train ：使用Y通道的MSE作为损失来对网络进行预训练。然后利用各通道的MSE对参数进行微调<br>④CbCr pre-train：使用Cb,Cr通道的MSE作为损失来对网络进行预训练，然后对所有通道的参数进行微调<br>⑤RGB：在RGB空间的三个通道上进行训练<br><img src="https://img-blog.csdnimg.cn/cda8a283a8434982a6fb13bd856e56ad.png" alt="图7 具有不同图层的映射"><br><img src="https://img-blog.csdnimg.cn/b010c0acd4a448109a2503f49df64dd0.png"><br><img src="https://img-blog.csdnimg.cn/682183b46c8a4de7b3fbe4d5fe1efbdd.png"></p>
-<h1 id="4-实验结论"><a href="#4-实验结论" class="headerlink" title="4.实验结论"></a>4.实验结论</h1><p>通过这篇论文，学习了SRCNN这种对于单图像进行超分辨率的深度学习方，通过公式演算，一步步探寻到了传统的基于稀疏编码的SR方法可以重构为一个深度卷积神经网络。我们表明，传统的基于稀疏编码的SR方法可以被重新表述为一个深度卷积神经网络。所提出的方法，即SRCNN，可以学习低分辨率和高分辨率图像之间的端到端映射，除了优化之外几乎没有额外的前/后处理。凭借轻量级的结构，SRCNN已经取得了比最先进的方法更出色的性能。我们猜想，通过探索更多的滤波器和不同的训练策略，可以进一步获得额外的性能。此外，所提出的结构具有简单和稳健的优点，可以应用于其他低层次的视觉问题，如图像去模糊化或同步SR+去噪。我们还可以研究一个网络来应对不同的放大系数。<br>SRCNN学习低分辨率和高分辨率图像之间的端到端映射，除了优化之外几乎没有额外的预处理/后处理，由于采用了轻型结构，SRCNN的性能优于目前基于实例的的方法。并进一步探索可以知道更多的卷积核和不同的训练策略，可以获得更好的性能。对于一些低质图片，可以有很大的发挥作用的空间，在人脸识别等领域大展身手。</p>
-<h1 id="参考文献："><a href="#参考文献：" class="headerlink" title="参考文献："></a>参考文献：</h1><p>[1]张俊韬. 基于注意力卷积神经网络的图像超分辨率研究[D].哈尔滨工程大学,2021.DOI:10.27060/d.cnki.ghbcu.2021.001483.<br>[2]查体博. 基于深度卷积神经网络的列车检测图像超分辨方法研究[D].西南交通大学,2021.DOI:10.27414/d.cnki.gxnju.2021.002909.<br>[3]Chao Dong,Chen Change Loy,Kaiming He,Xiaoou Tang. Image Super-Resolution Using Deep Convolutional Networks.[J]. CoRR,2015,abs/1501.00092.<br>[4]杨悦,谢辛,何蕾,胡敏.连分式插值结合卷积神经网络的超分辨率重建[J].合肥工业大学学报(自然科学版),2021,44(08):1146-1152.<br>[5]曾诗悦.基于SRCNN模型的图像压缩方法研究[J].信息技术与信息化,2020(09):98-100.</p>
+<h2 id="1-1Load语法"><a href="#1-1Load语法" class="headerlink" title="1.1Load语法"></a>1.1Load语法</h2><p><img src="https://img-blog.csdnimg.cn/8c30f62442674639900b2f5604466cf2.png"></p>
+<h3 id="1-1-1-filepath"><a href="#1-1-1-filepath" class="headerlink" title="1.1.1 filepath"></a>1.1.1 filepath</h3><p><img src="https://img-blog.csdnimg.cn/2a6b08da58f045ad908c2905f35356ce.png"></p>
+<h3 id="1-1-2-local"><a href="#1-1-2-local" class="headerlink" title="1.1.2 local"></a>1.1.2 local</h3><p>我们把指令打到Hive的服务器上，Hive执行携带LOCAL的指令，<strong>filepath就是从Hive的服务器找，而不是从自己电脑本地找</strong><br><img src="https://img-blog.csdnimg.cn/3de576b540b140fbafba9da51a497316.png"></p>
+<h3 id="1-1-3overwrite"><a href="#1-1-3overwrite" class="headerlink" title="1.1.3overwrite"></a>1.1.3overwrite</h3><p>如果使用了OVERWRITE关键字，则<strong>目标表</strong>（或者<strong>分区</strong>）中的已经存在的数据会被删除，然后再将file写入</p>
+<p>例如：如果Android和IOS两个日志表都是按day分区，中间表也按day分区，那么需要<strong>再针对source进行静态分区，防止二者互相overwrite</strong></p>
+<h3 id="1-1-4into"><a href="#1-1-4into" class="headerlink" title="1.1.4into"></a>1.1.4into</h3><p>into就是追加，但可能出现“写入中断导致的数据重复”等问题。因此一般都是用overwrite</p>
+<h2 id="1-2-Hive3-0新特性"><a href="#1-2-Hive3-0新特性" class="headerlink" title="1.2 Hive3.0新特性"></a>1.2 Hive3.0新特性</h2><p>主要是对LOAD加载时，<strong>把多余的字段用于匹配分区</strong></p>
+<p>本来加载的时候没有指定分区，语句是报错的，但是文件的格式符合表的结构，前两个是col1,col2,<strong>最后一个是分区字段col3，则此时会将load语句转换成为insert as select语句。</strong></p>
+<p><img src="https://img-blog.csdnimg.cn/c3d617722c1a455a8e0f83a6f14c4d62.png"></p>
+<h1 id="2-insert加载数据"><a href="#2-insert加载数据" class="headerlink" title="2.insert加载数据"></a>2.insert加载数据</h1><ul>
+<li>在RDBMS（关系数据库管理系统）中，insert + values的插入数据方式很常用，<strong>也很快</strong>。但是在Hive中哪怕是只插入一条数据，底层也是走MapReduce，<strong>这也是数仓只能用作OLAP（联机分析处理），不能用作OLTP（在线/联机事务处理）的主要原因</strong></li>
+<li><strong>insert操作只看字段按顺序映射</strong>，因此在执行insert  +  select的时候必须把字段顺序确定好，<strong>多余的字段也是按顺序进行分区</strong></li>
+</ul>
+<p>静态insert：</p>
+<pre><code>insert into table da_luna.tmp_withtest partition(day_partition = &#39;2022-11-13&#39;) values(123,&#39;2022-11-12&#39;)
+</code></pre>
+<h2 id="2-1-官方推荐的数据加载方式load及其优缺点"><a href="#2-1-官方推荐的数据加载方式load及其优缺点" class="headerlink" title="2.1 官方推荐的数据加载方式load及其优缺点"></a>2.1 官方推荐的数据加载方式load及其优缺点</h2><p>官方推荐：把数据清洗为结构化文件，然后通过load加载到表中</p>
+<ul>
+<li>优点：效率高</li>
+<li>缺点：但这样无法处理以下场景（只需要部分字段、需要对数据进行处理后再插入）</li>
+</ul>
+<h2 id="2-2-多重插入multiple-insert"><a href="#2-2-多重插入multiple-insert" class="headerlink" title="2.2 多重插入multiple insert"></a>2.2 多重插入multiple insert</h2><ul>
+<li>翻译为多次插入，多重插入，其核心功能是:<strong>一次扫描，多次插入</strong>。</li>
+<li>语法目的就是减少扫描的次数，<strong>在一次扫描中。完成多次insert操作</strong>。</li>
+<li>同表效率union all的优化更好</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/97d6adb8a2454f638d1dd6ad76b422e4.png"></p>
+<p>注意区分与“with中间表”的区别</p>
+<h2 id="2-3动态分区插入"><a href="#2-3动态分区插入" class="headerlink" title="2.3动态分区插入"></a>2.3动态分区插入</h2><p>上面的用load指令加载数据永远都是只能把partition写死（静态分区）<br>而通过insert + select ，每行的最后多余的字段就 按顺序 动态映射分区</p>
+<h3 id="2-3-1-set参数"><a href="#2-3-1-set参数" class="headerlink" title="2.3.1 set参数"></a>2.3.1 set参数</h3><ul>
+<li>允许动态分区：<code>set hive.exec.dynamic.partition=true; </code></li>
+<li>全字段动态分区： <code>set hive.mapred.mode=nonstrict;</code>这里可选<strong>strict（严格模式，必须指定至少一个静态分区，防止用户意外覆盖所有分区</strong>），也可以选择nonstrict允许所有分区都是动态的  </li>
+</ul>
+<h2 id="2-4导出数据insert-directory"><a href="#2-4导出数据insert-directory" class="headerlink" title="2.4导出数据insert directory"></a>2.4导出数据insert directory</h2><ul>
+<li>Hive支持 将select查询的结果导出成文件（<strong>select的结果是对象，因此在转化为文件时可以重新指定其存储格式等</strong>）</li>
+<li>导出类似于<code>hadoop fs -put</code>，<strong>并且是一个overwrite操作</strong>，因此需要考虑分区情况（指定到分区上的路径）和覆盖的情况</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/2123c1c77f434a9bb2099bf1816356b3.png"></p>
+<p><img src="https://img-blog.csdnimg.cn/8cd9042a6b944c7290643de4386bd560.png"></p>
+<h1 id="3-事务表（用于支持update和delete，不是insert）"><a href="#3-事务表（用于支持update和delete，不是insert）" class="headerlink" title="3.事务表（用于支持update和delete，不是insert）"></a>3.事务表（用于支持update和delete，不是insert）</h1><p><img src="https://img-blog.csdnimg.cn/25e7d46a3a5441a48c5ced496d4b2a26.png"></p>
+<ul>
+<li>事务表是通过<strong>增量表delta</strong>+<strong>事务id</strong>  实现ACID的</li>
+<li>只有建表时指定了属性参数<code>TBLPROPERTIES (&#39;transactional&#39; = &#39;true&#39;);</code>的才能在<strong>update、delete操作</strong>时产生delta表和delete_delta表</li>
+<li>如果在创建表时不指定为事务表，那么在update、delete操作时直接报错<code>Error while compiling statement: FAILED: SemanticException [Error 10294]: Attempt to do update or delete using transaction manager that does not support these operations.</code><h2 id="3-1事务表的创建"><a href="#3-1事务表的创建" class="headerlink" title="3.1事务表的创建"></a>3.1事务表的创建</h2>需要设置<code>set</code>和<code>TBLPROPERTIES</code>变量</li>
+</ul>
+<pre><code>--Hive中事务表的创建使用
+--1、开启事务配置（可以使用set设置当前session生效 也可以配置在hive-site.xml中）
+set hive.support.concurrency = true; --Hive是否支持并发
+set hive.enforce.bucketing = true; --从Hive2.0开始不再需要  是否开启分桶功能
+set hive.exec.dynamic.partition.mode = nonstrict; --动态分区模式  非严格
+set hive.txn.manager = org.apache.hadoop.hive.ql.lockmgr.DbTxnManager; --
+set hive.compactor.initiator.on = true; --是否在Metastore实例上运行启动压缩合并
+set hive.compactor.worker.threads = 1; --在此metastore实例上运行多少个压缩程序工作线程。
+
+
+--事务表的创建
+CREATE TABLE emp (id int, name string, salary int)
+STORED AS ORC TBLPROPERTIES (&#39;transactional&#39; = &#39;true&#39;);
+</code></pre>
+<h2 id="3-2局限性"><a href="#3-2局限性" class="headerlink" title="3.2局限性"></a>3.2局限性</h2><p><img src="https://img-blog.csdnimg.cn/87ba3afe9e154d00980fa7e3e89d2779.png"></p>
+<h2 id="3-3为何需要事务表"><a href="#3-3为何需要事务表" class="headerlink" title="3.3为何需要事务表"></a>3.3为何需要事务表</h2><p>虽然Hive面向分析，HDFS不支持随机修改文件，但总有一些情况需要对某一行数据进行修改，总不可能每次都重写一遍文件吧，如下场景：</p>
+<ul>
+<li>Flume、KafKa之类的<strong>流式传输</strong>到现有分区，可能产生<strong>脏读</strong></li>
+<li>某些收集的数据不正确or必须修改（局部修正）</li>
+</ul>
+<h2 id="3-4实现原理"><a href="#3-4实现原理" class="headerlink" title="3.4实现原理"></a>3.4实现原理</h2><h3 id="3-4-1-delta文件与delete-delta文件"><a href="#3-4-1-delta文件与delete-delta文件" class="headerlink" title="3.4.1 delta文件与delete_delta文件"></a>3.4.1 delta文件与delete_delta文件</h3><p><img src="https://img-blog.csdnimg.cn/517c8825cbc14558840250dd0f180efb.png"><br><img src="https://img-blog.csdnimg.cn/8e1e8e075ea6469ebf91b21338cc0a3a.png"></p>
+<h3 id="3-4-2-Compator合并器"><a href="#3-4-2-Compator合并器" class="headerlink" title="3.4.2 Compator合并器"></a>3.4.2 Compator合并器</h3><ul>
+<li>小合并：类似合并多个AOF记录</li>
+<li>大合并：类似Redis4之后将RDB+AOF合并为新的RDB</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/3ef83f9decee4f6f9625520ed7434b1a.png"></p>
+<h1 id="4-update和delete"><a href="#4-update和delete" class="headerlink" title="4.update和delete"></a>4.update和delete</h1><p><img src="https://img-blog.csdnimg.cn/70212645592d4f0189faf7b75d3f7e68.png"></p>
+<p><img src="https://img-blog.csdnimg.cn/ef908280961b4e5d93acab698abd1cba.png"></p>
 
       
        <hr><span style="font-style: italic;color: gray;"> 生命以负熵为食，归整以抵抗熵增； </span>
