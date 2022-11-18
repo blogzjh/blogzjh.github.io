@@ -4,6 +4,44 @@
   
     
     <entry>
+      <title>词典直播从日志提取几十个指标的方案</title>
+      <link href="/2022/11/18/%E8%AF%8D%E5%85%B8%E7%9B%B4%E6%92%AD%E4%BB%8E%E6%97%A5%E5%BF%97%E6%8F%90%E5%8F%96%E5%87%A0%E5%8D%81%E4%B8%AA%E6%8C%87%E6%A0%87%E7%9A%84%E6%96%B9%E6%A1%88/"/>
+      <url>/2022/11/18/%E8%AF%8D%E5%85%B8%E7%9B%B4%E6%92%AD%E4%BB%8E%E6%97%A5%E5%BF%97%E6%8F%90%E5%8F%96%E5%87%A0%E5%8D%81%E4%B8%AA%E6%8C%87%E6%A0%87%E7%9A%84%E6%96%B9%E6%A1%88/</url>
+      
+        <content type="html"><![CDATA[<h1 id="1-场景"><a href="#1-场景" class="headerlink" title="1.场景"></a>1.场景</h1><p>Hive日志表中要取出几十个统计指标，并最后做OLAP</p><h1 id="2-注意点"><a href="#2-注意点" class="headerlink" title="2.注意点"></a>2.注意点</h1><p>都是来自于同一个表的很多指标，不能用常规的select ..from。这样会导致很多次扫表，要用from insert多重插入 或者 union all，这边我试了下，<strong>同表union all的优化比from insert更好</strong>，500W数据查20字段的时间占比是：</p><ul><li>select from : 1000s</li><li>from insert : 80s</li><li>union all : 60s</li></ul><p>这里给出了两个方案，最后选用的方案2，<br>主要是考虑了：</p><ul><li>MySQL虽然快，<strong>但OLAP本身时效性要求不高</strong>，没必要徒增开发难度，与接入MySQL后续的维护成本</li><li>因为从日志表查数据，<strong>想要用Union ALL的话，必须要用中间表的k-v格式</strong>，然后再多行转多列</li><li><strong>如何快速发现数据没统计</strong>？（见第4点，如果没统计就可以显示为-1）</li></ul><p><img src="https://img-blog.csdnimg.cn/8dfc5b51e26b45408c6475fd48334f7e.png" alt="方案1"><br><img src="https://img-blog.csdnimg.cn/ee788024645143239b554ea97f3a0328.png" alt="方案2"></p><h1 id="3-SQL脚本"><a href="#3-SQL脚本" class="headerlink" title="3. SQL脚本"></a>3. SQL脚本</h1><p>脚本1:</p><p>##插入昨天来源于安卓的数据insert into tmp2(day, source, k1, k2)VALUES (date_sub(current_date,interval 1 day) ,        ‘Android’,        (select value from tmp1 where day = date_sub(current_date,interval 1 day) and <code>key</code>= ‘action1’ and source = ‘Android’),        (select value from tmp1 where day = date_sub(current_date,interval 1 day) and <code>key</code>= ‘action2’ and source = ‘Android’)        );##插入昨天来源于IOS的数据insert into tmp2(day, source, k1, k2)VALUES (date_sub(current_date,interval 1 day) ,        ‘IOS’,        (select value from tmp1 where day = date_sub(current_date,interval 1 day) and <code>key</code>= ‘action1’ and source = ‘IOS’),        (select value from tmp1 where day = date_sub(current_date,interval 1 day) and <code>key</code>= ‘action2’ and source = ‘IOS’)        );</p><p>脚本234涉及业务代码，不展示了</p><h1 id="4-多行转多列的方法"><a href="#4-多行转多列的方法" class="headerlink" title="4.多行转多列的方法"></a>4.多行转多列的方法</h1><p>可以利用str_to_map函数，也可以用max（case  when else）<br>后者更好，后者可以指定值为-1（如果那天的数据缺失），</p><p>没数据统计出来是0，如果没统计就是-1，一下就看出来了</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 工作笔记 </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>词典用户最近登录时间接口设计</title>
+      <link href="/2022/11/18/%E8%AF%8D%E5%85%B8%E7%94%A8%E6%88%B7%E6%9C%80%E8%BF%91%E7%99%BB%E5%BD%95%E6%97%B6%E9%97%B4%E6%8E%A5%E5%8F%A3%E8%AE%BE%E8%AE%A1/"/>
+      <url>/2022/11/18/%E8%AF%8D%E5%85%B8%E7%94%A8%E6%88%B7%E6%9C%80%E8%BF%91%E7%99%BB%E5%BD%95%E6%97%B6%E9%97%B4%E6%8E%A5%E5%8F%A3%E8%AE%BE%E8%AE%A1/</url>
+      
+        <content type="html"><![CDATA[<p>几个关键注意点：</p><ul><li>Hive分区时要考虑”如果某天数据中断“，<strong>补数据的一致性</strong></li><li>Hive分区时要考虑”同day不同源数据互相覆盖“，<strong>要对source分区</strong></li><li>两百亿数据量导入Mongo，并发设置1，不做限速的情况下在mms（ops manager）上监测分片集群会不会有较大影响</li><li>Grafana如何去接入并展示，几个指标的含义及原</li><li>AOP如何针对业务封装（Controller的出参规范会影响@AfterRetuning的空置判断，从而影响到result指标（Meters.mark()））<br><img src="https://img-blog.csdnimg.cn/d8d1f90a83b142b69d02266cf64309b7.png"></li></ul><p>关于Grafana的接入在另一篇博客 Grafana接入、使用、与分析</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 工作笔记 </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>Hive DDL、存储方式、分区分桶</title>
       <link href="/2022/11/11/Hive-DDL%E3%80%81%E5%AD%98%E5%82%A8%E6%96%B9%E5%BC%8F%E3%80%81%E5%88%86%E5%8C%BA%E5%88%86%E6%A1%B6/"/>
       <url>/2022/11/11/Hive-DDL%E3%80%81%E5%AD%98%E5%82%A8%E6%96%B9%E5%BC%8F%E3%80%81%E5%88%86%E5%8C%BA%E5%88%86%E6%A1%B6/</url>
@@ -32,7 +70,7 @@
       
       <categories>
           
-          <category> 工作 </category>
+          <category> 工作笔记 </category>
           
       </categories>
       
