@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Restful风格真的有必要吗？ | 张家豪的博客</title>
+  <title>定时任务发短信 | 张家豪的博客</title>
   <meta name="keywords" content="">
-  <meta name="description" content="Restful风格真的有必要吗？ | 张家豪的博客">
+  <meta name="description" content="定时任务发短信 | 张家豪的博客">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="description" content="1.需求背景根据做题的情况，生成对应的短信case（一共十几种case）学情报告)，定时任务发送短信，用户可以通过短信中的短url跳转长url，实现app唤起，打开对应那天的详细学情报告如下图： 2.本次开发中的亮点2.1 发现并配合解决了有道词典的RocketMQ环境问题 发现并解决了测试环境RocketMQ的无感知消息丢失bug————双主双从，其中一个broker的没有写权限（这是有道词典自">
 <meta property="og:type" content="article">
@@ -834,9 +834,9 @@
 </aside>
 <div id="post">
     <div class="pjax">
-        <article id="post-Restful风格真的有必要吗" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-定时任务发短信" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">Restful风格真的有必要吗？</h1>
+        <h1 class="article-title">定时任务发短信</h1>
     
     <div class="article-meta">
         
@@ -854,12 +854,12 @@
     </div>
     <div class="article-meta">
         
-            发布时间 : <time class="date" title='最后更新: 2022-07-19 20:22:15'>2022-07-19 20:19</time>
+            发布时间 : <time class="date" title='最后更新: 2022-12-26 21:14:52'>2022-12-26 20:33</time>
         
     </div>
     <div class="article-meta">
         
-        <span>字数:593</span>
+        <span>字数:1.8k</span>
         
         
         <span id="busuanzi_container_page_pv">
@@ -878,7 +878,7 @@
     
     <div class="toc-ref">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E7%94%A8Restful"><span class="toc-text">为什么不用Restful</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E6%B5%8F%E8%A7%88%E5%99%A8%E6%96%B9%E9%9D%A2"><span class="toc-text">1.浏览器方面</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-SpringMVC%E6%96%B9%E9%9D%A2"><span class="toc-text">2.SpringMVC方面</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E4%B8%9A%E5%8A%A1%E6%96%B9%E9%9D%A2"><span class="toc-text">3.业务方面</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-Http%E5%8D%8F%E8%AE%AE%E6%96%B9%E9%9D%A2"><span class="toc-text">4.Http协议方面</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E8%83%BD%E7%94%A8Restful"><span class="toc-text">什么时候能用Restful</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Get%E5%92%8CPost%E7%9A%84%E4%B8%80%E4%BA%9B%E5%8C%BA%E5%88%AB"><span class="toc-text">Get和Post的一些区别</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E9%9C%80%E6%B1%82%E8%83%8C%E6%99%AF"><span class="toc-text">1.需求背景</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E6%9C%AC%E6%AC%A1%E5%BC%80%E5%8F%91%E4%B8%AD%E7%9A%84%E4%BA%AE%E7%82%B9"><span class="toc-text">2.本次开发中的亮点</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-%E5%8F%91%E7%8E%B0%E5%B9%B6%E9%85%8D%E5%90%88%E8%A7%A3%E5%86%B3%E4%BA%86%E6%9C%89%E9%81%93%E8%AF%8D%E5%85%B8%E7%9A%84RocketMQ%E7%8E%AF%E5%A2%83%E9%97%AE%E9%A2%98"><span class="toc-text">2.1 发现并配合解决了有道词典的RocketMQ环境问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-1-%E6%96%B9%E6%A1%88%E8%AE%BE%E8%AE%A1"><span class="toc-text">2.1.1 方案设计</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-2-%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3"><span class="toc-text">2.1.2 问题解决</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-%E5%8F%91%E7%8E%B0%E7%BA%BF%E4%B8%8A%E5%AE%B9%E5%99%A8etcd%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81%E5%A4%B1%E6%95%88%E9%95%BF%E8%BE%BE%E5%87%A0%E4%B8%AA%E6%9C%88"><span class="toc-text">2.2 发现线上容器etcd分布式锁失效长达几个月</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-1-%E6%96%B9%E6%A1%88%E8%AE%BE%E8%AE%A1"><span class="toc-text">2.2.1 方案设计</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-2-%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3"><span class="toc-text">2.2.2 问题解决</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-3-%E9%97%AE%E9%A2%98%E8%BF%BD%E6%A0%B9%E6%BA%AF%E6%BA%90"><span class="toc-text">2.2.3 问题追根溯源</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-%E7%BA%BF%E4%B8%8Abug%E6%8E%92%E6%9F%A5"><span class="toc-text">2.3 线上bug排查</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-1-%E7%BA%BF%E4%B8%8A%E6%95%B0%E6%8D%AE%E9%87%8F%E5%A4%A7%EF%BC%8C%E4%BA%8B%E5%8A%A1%E8%B6%85%E6%97%B6%EF%BC%88%E6%B5%8B%E8%AF%95%E7%8E%AF%E5%A2%83%E6%95%B0%E6%8D%AE%E9%87%8F%E5%B0%8F%E6%B5%8B%E4%B8%8D%E5%87%BA%E6%9D%A5%EF%BC%89"><span class="toc-text">2.3.1 线上数据量大，事务超时（测试环境数据量小测不出来）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-2-%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB%EF%BC%9Ainsert%E7%AB%8B%E9%A9%ACselect%E5%AF%BC%E8%87%B4%E7%9A%84%E7%A9%BA%E6%8C%87%E9%92%88"><span class="toc-text">2.3.2 读写分离：insert立马select导致的空指针</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-4-qps%E6%8E%A7%E5%88%B6%EF%BC%88%E9%80%9A%E8%BF%87ELK%E5%92%8CGrafana%EF%BC%89"><span class="toc-text">2.4 qps控制（通过ELK和Grafana）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-1-%E6%96%B9%E6%A1%88%E8%AE%BE%E8%AE%A1"><span class="toc-text">2.4.1 方案设计</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-5-%E5%88%A9%E7%94%A8%E5%8D%81%E5%85%AD%E8%BF%9B%E5%88%B6%E5%86%99%E7%9A%84%E7%AE%97%E6%B3%95"><span class="toc-text">2.5 利用十六进制写的算法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-6-%E5%90%84%E7%A7%8D%E4%B8%80%E8%87%B4%E6%80%A7%E9%97%AE%E9%A2%98"><span class="toc-text">2.6 各种一致性问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-7-%E5%8F%8D%E6%80%9D%E5%A4%8D%E7%9B%98"><span class="toc-text">2.7 反思复盘</span></a></li></ol></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -894,35 +894,127 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>到现在经过了两段实习，也因为喜欢网上冲浪，认识了不少大厂的朋友。反正大家的一致意见都是Restful利大于弊。我查了几天资料，稍微总结一下</p>
-<h1 id="为什么不用Restful"><a href="#为什么不用Restful" class="headerlink" title="为什么不用Restful"></a>为什么不用Restful</h1><h2 id="1-浏览器方面"><a href="#1-浏览器方面" class="headerlink" title="1.浏览器方面"></a>1.浏览器方面</h2><ul>
-<li>浏览器普遍对GET和POST的支持最好</li>
-<li>浏览器表单form提交只支持GET和POST</li>
+        <h1 id="1-需求背景"><a href="#1-需求背景" class="headerlink" title="1.需求背景"></a>1.需求背景</h1><p>根据做题的情况，生成对应的短信case（一共十几种case）学情报告)，定时任务发送短信，用户可以通过短信中的<strong>短url跳转长url，实现app唤起</strong>，打开<strong>对应那天</strong>的详细学情报告<br>如下图：<br><img src="https://img-blog.csdnimg.cn/e0637925022f4d488cd4c38b05b2be67.png"><img src="https://img-blog.csdnimg.cn/1821ab2e7a0f41d6a7baa13a168d20e4.png"></p>
+<h1 id="2-本次开发中的亮点"><a href="#2-本次开发中的亮点" class="headerlink" title="2.本次开发中的亮点"></a>2.本次开发中的亮点</h1><h2 id="2-1-发现并配合解决了有道词典的RocketMQ环境问题"><a href="#2-1-发现并配合解决了有道词典的RocketMQ环境问题" class="headerlink" title="2.1 发现并配合解决了有道词典的RocketMQ环境问题"></a>2.1 发现并配合解决了有道词典的RocketMQ环境问题</h2><ul>
+<li>发现并解决了测试环境RocketMQ的<strong>无感知消息丢失bug</strong>————<strong>双主双从，其中一个broker的没有写权限</strong>（这是有道词典自己搭的RocketMQ，被运维误关掉了写入权限，两边沟通比较少，又因为生产者无感知，所以这个问题已经出现非常久了，我这个需求花钱比较多，所以对数量核对比较仔细才发现的）</li>
+<li>以前一直用的RabbitMQ，这次使用RocketMQ属于现学、现用、快速掌握后排查bug</li>
 </ul>
-<h2 id="2-SpringMVC方面"><a href="#2-SpringMVC方面" class="headerlink" title="2.SpringMVC方面"></a>2.SpringMVC方面</h2><ul>
-<li><strong>SpringMVC解析POST请求可以自动解析param和body，不需要加注解，而PUT DELETE请求必须加@RequestParam、@PathVariable、@RequestBody注解</strong>，虽然Spring3支持对PUT请求体的映射，但是需要在web.xml或者WebMvcConfigurerAdapter中进行配置————————这一点确实很好用，我现在维护的这个项目时间长了觉得真的很方便，很多没必要去字段匹配的直接写就好了</li>
+<h3 id="2-1-1-方案设计"><a href="#2-1-1-方案设计" class="headerlink" title="2.1.1 方案设计"></a>2.1.1 方案设计</h3><ul>
+<li><p>排除生产者问题：<strong>用回调函数来确认消息是否成功发送</strong>；————都是成功回调</p>
+</li>
+<li><p>排除消费者问题：在RocketMQ的web管理后台中，<strong>该topic的消息数等于消费者的消费数、且消费者点位始终等于代理者点位</strong>；————正常消费</p>
+</li>
+<li><p>这里问题已经定位到了RocketMQ本身，负责人将RocketMQ重新部署之后，<strong>发现积压了十几亿条的消息，并且另一个主节点只能写入不能消费（是主节点，不是从节点，所以这里一定是有问题）</strong><img src="https://img-blog.csdnimg.cn/ff0d5d0fc8ee4bc491263ceeddfed854.png"></p>
+<h3 id="2-1-2-问题解决"><a href="#2-1-2-问题解决" class="headerlink" title="2.1.2 问题解决"></a>2.1.2 问题解决</h3></li>
+<li><p>后面负责人修改了测试环境的架构，变成了单主单从，至于原因则如下<img src="https://img-blog.csdnimg.cn/0dfc99a8fff14574bbf84c548805972b.png"><img src="https://img-blog.csdnimg.cn/07be092f83824b0da13ced7b3dd3869b.png"></p>
+</li>
 </ul>
-<h2 id="3-业务方面"><a href="#3-业务方面" class="headerlink" title="3.业务方面"></a>3.业务方面</h2><ul>
-<li>一个“删”“改”操作不一定会那么干净，里面可能会夹杂很多的“查”“增”操作，但用一个PUT连基本RESTful的优势都成了劣势</li>
-<li>增删改查的不同操作可以通过url的最后一项来区分：例如 */deleteXxxx或editXxxx</li>
-<li>Restful只是一种风格，不是规范，对业务没有帮助</li>
+<h2 id="2-2-发现线上容器etcd分布式锁失效长达几个月"><a href="#2-2-发现线上容器etcd分布式锁失效长达几个月" class="headerlink" title="2.2 发现线上容器etcd分布式锁失效长达几个月"></a>2.2 发现线上容器etcd分布式锁失效长达几个月</h2><ul>
+<li>这是线上测试时，短信一次会收到相同的3~4条，我当时第一个反应是etcd分布式锁出了问题（后续通过排查发现是容器出现了问题）</li>
 </ul>
-<h2 id="4-Http协议方面"><a href="#4-Http协议方面" class="headerlink" title="4.Http协议方面"></a>4.Http协议方面</h2><ul>
-<li>同时，<strong>POST请求在大多数浏览器中默认提交两次tcp包，在网络环境差的情况下更保险</strong></li>
-<li><strong>PUT和DELETE在http协议中本质和POST一样，没有任何优势</strong>，反而在SpringMVC中容易出现一些问题</li>
+<h3 id="2-2-1-方案设计"><a href="#2-2-1-方案设计" class="headerlink" title="2.2.1 方案设计"></a>2.2.1 方案设计</h3><ul>
+<li>先不部署到容器，而是自己<strong>在两台物理机启动定时任务</strong>，分别连接prod、test环境的etcd锁均正常；————<strong>etcd分布式锁没有问题</strong></li>
+<li><strong>配置logback，把测试服的日志打到线上elk</strong>，发现是线上和测试服容器部署的项目都失效了；————<strong>容器出了问题</strong></li>
 </ul>
-<h1 id="什么时候能用Restful"><a href="#什么时候能用Restful" class="headerlink" title="什么时候能用Restful"></a>什么时候能用Restful</h1><p>当且仅当</p>
+<h3 id="2-2-2-问题解决"><a href="#2-2-2-问题解决" class="headerlink" title="2.2.2 问题解决"></a>2.2.2 问题解决</h3><p>换了一个组件，这是有道词典今年的新组件，由我接入项目之后，其他人也把自己的定时任务迁移，类似于美团的XXLJob定时任务框架</p>
+<h3 id="2-2-3-问题追根溯源"><a href="#2-2-3-问题追根溯源" class="headerlink" title="2.2.3 问题追根溯源"></a>2.2.3 问题追根溯源</h3><p>我看了一下别人的定时任务日志，发现其实早在9月份，分布式就已经失效了，没有发现问题可能是因为这些定时任务是强一致性的、即便是不一致也不会造成P0级别的事故，如下图别人写的定时任务，每次推送4条：<br><img src="https://img-blog.csdnimg.cn/7a27e0d02bd54eef938e906fde9f130b.png"></p>
+<p>早在9月就出现了问题<img src="https://img-blog.csdnimg.cn/5284a12b97bf419c8e23e20cc9a5c14f.png"></p>
+<h2 id="2-3-线上bug排查"><a href="#2-3-线上bug排查" class="headerlink" title="2.3 线上bug排查"></a>2.3 线上bug排查</h2><h3 id="2-3-1-线上数据量大，事务超时（测试环境数据量小测不出来）"><a href="#2-3-1-线上数据量大，事务超时（测试环境数据量小测不出来）" class="headerlink" title="2.3.1 线上数据量大，事务超时（测试环境数据量小测不出来）"></a>2.3.1 线上数据量大，事务超时（测试环境数据量小测不出来）</h3><ul>
+<li>通过添加日志，在ELK分析，解决了<strong>线上事务超时</strong>导致的任务挂掉的问题。————我沿用的那个业务层加了<code>@Transactional</code>注解，而我的定时任务业务耗时很长，所以任务一结束就回滚抛异常（虽然这里回滚没意义，但是抛异常会导致我的任务中断）</li>
+</ul>
+<h3 id="2-3-2-读写分离：insert立马select导致的空指针"><a href="#2-3-2-读写分离：insert立马select导致的空指针" class="headerlink" title="2.3.2 读写分离：insert立马select导致的空指针"></a>2.3.2 读写分离：insert立马select导致的空指针</h3><p>造成空指针异常的代码如下<br><img src="https://img-blog.csdnimg.cn/aafded5acab2408d982adc43abc7991a.png"></p>
 <ul>
-<li><strong>幂等修改删除</strong>可以用put，delete；不幂等用post</li>
-<li>删除就是删除，修改就是修改，不会影响其他的业务数据</li>
-<li>培训机构忽悠小白时</li>
+<li>线上测试时出现空指针异常，<strong>强制Mybatis使用写库，避免“先insert后立马select”造成的空指针</strong><img src="https://img-blog.csdnimg.cn/841bafcb3be9409c8404fd78624550f9.png"><h2 id="2-4-qps控制（通过ELK和Grafana）"><a href="#2-4-qps控制（通过ELK和Grafana）" class="headerlink" title="2.4 qps控制（通过ELK和Grafana）"></a>2.4 qps控制（通过ELK和Grafana）</h2></li>
+<li>因为涉及到很多地方需要调用外部接口，所以需要严格控制qps<h3 id="2-4-1-方案设计"><a href="#2-4-1-方案设计" class="headerlink" title="2.4.1 方案设计"></a>2.4.1 方案设计</h3></li>
+<li>先确认最高允许的qps，通过sleep保证最大qps不超过阈值，然后结合ELK中的qps预估<img src="https://img-blog.csdnimg.cn/105b748fa8fe4b61a8b1e3d8a55db572.png">以及Grafana中的监控<img src="https://img-blog.csdnimg.cn/34a608c8cac94888bc40a25236188c09.png">来确定最终是否需要sleep延迟，需要多少ms？</li>
 </ul>
-<h1 id="Get和Post的一些区别"><a href="#Get和Post的一些区别" class="headerlink" title="Get和Post的一些区别"></a>Get和Post的一些区别</h1><ul>
-<li>“是否提交大量数据”的功能可以直接由POST和GET来区分，GET不能放body参数，数据只能裸露放在url上，但浏览器url的长度大多限制为2kb，可以用POST来放body参数。</li>
-<li>GET请求的请求数据可能被浏览器缓存</li>
-<li>如果非幂等请求用GET，结果如果被缓存就会出错，可以通过请求<strong>参数带时间戳等不重复无关参数</strong>来强制防止缓存</li>
-<li>如果敏感信息用GET，那你的敏感信息就可能被完整的保存在了本地浏览器。当然，可以通过加密手段解决</li>
+<h2 id="2-5-利用十六进制写的算法"><a href="#2-5-利用十六进制写的算法" class="headerlink" title="2.5 利用十六进制写的算法"></a>2.5 利用十六进制写的算法</h2><ul>
+<li>通过<strong>主键 - yid映射，配合自创的利用十六进制的算法，实现长url转短url，且无法估计线上用户数量、且能跳转到对应当天的学情报告</strong></li>
+<li>如最上方短信内容，这里可以把最多21亿用户的id都映射为长度为8的字母（长度固定则无法预估用户量、长度短避免短信浪费钱、超过21亿的用户也可以直接int转long）<img src="https://img-blog.csdnimg.cn/68800976353a4f6b8f22c79947172fc4.png"></li>
 </ul>
+<pre><code>    public class LongUrlUtils &#123;
+        private static final Integer Hexadecimal = 16;
+    
+        /**
+         * 对id进行加密，转为8位定长字符串(只包含数字和大写字母)
+         */
+        public static String encryptInteger(Integer id) &#123;
+            String s = Integer.toHexString(Integer.MAX_VALUE - id).toUpperCase();
+            char[] chars = s.toCharArray();
+            for (int i = 0; i &lt; s.length(); i++) &#123;
+                chars[i] = (char) (chars[i] + (Hexadecimal + i/2));
+            &#125;
+            return new String(chars);
+        &#125;
+    
+        /**
+         * 8位字符串解密为id
+         */
+        public static Integer decryptInteger(String s) &#123;
+            char[] chars = s.toCharArray();
+            for (int i = 0; i &lt; s.length(); i++) &#123;
+                chars[i] = (char) (chars[i] - (Hexadecimal + i/2));
+            &#125;
+            return Integer.MAX_VALUE - Integer.parseInt(new String(chars).toLowerCase(), Hexadecimal);
+        &#125;
+    
+    &#125;
+</code></pre>
+<h2 id="2-6-各种一致性问题"><a href="#2-6-各种一致性问题" class="headerlink" title="2.6 各种一致性问题"></a>2.6 各种一致性问题</h2><p>因为涉及到 MQ、与钱相关的发短信，所以需要考虑的一致性问题很多，比如：</p>
+<ul>
+<li>要<strong>同步而非异步</strong>添加MySQL中短信的记录，防止MQ异步发送在前（消费者先于生产者修改状态）</li>
+<li>生产者成功or失败的回调、消费者发短信失败时<strong>异步延时</strong>重新入队（<strong>防止不停重试导致的CPU占用过高甚至重启</strong>，短信接口调用失败的手机号短时间内会一直失败）</li>
+</ul>
+<h2 id="2-7-反思复盘"><a href="#2-7-反思复盘" class="headerlink" title="2.7 反思复盘"></a>2.7 反思复盘</h2><ul>
+<li><strong>通过AOP封装了etcd可重入分布式锁</strong>，后续因为接入了其他组件，没有用etcd所以这里也没有上</li>
+<li>第一版中是深clone解决定时任务方法无法携带形参的问题。因为定时任务需要暴露为接口给测试，所以定时任务的业务方法必须全部抽象为一个service，这一点我认为是通用的，否则就只能通过深clone这种比较笨的方法</li>
+</ul>
+<p>AOP初版：写这篇文章的时候AOP只是初步看了没问题，后续还需要优化，有空了补上</p>
+<pre><code>@Aspect
+@Component
+@Slf4j
+public class EtcdLockAspect &#123;
+      @Value(&quot;$&#123;dlock.addr&#125;&quot;)
+      private String dlockAddr;
+      @Value(&quot;$&#123;dlock.name&#125;&quot;)
+      private String dlockName;
+    
+    @Around(&quot;@annotation(outfox.hardware.pad.aop.annotation.EtcdLock)&quot;)
+    public Object lockTheMethod(ProceedingJoinPoint joinPoint) throws Throwable &#123;
+        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        Object target = joinPoint.getTarget();
+        //日志记录
+        String methodName = signature.getName();
+        String className = target.getClass().getName();
+        String location = String.format(&quot; ClassName: %s, MethodName: %s().&quot;, className, methodName);
+        log.info(&quot;start task before EtcdDLock:&quot; + location);
+        //加锁
+        EtcdLock annotation = signature.getMethod().getAnnotation(EtcdLock.class);
+        String taskName = annotation.taskName();
+        boolean reentrant = annotation.reentrant();
+        EtcdDLock dlock = EtcdDLock.builder().name(dlockName + taskName).addr(dlockAddr).reentrant(reentrant).build();
+        Object res = null;
+        if (dlock.tryLock()) &#123;
+            log.info(&quot;task start:&quot; + location);
+            try &#123;
+               res = joinPoint.proceed();
+            &#125; catch (Exception e) &#123;
+                log.error(&quot;task erro:&quot; + location, e);
+            &#125; finally &#123;
+                dlock.unlock();
+            &#125;
+            log.info(&quot;task end:&quot; + location);
+        &#125;
+        try &#123;
+            dlock.close();
+        &#125; catch (IOException e) &#123;
+            log.error(&quot;close dlock erro&quot; + location, e);
+        &#125;
+        return res;
+    &#125;
+&#125;
+    
+</code></pre>
 
       
        <hr><span style="font-style: italic;color: gray;"> 生命以负熵为食，归整以抵抗熵增； </span>

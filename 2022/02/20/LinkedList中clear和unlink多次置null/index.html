@@ -6,27 +6,30 @@
   <meta name="keywords" content="">
   <meta name="description" content="LinkedList中clear和unlink方法为什么多次置null | 张家豪的博客">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="除了es-head，其他的插件都需要与es版本一致 1 es7.6.2每个es都是自成一个集群，不同于solar还需要zk来搭建集群 1.1 下载安装https:&#x2F;&#x2F;www.elastic.co&#x2F;cn&#x2F;downloads&#x2F;past-releases&#x2F;elasticsearch-7-6-2因为占用内存实在是太大了，我在服务器上装了运行不起来，所以下载了win版本 1.2 配置文件在\elastics">
+<meta name="description" content="1.需求背景根据做题的情况，生成对应的短信case（一共十几种case）学情报告)，定时任务发送短信，用户可以通过短信中的短url跳转长url，实现app唤起，打开对应那天的详细学情报告如下图： 2.本次开发中的亮点2.1 发现并配合解决了有道词典的RocketMQ环境问题 发现并解决了测试环境RocketMQ的无感知消息丢失bug————双主双从，其中一个broker的没有写权限（这是有道词典自">
 <meta property="og:type" content="article">
-<meta property="og:title" content="es、head、ik的搭建">
-<meta property="og:url" content="https://blogzjh.github.io/2022/11/18/es%E3%80%81head%E3%80%81ik%E7%9A%84%E6%90%AD%E5%BB%BA/index.html">
+<meta property="og:title" content="定时任务发短信">
+<meta property="og:url" content="https://blogzjh.github.io/2022/12/26/%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1%E5%8F%91%E7%9F%AD%E4%BF%A1/index.html">
 <meta property="og:site_name" content="张家豪的博客">
-<meta property="og:description" content="除了es-head，其他的插件都需要与es版本一致 1 es7.6.2每个es都是自成一个集群，不同于solar还需要zk来搭建集群 1.1 下载安装https:&#x2F;&#x2F;www.elastic.co&#x2F;cn&#x2F;downloads&#x2F;past-releases&#x2F;elasticsearch-7-6-2因为占用内存实在是太大了，我在服务器上装了运行不起来，所以下载了win版本 1.2 配置文件在\elastics">
+<meta property="og:description" content="1.需求背景根据做题的情况，生成对应的短信case（一共十几种case）学情报告)，定时任务发送短信，用户可以通过短信中的短url跳转长url，实现app唤起，打开对应那天的详细学情报告如下图： 2.本次开发中的亮点2.1 发现并配合解决了有道词典的RocketMQ环境问题 发现并解决了测试环境RocketMQ的无感知消息丢失bug————双主双从，其中一个broker的没有写权限（这是有道词典自">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/e44644c2311043c0b94644bc446b8b90.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/669c4c406b0542c38d16959b379449c4.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/db89586d8e864d168344a8679da326f8.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/e96010dda3ca4a038d1909b7caaa789a.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/8231760958804319a4f315edd20b84b3.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/52471ac477764fcf8a926470ce4ee9eb.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/4f6f867b9e044e4591351447a1bb3d77.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/5cbcbd485c2449fba2706e9fa273a662.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/a55c9a26d73449c38a4170da637103bb.png">
-<meta property="article:published_time" content="2022-11-18T07:52:15.000Z">
-<meta property="article:modified_time" content="2022-11-18T07:52:26.209Z">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e0637925022f4d488cd4c38b05b2be67.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/1821ab2e7a0f41d6a7baa13a168d20e4.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ff0d5d0fc8ee4bc491263ceeddfed854.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/0dfc99a8fff14574bbf84c548805972b.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/07be092f83824b0da13ced7b3dd3869b.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7a27e0d02bd54eef938e906fde9f130b.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5284a12b97bf419c8e23e20cc9a5c14f.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/aafded5acab2408d982adc43abc7991a.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/841bafcb3be9409c8404fd78624550f9.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/105b748fa8fe4b61a8b1e3d8a55db572.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/34a608c8cac94888bc40a25236188c09.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/68800976353a4f6b8f22c79947172fc4.png">
+<meta property="article:published_time" content="2022-12-26T12:33:02.000Z">
+<meta property="article:modified_time" content="2022-12-26T13:14:52.503Z">
 <meta property="article:author" content="张家豪">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://img-blog.csdnimg.cn/e44644c2311043c0b94644bc446b8b90.png">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/e0637925022f4d488cd4c38b05b2be67.png">
 
 
 <link rel="icon" href="/img/QQ图片20211224224200.jpg">
@@ -136,7 +139,7 @@
     <li>
         <div class="all active" data-rel="全部文章">全部文章
             
-                <small>(61)</small>
+                <small>(63)</small>
             
         </div>
     </li>
@@ -161,7 +164,7 @@
                     <div data-rel="工作笔记">
                         
                         工作笔记
-                        <small>(15)</small>
+                        <small>(16)</small>
                         
                     </div>
                     
@@ -217,7 +220,7 @@
                     <div data-rel="中间件">
                         
                         中间件
-                        <small>(12)</small>
+                        <small>(13)</small>
                         
                     </div>
                     
@@ -252,8 +255,8 @@
         
     </div>
 </div>
-<input type="hidden" id="yelog_site_posts_number" value="61">
-<input type="hidden" id="yelog_site_word_count" value="112.2k">
+<input type="hidden" id="yelog_site_posts_number" value="63">
+<input type="hidden" id="yelog_site_word_count" value="115.6k">
 <div style="display: none">
     <span id="busuanzi_value_site_uv"></span>
     <span id="busuanzi_value_site_pv"></span>
@@ -308,6 +311,22 @@
 
     
     <nav id="title-list-nav">
+        
+        <a  class="全部文章 工作笔记 "
+           href="/2022/12/26/%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1%E5%8F%91%E7%9F%AD%E4%BF%A1/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="定时任务发短信">定时任务发短信</span>
+            <span class="post-date" title="2022-12-26 20:33:02">2022/12/26</span>
+        </a>
+        
+        <a  class="全部文章 中间件 "
+           href="/2022/11/27/MySQL%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0%E5%8F%8A%E6%BB%91%E7%AA%97%E5%8E%9F%E7%90%86/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="MySQL窗口函数及滑窗原理">MySQL窗口函数及滑窗原理</span>
+            <span class="post-date" title="2022-11-27 22:13:14">2022/11/27</span>
+        </a>
         
         <a  class="全部文章 中间件 "
            href="/2022/11/18/es%E3%80%81head%E3%80%81ik%E7%9A%84%E6%90%AD%E5%BB%BA/"
