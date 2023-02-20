@@ -6,32 +6,31 @@
   <meta name="keywords" content="">
   <meta name="description" content="定时任务发短信 | 张家豪的博客">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="窗口函数在统计类的需求中很常见，稍微复杂一点的查询需求就有可能用到它，使用窗口函数可以极大的简化我们的 SQL 语句。像 Oracle、SQL Server 这些数据库在较早的版本就支持窗口函数了，MySQL 直到 8.0 版本后才支持它。一般来说涉及复杂的分组内问题如：   总是关注n几个记录（n日活跃汇总、n场直播观场汇总） 按A分组，满足B时C的值（每个部门 A 工资 B 排名前n的员工 C">
+<meta name="description" content="1.需求背景根据做题的情况，生成对应的短信case（一共十几种case）学情报告)，定时任务发送短信，用户可以通过短信中的短url跳转长url，实现app唤起，打开对应那天的详细学情报告如下图： 2.本次开发中的亮点2.1 发现并配合解决了有道词典的RocketMQ环境问题 发现并解决了测试环境RocketMQ的无感知消息丢失bug————双主双从，其中一个broker的没有写权限（这是有道词典自">
 <meta property="og:type" content="article">
-<meta property="og:title" content="MySQL窗口函数及滑窗原理">
-<meta property="og:url" content="https://blogzjh.github.io/2022/11/27/MySQL%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0%E5%8F%8A%E6%BB%91%E7%AA%97%E5%8E%9F%E7%90%86/index.html">
+<meta property="og:title" content="定时任务发短信">
+<meta property="og:url" content="https://blogzjh.github.io/2022/12/26/%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1%E5%8F%91%E7%9F%AD%E4%BF%A1/index.html">
 <meta property="og:site_name" content="张家豪的博客">
-<meta property="og:description" content="窗口函数在统计类的需求中很常见，稍微复杂一点的查询需求就有可能用到它，使用窗口函数可以极大的简化我们的 SQL 语句。像 Oracle、SQL Server 这些数据库在较早的版本就支持窗口函数了，MySQL 直到 8.0 版本后才支持它。一般来说涉及复杂的分组内问题如：   总是关注n几个记录（n日活跃汇总、n场直播观场汇总） 按A分组，满足B时C的值（每个部门 A 工资 B 排名前n的员工 C">
+<meta property="og:description" content="1.需求背景根据做题的情况，生成对应的短信case（一共十几种case）学情报告)，定时任务发送短信，用户可以通过短信中的短url跳转长url，实现app唤起，打开对应那天的详细学情报告如下图： 2.本次开发中的亮点2.1 发现并配合解决了有道词典的RocketMQ环境问题 发现并解决了测试环境RocketMQ的无感知消息丢失bug————双主双从，其中一个broker的没有写权限（这是有道词典自">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/938e0b31e4b748a0bf2891c5b2109557.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/0fc16478c8ff4b949e70d46fba706365.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/7f6de296bc7442219e2090c08fe4ef85.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/f162c832aefb4e5eb18c73a7642f398f.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/1e4f09731ec243858a7ddf2df802ead0.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/edbe26dd42b84232bbbd098e567e54c7.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/1d109e3d3c7a4e228e450297d37f396e.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/c81e27a63c084edfa255c1498acc79be.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/7c9b83ed5b06468bb6458c3a7a6d62ee.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/de6e0913bf5940ddb33afec1fb645e37.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/26839a014ca044b5a92567c7ce3bfd08.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e0637925022f4d488cd4c38b05b2be67.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/1821ab2e7a0f41d6a7baa13a168d20e4.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ff0d5d0fc8ee4bc491263ceeddfed854.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/0dfc99a8fff14574bbf84c548805972b.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/07be092f83824b0da13ced7b3dd3869b.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5284a12b97bf419c8e23e20cc9a5c14f.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/aafded5acab2408d982adc43abc7991a.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/841bafcb3be9409c8404fd78624550f9.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/105b748fa8fe4b61a8b1e3d8a55db572.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f9ca8d08ad21409b965ff47fe1c959e3.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/68800976353a4f6b8f22c79947172fc4.png">
 <meta property="og:image" content="https://img-blog.csdnimg.cn/1ea1f3376a1f4c2993f2e2dbbd0421f2.png">
 <meta property="og:image" content="https://img-blog.csdnimg.cn/7fe6e9472a924cfe8a8d44b9ac644e1e.png">
-<meta property="og:image" content="https://img-blog.csdnimg.cn/eabd7cc0f8d343d2b4d4eb21cd5820ca.jpeg">
-<meta property="article:published_time" content="2022-11-27T14:13:14.000Z">
-<meta property="article:modified_time" content="2022-11-27T14:23:34.797Z">
+<meta property="article:published_time" content="2022-12-26T12:33:02.000Z">
+<meta property="article:modified_time" content="2023-02-20T11:32:26.819Z">
 <meta property="article:author" content="张家豪">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://img-blog.csdnimg.cn/938e0b31e4b748a0bf2891c5b2109557.png">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/e0637925022f4d488cd4c38b05b2be67.png">
 
 
 <link rel="icon" href="/img/QQ图片20211224224200.jpg">
@@ -258,7 +257,7 @@
     </div>
 </div>
 <input type="hidden" id="yelog_site_posts_number" value="63">
-<input type="hidden" id="yelog_site_word_count" value="115.7k">
+<input type="hidden" id="yelog_site_word_count" value="115.9k">
 <div style="display: none">
     <span id="busuanzi_value_site_uv"></span>
     <span id="busuanzi_value_site_pv"></span>
@@ -856,12 +855,12 @@
     </div>
     <div class="article-meta">
         
-            发布时间 : <time class="date" title='最后更新: 2022-12-27 23:16:55'>2022-12-26 20:33</time>
+            发布时间 : <time class="date" title='最后更新: 2023-02-20 19:32:26'>2022-12-26 20:33</time>
         
     </div>
     <div class="article-meta">
         
-        <span>字数:1.9k</span>
+        <span>字数:2.1k</span>
         
         
         <span id="busuanzi_container_page_pv">
@@ -880,7 +879,7 @@
     
     <div class="toc-ref">
     
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E9%9C%80%E6%B1%82%E8%83%8C%E6%99%AF"><span class="toc-text">1.需求背景</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E6%9C%AC%E6%AC%A1%E5%BC%80%E5%8F%91%E4%B8%AD%E7%9A%84%E4%BA%AE%E7%82%B9"><span class="toc-text">2.本次开发中的亮点</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-%E5%8F%91%E7%8E%B0%E5%B9%B6%E9%85%8D%E5%90%88%E8%A7%A3%E5%86%B3%E4%BA%86%E6%9C%89%E9%81%93%E8%AF%8D%E5%85%B8%E7%9A%84RocketMQ%E7%8E%AF%E5%A2%83%E9%97%AE%E9%A2%98"><span class="toc-text">2.1 发现并配合解决了有道词典的RocketMQ环境问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-1-%E6%96%B9%E6%A1%88%E8%AE%BE%E8%AE%A1"><span class="toc-text">2.1.1 方案设计</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-2-%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3"><span class="toc-text">2.1.2 问题解决</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-%E5%8F%91%E7%8E%B0%E7%BA%BF%E4%B8%8A%E5%AE%B9%E5%99%A8etcd%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81%E5%A4%B1%E6%95%88%E9%95%BF%E8%BE%BE%E5%87%A0%E4%B8%AA%E6%9C%88"><span class="toc-text">2.2 发现线上容器etcd分布式锁失效长达几个月</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-1-%E6%96%B9%E6%A1%88%E8%AE%BE%E8%AE%A1"><span class="toc-text">2.2.1 方案设计</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-2-%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3"><span class="toc-text">2.2.2 问题解决</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-3-%E9%97%AE%E9%A2%98%E8%BF%BD%E6%A0%B9%E6%BA%AF%E6%BA%90"><span class="toc-text">2.2.3 问题追根溯源</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-%E7%BA%BF%E4%B8%8Abug%E6%8E%92%E6%9F%A5"><span class="toc-text">2.3 线上bug排查</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-1-%E7%BA%BF%E4%B8%8A%E6%95%B0%E6%8D%AE%E9%87%8F%E5%A4%A7%EF%BC%8C%E4%BA%8B%E5%8A%A1%E8%B6%85%E6%97%B6%EF%BC%88%E6%B5%8B%E8%AF%95%E7%8E%AF%E5%A2%83%E6%95%B0%E6%8D%AE%E9%87%8F%E5%B0%8F%E6%B5%8B%E4%B8%8D%E5%87%BA%E6%9D%A5%EF%BC%89"><span class="toc-text">2.3.1 线上数据量大，事务超时（测试环境数据量小测不出来）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-2-%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB%EF%BC%9Ainsert%E7%AB%8B%E9%A9%ACselect%E5%AF%BC%E8%87%B4%E7%9A%84%E7%A9%BA%E6%8C%87%E9%92%88"><span class="toc-text">2.3.2 读写分离：insert立马select导致的空指针</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-4-qps%E6%8E%A7%E5%88%B6%EF%BC%88%E9%80%9A%E8%BF%87ELK%E5%92%8CGrafana%EF%BC%89"><span class="toc-text">2.4 qps控制（通过ELK和Grafana）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-1-%E6%96%B9%E6%A1%88%E8%AE%BE%E8%AE%A1%EF%BC%88%E8%BF%99%E9%87%8C%E9%99%90%E9%80%9F%E7%9A%84%E6%98%AF%E4%B8%A4%E4%B8%AA%E4%B8%8D%E5%90%8C%E7%9A%84%E5%9C%B0%E6%96%B9%EF%BC%89"><span class="toc-text">2.4.1 方案设计（这里限速的是两个不同的地方）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-5-%E5%88%A9%E7%94%A8%E5%8D%81%E5%85%AD%E8%BF%9B%E5%88%B6%E5%86%99%E7%9A%84%E7%AE%97%E6%B3%95"><span class="toc-text">2.5 利用十六进制写的算法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-6-%E5%90%84%E7%A7%8D%E4%B8%80%E8%87%B4%E6%80%A7%E9%97%AE%E9%A2%98"><span class="toc-text">2.6 各种一致性问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-7-%E5%8F%8D%E6%80%9D%E5%A4%8D%E7%9B%98"><span class="toc-text">2.7 反思复盘</span></a></li></ol></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E9%9C%80%E6%B1%82%E8%83%8C%E6%99%AF"><span class="toc-text">1.需求背景</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E6%9C%AC%E6%AC%A1%E5%BC%80%E5%8F%91%E4%B8%AD%E7%9A%84%E4%BA%AE%E7%82%B9"><span class="toc-text">2.本次开发中的亮点</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-%E5%8F%91%E7%8E%B0%E5%B9%B6%E9%85%8D%E5%90%88%E8%A7%A3%E5%86%B3%E4%BA%86%E6%9C%89%E9%81%93%E8%AF%8D%E5%85%B8%E7%9A%84RocketMQ%E7%8E%AF%E5%A2%83%E9%97%AE%E9%A2%98"><span class="toc-text">2.1 发现并配合解决了有道词典的RocketMQ环境问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-1-%E6%96%B9%E6%A1%88%E8%AE%BE%E8%AE%A1"><span class="toc-text">2.1.1 方案设计</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-2-%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3"><span class="toc-text">2.1.2 问题解决</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-%E5%8F%91%E7%8E%B0%E7%BA%BF%E4%B8%8A%E5%AE%B9%E5%99%A8etcd%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81%E5%A4%B1%E6%95%88%E9%95%BF%E8%BE%BE%E5%87%A0%E4%B8%AA%E6%9C%88"><span class="toc-text">2.2 发现线上容器etcd分布式锁失效长达几个月</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-1-%E6%96%B9%E6%A1%88%E8%AE%BE%E8%AE%A1"><span class="toc-text">2.2.1 方案设计</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-2-%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3"><span class="toc-text">2.2.2 问题解决</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-3-%E9%97%AE%E9%A2%98%E8%BF%BD%E6%A0%B9%E6%BA%AF%E6%BA%90"><span class="toc-text">2.2.3 问题追根溯源</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-%E7%BA%BF%E4%B8%8Abug%E6%8E%92%E6%9F%A5"><span class="toc-text">2.3 线上bug排查</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-1-%E7%BA%BF%E4%B8%8A%E6%95%B0%E6%8D%AE%E9%87%8F%E5%A4%A7%EF%BC%8C%E4%BA%8B%E5%8A%A1%E8%B6%85%E6%97%B6%EF%BC%88%E6%B5%8B%E8%AF%95%E7%8E%AF%E5%A2%83%E6%95%B0%E6%8D%AE%E9%87%8F%E5%B0%8F%E6%B5%8B%E4%B8%8D%E5%87%BA%E6%9D%A5%EF%BC%89"><span class="toc-text">2.3.1 线上数据量大，事务超时（测试环境数据量小测不出来）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-2-%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB%EF%BC%9Ainsert%E7%AB%8B%E9%A9%ACselect%E5%AF%BC%E8%87%B4%E7%9A%84%E7%A9%BA%E6%8C%87%E9%92%88"><span class="toc-text">2.3.2 读写分离：insert立马select导致的空指针</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-4-qps%E6%8E%A7%E5%88%B6%EF%BC%88%E9%80%9A%E8%BF%87ELK%E5%92%8CGrafana%EF%BC%89"><span class="toc-text">2.4 qps控制（通过ELK和Grafana）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-1-%E6%96%B9%E6%A1%88%E8%AE%BE%E8%AE%A1%EF%BC%88%E8%BF%99%E9%87%8C%E9%99%90%E9%80%9F%E7%9A%84%E6%98%AF%E4%B8%A4%E4%B8%AA%E4%B8%8D%E5%90%8C%E7%9A%84%E5%9C%B0%E6%96%B9%EF%BC%89"><span class="toc-text">2.4.1 方案设计（这里限速的是两个不同的地方）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-5-%E5%88%A9%E7%94%A8%E5%8D%81%E5%85%AD%E8%BF%9B%E5%88%B6%E5%86%99%E7%9A%84%E7%AE%97%E6%B3%95"><span class="toc-text">2.5 利用十六进制写的算法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-6-%E5%90%84%E7%A7%8D%E4%B8%80%E8%87%B4%E6%80%A7%E9%97%AE%E9%A2%98"><span class="toc-text">2.6 各种一致性问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-7-%E5%8F%8D%E6%80%9D%E5%A4%8D%E7%9B%98"><span class="toc-text">2.7 反思复盘</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E4%B8%9A%E5%8A%A1%E4%B8%8A%E9%81%BF%E5%85%8D%E5%A4%8D%E6%9D%82SQL%EF%BC%9A%E7%BA%BF%E4%B8%8A8-0-%E6%B5%8B%E8%AF%955-7%EF%BC%8C%E7%94%A8%E4%B8%8D%E4%BA%86%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0"><span class="toc-text">3.业务上避免复杂SQL：线上8.0 测试5.7，用不了窗口函数</span></a></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -1020,6 +1019,16 @@ public class EtcdLockAspect &#123;
     &#125;
 &#125;
     
+</code></pre>
+<h1 id="3-业务上避免复杂SQL：线上8-0-测试5-7，用不了窗口函数"><a href="#3-业务上避免复杂SQL：线上8-0-测试5-7，用不了窗口函数" class="headerlink" title="3.业务上避免复杂SQL：线上8.0 测试5.7，用不了窗口函数"></a>3.业务上避免复杂SQL：线上8.0 测试5.7，用不了窗口函数</h1><p>本来一开始我看测试库MySQL用的8.0以为线上也是8.0 打算用窗口函数来写，结果后来问了运维才知道线上是5.7，如果用窗口函数写就很简单<br><img src="https://img-blog.csdnimg.cn/1ea1f3376a1f4c2993f2e2dbbd0421f2.png"></p>
+<p>如果要换成5.7版本的，不用窗口函数，那写起来就很庞大了，而且这下面这个已经是最简<img src="https://img-blog.csdnimg.cn/7fe6e9472a924cfe8a8d44b9ac644e1e.png"></p>
+<p>为了避免复杂SQL，最终还是直接select出来然后在java中用流处理</p>
+<pre><code>    select user_id as userId
+         , knowledge_name as knowledgeName
+         ,score as score
+    from tb_math_knowledge_point
+    where  update_time &lt;![CDATA[ &lt;= ]]&gt; #&#123;endTime&#125;
+    and update_time &lt;![CDATA[ &gt;= ]]&gt; #&#123;startTime&#125;
 </code></pre>
 
       
